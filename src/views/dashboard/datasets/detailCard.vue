@@ -1,0 +1,1322 @@
+<template>
+  <section id="dataset">
+    <div id="datasetBody">
+      <el-row class="dataset_body">
+        <el-col :xs="24" :sm="24" :md="24" :lg="4" :xl="4" class="left">
+          <div class="labelList">
+            <div class="title">Dataset Structure</div>
+            <ul>
+              <li>
+                <router-link to="">Data Instances</router-link>
+              </li>
+              <li>
+                <router-link to="">Data Fields</router-link>
+              </li>
+              <li>
+                <router-link to="">Data Splits</router-link>
+              </li>
+            </ul>
+          </div>
+          <div class="labelList">
+            <div class="title">Dataset Creation</div>
+            <ul>
+              <li>
+                <router-link class="disbled" to="">Curation Rationale</router-link>
+              </li>
+              <li>
+                <router-link to="">Source Data</router-link>
+              </li>
+              <li>
+                <router-link to="">Annotations</router-link>
+              </li>
+              <li>
+                <router-link class="disbled" to="">Personal and Sensitive Information</router-link>
+              </li>
+            </ul>
+          </div>
+          <div class="labelList">
+            <div class="title">Dataset Creation</div>
+            <ul>
+              <li>
+                <router-link class="disbled" to="">Curation Rationale</router-link>
+              </li>
+              <li>
+                <router-link to="">Source Data</router-link>
+              </li>
+              <li>
+                <router-link to="">Annotations</router-link>
+              </li>
+              <li>
+                <router-link class="disbled" to="">Personal and Sensitive Information</router-link>
+              </li>
+            </ul>
+          </div>
+          <div class="labelList">
+            <div class="title">Additional Information</div>
+            <ul>
+              <li>
+                <router-link class="disbled" to="">Dataset Curators</router-link>
+              </li>
+              <li>
+                <router-link class="disbled" to="">Licensing Information</router-link>
+              </li>
+              <li>
+                <router-link to="">Citation Information</router-link>
+              </li>
+              <li>
+                <router-link to="">Contributions</router-link>
+              </li>
+            </ul>
+          </div>
+        </el-col>
+        <el-col :xs="24" :sm="24" :md="24" :lg="14" :xl="14" class="right">
+          <div class="data">
+            <div class="top">
+              <div class="top_text">
+                Dataset Preview
+                <el-button>API</el-button>
+              </div>
+              <el-button>Text2Text Generation</el-button>
+            </div>
+            <div class="top">
+              <div class="top_text">
+                <span class="span">Subset</span>
+                <el-input v-model="searchValue" class="w-50 m-2" placeholder="Axb" />
+              </div>
+            </div>
+            <el-table :data="tableData" border stripe style="width: 100%" max-height="450">
+              <el-table-column label="sentence1 (string)" prop="sentence1" />
+              <el-table-column label="sentence2 (string)" prop="sentence2" />
+              <el-table-column label="idx (int32)" prop="idx" width="100" />
+              <el-table-column label="label (class label)" prop="label" width="150" />
+            </el-table>
+          </div>
+          <div class="text">
+            <p>Dataset Card for "super_glue"</p>
+            <p>Dataset Summary</p>
+            <p>SuperGLUE (https://super.gluebenchmark.com/) is a new benchmark styled after GLUE with a new set of more difficult language understanding tasks, improved resources, and a new public leaderboard.</p>
+            <br />
+            <p>BoolQ (Boolean Questions, Clark et al., 2019a) is a QA task where each example consists of a short passage and a yes/no question about the passage. The questions are provided anonymously and unsolicited by users of the Google search
+              engine, and afterwards paired with</p>
+          </div>
+        </el-col>
+        <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6" class="left">
+          <div class="list">
+            <div class="title">
+              Downloads last month
+              <b>1,149,560</b>
+            </div>
+            <div class="cont">
+              <el-row :gutter="12">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Tasks" :key="index">
+                  <router-link to="">
+                    <i class="icon"></i>
+                    {{l}}
+                  </router-link>
+                </el-col>
+                <el-col :span="24">
+                  <div class="more">+ 54 Tasks</div>
+                </el-col>
+              </el-row>
+            </div>
+          </div>
+          <div class="labelModel">
+            <ul>
+              <li>
+                <p>Homepage:</p>
+                <b>github.com</b>
+              </li>
+              <li>
+                <p>Size of downloaded dataset files:</p>
+                <b>55.66MB</b>
+              </li>
+              <li>
+                <p>Size of the generated dataset:</p>
+                <b>238.01MB</b>
+              </li>
+              <li>
+                <p>Total amount of disk used:</p>
+                <b>293.67MB</b>
+              </li>
+            </ul>
+          </div>
+          <div class="list">
+            <div class="title">
+              <p>
+                <i class="icon icon_datasets"></i>
+                Models trained or fine-tuned on</p>
+              <small>super_glue</small>
+            </div>
+          </div>
+          <el-row class="list_body" v-loading="false">
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata" :key="l">
+              <el-card class="box-card" @click="detailFun(list, l)">
+                <template #header>
+                  <div class="card-header">
+                    <div class="name">
+                      <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
+                      <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
+                      <img v-else src="@/assets/images/dashboard/people_03.png" alt="">
+                      <b>{{list.name}}</b>
+                    </div>
+                    <span>27</span>
+                  </div>
+                </template>
+                <div class="text">
+                  <i class="icon icon_image"></i>
+                  <p class="ellipsis">argilla/news-summary</p>
+                </div>
+                <!-- <div class="text">
+                                  <el-row :gutter="6">
+                                      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
+                                          <router-link to="" class="ellipsis">
+                                              {{list.license}}
+                                          </router-link>
+                                      </el-col>
+                                  </el-row>
+                              </div> -->
+                <div class="text item">
+                  <div class="item_body">
+                    <i class="icon icon_time"></i>
+                    <span class="small">5 Sept 2022 - 5 Oct 2022</span>
+                  </div>
+                  <div class="item_body">
+                    <i class="icon icon_up"></i>
+                    <span class="small">5.15M</span>
+                  </div>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+        </el-col>
+      </el-row>
+      <!-- <detail-files v-else-if="activeName==='files'"></detail-files> -->
+    </div>
+  </section>
+</template>
+<script>
+// import detailFiles from '@/views/dashboard/datasets/detailFiles.vue'
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { useStore } from "vuex"
+import { useRouter, useRoute } from 'vue-router'
+export default defineComponent({
+  name: 'Datasets',
+  components: {
+    // detailFiles
+  },
+  setup () {
+    const store = useStore()
+    const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
+    const dataList = reactive({
+      Tasks: [
+        'Text Classification', 'Text Retrieval', 'Text Generation', 'Question Answering',
+        'Token Classification', 'Text2Text Generation', 'Voice Activity Detection'
+      ],
+      SubTasks: [
+        'language-modeling', 'multi-class-classification', 'named-entity-recognition',
+        'extractive-qa', 'natural-language-inference'
+      ],
+      Sizes: [
+        'n<1K', '1K<n<10K', '10K<n<100K', '100K<n<1M', '1M<n<10M', '10M<n<100M', '100M<n<1B', '1B<n<10B',
+        '10B<b<100B', '100B<n<1T', 'n>1T'
+      ],
+      Licenses: [
+        'mit', 'apache-2.0', 'cc-by-4.0', 'other', 'cc-by-sa-4.0'
+      ]
+    })
+    const searchValue = ref('')
+    const value = ref('')
+    const options = ref([
+      {
+        value: 'Option1',
+        label: 'Most Downloads',
+      },
+      {
+        value: 'Option2',
+        label: 'Alphabetical',
+      },
+      {
+        value: 'Option3',
+        label: 'Recently Updated',
+      },
+      {
+        value: 'Option4',
+        label: 'Most Likes',
+      }
+    ])
+    const currentPage1 = ref(1)
+    const small = ref(false)
+    const background = ref(false)
+    const listLoad = ref(true)
+    const listdata = ref([])
+    const total = ref(0)
+    const bodyWidth = ref(document.body.clientWidth < 992)
+    const system = getCurrentInstance().appContext.config.globalProperties
+    const route = useRoute()
+    const router = useRouter()
+    const activeName = ref('card')
+    const tableData = ref([
+      {
+        sentence1: '"The cat sat on the mat."',
+        sentence2: '"The cat did not sit on the mat."',
+        idx: '0',
+        label: '1   (not_entailment)'
+      },
+      {
+        sentence1: '"The cat did not sit on the mat."',
+        sentence2: '"The cat sat on the mat."',
+        idx: '1',
+        label: '1   (not_entailment)'
+      },
+      {
+        sentence1: '"When you\'ve got no snow,  it\'s really hard to...',
+        sentence2: '"When you\'ve got snow, it\'s really hard to learn a snowy...',
+        idx: '2',
+        label: '1   (not_entailment)'
+      },
+      {
+        sentence1: '"Out of the box, Ouya doesn\'t support media...',
+        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
+        idx: '3',
+        label: '1   (not_entailment)'
+      },
+      {
+        sentence1: '"Out of the box, Ouya doesn\'t support media...',
+        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
+        idx: '4',
+        label: '1   (not_entailment)'
+      },
+      {
+        sentence1: '"Out of the box, Ouya supports Twitch.tv...',
+        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
+        idx: '5',
+        label: '1   (not_entailment)'
+      },
+      {
+        sentence1: '"Out of the box, Ouy supports media apps...',
+        sentence2: '"Out of the box, Ouya supports Twitch.tv and XBMC media player."',
+        idx: '6',
+        label: '1   (not_entailment)'
+      }
+    ])
+
+    function handleClick (tab, event) {
+      router.push({ name: 'datasetDetail', params: { name: route.params.name, tabs: tab.props.name } })
+    }
+    async function handleSizeChange (val) { }
+    async function handleCurrentChange (val) { }
+    function NumFormat (value) {
+      if (String(value) === '0') return '0'
+      else if (!value) return '-'
+      var intPartArr = String(value).split('.')
+      var intPartFormat = intPartArr[0]
+        .toString()
+        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
+      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
+    }
+    async function init () {
+      // listLoad.value = true
+      // listdata.value = []
+      // total.value = 0
+      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}dataset`, 'get')
+      // if (listRes) {
+      //   listdata.value = listRes.datasets || []
+      //   total.value = listRes.datasets.length
+      // }
+      // await system.$commonFun.timeout(500)
+      // listLoad.value = false
+
+      listdata.value = [
+        {
+          is_public: "1",
+          name: "Frigg"
+        },
+        {
+          is_public: "1",
+          name: "Travis"
+        },
+        {
+          is_public: "1",
+          name: "Tyree"
+        }
+      ]
+    }
+    async function getData () {
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      console.log(listRes)
+    }
+    function detailFun (row, index) {
+      console.log(row, index)
+    }
+    onMounted(() => {
+      activeName.value = route.params.tabs || 'card'
+      init()
+      // getData()
+    })
+    watch(lagLogin, (newValue, oldValue) => {
+      if (!lagLogin.value) init()
+    })
+    return {
+      lagLogin,
+      dataList,
+      searchValue,
+      value,
+      options,
+      currentPage1,
+      small,
+      background,
+      listLoad,
+      listdata,
+      total,
+      activeName,
+      bodyWidth,
+      system,
+      route,
+      router,
+      tableData,
+      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
+    }
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+#dataset {
+  background: #fff;
+  color: #333;
+  font-size: 18px;
+  @media screen and (max-width: 1200px) {
+    font-size: 16px;
+  }
+  .dataset_head {
+    padding: 0.7rem 0 0;
+    background-color: #fbfbfc;
+    border-bottom: 1px solid #f1f1f1;
+    .content {
+      display: flex;
+      align-items: stretch;
+      padding: 0 0.16rem;
+      margin: 0 auto 0.25rem;
+      font-size: 14px;
+      @media screen and (min-width: 1280px) {
+        max-width: 1280px;
+      }
+      @media screen and (min-width: 1536px) {
+        max-width: 1536px;
+      }
+      .name {
+        display: flex;
+        align-items: center;
+        font-size: 0.22rem;
+        color: #878c93;
+        line-height: 1;
+        b {
+          padding: 0 0.07rem 0 0.1rem;
+          color: #000;
+        }
+        .icon {
+          width: 0.23rem;
+          height: 0.23rem;
+          margin: 0 0.07rem 0 0;
+        }
+        .icon_datasets {
+          background: url(../../../assets/images/icons/icon_19.png) no-repeat
+            left center;
+          background-size: auto 100%;
+        }
+        .icon_copy {
+          width: 0.18rem;
+          height: 0.18rem;
+          background: url(../../../assets/images/icons/icon_36.png) no-repeat
+            left center;
+          background-size: auto 100%;
+          cursor: pointer;
+        }
+        .icon_like {
+          width: 0.18rem;
+          height: 0.18rem;
+          background: url(../../../assets/images/icons/icon_37.png) no-repeat
+            left center;
+          background-size: auto 100%;
+          cursor: pointer;
+        }
+        .el-button {
+          font-size: 16px;
+          color: #878c93;
+          @media screen and (max-width: 1440px) {
+            font-size: 14px;
+          }
+          @media screen and (max-width: 441px) {
+            font-size: 13px;
+          }
+        }
+      }
+    }
+    .tag {
+      margin: 0 auto;
+      line-height: 0.3rem;
+      font-size: 0.18rem;
+      a {
+        display: flex;
+        align-items: center;
+        padding: 0.03rem 0.07rem;
+        margin: 0 0 0 0.1rem;
+        background-color: transparent;
+        border-radius: 0.05rem;
+        font-size: 13px;
+        color: #606060;
+        border: 2px solid #f1f1f2;
+        line-height: 1;
+        @media screen and (min-width: 1800px) {
+          font-size: 15px;
+        }
+        @media screen and (max-width: 1440px) {
+          font-size: 12px;
+        }
+        &:hover {
+          opacity: 0.9;
+        }
+        .icon {
+          width: 0.23rem;
+          height: 0.23rem;
+          margin: 0 0.07rem 0 0;
+          background: url(../../../assets/images/icons/icon_22.png) no-repeat
+            left center;
+          background-size: 17px;
+        }
+      }
+      .more {
+        float: left;
+        padding: 5px 8px;
+        margin: 3px 0 0 0;
+        font-size: 13px;
+        color: #9ca3b1;
+        display: inline-block;
+        border-radius: 0.08rem;
+        cursor: pointer;
+        @media screen and (min-width: 1800px) {
+          font-size: 15px;
+        }
+        &:hover {
+          background-color: #f5f6f8;
+        }
+      }
+    }
+    .tag_sub {
+      margin: 0.1rem auto 0.4rem;
+      a {
+        color: #562683;
+        background-color: #f3f1ff;
+      }
+    }
+    :deep(.demo-tabs) {
+      margin: 0 auto;
+      .el-tabs__header {
+        margin: 0;
+      }
+      .el-tabs__item {
+        height: auto;
+        padding: 0.15rem 0;
+        line-height: 1;
+        font-size: 0.18rem;
+        @media screen and (max-width: 1600px) {
+          font-size: 16px;
+        }
+        @media screen and (max-width: 441px) {
+          font-size: 14px;
+        }
+        .custom-tabs-label {
+          display: flex;
+          align-items: center;
+          padding: 0 0.2rem;
+          .icon {
+            height: 16px;
+            margin: 0 0.07rem 0 0;
+          }
+          .icon_datasets {
+            width: 16px;
+            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
+              left center;
+            background-size: auto 100%;
+          }
+          b {
+            display: block;
+            height: auto;
+            padding: 0.03rem;
+            margin: 0 0.07rem;
+            background-color: #7405ff;
+            color: #fff;
+            border-radius: 5px;
+            line-height: 1;
+            font-size: 14px;
+          }
+        }
+        &.is-active {
+          color: #000;
+        }
+        &:hover {
+          color: #7405ff;
+        }
+      }
+      .el-tabs__active-bar {
+        background-color: #000;
+      }
+      .el-tabs__nav-wrap::after {
+        display: none;
+      }
+    }
+  }
+  :deep(.dataset_body) {
+    display: flex;
+    align-items: stretch;
+    padding: 0;
+    margin: auto;
+    font-size: 14px;
+    text-align: left;
+    @media screen and (max-width: 1600px) {
+      padding: 0 0.16rem;
+    }
+    @media screen and (min-width: 1280px) {
+      max-width: 1280px;
+    }
+    @media screen and (min-width: 1536px) {
+      max-width: 1536px;
+    }
+    .left {
+      position: relative;
+      padding: 0.3rem 0;
+      background-color: #fff;
+      .labelList {
+        margin: 0 0 0.4rem;
+        text-align: left;
+        .title {
+          margin: 0 0 0.1rem;
+          font-size: 0.18rem;
+          color: #000000;
+          @media screen and (max-width: 1600px) {
+            font-size: 16px;
+          }
+          @media screen and (max-width: 441px) {
+            font-size: 14px;
+          }
+        }
+        ul {
+          li {
+            a {
+              display: block;
+              padding: 0.05rem 0.12rem;
+              color: #878c93;
+              font-size: 0.16rem;
+              line-height: 1.1;
+              @media screen and (max-width: 1600px) {
+                font-size: 16px;
+              }
+              @media screen and (max-width: 441px) {
+                font-size: 13px;
+              }
+              &:hover {
+                text-decoration: underline;
+              }
+              &.disbled {
+                color: #cccccc;
+              }
+            }
+          }
+        }
+      }
+      .list {
+        margin: 0.2rem 0.16rem 0;
+        .title {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.1rem 0;
+          margin: 0 0 0.1rem;
+          font-size: 16px;
+          color: #000;
+          border-radius: 0.08rem;
+          @media screen and (max-width: 1440px) {
+            font-size: 14px;
+          }
+          .icon {
+            width: 0.22rem;
+            height: 0.22rem;
+            margin: 0 0.13rem 0 0;
+          }
+          .icon_sizes {
+            background: url(../../../assets/images/icons/icon_7.png) no-repeat
+              left center;
+            background-size: 17px;
+          }
+          .icon_licenses {
+            background: url(../../../assets/images/icons/icon_8.png) no-repeat
+              left center;
+            background-size: 17px;
+          }
+          .icon_datasets {
+            width: 16px;
+            height: 16px;
+            margin: 0 5px 0 0;
+            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
+              left center;
+            background-size: auto 100%;
+          }
+          b {
+            font-size: 17px;
+            color: #000;
+            @media screen and (min-width: 1800px) {
+              font-size: 18px;
+            }
+            @media screen and (max-width: 1440px) {
+              font-size: 15px;
+            }
+          }
+          small {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000;
+            @media screen and (min-width: 1800px) {
+              font-size: 15px;
+            }
+            @media screen and (max-width: 1440px) {
+              font-size: 12px;
+            }
+          }
+          p {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+            .icon {
+            }
+          }
+        }
+        .cont {
+          padding: 0.25rem 0.06rem;
+          .el-row {
+            .el-col {
+              max-width: max-content;
+              width: auto;
+              flex: auto;
+              a {
+                display: block;
+                padding: 0.03rem 0.07rem;
+                margin: 0.03rem auto;
+                background-color: transparent;
+                border-radius: 0.05rem;
+                font-size: 13px;
+                color: #606060;
+                border: 2px solid #f1f1f2;
+                @media screen and (min-width: 1800px) {
+                  font-size: 15px;
+                }
+                @media screen and (max-width: 1440px) {
+                  font-size: 12px;
+                }
+                &:hover {
+                  opacity: 0.9;
+                }
+                .icon {
+                  width: 0.22rem;
+                  height: 0.22rem;
+                  margin: 0 0.03rem 0 0;
+                }
+                .icon_sizes {
+                  background: url(../../../assets/images/icons/icon_7.png)
+                    no-repeat left center;
+                  background-size: 17px;
+                }
+                .icon_licenses {
+                  background: url(../../../assets/images/icons/icon_21.png)
+                    no-repeat left center;
+                  background-size: 17px;
+                }
+              }
+              .more {
+                float: left;
+                padding: 5px 8px;
+                margin: 3px 0 0 0;
+                font-size: 13px;
+                color: #9ca3b1;
+                display: inline-block;
+                border-radius: 0.08rem;
+                cursor: pointer;
+                @media screen and (min-width: 1800px) {
+                  font-size: 15px;
+                }
+                &:hover {
+                  background-color: #f5f6f8;
+                }
+              }
+            }
+          }
+        }
+        &:nth-child(1) {
+          .cont {
+            .el-row {
+              .el-col {
+                a {
+                  display: flex;
+                  align-items: center;
+                  &:hover {
+                    background-color: #eee;
+                  }
+                }
+                &:nth-child(1) {
+                  a {
+                    .icon {
+                      background: url(../../../assets/images/icons/icon_22.png)
+                        no-repeat left center;
+                      background-size: 17px;
+                    }
+                  }
+                }
+                &:nth-child(2) {
+                  a {
+                    .icon {
+                      background: url(../../../assets/images/icons/icon_23.png)
+                        no-repeat left center;
+                      background-size: 17px;
+                    }
+                  }
+                }
+                &:nth-child(3) {
+                  a {
+                    .icon {
+                      background: url(../../../assets/images/icons/icon_24.png)
+                        no-repeat left center;
+                      background-size: 17px;
+                    }
+                  }
+                }
+                &:nth-child(4) {
+                  a {
+                    .icon {
+                      background: url(../../../assets/images/icons/icon_25.png)
+                        no-repeat left center;
+                      background-size: 17px;
+                    }
+                  }
+                }
+                &:nth-child(5) {
+                  a {
+                    .icon {
+                      background: url(../../../assets/images/icons/icon_26.png)
+                        no-repeat left center;
+                      background-size: 17px;
+                    }
+                  }
+                }
+                &:nth-child(6) {
+                  a {
+                    .icon {
+                      background: url(../../../assets/images/icons/icon_27.png)
+                        no-repeat left center;
+                      background-size: 17px;
+                    }
+                  }
+                }
+                &:nth-child(7) {
+                  a {
+                    .icon {
+                      background: url(../../../assets/images/icons/icon_28.png)
+                        no-repeat left center;
+                      background-size: 17px;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        &:nth-child(2) {
+          .cont {
+            .el-row {
+              .el-col {
+                a {
+                  background-color: #f3f1ff;
+                  color: #562683;
+                  border: 0;
+                }
+              }
+            }
+          }
+        }
+        &:nth-child(3) {
+          .cont {
+            .el-row {
+              .el-col {
+                a {
+                  background-color: #dfbafa;
+                  color: #5b21c6;
+                  border: 0;
+                }
+              }
+            }
+          }
+        }
+        &:nth-child(4) {
+          .cont {
+            .el-row {
+              .el-col {
+                a {
+                  display: flex;
+                  align-items: center;
+                  &:hover {
+                    background-color: #eee;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      .labelModel {
+        padding: 0.2rem 0.16rem;
+        border-top: 1px solid #f1f1f1;
+        border-bottom: 1px solid #f1f1f1;
+        text-align: left;
+        ul {
+          display: flex;
+          flex-wrap: wrap;
+          li {
+            width: auto;
+            padding: 0.07rem;
+            margin: 0.03rem 0.08rem 0.03rem 0;
+            border: 1px solid #f1f1f1;
+            border-radius: 0.07rem;
+            p {
+              color: #878c93;
+              font-size: 12px;
+              @media screen and (min-width: 1800px) {
+                font-size: 14px;
+              }
+            }
+            b,
+            a {
+              color: #606060;
+              font-size: 13px;
+              @media screen and (min-width: 1800px) {
+                font-size: 15px;
+              }
+            }
+          }
+        }
+      }
+      .list_body {
+        padding: 0 0.16rem;
+        .el-col {
+          margin: 0.05rem 0;
+          max-width: 350px;
+          .box-card {
+            padding: 0.1rem 0.2rem;
+            background-color: #fff;
+            border-color: #e4e4e4;
+            border-radius: 0.1rem;
+            box-shadow: none;
+            * {
+              cursor: pointer;
+            }
+            .el-card__header {
+              padding: 0;
+              border: 0;
+              .card-header {
+                display: flex;
+                justify-content: space-between;
+                .name {
+                  display: flex;
+                  align-items: center;
+                  flex-wrap: wrap;
+                  width: 80%;
+                  color: #606060;
+                  @media screen and (min-width: 441px) {
+                  }
+                  b {
+                    width: calc(100% - 0.6rem);
+                    padding: 0;
+                    font-size: 16px;
+                    font-weight: normal;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    word-spacing: normal;
+                    text-align: left;
+                    line-height: 1.2;
+                    color: inherit;
+                    @media screen and (max-width: 1440px) {
+                      font-size: 15px;
+                    }
+                    @media screen and (max-width: 768px) {
+                      font-size: 14px;
+                    }
+                    @media screen and (max-width: 441px) {
+                      font-size: 13px;
+                    }
+                  }
+                }
+                img {
+                  width: 0.4rem;
+                  margin: 0.05rem 0.1rem 0 0;
+                  border-radius: 100%;
+                  border: 2px solid #7405ff;
+                }
+                span {
+                  height: 0.25rem;
+                  padding-left: 0.3rem;
+                  background: url(../../../assets/images/icons/icon_9.png)
+                    no-repeat left 0px;
+                  background-size: 0.2rem;
+                  font-size: 14px;
+                  color: #000;
+                  line-height: 0.25rem;
+                  @media screen and (min-width: 1800px) {
+                    font-size: 15px;
+                  }
+                }
+              }
+            }
+            .el-card__body {
+              padding: 0.15rem 0 0.05rem;
+              .text {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                flex-wrap: wrap;
+                color: #000;
+                line-height: 1;
+                @media screen and (min-width: 1800px) {
+                  font-size: 15px;
+                }
+                .icon {
+                  width: 20px;
+                  height: 20px;
+                  margin: 0 6px 0 0;
+                }
+                .icon_text {
+                  background: url(../../../assets/images/icons/icon_10.png)
+                    no-repeat left center;
+                  background-size: 100%;
+                }
+                .icon_time {
+                  width: 15px;
+                  background: url(../../../assets/images/icons/icon_11.png)
+                    no-repeat left center;
+                  background-size: 100%;
+                }
+                .icon_up {
+                  width: 15px;
+                  margin: 0 3px 0 0;
+                  background: url(../../../assets/images/icons/icon_20.png)
+                    no-repeat left center;
+                  background-size: 100%;
+                }
+                .icon_image {
+                  background: url(../../../assets/images/icons/icon_30.png)
+                    no-repeat left center;
+                  background-size: 100%;
+                }
+                .small {
+                  margin-top: 3px;
+                  color: #9ca3b1;
+                  font-size: 12px;
+                  text-align: left;
+                  @media screen and (min-width: 1800px) {
+                    font-size: 13px;
+                  }
+                }
+                .el-row {
+                  width: 100%;
+                  margin: 0.1rem 0 0.25rem;
+                  .el-col {
+                    margin: 0.05rem 0;
+                    a {
+                      display: block;
+                      padding-top: 0.05rem;
+                      padding-bottom: 0.05rem;
+                      margin: 0.03rem auto;
+                      background-color: #f3f1ff;
+                      border-radius: 0.2rem;
+                      font-size: 13px;
+                      color: #5b21c6;
+                      @media screen and (min-width: 1800px) {
+                        font-size: 15px;
+                      }
+                      @media screen and (max-width: 1440px) {
+                        font-size: 12px;
+                      }
+                      &:hover {
+                        opacity: 0.9;
+                      }
+                    }
+                    &:nth-child(2n + 2) {
+                      a {
+                        background-color: #dfbafa;
+                        color: #5b21c6;
+                      }
+                    }
+                  }
+                }
+                .ellipsis {
+                  width: calc(100% - 26px);
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  word-spacing: normal;
+                  text-align: left;
+                }
+              }
+              .item {
+                justify-content: space-between;
+                margin: 0.3rem 0 0;
+                .item_body {
+                  display: flex;
+                  align-items: center;
+                }
+              }
+            }
+          }
+          &:hover {
+            .box-card {
+              background-color: #307aff;
+              .el-card__header {
+                .card-header {
+                  .name {
+                    color: #fff;
+                  }
+                  img {
+                    border: 2px solid #fff;
+                  }
+                  span {
+                    background: url(../../../assets/images/icons/icon_9_1.png)
+                      no-repeat left 0px;
+                    background-size: 0.2rem;
+                    color: #fff;
+                  }
+                }
+              }
+              .el-card__body {
+                .text {
+                  color: #fff;
+                  .icon_text {
+                    background: url(../../../assets/images/icons/icon_10_1.png)
+                      no-repeat left center;
+                    background-size: 100%;
+                  }
+                  .icon_time {
+                    background: url(../../../assets/images/icons/icon_11_1.png)
+                      no-repeat left center;
+                    background-size: 100%;
+                  }
+                  .icon_up {
+                    background: url(../../../assets/images/icons/icon_20_1.png)
+                      no-repeat left center;
+                    background-size: 100%;
+                  }
+                  .icon_image {
+                    background: url(../../../assets/images/icons/icon_30_1.png)
+                      no-repeat left center;
+                    background-size: 100%;
+                  }
+                  .small {
+                    color: #fff;
+                  }
+                  .el-row {
+                    .el-col {
+                      a {
+                        background-color: #fff;
+                      }
+                      &:nth-child(2n + 2) {
+                        a {
+                          background-color: #dfbafa;
+                          color: #5b21c6;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        .list_nodata {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 200px;
+          font-size: 18px;
+        }
+      }
+    }
+    .right {
+      position: relative;
+      padding: 0.4rem 0.2rem;
+      .data {
+        padding: 0.1rem 0 0;
+        margin: 0 0 0.4rem;
+        border: 1px solid #f1f1f1;
+        border-radius: 0.1rem;
+        color: #606060;
+        overflow: hidden;
+        .top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          padding: 0.1rem 4%;
+          font-size: 0.19rem;
+          .top_text {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 0.2rem;
+            color: #000000;
+            @media screen and (max-width: 1600px) {
+              font-size: 18px;
+            }
+            @media screen and (max-width: 1440px) {
+              font-size: 16px;
+            }
+            @media screen and (max-width: 441px) {
+              font-size: 14px;
+            }
+            b {
+              padding: 0.08rem 0.25rem;
+              margin: 0 0.17rem 0 0;
+              background-color: #7405ff;
+              font-size: 0.215rem;
+              font-weight: normal;
+              line-height: 1;
+              color: #fff;
+              border-radius: 0.09rem;
+            }
+            .el-input {
+              max-width: 3.45rem;
+              margin: 0.1rem 0 0 0;
+              .el-input__inner {
+                // padding-left: 0.35rem;
+                // background: url(../../../assets/images/icons/icon_10_2.png)
+                //   no-repeat 0.1rem center;
+                // background-size: 17px;
+                border-radius: 0.1rem;
+                border-color: #cccccc;
+                @media screen and (min-width: 1800px) {
+                  font-size: 15px;
+                }
+              }
+              .el-input__prefix {
+                padding: 0;
+                .el-icon {
+                  svg {
+                    width: 0.22rem;
+                    height: 0.22rem;
+                    color: #9ea5b3;
+                  }
+                }
+              }
+            }
+            .el-button {
+              padding: 0.03rem 0.1rem;
+              margin: 0 0 0 0.2rem;
+              line-height: 1;
+              border-radius: 5px;
+            }
+            .span {
+              width: 100%;
+              color: #606060;
+              font-size: 16px;
+              @media screen and (max-width: 1440px) {
+                font-size: 15px;
+              }
+              @media screen and (max-width: 768px) {
+                font-size: 14px;
+              }
+            }
+          }
+          .el-button {
+            width: auto;
+            height: auto;
+            padding: 0.05rem 0.15rem;
+            background: linear-gradient(180deg, #fefefe, #f0f0f0);
+            border-color: #e1e1e1;
+            font-size: 14px;
+            line-height: 1.2;
+            border-radius: 0.09rem;
+            @media screen and (min-width: 1800px) {
+              font-size: 15px;
+            }
+          }
+        }
+        .el-table {
+          margin: 0.1rem 0 0;
+          .el-table__inner-wrapper {
+            tr {
+              color: #000;
+              th,
+              td {
+                padding: 0.13rem 0;
+                .cell {
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: normal;
+                  display: -webkit-box;
+                  -webkit-line-clamp: 2;
+                  -webkit-box-orient: vertical;
+                }
+                &:nth-child(3) {
+                  text-align: right;
+                }
+              }
+              th {
+                padding: 0.18rem 0;
+              }
+            }
+          }
+        }
+      }
+      .text {
+        text-align: left;
+        p {
+          padding: 0.02rem 0;
+          font-size: 18px;
+          color: #565656;
+          line-height: 1.4;
+          @media screen and (max-width: 1600px) {
+            font-size: 16px;
+          }
+          @media screen and (max-width: 1440px) {
+            font-size: 14px;
+          }
+          @media screen and (max-width: 600px) {
+            font-size: 12px;
+          }
+        }
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: #f1f1f1;
+      }
+      &::before {
+        position: absolute;
+        content: "";
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: #f1f1f1;
+      }
+    }
+  }
+}
+</style>
+
+
+<i18n>
+{
+  "en": {},
+  "zh": {}
+}
+</i18n>
