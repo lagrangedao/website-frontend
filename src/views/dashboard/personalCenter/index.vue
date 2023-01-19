@@ -13,8 +13,7 @@
           <img :src="peopleUrl" class="logo_sidebar" alt="">
           <div class="personal">
             <div class="title">
-              <!-- {{info.address}} -->
-              Cao
+              {{info.address}}
             </div>
             <div class="desc">Founder, FilSwan</div>
             <el-button type="" text bg>Edit profile</el-button>

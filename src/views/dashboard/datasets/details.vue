@@ -55,6 +55,18 @@
             </span>
           </template>
         </el-tab-pane>
+        <el-tab-pane name="settings">
+          <template #label>
+            <span class="custom-tabs-label">
+              <!-- <i class="icon icon_datasets"></i> -->
+              <el-icon class="icon">
+                <Setting />
+              </el-icon>
+              <span>Settings</span>
+            </span>
+          </template>
+          <detail-setting :listdata="listdata.is_public"></detail-setting>
+        </el-tab-pane>
       </el-tabs>
     </div>
   </section>
@@ -62,14 +74,20 @@
 <script>
 import detailCard from './detailCard.vue'
 import detailFiles from './detailFiles.vue'
+import detailSetting from './detailSetting.vue'
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import {
+  Setting
+} from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'Datasets',
   components: {
     detailFiles,
-    detailCard
+    detailCard,
+    detailSetting,
+    Setting
   },
   setup () {
     const store = useStore()
@@ -115,7 +133,8 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref([])
+    const listdata = ref({})
+    const filedata = ref([])
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
@@ -182,50 +201,49 @@ export default defineComponent({
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
     async function init () {
-      // listLoad.value = true
-      // listdata.value = []
-      // total.value = 0
-      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}dataset`, 'get')
-      // if (listRes) {
-      //   listdata.value = listRes.datasets || []
-      //   total.value = listRes.datasets.length
-      // }
-      // await system.$commonFun.timeout(500)
-      // listLoad.value = false
-
-      listdata.value = [
-        {
-          is_public: "1",
-          name: "Frigg"
-        },
-        {
-          is_public: "1",
-          name: "Travis"
-        },
-        {
-          is_public: "1",
-          name: "Tyree"
-        }
-      ]
-    }
-    async function getData () {
+      if (route.name !== 'datasetDetail') return
+      listLoad.value = true
+      listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
-      console.log(listRes)
+      if (listRes && listRes.status === 'success') {
+        filedata.value = listRes.data.files || []
+        listdata.value = listRes.data.dataset || { name: route.params.name }
+      }
+      await system.$commonFun.timeout(500)
+      listLoad.value = false
+
+      // listdata.value = [
+      //   {
+      //     is_public: "1",
+      //     name: "Frigg"
+      //   },
+      //   {
+      //     is_public: "1",
+      //     name: "Travis"
+      //   },
+      //   {
+      //     is_public: "1",
+      //     name: "Tyree"
+      //   }
+      // ]
     }
     function detailFun (row, index) {
       console.log(row, index)
     }
+    function getDatasetList (meta) {
+      if (meta) init()
+    }
     onMounted(() => {
       activeName.value = route.params.tabs || 'card'
       init()
-      // getData()
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
     })
     watch(route, (to, from) => {
+      if (to.name !== 'datasetDetail') return
       activeName.value = to.params.tabs || 'card'
-      init()
+      // init()
       window.scrollTo(0, 0)
     })
     return {
@@ -238,6 +256,7 @@ export default defineComponent({
       small,
       background,
       listLoad,
+      filedata,
       listdata,
       total,
       activeName,
@@ -246,7 +265,7 @@ export default defineComponent({
       route,
       router,
       tableData,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
+      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList
     }
   }
 })
@@ -261,7 +280,7 @@ export default defineComponent({
     font-size: 16px;
   }
   .dataset_head {
-    padding: 0.7rem 0 0;
+    padding: 0.5rem 0 0;
     background-color: #fbfbfc;
     border-bottom: 1px solid #f1f1f1;
     .content {
@@ -418,6 +437,9 @@ export default defineComponent({
           padding: 0 0.2rem;
           .icon {
             height: 16px;
+          }
+          .el-icon {
+            margin: 0 0.07rem 0 0;
           }
           .icon_datasets {
             width: 16px;

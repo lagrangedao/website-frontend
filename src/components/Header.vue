@@ -55,7 +55,7 @@
               </router-link>
             </template>
             <el-menu-item index="/dashboard/create_dataset">+ New Dataset</el-menu-item>
-            <!-- <el-menu-item index="sign_out">Sign Out</el-menu-item> -->
+            <el-menu-item index="sign_out">Sign Out</el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-col>

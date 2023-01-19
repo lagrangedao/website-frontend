@@ -5,7 +5,7 @@ const CompressionWebpackPlugin = require('compression-webpack-plugin') // gzip�
 const productionGzipExtensions = /\.(js|css|json|txt|html|ico|svg)(\?.*)?$/i // gzip匹配文件规则
 const NOT_DEV = process.env.NODE_ENV !== 'development'
 
-const globalConfig = require('./src/config/index.js') 
+const globalConfig = require('./src/config/index.js')
 
 const resolve = dir => path.join(__dirname, dir)
 const addOptions = {
@@ -32,7 +32,7 @@ module.exports = {
     }
   },
 
-  configureWebpack:(config)=>{
+  configureWebpack: (config) => {
     config.name = globalConfig.baseTitle //用于设置public/index.html的默认title
     config.entry.app = ['babel-polyfill', './src/main.js']; //入口文件
     let plugins = [
@@ -41,16 +41,16 @@ module.exports = {
           warnings: false,
           compress: {
             // drop_console:true,
-            drop_debugger:true
+            drop_debugger: true
           },
-          output:{
+          output: {
             // 去掉注释内容
             comments: false,
           }
         },
         sourceMap: false,
         parallel: true,
-      }),    //删除console插件
+      }), //删除console插件
       new CompressionWebpackPlugin({
         filename: '[path].gz[query]',
         algorithm: 'gzip',
@@ -61,7 +61,7 @@ module.exports = {
       })
     ];
     //只有打包生产环境才需要将console删除
-    if(NOT_DEV){
+    if (NOT_DEV) {
       config.mode = 'production';
       config.plugins = [...config.plugins, ...plugins];
       config.performance = {
@@ -83,9 +83,10 @@ module.exports = {
       .set('@store', resolve('src/store'))
       .set('@utils', resolve('src/utils'))
       .set('@views', resolve('src/views'))
-      .set('vue-i18n', 'vue-i18n/dist/vue-i18n.cjs.js');
+      .set('vue-i18n', 'vue-i18n/dist/vue-i18n.cjs.js')
+      .set('@public', resolve('public'));
     //打包文件带hash
-    config.output.filename('[name].[hash].js').end(); 
+    config.output.filename('[name].[hash].js').end();
 
     //为了补删除换行而加的配置
     config.module
@@ -100,7 +101,7 @@ module.exports = {
   },
 
   devServer: {
-    port: 8080, 
+    port: 8080,
     open: true, //配置自动启动浏览器
     // proxy: { 
     //   '/api': {

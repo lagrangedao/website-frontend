@@ -3,102 +3,19 @@
     <div id="datasetBody">
       <el-row class="dataset_body">
         <el-col :xs="24" :sm="24" :md="24" :lg="4" :xl="4" class="left">
-          <div class="labelList">
-            <div class="title">Dataset Structure</div>
-            <ul>
-              <li>
-                <router-link to="">Data Instances</router-link>
-              </li>
-              <li>
-                <router-link to="">Data Fields</router-link>
-              </li>
-              <li>
-                <router-link to="">Data Splits</router-link>
-              </li>
-            </ul>
-          </div>
-          <div class="labelList">
-            <div class="title">Dataset Creation</div>
-            <ul>
-              <li>
-                <router-link class="disbled" to="">Curation Rationale</router-link>
-              </li>
-              <li>
-                <router-link to="">Source Data</router-link>
-              </li>
-              <li>
-                <router-link to="">Annotations</router-link>
-              </li>
-              <li>
-                <router-link class="disbled" to="">Personal and Sensitive Information</router-link>
-              </li>
-            </ul>
-          </div>
-          <div class="labelList">
-            <div class="title">Dataset Creation</div>
-            <ul>
-              <li>
-                <router-link class="disbled" to="">Curation Rationale</router-link>
-              </li>
-              <li>
-                <router-link to="">Source Data</router-link>
-              </li>
-              <li>
-                <router-link to="">Annotations</router-link>
-              </li>
-              <li>
-                <router-link class="disbled" to="">Personal and Sensitive Information</router-link>
-              </li>
-            </ul>
-          </div>
-          <div class="labelList">
-            <div class="title">Additional Information</div>
-            <ul>
-              <li>
-                <router-link class="disbled" to="">Dataset Curators</router-link>
-              </li>
-              <li>
-                <router-link class="disbled" to="">Licensing Information</router-link>
-              </li>
-              <li>
-                <router-link to="">Citation Information</router-link>
-              </li>
-              <li>
-                <router-link to="">Contributions</router-link>
-              </li>
-            </ul>
+          <div class="labelList affix-container" id="permiss">
+            <el-affix target=".affix-container" :offset="80">
+              <ul>
+                <!-- :style="{ padding: `0 0 0 ${anchor.indent * 10}px` }" -->
+                <li v-for="(anchor, index) in titles" :key="index + 'art'">
+                  <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
+                </li>
+              </ul>
+            </el-affix>
           </div>
         </el-col>
         <el-col :xs="24" :sm="24" :md="24" :lg="14" :xl="14" class="right">
-          <div class="data">
-            <div class="top">
-              <div class="top_text">
-                Dataset Preview
-                <el-button>API</el-button>
-              </div>
-              <el-button>Text2Text Generation</el-button>
-            </div>
-            <div class="top">
-              <div class="top_text">
-                <span class="span">Subset</span>
-                <el-input v-model="searchValue" class="w-50 m-2" placeholder="Axb" />
-              </div>
-            </div>
-            <el-table :data="tableData" border stripe style="width: 100%" max-height="450">
-              <el-table-column label="sentence1 (string)" prop="sentence1" />
-              <el-table-column label="sentence2 (string)" prop="sentence2" />
-              <el-table-column label="idx (int32)" prop="idx" width="100" />
-              <el-table-column label="label (class label)" prop="label" width="150" />
-            </el-table>
-          </div>
-          <div class="text">
-            <p>Dataset Card for "super_glue"</p>
-            <p>Dataset Summary</p>
-            <p>SuperGLUE (https://super.gluebenchmark.com/) is a new benchmark styled after GLUE with a new set of more difficult language understanding tasks, improved resources, and a new public leaderboard.</p>
-            <br />
-            <p>BoolQ (Boolean Questions, Clark et al., 2019a) is a QA task where each example consists of a short passage and a yes/no question about the passage. The questions are provided anonymously and unsolicited by users of the Google search
-              engine, and afterwards paired with</p>
-          </div>
+          <v-md-preview :text="text" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
         <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6" class="left">
           <div class="list">
@@ -190,20 +107,17 @@
           </el-row>
         </el-col>
       </el-row>
-      <!-- <detail-files v-else-if="activeName==='files'"></detail-files> -->
     </div>
   </section>
 </template>
 <script>
-// import detailFiles from '@/views/dashboard/datasets/detailFiles.vue'
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+
 export default defineComponent({
   name: 'Datasets',
-  components: {
-    // detailFiles
-  },
+  components: {},
   setup () {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
@@ -254,7 +168,6 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const activeName = ref('card')
     const tableData = ref([
       {
         sentence1: '"The cat sat on the mat."',
@@ -325,7 +238,6 @@ export default defineComponent({
       // }
       // await system.$commonFun.timeout(500)
       // listLoad.value = false
-
       listdata.value = [
         {
           is_public: "1",
@@ -348,10 +260,49 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
+
+    const text = ref('')
+    const preview = ref(null);
+    const titles = ref([]);
+    const imgClick = (url, index) => {
+      console.log(url, index);
+    };
+    //获取锚点数组 获取完接口后调用
+    const getTitle = async () => {
+      text.value = await system.$commonFun.sendRequest(`${process.env.BASE_URL}Dataset-Card-Template.md`, 'get')
+      nextTick(() => {
+        //获取所有的标题
+        const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+        titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+        if (!titles.value.length) {
+          titles.value = [];
+          return;
+        }
+
+        const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+        //给每一个加样式
+        titles.value = titles.value.map(el => ({
+          title: el.innerText,
+          lineIndex: el.getAttribute('data-v-md-line'),
+          indent: hTags.indexOf(el.tagName)
+        }));
+      });
+    };
+    function handleAnchorClick (anchor) {
+      const { lineIndex } = anchor
+      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
+
+      if (heading) {
+        preview.value.scrollToTarget({
+          target: heading,
+          scrollContainer: window,
+          top: 60,
+        })
+      }
+    }
     onMounted(() => {
-      activeName.value = route.params.tabs || 'card'
+      getTitle()
       init()
-      // getData()
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
@@ -368,12 +319,12 @@ export default defineComponent({
       listLoad,
       listdata,
       total,
-      activeName,
       bodyWidth,
       system,
       route,
       router,
       tableData,
+      text, imgClick, getTitle, titles, preview, handleAnchorClick,
       init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
     }
   }
@@ -388,182 +339,12 @@ export default defineComponent({
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
-  .dataset_head {
-    padding: 0.7rem 0 0;
-    background-color: #fbfbfc;
-    border-bottom: 1px solid #f1f1f1;
-    .content {
-      display: flex;
-      align-items: stretch;
-      padding: 0 0.16rem;
-      margin: 0 auto 0.25rem;
-      font-size: 14px;
-      @media screen and (min-width: 1280px) {
-        max-width: 1280px;
-      }
-      @media screen and (min-width: 1536px) {
-        max-width: 1536px;
-      }
-      .name {
-        display: flex;
-        align-items: center;
-        font-size: 0.22rem;
-        color: #878c93;
-        line-height: 1;
-        b {
-          padding: 0 0.07rem 0 0.1rem;
-          color: #000;
-        }
-        .icon {
-          width: 0.23rem;
-          height: 0.23rem;
-          margin: 0 0.07rem 0 0;
-        }
-        .icon_datasets {
-          background: url(../../../assets/images/icons/icon_19.png) no-repeat
-            left center;
-          background-size: auto 100%;
-        }
-        .icon_copy {
-          width: 0.18rem;
-          height: 0.18rem;
-          background: url(../../../assets/images/icons/icon_36.png) no-repeat
-            left center;
-          background-size: auto 100%;
-          cursor: pointer;
-        }
-        .icon_like {
-          width: 0.18rem;
-          height: 0.18rem;
-          background: url(../../../assets/images/icons/icon_37.png) no-repeat
-            left center;
-          background-size: auto 100%;
-          cursor: pointer;
-        }
-        .el-button {
-          font-size: 16px;
-          color: #878c93;
-          @media screen and (max-width: 1440px) {
-            font-size: 14px;
-          }
-          @media screen and (max-width: 441px) {
-            font-size: 13px;
-          }
-        }
-      }
-    }
-    .tag {
-      margin: 0 auto;
-      line-height: 0.3rem;
-      font-size: 0.18rem;
-      a {
-        display: flex;
-        align-items: center;
-        padding: 0.03rem 0.07rem;
-        margin: 0 0 0 0.1rem;
-        background-color: transparent;
-        border-radius: 0.05rem;
-        font-size: 13px;
-        color: #606060;
-        border: 2px solid #f1f1f2;
-        line-height: 1;
-        @media screen and (min-width: 1800px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 1440px) {
-          font-size: 12px;
-        }
-        &:hover {
-          opacity: 0.9;
-        }
-        .icon {
-          width: 0.23rem;
-          height: 0.23rem;
-          margin: 0 0.07rem 0 0;
-          background: url(../../../assets/images/icons/icon_22.png) no-repeat
-            left center;
-          background-size: 17px;
-        }
-      }
-      .more {
-        float: left;
-        padding: 5px 8px;
-        margin: 3px 0 0 0;
-        font-size: 13px;
-        color: #9ca3b1;
-        display: inline-block;
-        border-radius: 0.08rem;
-        cursor: pointer;
-        @media screen and (min-width: 1800px) {
-          font-size: 15px;
-        }
-        &:hover {
-          background-color: #f5f6f8;
-        }
-      }
-    }
-    .tag_sub {
-      margin: 0.1rem auto 0.4rem;
-      a {
-        color: #562683;
-        background-color: #f3f1ff;
-      }
-    }
-    :deep(.demo-tabs) {
-      margin: 0 auto;
-      .el-tabs__header {
-        margin: 0;
-      }
-      .el-tabs__item {
-        height: auto;
-        padding: 0.15rem 0;
-        line-height: 1;
-        font-size: 0.18rem;
-        @media screen and (max-width: 1600px) {
-          font-size: 16px;
-        }
-        @media screen and (max-width: 441px) {
-          font-size: 14px;
-        }
-        .custom-tabs-label {
-          display: flex;
-          align-items: center;
-          padding: 0 0.2rem;
-          .icon {
-            height: 16px;
-            margin: 0 0.07rem 0 0;
-          }
-          .icon_datasets {
-            width: 16px;
-            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
-              left center;
-            background-size: auto 100%;
-          }
-          b {
-            display: block;
-            height: auto;
-            padding: 0.03rem;
-            margin: 0 0.07rem;
-            background-color: #7405ff;
-            color: #fff;
-            border-radius: 5px;
-            line-height: 1;
-            font-size: 14px;
-          }
-        }
-        &.is-active {
-          color: #000;
-        }
-        &:hover {
-          color: #7405ff;
-        }
-      }
-      .el-tabs__active-bar {
-        background-color: #000;
-      }
-      .el-tabs__nav-wrap::after {
-        display: none;
-      }
+  .mark {
+    display: flex;
+    flex-wrap: wrap;
+    .left,
+    .right {
+      width: 50%;
     }
   }
   :deep(.dataset_body) {
@@ -587,10 +368,23 @@ export default defineComponent({
       padding: 0.3rem 0;
       background-color: #fff;
       .labelList {
-        margin: 0 0 0.4rem;
+        margin: 0.2rem 0 0.4rem;
         text-align: left;
         .title {
+          padding: 0.05rem 0;
           margin: 0 0 0.1rem;
+          font-size: 0.2rem;
+          color: #000000;
+          @media screen and (max-width: 1600px) {
+            font-size: 18px;
+          }
+          @media screen and (max-width: 441px) {
+            font-size: 16px;
+          }
+        }
+        .sub_title {
+          padding: 0.05rem 0;
+          margin: 0.1rem 0 0;
           font-size: 0.18rem;
           color: #000000;
           @media screen and (max-width: 1600px) {
@@ -609,7 +403,7 @@ export default defineComponent({
               font-size: 0.16rem;
               line-height: 1.1;
               @media screen and (max-width: 1600px) {
-                font-size: 16px;
+                font-size: 15px;
               }
               @media screen and (max-width: 441px) {
                 font-size: 13px;

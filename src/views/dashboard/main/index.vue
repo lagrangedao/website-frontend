@@ -1,19 +1,6 @@
 <template>
   <section id="step">
     <div class="step_body">
-      <!-- <div class="relative group repo-copy-code">
-                <pre v-highlight>
-                    <code class="language-java hljs"></code>
-                </pre>
-                <button class="absolute top-3 right-3 transition opacity-0 group-hover:opacity-80">
-                    <svg class="" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="currentColor" focusable="false" role="img" width="0.9em" height="0.9em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                        <path d="M28,10V28H10V10H28m0-2H10a2,2,0,0,0-2,2V28a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2Z" transform="translate(0)"></path>
-                        <path d="M4,18H2V4A2,2,0,0,1,4,2H18V4H4Z" transform="translate(0)"></path>
-                        <rect fill="none" width="32" height="32"></rect>
-                    </svg>
-                </button>
-            </div> -->
-
       <div class="loginBody width">
         <el-row>
           <el-col :xs="24" :sm="12" :md="13" :lg="13" :xl="13" class="left">

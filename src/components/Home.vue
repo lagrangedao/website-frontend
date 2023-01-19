@@ -13,6 +13,7 @@
                             </keep-alive>
                         </transition>
                     </router-view>
+                    <el-backtop :right="40" :bottom="40" />
                 </div>
             </el-main>
             <el-footer v-if="route.name !== 'main'" :class="{'footer_position': positionStyle}">

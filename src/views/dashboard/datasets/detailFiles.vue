@@ -3,7 +3,7 @@
     <el-row class="dataset_body">
       <header>
         <div class="title">{{route.params.name}}{{labelTab === 'upload'?'/':''}}</div>
-        <el-dropdown trigger="click" @command="handleCommand">
+        <el-dropdown trigger="click" @command="handleCommand" v-if="labelTab === 'list'">
           <span class="el-dropdown-link">
             <el-icon class="el-icon--right">
               <Plus />
@@ -122,6 +122,7 @@ export default defineComponent({
     const router = useRouter()
 
     async function init () {
+      if (route.name !== 'datasetDetail') return
       listLoad.value = true
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
@@ -154,15 +155,16 @@ export default defineComponent({
           uploadLoad.value = true
           let fd = new FormData()
           fileList.value.forEach(file => {
-            let fileBlob = new Blob([file])
-            fd.append('file', fileBlob, file.name)
+            let fileNew = new File([file.raw], file.name)
+            fd.append('file', fileNew, file.name)
           })
-          fd.append("is_public", listdata.value.is_public)
-          fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
+          // fd.append("is_public", listdata.value.is_public)
+          // fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
           const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
-          if (uploadRes && uploadRes.files) {
-            await system.$commonFun.timeout(500)
-            system.$commonFun.messageTip('success', 'Upload files successfully!')
+          await system.$commonFun.timeout(500)
+          if (uploadRes && uploadRes.status === "success") {
+            if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
+            else system.$commonFun.messageTip('error', uploadRes.data.message)
           } else system.$commonFun.messageTip('error', 'Upload failed!')
           reset()
           init()
@@ -219,184 +221,6 @@ export default defineComponent({
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
-  .dataset_head {
-    padding: 0.7rem 0 0;
-    background-color: #fbfbfc;
-    border-bottom: 1px solid #f1f1f1;
-    .content {
-      display: flex;
-      align-items: stretch;
-      padding: 0 0.16rem;
-      margin: 0 auto 0.25rem;
-      font-size: 14px;
-      @media screen and (min-width: 1280px) {
-        max-width: 1280px;
-      }
-      @media screen and (min-width: 1536px) {
-        max-width: 1536px;
-      }
-      .name {
-        display: flex;
-        align-items: center;
-        font-size: 0.22rem;
-        color: #878c93;
-        line-height: 1;
-        b {
-          padding: 0 0.07rem 0 0.1rem;
-          color: #000;
-        }
-        .icon {
-          width: 0.23rem;
-          height: 0.23rem;
-          margin: 0 0.07rem 0 0;
-        }
-        .icon_datasets {
-          background: url(../../../assets/images/icons/icon_19.png) no-repeat
-            left center;
-          background-size: auto 100%;
-        }
-        .icon_copy {
-          width: 0.18rem;
-          height: 0.18rem;
-          background: url(../../../assets/images/icons/icon_36.png) no-repeat
-            left center;
-          background-size: auto 100%;
-          cursor: pointer;
-        }
-        .icon_like {
-          width: 0.18rem;
-          height: 0.18rem;
-          background: url(../../../assets/images/icons/icon_37.png) no-repeat
-            left center;
-          background-size: auto 100%;
-          cursor: pointer;
-        }
-        .el-button {
-          font-size: 16px;
-          color: #878c93;
-          @media screen and (max-width: 1440px) {
-            font-size: 14px;
-          }
-          @media screen and (max-width: 441px) {
-            font-size: 13px;
-          }
-        }
-      }
-    }
-    .tag {
-      margin: 0 auto;
-      line-height: 0.3rem;
-      font-size: 0.18rem;
-      a {
-        display: flex;
-        align-items: center;
-        padding: 0.03rem 0.07rem;
-        margin: 0 0 0 0.1rem;
-        background-color: transparent;
-        border-radius: 0.05rem;
-        font-size: 13px;
-        color: #606060;
-        border: 2px solid #f1f1f2;
-        line-height: 1;
-        @media screen and (min-width: 1800px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 1440px) {
-          font-size: 12px;
-        }
-        &:hover {
-          opacity: 0.9;
-        }
-        .icon {
-          width: 0.23rem;
-          height: 0.23rem;
-          margin: 0 0.07rem 0 0;
-          background: url(../../../assets/images/icons/icon_22.png) no-repeat
-            left center;
-          background-size: 17px;
-        }
-      }
-      .more {
-        float: left;
-        padding: 5px 8px;
-        margin: 3px 0 0 0;
-        font-size: 13px;
-        color: #9ca3b1;
-        display: inline-block;
-        border-radius: 0.08rem;
-        cursor: pointer;
-        @media screen and (min-width: 1800px) {
-          font-size: 15px;
-        }
-        &:hover {
-          background-color: #f5f6f8;
-        }
-      }
-    }
-    .tag_sub {
-      margin: 0.1rem auto 0.4rem;
-      a {
-        color: #562683;
-        background-color: #f3f1ff;
-      }
-    }
-    :deep(.demo-tabs) {
-      margin: 0 auto;
-      .el-tabs__header {
-        margin: 0;
-      }
-      .el-tabs__item {
-        height: auto;
-        padding: 0.15rem 0;
-        line-height: 1;
-        font-size: 0.18rem;
-        @media screen and (max-width: 1600px) {
-          font-size: 16px;
-        }
-        @media screen and (max-width: 441px) {
-          font-size: 14px;
-        }
-        .custom-tabs-label {
-          display: flex;
-          align-items: center;
-          padding: 0 0.2rem;
-          .icon {
-            height: 16px;
-            margin: 0 0.07rem 0 0;
-          }
-          .icon_datasets {
-            width: 16px;
-            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
-              left center;
-            background-size: auto 100%;
-          }
-          b {
-            display: block;
-            height: auto;
-            padding: 0.03rem;
-            margin: 0 0.07rem;
-            background-color: #7405ff;
-            color: #fff;
-            border-radius: 5px;
-            line-height: 1;
-            font-size: 14px;
-          }
-        }
-        &.is-active {
-          color: #000;
-        }
-        &:hover {
-          color: #7405ff;
-        }
-      }
-      .el-tabs__active-bar {
-        background-color: #000;
-      }
-      .el-tabs__nav-wrap::after {
-        display: none;
-      }
-    }
-  }
   :deep(.dataset_body) {
     display: flex;
     align-items: stretch;
@@ -433,14 +257,14 @@ export default defineComponent({
         padding: 7px 12px;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         border: 1px solid #e1e1e1;
-        font-size: 16px;
+        font-size: 15px;
         line-height: 1;
         border-radius: 0.09rem;
         @media screen and (min-width: 1800px) {
-          font-size: 18px;
+          font-size: 17px;
         }
         @media screen and (max-width: 1440px) {
-          font-size: 14px;
+          font-size: 13px;
         }
       }
     }
@@ -469,8 +293,10 @@ export default defineComponent({
               text-overflow: ellipsis;
               white-space: normal;
               display: -webkit-box;
-              -webkit-line-clamp: 1;
+              -webkit-line-clamp: 2;
               -webkit-box-orient: vertical;
+              line-height: 1.5;
+              word-break: break-word;
               i {
                 font-size: 14px;
               }
