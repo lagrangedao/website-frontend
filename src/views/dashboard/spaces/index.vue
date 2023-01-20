@@ -312,6 +312,17 @@ export default defineComponent({
                 font-family: "OpenSauceOne-Regular";
                 font-size: 0.3rem;
                 font-weight: 100;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                line-height: 1.5;
+                word-break: break-word;
+                @media screen and (max-width: 1440px) {
+                  font-size: 0.25rem;
+                }
               }
             }
             .el-card__body {
@@ -342,11 +353,11 @@ export default defineComponent({
                   color: #878c93;
                   font-size: 12px;
                   cursor: pointer;
-                  @media screen and (min-width: 1800px) {
-                    font-size: 14px;
-                  }
                   @media screen and (min-width: 1440px) {
                     font-size: 13px;
+                  }
+                  @media screen and (min-width: 1800px) {
+                    font-size: 15px;
                   }
                 }
                 .small {

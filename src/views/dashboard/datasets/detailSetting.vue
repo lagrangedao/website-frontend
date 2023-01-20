@@ -1,7 +1,7 @@
 <template>
   <section id="dataset">
     <el-row class="dataset_body" v-loading="listLoad">
-      <div class="fileList">
+      <div class="fileList" v-loading="renameLoad">
         <div class="title">Rename or transfer this dataset</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -27,7 +27,7 @@
         </el-form>
         <el-button size="large" :disabled="!ruleForm.name" @click="submitForm('ruleFormRef')">I understand the consequences, rename this dataset</el-button>
       </div>
-      <div class="fileList">
+      <div class="fileList" v-loading="deleteLoad">
         <div class="title">Delete this dataset</div>
         <div class="tip">This action
           <b>cannot</b> be undone. This will permanently delete the
@@ -88,6 +88,7 @@ export default defineComponent({
     const ruleFormRef = ref(null)
     const ruleFormRefDelete = ref(null)
     const renameLoad = ref(false)
+    const deleteLoad = ref(false)
     const listLoad = ref(false)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -108,8 +109,11 @@ export default defineComponent({
           const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'put', formData)
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
-            system.$commonFun.messageTip('success', 'Update successfully!')
-            router.push({ name: 'datasetDetail', params: { name: ruleForm.name, tabs: 'settings' } })
+            if (listRes.data.dataset) {
+              system.$commonFun.messageTip('success', 'Update successfully!')
+              router.push({ name: 'datasetDetail', params: { name: ruleForm.name, tabs: 'settings' } })
+            }
+            else system.$commonFun.messageTip('error', listRes.data.message)
           } else system.$commonFun.messageTip('error', 'Upload failed!')
           ruleForm.name = ''
           renameLoad.value = false
@@ -123,18 +127,19 @@ export default defineComponent({
       if (!formEl) return
       await ruleFormRefDelete.value.validate(async (valid, fields) => {
         if (valid) {
-          renameLoad.value = true
+          deleteLoad.value = true
           let formData = new FormData()
           formData.append('name', route.params.name)
           const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'delete', formData)
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
-            system.$commonFun.messageTip('success', 'Delete successfully!')
+            if (listRes.data.dataset) system.$commonFun.messageTip('success', 'Delete successfully!')
+            else system.$commonFun.messageTip('error', listRes.data.message)
             router.push({ name: 'datasets' })
           } else system.$commonFun.messageTip('error', 'Delete failed!')
           ruleForm.name = ''
           ruleForm.delete = ''
-          renameLoad.value = false
+          deleteLoad.value = false
         } else {
           console.log('error submit!', fields)
           return false
@@ -151,6 +156,7 @@ export default defineComponent({
       lagLogin,
       metaAddress,
       renameLoad,
+      deleteLoad,
       ruleForm,
       rules,
       rulesDelete,

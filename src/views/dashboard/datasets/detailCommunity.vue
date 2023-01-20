@@ -2,7 +2,7 @@
   <section id="dataset">
     <el-row class="dataset_body">
       <div class="fileList">
-        settings
+        No Data
       </div>
     </el-row>
   </section>
@@ -19,7 +19,10 @@ export default defineComponent({
   components: {
     CaretBottom
   },
-  setup () {
+  props: {
+    isVisible: { type: Boolean, default: false }
+  },
+  setup (props) {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const info = reactive({
@@ -42,7 +45,6 @@ export default defineComponent({
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
-    onMounted(() => { })
     watch(route, (to, from) => {
       info.name = ''
       window.scrollTo(0, 0)
@@ -54,6 +56,7 @@ export default defineComponent({
       system,
       route,
       router,
+      props,
       renameFun, momentFilter
     }
   }
@@ -87,11 +90,21 @@ export default defineComponent({
     .fileList {
       width: 100%;
       margin: 0.2rem 0 0;
+      padding: 0.2rem;
       border: 1px solid #e4e4e4;
       border-radius: 0.1rem;
       color: #606060;
+      text-align: center;
       overflow: hidden;
     }
+  }
+  .affix-container {
+    position: relative;
+    margin: 80px 0 0;
+    text-align: center;
+    height: 1400px;
+    border-radius: 4px;
+    background: var(--el-color-primary-light-9);
   }
 }
 </style>

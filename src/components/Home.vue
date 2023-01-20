@@ -95,6 +95,7 @@ export default defineComponent({
   .el-main {
     padding: 0;
     background-color: #fff;
+    overflow: visible;
     &.main_position {
       height: calc(100% - 0.68rem);
       background-color: #180e1a;

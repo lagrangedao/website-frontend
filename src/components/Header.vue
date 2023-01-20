@@ -74,7 +74,7 @@ export default defineComponent({
     const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const logo = require("@/assets/images/icons/logo_w.png")
-    const people_img = require("@/assets/images/dashboard/people.png")
+    const people_img = require("@/assets/images/dashboard/people_09.png")
     const searchValue = ref('')
     const activeIndex = ref('')
     const bodyWidth = ref(document.body.clientWidth < 992)

@@ -15,7 +15,8 @@
             <div class="title">
               {{info.address}}
             </div>
-            <div class="desc">Founder, FilSwan</div>
+            <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
+            <div class="desc">Balance: {{info.balance||'-'}}</div>
             <el-button type="" text bg>Edit profile</el-button>
           </div>
           <div class="personal">
@@ -34,8 +35,8 @@
           </div>
           <div class="media">
             <a href="" target="_blank"></a>
-            <a href="" target="_blank"></a>
-            <a href="" target="_blank"></a>
+            <a href="https://mobile.twitter.com/lagrangedao" target="_blank"></a>
+            <a href="https://github.com/lagrangedao" target="_blank"></a>
           </div>
         </div>
       </el-col>

@@ -2,22 +2,19 @@
   <section id="dataset">
     <div id="datasetBody">
       <el-row class="dataset_body">
-        <el-col :xs="24" :sm="24" :md="24" :lg="4" :xl="4" class="left">
-          <div class="labelList affix-container" id="permiss">
-            <el-affix target=".affix-container" :offset="80">
-              <ul>
-                <!-- :style="{ padding: `0 0 0 ${anchor.indent * 10}px` }" -->
-                <li v-for="(anchor, index) in titles" :key="index + 'art'">
-                  <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
-                </li>
-              </ul>
-            </el-affix>
+        <el-col :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
+          <div class="labelList" id="permiss">
+            <ul>
+              <li v-for="(anchor, index) in titles" :key="index + 'art'">
+                <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
+              </li>
+            </ul>
           </div>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="24" :lg="14" :xl="14" class="right">
+        <el-col :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
           <v-md-preview :text="text" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6" class="left">
+        <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="6" class="left">
           <div class="list">
             <div class="title">
               Downloads last month
@@ -118,7 +115,10 @@ import { useRouter, useRoute } from 'vue-router'
 export default defineComponent({
   name: 'Datasets',
   components: {},
-  setup () {
+  props: {
+    isVisible: { type: Boolean, default: false }
+  },
+  setup (props) {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const dataList = reactive({
@@ -267,11 +267,9 @@ export default defineComponent({
     const imgClick = (url, index) => {
       console.log(url, index);
     };
-    //获取锚点数组 获取完接口后调用
     const getTitle = async () => {
       text.value = await system.$commonFun.sendRequest(`${process.env.BASE_URL}Dataset-Card-Template.md`, 'get')
       nextTick(() => {
-        //获取所有的标题
         const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
         titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
         if (!titles.value.length) {
@@ -280,7 +278,6 @@ export default defineComponent({
         }
 
         const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-        //给每一个加样式
         titles.value = titles.value.map(el => ({
           title: el.innerText,
           lineIndex: el.getAttribute('data-v-md-line'),
@@ -296,7 +293,7 @@ export default defineComponent({
         preview.value.scrollToTarget({
           target: heading,
           scrollContainer: window,
-          top: 60,
+          top: 0,
         })
       }
     }
@@ -324,6 +321,7 @@ export default defineComponent({
       route,
       router,
       tableData,
+      props,
       text, imgClick, getTitle, titles, preview, handleAnchorClick,
       init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
     }
@@ -370,6 +368,16 @@ export default defineComponent({
       .labelList {
         margin: 0.2rem 0 0.4rem;
         text-align: left;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0.2rem;
+        width: 100%;
+        .sticky_element {
+          // position: fixed;
+          // top: 10px;
+          // display: block;
+          // max-width: 16.6666666667%;
+        }
         .title {
           padding: 0.05rem 0;
           margin: 0 0 0.1rem;
@@ -401,7 +409,14 @@ export default defineComponent({
               padding: 0.05rem 0.12rem;
               color: #878c93;
               font-size: 0.16rem;
-              line-height: 1.1;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: normal;
+              display: -webkit-box;
+              -webkit-line-clamp: 1;
+              -webkit-box-orient: vertical;
+              line-height: 1.5;
+              word-break: break-word;
               @media screen and (max-width: 1600px) {
                 font-size: 15px;
               }

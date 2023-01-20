@@ -29,8 +29,8 @@ async function sendRequest(apilink, type, jsonObject) {
         return response.data
     }
   } catch (err) {
-    console.error(err, err.response, err.response.data)
-    messageTip('error', err.response.data.msg || 'Fail')
+    console.error(err, err.response)
+    messageTip('error', err.response ? err.response.statusText : 'Fail')
     if (err.response.status === 401) {
       signOutFun()
     } else if (err.response) {

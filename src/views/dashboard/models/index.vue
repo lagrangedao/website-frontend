@@ -232,7 +232,7 @@ export default defineComponent({
       listLoad.value = true
       listdata.value = []
       total.value = 0
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}dataset`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'get')
       if (listRes) {
         listdata.value = listRes.datasets || []
         total.value = listRes.datasets.length

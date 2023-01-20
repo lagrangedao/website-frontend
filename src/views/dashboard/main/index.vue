@@ -52,13 +52,13 @@
             </div>
             <div v-loading="loginLoad" class="demo-ruleForm">
               <div class="form_title">Enter your email address to verify login</div>
-              <el-form :model="form" status-icon :rules="rules" ref="form">
+              <el-form :model="form" status-icon :rules="rules" ref="ruleFormRef">
                 <el-form-item prop="email">
-                  <el-input v-model="form.email" placeholder="you@domain.com" ref="bucketEmailRef"></el-input>
+                  <el-input v-model="form.email" placeholder="you@domain.com"></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="submitEmail('form')">{{$t('fs3Login.Connect_form_btn')}}</el-button>
-                  <p style="color:#f40000">Unable to verify captcha. Please try again</p>
+                  <el-button type="primary" @click="submitEmail('ruleFormRef')">{{$t('fs3Login.Connect_form_btn')}}</el-button>
+                  <p v-if="form.tip" style="color:#f40000">Unable to verify captcha. Please try again</p>
                 </el-form-item>
               </el-form>
             </div>
@@ -68,7 +68,7 @@
       <footer>
         <div class="foot_media">
           <a href="jacascript:;" target="_blank"><img :src="share_telegram" alt=""></a>
-          <a href="jacascript:;" target="_blank"><img :src="share_twitter" alt=""></a>
+          <a href="https://mobile.twitter.com/lagrangedao" target="_blank"><img :src="share_twitter" alt=""></a>
           <a href="jacascript:;" target="_blank"><img :src="share_discord" alt=""></a>
         </div>
       </footer>
@@ -98,11 +98,24 @@ export default defineComponent({
     const activeIndex = ref('')
     const active = ref(0)
     const loginLoad = ref(false)
+    const ruleFormRef = ref(null)
     const form = reactive({
-      email: ''
+      email: '',
+      tip: false
     })
     const rules = reactive({
-      email: [{ required: true, message: '', trigger: 'blur' }]
+      email: [
+        {
+          required: true,
+          message: 'Please input email address',
+          trigger: 'blur',
+        },
+        {
+          type: 'email',
+          message: 'Please input correct email address',
+          trigger: ['blur', 'change'],
+        },
+      ]
     })
     const info = reactive({
       address: '',
@@ -184,6 +197,30 @@ export default defineComponent({
         // window.location.reload()
       })
     }
+    const submitEmail = async (formEl) => {
+      if (!formEl) return
+      await ruleFormRef.value.validate(async (valid, fields) => {
+        if (valid) {
+          form.tip = true
+          // renameLoad.value = true
+          // let formData = new FormData()
+          // formData.append('name', route.params.name)
+          // formData.append('is_public', props.listdata) // public:1, private:0
+          // formData.append('new_name', ruleForm.name)
+          // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'put', formData)
+          // await system.$commonFun.timeout(500)
+          // if (listRes && listRes.status === 'success') {
+          //   system.$commonFun.messageTip('success', 'Update successfully!')
+          //   router.push({ name: 'datasetDetail', params: { name: ruleForm.name, tabs: 'settings' } })
+          // } else system.$commonFun.messageTip('error', 'Upload failed!')
+          // ruleForm.name = ''
+          // renameLoad.value = false
+        } else {
+          console.log('error submit!', fields)
+          return false
+        }
+      })
+    }
     onMounted(() => {
       fn()
     })
@@ -206,11 +243,12 @@ export default defineComponent({
       share_twitter,
       share_discord,
       form,
+      ruleFormRef,
       rules,
       system,
       route,
       router,
-      signFun, signIn, hiddAddress, changeNetChange, getStart
+      signFun, signIn, hiddAddress, changeNetChange, getStart, submitEmail
     }
   }
 })

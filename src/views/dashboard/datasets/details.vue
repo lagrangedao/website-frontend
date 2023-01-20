@@ -22,12 +22,12 @@
         </router-link>
       </div>
       <div class="tag tag_sub content">
-        Sub-tasks:: &nbsp;
+        Sub-tasks: &nbsp;
         <router-link to="">
           language-modeling
         </router-link>
       </div>
-      <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+      <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
         <el-tab-pane name="card">
           <template #label>
             <span class="custom-tabs-label">
@@ -54,6 +54,7 @@
               <b>3</b>
             </span>
           </template>
+          <detail-community></detail-community>
         </el-tab-pane>
         <el-tab-pane name="settings">
           <template #label>
@@ -74,8 +75,9 @@
 <script>
 import detailCard from './detailCard.vue'
 import detailFiles from './detailFiles.vue'
+import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onUnmounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -86,6 +88,7 @@ export default defineComponent({
   components: {
     detailFiles,
     detailCard,
+    detailCommunity,
     detailSetting,
     Setting
   },
@@ -298,7 +301,7 @@ export default defineComponent({
       .name {
         display: flex;
         align-items: center;
-        font-size: 0.22rem;
+        font-size: 0.21rem;
         color: #878c93;
         line-height: 1;
         b {
@@ -324,15 +327,15 @@ export default defineComponent({
           cursor: pointer;
         }
         .icon_like {
-          width: 0.18rem;
-          height: 0.18rem;
+          width: 0.16rem;
+          height: 0.16rem;
           background: url(../../../assets/images/icons/icon_37.png) no-repeat
             left center;
           background-size: auto 100%;
           cursor: pointer;
         }
         .el-button {
-          font-size: 16px;
+          font-size: 15px;
           color: #878c93;
           @media screen and (max-width: 1440px) {
             font-size: 14px;
@@ -419,6 +422,7 @@ export default defineComponent({
       }
       .el-tabs__content {
         border-top: 1px solid #f1f1f1;
+        overflow: visible;
       }
       .el-tabs__item {
         height: auto;
