@@ -99,6 +99,7 @@ export default defineComponent({
       // console.log(route.name, row)
       if (row) {
         if (row.indexOf('dataset') > -1) activeIndex.value = '/dashboard/dataset'
+        else if (row.indexOf('model') > -1) activeIndex.value = '/dashboard/models'
         else activeIndex.value = row
         return
       }

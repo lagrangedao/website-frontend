@@ -113,7 +113,7 @@
         </div>
         <el-row :gutter="32" class="list_body" v-loading="listLoad">
           <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
-            <el-card class="box-card">
+            <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
                   <div class="name">
@@ -228,6 +228,10 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
+    function detailFun (row, index) {
+      // console.log(row, index)
+      router.push({ name: 'modelsDetail', params: { name: row.name, tabs: 'card' } })
+    }
     async function init () {
       listLoad.value = true
       listdata.value = []
@@ -261,7 +265,7 @@ export default defineComponent({
       total,
       bodyWidth,
       system,
-      init, NumFormat, handleCurrentChange, handleSizeChange, momentFilter
+      init, NumFormat, handleCurrentChange, handleSizeChange, momentFilter, detailFun
     }
   }
 })
@@ -671,6 +675,9 @@ export default defineComponent({
             border-color: #e4e4e4;
             border-radius: 0.1rem;
             box-shadow: 5px 7px 9px rgba(0, 0, 0, 0.15);
+            * {
+              cursor: pointer;
+            }
             .el-card__header {
               padding: 0;
               border: 0;

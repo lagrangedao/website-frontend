@@ -17,6 +17,8 @@ const datasetsCreate = () =>
     import ("@/views/dashboard/datasets/createDataset");
 const models = () =>
     import ("@/views/dashboard/models/index");
+const modelsDetail = () =>
+    import ("@/views/dashboard/models/details");
 const spaces = () =>
     import ("@/views/dashboard/spaces/index");
 const personalCenter = () =>
@@ -55,6 +57,11 @@ const routes = [{
                     path: '/dashboard/models',
                     name: 'models',
                     component: models
+                },
+                {
+                    path: '/dashboard/models/:name/:tabs',
+                    name: 'modelsDetail',
+                    component: modelsDetail
                 },
                 {
                     path: '/dashboard/create_dataset',

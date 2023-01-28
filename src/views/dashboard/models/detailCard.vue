@@ -2,63 +2,40 @@
   <section id="dataset">
     <div id="datasetBody">
       <el-row class="dataset_body">
-        <el-col :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
-          <div class="labelList" id="permiss">
-            <ul>
-              <li v-for="(anchor, index) in titles" :key="index + 'art'">
-                <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
-              </li>
-            </ul>
+        <el-col :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
+          <div class="button">
+            <el-button type="" text bg>Edit model card</el-button>
           </div>
+          <p class="p title">BERT base model (uncased)</p>
+          <p class="p">Pretrained model on English language using a masked language modeling (MLM) objective. It was introduced in this paper and first released in this repository. This model is uncased: it does not make a difference between english and
+            English. </p>
+          <p class="p title">Disclaimer: The team releasing BERT did not write a model card for this model so this model card has been written by the Hugging Face team. </p>
+          <p class="p title">Model description </p>
+          <p class="p">BERT is a transformers model pretrained on a large corpus of English data in a self-supervised fashion. This means it was pretrained on the raw texts only, with no humans labeling them in any way (which is why it can use lots of publicly
+            available data) with an automatic process to generate inputs and labels from those texts. More precisely, it was pretrained with two objectives: </p>
+          <p class="p title">Masked language modeling (MLM): taking a sentence, the model randomly masks 15% of the words in the input then run the entire masked sentence through the model and has to predict the masked words. This is different from traditional
+            recurrent neural networks (RNNs) that usually see the words one after the other, or from autoregressive models like GPT which internally masks the future tokens. It allows the model to learn a bidirectional representation of the
+            sentence. </p>
+          <p class="p">Next sentence prediction (NSP): the models concatenates two masked sentences as inputs during pretraining. Sometimes they correspond to sentences that were next to each other in the original text, sometimes not. The model then has
+            to predict if the two sentences were following each other or not. </p>
+          <p class="p">This way, the model learns an inner representation of the English language that can then be used to extract features useful for downstream tasks: if you have a dataset of labeled sentences, for instance, you can train a standard classifier
+            using the features produced by the BERT model as inputs. </p>
+          <p class="p title">Model variations</p>
+          <p class="p"> BERT has originally been released in base and large variations, for cased and uncased input text. The uncased models also strips out an accent markers. </p>
+          <p class="p">Chinese and multilingual uncased and cased versions followed shortly after.</p>
         </el-col>
-        <el-col :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
-          <v-md-preview :text="text" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
-        </el-col>
-        <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="6" class="left">
+        <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="7" class="left">
           <div class="list">
             <div class="title">
               Downloads last month
               <b>1,149,560</b>
             </div>
-            <div class="cont">
-              <el-row :gutter="12">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Tasks" :key="index">
-                  <router-link to="">
-                    <i class="icon"></i>
-                    {{l}}
-                  </router-link>
-                </el-col>
-                <el-col :span="24">
-                  <div class="more">+ 54 Tasks</div>
-                </el-col>
-              </el-row>
-            </div>
-          </div>
-          <div class="labelModel">
-            <ul>
-              <li>
-                <p>Homepage:</p>
-                <b>github.com</b>
-              </li>
-              <li>
-                <p>Size of downloaded dataset files:</p>
-                <b>55.66MB</b>
-              </li>
-              <li>
-                <p>Size of the generated dataset:</p>
-                <b>238.01MB</b>
-              </li>
-              <li>
-                <p>Total amount of disk used:</p>
-                <b>293.67MB</b>
-              </li>
-            </ul>
           </div>
           <div class="list">
             <div class="title">
               <p>
-                <i class="icon icon_datasets"></i>
-                Models trained or fine-tuned on</p>
+                <i class="icon icon_models"></i>
+                Datasets used to train</p>
               <small>{{route.params.name}}</small>
             </div>
           </div>
@@ -214,7 +191,7 @@ export default defineComponent({
     ])
 
     function handleClick (tab, event) {
-      router.push({ name: 'datasetDetail', params: { name: route.params.name, tabs: tab.props.name } })
+      router.push({ name: 'modelsDetail', params: { name: route.params.name, tabs: tab.props.name } })
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
@@ -298,7 +275,7 @@ export default defineComponent({
       }
     }
     onMounted(() => {
-      getTitle()
+      // getTitle()
       init()
     })
     watch(lagLogin, (newValue, oldValue) => {
@@ -436,15 +413,12 @@ export default defineComponent({
       .list {
         margin: 0.2rem 0.16rem 0;
         .title {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
-          font-size: 16px;
-          color: #000;
+          font-size: 15px;
+          color: #878c93;
           border-radius: 0.08rem;
-          @media screen and (max-width: 1440px) {
+          @media screen and (max-width: 1600px) {
             font-size: 14px;
           }
           .icon {
@@ -470,9 +444,19 @@ export default defineComponent({
               left center;
             background-size: auto 100%;
           }
+          .icon_models {
+            width: 16px;
+            height: 16px;
+            margin: 0 5px 0 0;
+            background: url(../../../assets/images/icons/icon_19.png) no-repeat
+              left center;
+            background-size: auto 100%;
+          }
           b {
+            display: block;
             font-size: 17px;
-            color: #000;
+            font-weight: normal;
+            color: #606060;
             @media screen and (min-width: 1800px) {
               font-size: 18px;
             }
@@ -957,7 +941,7 @@ export default defineComponent({
     }
     .right {
       position: relative;
-      padding: 0.4rem 0.2rem;
+      padding: 0.2rem 0.2rem 0.4rem 0;
       .data {
         padding: 0.1rem 0 0;
         margin: 0 0 0.4rem;
@@ -1099,6 +1083,38 @@ export default defineComponent({
           }
         }
       }
+      .p {
+        width: 100%;
+        max-width: 800px;
+        line-height: 1.6;
+        font-size: 0.18rem;
+        color: #565656;
+        @media screen and (max-width: 1600px) {
+          font-size: 17px;
+        }
+        @media screen and (max-width: 1440px) {
+          font-size: 16px;
+        }
+        @media screen and (max-width: 441px) {
+          font-size: 14px;
+        }
+        &.title {
+          margin-top: 0.2rem;
+        }
+      }
+      .button {
+        display: flex;
+        justify-content: flex-end;
+        .el-button {
+          padding: 0.15rem 0.2rem;
+          background: lighten($color: #f0f0f0, $amount: 0);
+          border-radius: 0.07rem;
+          color: #606060;
+          &:hover {
+            opacity: 0.95;
+          }
+        }
+      }
       &::after {
         position: absolute;
         content: "";
@@ -1108,15 +1124,15 @@ export default defineComponent({
         width: 1px;
         background-color: #f1f1f1;
       }
-      &::before {
-        position: absolute;
-        content: "";
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background-color: #f1f1f1;
-      }
+      // &::before {
+      //   position: absolute;
+      //   content: "";
+      //   left: 0;
+      //   top: 0;
+      //   bottom: 0;
+      //   width: 1px;
+      //   background-color: #f1f1f1;
+      // }
     }
   }
 }
