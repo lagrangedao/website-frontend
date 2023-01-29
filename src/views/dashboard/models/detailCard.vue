@@ -1123,6 +1123,9 @@ export default defineComponent({
         bottom: 0;
         width: 1px;
         background-color: #f1f1f1;
+        @media screen and (max-width: 992px) {
+          width: 0px;
+        }
       }
       // &::before {
       //   position: absolute;

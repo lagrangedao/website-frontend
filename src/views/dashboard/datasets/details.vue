@@ -44,7 +44,7 @@
               <span>Files and versions</span>
             </span>
           </template>
-          <detail-files></detail-files>
+          <detail-files v-if="activeName === 'files'"></detail-files>
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
@@ -54,7 +54,7 @@
               <b>3</b>
             </span>
           </template>
-          <detail-community></detail-community>
+          <detail-community v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
         <el-tab-pane name="settings">
           <template #label>
@@ -66,7 +66,7 @@
               <span>Settings</span>
             </span>
           </template>
-          <detail-setting :listdata="listdata.is_public"></detail-setting>
+          <detail-setting v-if="activeName === 'settings'"></detail-setting>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -77,7 +77,7 @@ import detailCard from './detailCard.vue'
 import detailFiles from './detailFiles.vue'
 import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
-import { defineComponent, computed, onMounted, onUnmounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -94,6 +94,7 @@ export default defineComponent({
   },
   setup () {
     const store = useStore()
+    const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const dataList = reactive({
       Tasks: [
@@ -136,7 +137,6 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref({})
     const filedata = ref([])
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -203,50 +203,11 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
-    async function init () {
-      if (route.name !== 'datasetDetail') return
-      listLoad.value = true
-      listdata.value = {}
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        filedata.value = listRes.data.files || []
-        listdata.value = listRes.data.dataset || { name: route.params.name }
-      }
-      await system.$commonFun.timeout(500)
-      listLoad.value = false
-
-      // listdata.value = [
-      //   {
-      //     is_public: "1",
-      //     name: "Frigg"
-      //   },
-      //   {
-      //     is_public: "1",
-      //     name: "Travis"
-      //   },
-      //   {
-      //     is_public: "1",
-      //     name: "Tyree"
-      //   }
-      // ]
-    }
     function detailFun (row, index) {
       console.log(row, index)
     }
-    function getDatasetList (meta) {
-      if (meta) init()
-    }
-    onMounted(() => {
+    onActivated(() => {
       activeName.value = route.params.tabs || 'card'
-      init()
-    })
-    watch(lagLogin, (newValue, oldValue) => {
-      if (!lagLogin.value) init()
-    })
-    watch(route, (to, from) => {
-      if (to.name !== 'datasetDetail') return
-      activeName.value = to.params.tabs || 'card'
-      // init()
       window.scrollTo(0, 0)
     })
     return {
@@ -260,7 +221,6 @@ export default defineComponent({
       background,
       listLoad,
       filedata,
-      listdata,
       total,
       activeName,
       bodyWidth,
@@ -268,7 +228,7 @@ export default defineComponent({
       route,
       router,
       tableData,
-      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList
+      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
     }
   }
 })

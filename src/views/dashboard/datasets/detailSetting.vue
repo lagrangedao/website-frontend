@@ -50,7 +50,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -62,7 +62,7 @@ export default defineComponent({
     CaretBottom
   },
   props: {
-    listdata: { type: Number, default: 1 }
+    // listdata: { type: Number, default: 1 }
   },
   setup (props) {
     const store = useStore()
@@ -86,6 +86,7 @@ export default defineComponent({
       ]
     })
     const ruleFormRef = ref(null)
+    const listdata = ref({})
     const ruleFormRefDelete = ref(null)
     const renameLoad = ref(false)
     const deleteLoad = ref(false)
@@ -104,7 +105,7 @@ export default defineComponent({
           renameLoad.value = true
           let formData = new FormData()
           formData.append('name', route.params.name)
-          formData.append('is_public', props.listdata) // public:1, private:0
+          formData.append('is_public', listdata.value.is_public) // public:1, private:0
           formData.append('new_name', ruleForm.name)
           const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'put', formData)
           await system.$commonFun.timeout(500)
@@ -146,11 +147,22 @@ export default defineComponent({
         }
       })
     }
-    onMounted(() => { })
-    watch(route, (to, from) => {
+    async function init () {
+      if (route.name !== 'datasetDetail') return
+      listLoad.value = true
+      listdata.value = {}
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1' }
+      }
+      await system.$commonFun.timeout(500)
+      listLoad.value = false
+    }
+    onMounted(() => {
       ruleForm.name = ''
       ruleForm.delete = ''
       window.scrollTo(0, 0)
+      init()
     })
     return {
       lagLogin,
@@ -158,6 +170,7 @@ export default defineComponent({
       renameLoad,
       deleteLoad,
       ruleForm,
+      listdata,
       rules,
       rulesDelete,
       ruleFormRef,

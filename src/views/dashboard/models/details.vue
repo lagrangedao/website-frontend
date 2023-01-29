@@ -56,7 +56,7 @@
 </template>
 <script>
 import detailCard from './detailCard.vue'
-import { defineComponent, computed, onMounted, onUnmounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -212,18 +212,13 @@ export default defineComponent({
     function getDatasetList (meta) {
       if (meta) init()
     }
-    onMounted(() => {
+    onActivated(() => {
+      window.scrollTo(0, 0)
       activeName.value = route.params.tabs || 'card'
       init()
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
-    })
-    watch(route, (to, from) => {
-      if (to.name !== 'modelsDetail') return
-      activeName.value = to.params.tabs || 'card'
-      // init()
-      window.scrollTo(0, 0)
     })
     return {
       lagLogin,

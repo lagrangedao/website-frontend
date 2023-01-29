@@ -41,42 +41,66 @@ const routes = [{
                 {
                     path: '/dashboard/main',
                     name: 'main',
-                    component: main
+                    component: main,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/dataset',
                     name: 'datasets',
-                    component: datasets
+                    component: datasets,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/datasets/:name/:tabs',
                     name: 'datasetDetail',
-                    component: datasetDetail
+                    component: datasetDetail,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/models',
                     name: 'models',
-                    component: models
+                    component: models,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/models/:name/:tabs',
                     name: 'modelsDetail',
-                    component: modelsDetail
+                    component: modelsDetail,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/create_dataset',
                     name: 'datasetsCreate',
-                    component: datasetsCreate
+                    component: datasetsCreate,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/spaces',
                     name: 'spaces',
-                    component: spaces
+                    component: spaces,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/personal_center',
                     name: 'personalCenter',
                     component: personalCenter,
+                    meta: {
+                        keepAlive: true
+                    },
                     // beforeEnter: (to, from, next) => {
                     //   if (!sessionStorage.getItem('metaAddressLag')) {
                     //     next({

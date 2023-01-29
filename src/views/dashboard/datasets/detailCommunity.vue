@@ -8,7 +8,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -45,7 +45,7 @@ export default defineComponent({
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
-    watch(route, (to, from) => {
+    onMounted(() => {
       info.name = ''
       window.scrollTo(0, 0)
     })

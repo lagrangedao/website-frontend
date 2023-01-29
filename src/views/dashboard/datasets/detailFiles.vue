@@ -146,7 +146,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, nextTick, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, nextTick, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -468,15 +468,12 @@ export default defineComponent({
       return newNodeList;
     }
     onMounted(() => {
+      reset()
+      window.scrollTo(0, 0)
       init()
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
-    })
-    watch(route, (to, from) => {
-      reset()
-      init()
-      window.scrollTo(0, 0)
     })
     return {
       metaAddress,

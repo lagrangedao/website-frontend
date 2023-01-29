@@ -136,7 +136,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 export default defineComponent({
@@ -223,13 +223,14 @@ export default defineComponent({
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
-    onMounted(() => init())
+    // onMounted(() => init())
+    onActivated(() => {
+      window.scrollTo(0, 0)
+      init()
+    })
+    onDeactivated(() => { })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
-    })
-    watch(route, (to, from) => {
-      init()
-      window.scrollTo(0, 0)
     })
     return {
       lagLogin,

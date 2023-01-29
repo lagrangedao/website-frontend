@@ -1,8 +1,16 @@
 <template>
   <section id="dataset">
     <div id="datasetBody">
-      <el-row class="dataset_body">
-        <el-col :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
+      <el-row class="dataset_body" v-loading="listLoad">
+        <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
+          <div class="readme_body">
+            <div>
+              <b>No dataset card yet</b>
+              <p>New: Create and edit this dataset card directly on the website!</p>
+            </div>
+          </div>
+        </el-col>
+        <el-col v-if="urlReadme" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
             <ul>
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
@@ -11,7 +19,7 @@
             </ul>
           </div>
         </el-col>
-        <el-col :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
+        <el-col v-if="urlReadme" :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
           <v-md-preview :text="text" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
         <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="6" class="left">
@@ -108,7 +116,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
@@ -116,7 +124,7 @@ export default defineComponent({
   name: 'Datasets',
   components: {},
   props: {
-    isVisible: { type: Boolean, default: false }
+    // urlReadme: { type: String, default: '' }
   },
   setup (props) {
     const store = useStore()
@@ -158,6 +166,7 @@ export default defineComponent({
         label: 'Most Likes',
       }
     ])
+    const urlReadme = ref('')
     const currentPage1 = ref(1)
     const small = ref(false)
     const background = ref(false)
@@ -228,16 +237,24 @@ export default defineComponent({
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
     async function init () {
-      // listLoad.value = true
-      // listdata.value = []
-      // total.value = 0
-      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}dataset`, 'get')
-      // if (listRes) {
-      //   listdata.value = listRes.datasets || []
-      //   total.value = listRes.datasets.length
-      // }
-      // await system.$commonFun.timeout(500)
-      // listLoad.value = false
+      listLoad.value = true
+      listdata.value = []
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        // listdata.value = listRes.data.files || []
+        const fileLi = listRes.data.files || []
+        fileLi.forEach((element, i) => {
+          let el = element.name.split('/')
+          el.shift()
+          // console.log(el.join('/').toLowerCase())
+          if (el.join('/').toLowerCase() === 'readme.md') {
+            urlReadme.value = element.url
+            getTitle()
+          }
+        })
+      }
+      await system.$commonFun.timeout(500)
+      listLoad.value = false
       listdata.value = [
         {
           is_public: "1",
@@ -268,7 +285,14 @@ export default defineComponent({
       console.log(url, index);
     };
     const getTitle = async () => {
-      text.value = await system.$commonFun.sendRequest(`${process.env.BASE_URL}Dataset-Card-Template.md`, 'get')
+      if (!urlReadme.value) return
+      text.value = await fetch(urlReadme.value)
+        .then(res => res.arrayBuffer())
+        .then(buffer => {
+          const decoder = new TextDecoder("gbk")
+          const text = decoder.decode(buffer)
+          return text
+        })
       nextTick(() => {
         const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
         titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
@@ -297,12 +321,22 @@ export default defineComponent({
         })
       }
     }
+    onActivated(() => { })
     onMounted(() => {
-      getTitle()
+      urlReadme.value = ''
+      window.scrollTo(0, 0)
       init()
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
+    })
+    watch(route, (to, from) => {
+      if (to.name !== 'datasetDetail') return
+      if (to.params.tabs === 'card') {
+        urlReadme.value = ''
+        window.scrollTo(0, 0)
+        init()
+      }
     })
     return {
       lagLogin,
@@ -322,6 +356,7 @@ export default defineComponent({
       router,
       tableData,
       props,
+      urlReadme,
       text, imgClick, getTitle, titles, preview, handleAnchorClick,
       init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
     }
@@ -360,6 +395,42 @@ export default defineComponent({
     }
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
+    }
+    .readme_text {
+      position: relative;
+      padding: 0.5rem 0.3rem 0.3rem 0;
+      @media screen and (max-width: 992px) {
+        padding: 0.3rem 0;
+      }
+      .readme_body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        min-height: 300px;
+        background-color: #fbfbfc;
+        border: 1px solid #f1f1f1;
+        border-radius: 5px;
+        b,
+        p {
+          display: block;
+          width: 100%;
+          margin: 0.1rem auto;
+          text-align: center;
+        }
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: #f1f1f1;
+        @media screen and (max-width: 992px) {
+          width: 0px;
+        }
+      }
     }
     .left {
       position: relative;
@@ -1107,6 +1178,9 @@ export default defineComponent({
         bottom: 0;
         width: 1px;
         background-color: #f1f1f1;
+        @media screen and (max-width: 992px) {
+          width: 0px;
+        }
       }
       &::before {
         position: absolute;
@@ -1116,6 +1190,9 @@ export default defineComponent({
         bottom: 0;
         width: 1px;
         background-color: #f1f1f1;
+        @media screen and (max-width: 992px) {
+          width: 0px;
+        }
       }
     }
   }
