@@ -747,7 +747,7 @@ export default defineComponent({
       position: absolute;
       bottom: 0;
       right: 0.16rem;
-      min-height: 0.8rem;
+      min-height: 0.5rem;
       .foot_media {
         display: flex;
         justify-content: flex-end;

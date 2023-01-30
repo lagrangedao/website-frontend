@@ -18,13 +18,13 @@
         Tasks: &nbsp;
         <router-link to="">
           <i class="icon"></i>
-          Text Classification
+          <span class="a_text">Text Classification</span>
         </router-link>
       </div>
       <div class="tag tag_sub content">
-        Sub-tasks: &nbsp;
+        Sub-Tasks: &nbsp;
         <router-link to="">
-          language-modeling
+          <span class="a_text">language-modeling</span>
         </router-link>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
@@ -279,12 +279,16 @@ export default defineComponent({
           background-size: auto 100%;
         }
         .icon_copy {
-          width: 0.18rem;
-          height: 0.18rem;
+          width: 16px;
+          height: 16px;
           background: url(../../../assets/images/icons/icon_36.png) no-repeat
             left center;
           background-size: auto 100%;
           cursor: pointer;
+          @media screen and (min-width: 1800px) {
+            width: 18px;
+            height: 18px;
+          }
         }
         .icon_like {
           width: 0.16rem;
@@ -313,7 +317,7 @@ export default defineComponent({
       a {
         display: flex;
         align-items: center;
-        padding: 0.03rem 0.07rem;
+        padding: 0;
         margin: 0 0 0 0.1rem;
         background-color: transparent;
         border-radius: 0.05rem;
@@ -330,12 +334,15 @@ export default defineComponent({
         &:hover {
           opacity: 0.9;
         }
+        .a_text {
+          padding: 0.04rem 0.07rem;
+        }
         .icon {
-          width: 0.23rem;
+          width: 0.3rem;
           height: 0.23rem;
-          margin: 0 0.07rem 0 0;
-          background: url(../../../assets/images/icons/icon_22.png) no-repeat
-            left center;
+          margin: 0;
+          background: #fef7ef url(../../../assets/images/icons/icon_22.png)
+            no-repeat center;
           background-size: 17px;
         }
       }
@@ -426,6 +433,7 @@ export default defineComponent({
         }
         &.is-active {
           color: #000;
+          font-weight: 600;
         }
         &:hover {
           color: #7405ff;

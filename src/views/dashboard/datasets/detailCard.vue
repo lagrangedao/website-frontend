@@ -33,7 +33,7 @@
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Tasks" :key="index">
                   <router-link to="">
                     <i class="icon"></i>
-                    {{l}}
+                    <span class="a_text">{{l}}</span>
                   </router-link>
                 </el-col>
                 <el-col :span="24">
@@ -66,8 +66,9 @@
             <div class="title">
               <p>
                 <i class="icon icon_datasets"></i>
-                Models trained or fine-tuned on</p>
-              <small>{{route.params.name}}</small>
+                Models trained or fine-tuned on
+                <small>{{route.params.name}}</small>
+              </p>
             </div>
           </div>
           <el-row class="list_body" v-loading="false">
@@ -116,7 +117,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
@@ -326,6 +327,9 @@ export default defineComponent({
       urlReadme.value = ''
       window.scrollTo(0, 0)
       init()
+    })
+    onDeactivated(() => {
+      urlReadme.value = ''
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
@@ -539,7 +543,7 @@ export default defineComponent({
             margin: 0 5px 0 0;
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
               left center;
-            background-size: auto 100%;
+            background-size: 100%;
           }
           b {
             font-size: 17px;
@@ -563,11 +567,15 @@ export default defineComponent({
             }
           }
           p {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-spacing: normal;
+            white-space: nowrap;
             text-align: left;
+            line-height: 1;
             .icon {
+              display: block;
+              float: left;
             }
           }
         }
@@ -579,8 +587,8 @@ export default defineComponent({
               width: auto;
               flex: auto;
               a {
-                display: block;
-                padding: 0.03rem 0.07rem;
+                display: flex;
+                padding: 0;
                 margin: 0.03rem auto;
                 background-color: transparent;
                 border-radius: 0.05rem;
@@ -596,20 +604,32 @@ export default defineComponent({
                 &:hover {
                   opacity: 0.9;
                 }
+                .a_text {
+                  padding: 0.04rem 0.07rem;
+                }
                 .icon {
-                  width: 0.22rem;
+                  width: 0.3rem;
                   height: 0.22rem;
-                  margin: 0 0.03rem 0 0;
+                  padding: 0;
                 }
                 .icon_sizes {
                   background: url(../../../assets/images/icons/icon_7.png)
                     no-repeat left center;
                   background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
                 }
                 .icon_licenses {
+                  width: 0.28rem;
                   background: url(../../../assets/images/icons/icon_21.png)
-                    no-repeat left center;
+                    no-repeat right center;
                   background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
                 }
               }
               .more {
@@ -645,63 +665,98 @@ export default defineComponent({
                 &:nth-child(1) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_22.png)
-                        no-repeat left center;
+                      background: #fef7ef
+                        url(../../../assets/images/icons/icon_22.png) no-repeat
+                        center;
                       background-size: 17px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(2) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_23.png)
-                        no-repeat left center;
+                      background: #f0f3ff
+                        url(../../../assets/images/icons/icon_23.png) no-repeat
+                        center;
                       background-size: 17px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(3) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_24.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #f6f7ff
+                        url(../../../assets/images/icons/icon_24.png) no-repeat
+                        center;
+                      background-size: 18px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(4) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_25.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #f1f7ff
+                        url(../../../assets/images/icons/icon_25.png) no-repeat
+                        center;
+                      background-size: 15px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(5) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_26.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #f2f8ff
+                        url(../../../assets/images/icons/icon_26.png) no-repeat
+                        center;
+                      background-size: 15px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(6) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_27.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #edfdf6
+                        url(../../../assets/images/icons/icon_27.png) no-repeat
+                        center;
+                      background-size: 15px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(7) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_28.png)
-                        no-repeat left center;
+                      background: #fef3f3
+                        url(../../../assets/images/icons/icon_28.png) no-repeat
+                        center;
                       background-size: 17px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
@@ -841,11 +896,11 @@ export default defineComponent({
                 }
                 span {
                   height: 0.25rem;
-                  padding-left: 0.3rem;
+                  padding-left: 0.23rem;
                   background: url(../../../assets/images/icons/icon_9.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
-                  font-size: 14px;
+                    no-repeat left 2px;
+                  background-size: 0.17rem;
+                  font-size: 13px;
                   color: #000;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
@@ -855,7 +910,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0.15rem 0 0.05rem;
+              padding: 0.12rem 0 0;
               .text {
                 display: flex;
                 justify-content: flex-start;
@@ -941,11 +996,12 @@ export default defineComponent({
                   text-overflow: ellipsis;
                   word-spacing: normal;
                   text-align: left;
+                  line-height: 1.5;
                 }
               }
               .item {
                 justify-content: space-between;
-                margin: 0.3rem 0 0;
+                margin: 0.2rem 0 0;
                 .item_body {
                   display: flex;
                   align-items: center;
@@ -955,7 +1011,7 @@ export default defineComponent({
           }
           &:hover {
             .box-card {
-              background-color: #307aff;
+              background-color: #7405ff;
               .el-card__header {
                 .card-header {
                   .name {
@@ -966,8 +1022,8 @@ export default defineComponent({
                   }
                   span {
                     background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 0px;
-                    background-size: 0.2rem;
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
                     color: #fff;
                   }
                 }

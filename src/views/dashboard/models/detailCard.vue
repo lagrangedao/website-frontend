@@ -450,7 +450,7 @@ export default defineComponent({
             margin: 0 5px 0 0;
             background: url(../../../assets/images/icons/icon_19.png) no-repeat
               left center;
-            background-size: auto 100%;
+            background-size: 100%;
           }
           b {
             display: block;
@@ -754,11 +754,11 @@ export default defineComponent({
                 }
                 span {
                   height: 0.25rem;
-                  padding-left: 0.3rem;
+                  padding-left: 0.23rem;
                   background: url(../../../assets/images/icons/icon_9.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
-                  font-size: 14px;
+                    no-repeat left 2px;
+                  background-size: 0.17rem;
+                  font-size: 13px;
                   color: #000;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
@@ -768,7 +768,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0.15rem 0 0.05rem;
+              padding: 0.12rem 0 0;
               .text {
                 display: flex;
                 justify-content: flex-start;
@@ -854,11 +854,12 @@ export default defineComponent({
                   text-overflow: ellipsis;
                   word-spacing: normal;
                   text-align: left;
+                  line-height: 1.5;
                 }
               }
               .item {
                 justify-content: space-between;
-                margin: 0.3rem 0 0;
+                margin: 0.2rem 0 0;
                 .item_body {
                   display: flex;
                   align-items: center;
@@ -868,7 +869,7 @@ export default defineComponent({
           }
           &:hover {
             .box-card {
-              background-color: #307aff;
+              background-color: #7405ff;
               .el-card__header {
                 .card-header {
                   .name {
@@ -879,8 +880,8 @@ export default defineComponent({
                   }
                   span {
                     background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 0px;
-                    background-size: 0.2rem;
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
                     color: #fff;
                   }
                 }

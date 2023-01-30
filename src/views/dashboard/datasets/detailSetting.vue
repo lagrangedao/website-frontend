@@ -50,7 +50,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -159,10 +159,12 @@ export default defineComponent({
       listLoad.value = false
     }
     onMounted(() => {
-      ruleForm.name = ''
-      ruleForm.delete = ''
       window.scrollTo(0, 0)
       init()
+    })
+    onDeactivated(() => {
+      ruleForm.name = ''
+      ruleForm.delete = ''
     })
     return {
       lagLogin,

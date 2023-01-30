@@ -90,7 +90,7 @@
           </el-select>
         </div>
         <el-row :gutter="32" class="list_body" v-loading="listLoad">
-          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
+          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,5)" :key="l">
             <el-card class="box-card">
               <template #header>
                 <!-- <div class="card-header">
@@ -121,6 +121,30 @@
                 </div>
               </div>
             </el-card>
+          </el-col>
+          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l">
+            <el-card class="box-card">
+              <template #header>
+              </template>
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+                <div class="item_body">
+                  <i class="icon icon_up"></i>
+                  <span class="small">5.15M</span>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-if="listdata.models.length>5">
+            <span v-if="!listdata.datasetsIsShow" class="more_style" @click="listdata.datasetsIsShow = true">More&lt;&lt;</span>
+            <span v-else class="more_style" @click="listdata.datasetsIsShow = false">Fold</span>
           </el-col>
         </el-row>
         <div class="top">
@@ -133,26 +157,12 @@
           </div>
         </div>
         <el-row :gutter="32" class="list_body" v-loading="listLoad">
-          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
+          <el-col v-show="!listdata.modelsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models.slice(0,5)" :key="l">
             <el-card class="box-card">
-              <template #header>
-                <!-- <div class="card-header">
-                                    <span>27</span>
-                                </div> -->
-              </template>
               <div class="text">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.name}}</p>
               </div>
-              <!-- <div class="text">
-                                <el-row :gutter="6">
-                                    <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                        <router-link to="" class="ellipsis">
-                                            {{list.data_schema}}
-                                        </router-link>
-                                    </el-col>
-                                </el-row>
-                            </div> -->
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
@@ -165,6 +175,28 @@
               </div>
             </el-card>
           </el-col>
+          <el-col v-show="listdata.modelsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models" :key="l">
+            <el-card class="box-card">
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+                <div class="item_body">
+                  <i class="icon icon_up"></i>
+                  <span class="small">5.15M</span>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-if="listdata.models.length>5">
+            <span v-if="!listdata.modelsIsShow" class="more_style" @click="listdata.modelsIsShow = true">More&lt;&lt;</span>
+            <span v-else class="more_style" @click="listdata.modelsIsShow = false">Fold</span>
+          </el-col>
         </el-row>
       </el-col>
     </el-row>
@@ -172,7 +204,7 @@
 </template>
 <script>
 const ethereum = window.ethereum;
-import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
@@ -216,7 +248,12 @@ export default defineComponent({
     const loadingText = ref('')
     const prevType = ref(true)
     const dataSetIndex = ref(0)
-    const listdata = ref([])
+    const listdata = reactive({
+      datasets: [],
+      models: [],
+      datasetsIsShow: false,
+      modelsIsShow: false
+    })
     const listLoad = ref(false)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -252,7 +289,8 @@ export default defineComponent({
       listLoad.value = true
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'get')
       if (listRes) {
-        listdata.value = listRes.datasets || []
+        listdata.datasets = listRes.datasets || []
+        listdata.models = listRes.datasets || []
         dataSetIndex.value = listRes.datasets.length
       }
       await system.$commonFun.timeout(500)
@@ -296,6 +334,10 @@ export default defineComponent({
       fn()
       if (navLogin.value || !!metaAddress.value) isLogin()
       else router.push({ name: 'main' })
+    })
+    onDeactivated(() => {
+      listdata.datasetsIsShow = false
+      listdata.modelsIsShow = false
     })
     watch(navLogin, (newValue, oldValue) => {
       if (navLogin.value) isLogin()
@@ -776,6 +818,16 @@ export default defineComponent({
         padding: 0 0 0.2rem;
         .el-col {
           margin: 0.16rem 0;
+          .more_style {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
           .box-card {
             padding: 0.15rem 0.2rem;
             background-color: #fff;

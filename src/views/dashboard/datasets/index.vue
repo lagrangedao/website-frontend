@@ -12,7 +12,7 @@
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Tasks" :key="index">
                 <router-link to="">
                   <i class="icon"></i>
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -24,14 +24,14 @@
         <div class="list">
           <div class="title">
             <!-- <i class="icon icon_sizes"></i> -->
-            Sub-tasks
+            Sub-Tasks
           </div>
           <div class="cont">
             <el-row :gutter="12">
               <!-- :xs="6" :sm="6" :md="6" :lg="12" :xl="12" -->
               <el-col v-for="(l, index) in dataList.SubTasks" :key="index">
                 <router-link to="">
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -49,7 +49,7 @@
             <el-row :gutter="12">
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Sizes" :key="index">
                 <router-link to="">
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -68,7 +68,7 @@
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Licenses" :key="index">
                 <router-link to="">
                   <i class="icon icon_licenses"></i>
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -318,8 +318,8 @@ export default defineComponent({
               width: auto;
               flex: auto;
               a {
-                display: block;
-                padding: 0.03rem 0.07rem;
+                display: flex;
+                padding: 0;
                 margin: 0.03rem auto;
                 background-color: transparent;
                 border-radius: 0.05rem;
@@ -335,20 +335,32 @@ export default defineComponent({
                 &:hover {
                   opacity: 0.9;
                 }
+                .a_text {
+                  padding: 0.04rem 0.07rem;
+                }
                 .icon {
-                  width: 0.22rem;
+                  width: 0.3rem;
                   height: 0.22rem;
-                  margin: 0 0.03rem 0 0;
+                  padding: 0;
                 }
                 .icon_sizes {
                   background: url(../../../assets/images/icons/icon_7.png)
                     no-repeat left center;
                   background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
                 }
                 .icon_licenses {
+                  width: 0.28rem;
                   background: url(../../../assets/images/icons/icon_21.png)
-                    no-repeat left center;
+                    no-repeat right center;
                   background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
                 }
               }
               .more {
@@ -384,63 +396,98 @@ export default defineComponent({
                 &:nth-child(1) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_22.png)
-                        no-repeat left center;
+                      background: #fef7ef
+                        url(../../../assets/images/icons/icon_22.png) no-repeat
+                        center;
                       background-size: 17px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(2) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_23.png)
-                        no-repeat left center;
+                      background: #f0f3ff
+                        url(../../../assets/images/icons/icon_23.png) no-repeat
+                        center;
                       background-size: 17px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(3) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_24.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #f6f7ff
+                        url(../../../assets/images/icons/icon_24.png) no-repeat
+                        center;
+                      background-size: 18px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(4) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_25.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #f1f7ff
+                        url(../../../assets/images/icons/icon_25.png) no-repeat
+                        center;
+                      background-size: 15px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(5) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_26.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #f2f8ff
+                        url(../../../assets/images/icons/icon_26.png) no-repeat
+                        center;
+                      background-size: 15px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(6) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_27.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #edfdf6
+                        url(../../../assets/images/icons/icon_27.png) no-repeat
+                        center;
+                      background-size: 15px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
                 &:nth-child(7) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_28.png)
-                        no-repeat left center;
+                      background: #fef3f3
+                        url(../../../assets/images/icons/icon_28.png) no-repeat
+                        center;
                       background-size: 17px;
+                      @media screen and (max-width: 768px) {
+                        width: 25px;
+                        background-size: 15px;
+                      }
                     }
                   }
                 }
@@ -601,7 +648,7 @@ export default defineComponent({
         .el-col {
           margin: 0.16rem 0;
           .box-card {
-            padding: 0.15rem 0.2rem;
+            padding: 0.1rem 0.2rem;
             background-color: #fff;
             border-color: #e4e4e4;
             border-radius: 0.1rem;
@@ -640,11 +687,11 @@ export default defineComponent({
                 }
                 span {
                   height: 0.25rem;
-                  padding-left: 0.3rem;
+                  padding-left: 0.23rem;
                   background: url(../../../assets/images/icons/icon_9.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
-                  font-size: 14px;
+                    no-repeat left 2px;
+                  background-size: 0.17rem;
+                  font-size: 13px;
                   color: #000;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
@@ -654,7 +701,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0.15rem 0 0.05rem;
+              padding: 0.12rem 0 0;
               .text {
                 display: flex;
                 justify-content: flex-start;
@@ -739,7 +786,7 @@ export default defineComponent({
               }
               .item {
                 justify-content: space-between;
-                margin: 0.3rem 0 0;
+                margin: 0.2rem 0 0;
                 .item_body {
                   display: flex;
                   align-items: center;
@@ -749,7 +796,7 @@ export default defineComponent({
           }
           &:hover {
             .box-card {
-              background-color: #307aff;
+              background-color: #7405ff;
               .el-card__header {
                 .card-header {
                   .name {
@@ -760,8 +807,8 @@ export default defineComponent({
                   }
                   span {
                     background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 0px;
-                    background-size: 0.2rem;
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
                     color: #fff;
                   }
                 }
