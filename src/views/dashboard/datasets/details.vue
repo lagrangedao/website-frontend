@@ -35,7 +35,7 @@
               <span>Dataset card</span>
             </span>
           </template>
-          <detail-card></detail-card>
+          <detail-card :urlChange="activeName"></detail-card>
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
@@ -339,7 +339,7 @@ export default defineComponent({
         }
         .icon {
           width: 0.3rem;
-          height: 0.23rem;
+          height: 0.26rem;
           margin: 0;
           background: #fef7ef url(../../../assets/images/icons/icon_22.png)
             no-repeat center;

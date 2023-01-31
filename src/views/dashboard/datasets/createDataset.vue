@@ -29,7 +29,7 @@
                         <label class="label" for="dataname">
                             Dataset name
                             <div class="flex flex-row">
-                                <el-input v-model="ruleForm.name" placeholder="New dataset name" />
+                                <el-input v-model="ruleForm.name" placeholder="New dataset name" title="Only regular alphanumeric characters, '-', '.' and '_' supported" />
                             </div>
                         </label>
                     </el-form-item>
@@ -81,9 +81,17 @@ export default defineComponent({
             license: '',
             resource: '1'
         })
+        const validateInput = (rule, value, callback) => {
+            if (!checkSpecialKey(value)) {
+                callback(new Error("Only regular alphanumeric characters, '-', '.' and '_' supported"));
+            } else {
+                callback();
+            }
+        }
         const rules = reactive({
             name: [
-                { required: true, message: 'Please fill in this field', trigger: 'blur' }
+                { required: true, message: 'Please fill in this field', trigger: 'blur' },
+                { validator: validateInput, trigger: "blur" }
             ],
             license: [
                 { required: true, message: 'Please fill in this field', trigger: 'blur' }
@@ -95,6 +103,16 @@ export default defineComponent({
         const route = useRoute()
         const router = useRouter()
 
+        function checkSpecialKey (str) {
+            let specialKey =
+                "[~!#$^&*()=|{}':;'\\[\\],<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
+            for (let i = 0; i < str.length; i++) {
+                if (specialKey.indexOf(str.substr(i, 1)) != -1) {
+                    return false;
+                }
+            }
+            return true;
+        }
         const submitForm = async (formEl) => {
             if (!formEl) return
             await ruleFormRef.value.validate(async (valid, fields) => {
@@ -200,6 +218,7 @@ export default defineComponent({
             flex-wrap: wrap;
             align-items: flex-start;
             justify-content: flex-start;
+            text-align: left;
             .label {
               width: 100%;
               text-align: left;

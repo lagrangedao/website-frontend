@@ -346,7 +346,7 @@ export default defineComponent({
         }
         .icon {
           width: 0.3rem;
-          height: 0.23rem;
+          height: 0.26rem;
           margin: 0;
           background: #fef7ef url(../../../assets/images/icons/icon_22.png)
             no-repeat center;

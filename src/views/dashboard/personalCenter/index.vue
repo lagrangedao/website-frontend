@@ -8,7 +8,7 @@
       </div>
     </el-alert>
     <el-row class="dataset_body">
-      <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6" class="left">
+      <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
           <img :src="peopleUrl" class="logo_sidebar" alt="">
           <div class="personal">
@@ -40,7 +40,7 @@
           </div>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="18" class="right">
+      <el-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18" class="right">
         <div class="top">
           <div class="top_text">
             <!-- <h3>Hello {{info.address}}, <br />Welcome to FEVM Wallaby! </h3> -->

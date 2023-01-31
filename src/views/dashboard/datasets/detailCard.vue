@@ -10,7 +10,7 @@
             </div>
           </div>
         </el-col>
-        <el-col v-if="urlReadme" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
+        <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
             <ul>
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
@@ -19,8 +19,11 @@
             </ul>
           </div>
         </el-col>
-        <el-col v-if="urlReadme" :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
-          <v-md-preview :text="text" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
+        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
+          <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
+        </el-col>
+        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
+          <v-md-editor v-model="textEditorChange"></v-md-editor>
         </el-col>
         <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="6" class="left">
           <div class="list">
@@ -29,15 +32,50 @@
               <b>1,149,560</b>
             </div>
             <div class="cont">
+              <el-row :gutter="12" v-if="urlReadme">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview">
+                  <a>
+                    <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
+                      <el-icon>
+                        <EditPen />
+                      </el-icon>
+                      Edit dataset card
+                    </span>
+                  </a>
+                </el-col>
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
+                  <a>
+                    <span class="a_button" @click="isPreview=true">
+                      <el-icon>
+                        <CircleClose />
+                      </el-icon>
+                      Cancel
+                    </span>
+                  </a>
+                </el-col>
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
+                  <a>
+                    <span class="a_button" @click="editCommitFun">
+                      <el-icon>
+                        <Edit />
+                      </el-icon>
+                      Commit changes
+                    </span>
+                  </a>
+                </el-col>
+              </el-row>
               <el-row :gutter="12">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Tasks" :key="index">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
                   <router-link to="">
-                    <i class="icon"></i>
-                    <span class="a_text">{{l}}</span>
+                    <i class="icon icon_01"></i>
+                    <span class="a_text">Image Classification</span>
                   </router-link>
                 </el-col>
-                <el-col :span="24">
-                  <div class="more">+ 54 Tasks</div>
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
+                  <router-link to="">
+                    <i class="icon icon_02"></i>
+                    <span class="a_text">Translation</span>
+                  </router-link>
                 </el-col>
               </el-row>
             </div>
@@ -64,7 +102,7 @@
           </div>
           <div class="list">
             <div class="title">
-              <p>
+              <p :title="'Models trained or fine-tuned on '+route.params.name">
                 <i class="icon icon_datasets"></i>
                 Models trained or fine-tuned on
                 <small>{{route.params.name}}</small>
@@ -120,12 +158,20 @@
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import {
+  EditPen, Edit, CircleClose
+} from '@element-plus/icons-vue'
+import { async } from 'q';
 
 export default defineComponent({
   name: 'Datasets',
-  components: {},
+  components: {
+    EditPen,
+    Edit,
+    CircleClose
+  },
   props: {
-    // urlReadme: { type: String, default: '' }
+    urlChange: { type: String, default: 'card' }
   },
   setup (props) {
     const store = useStore()
@@ -168,6 +214,7 @@ export default defineComponent({
       }
     ])
     const urlReadme = ref('')
+    const isPreview = ref(true)
     const currentPage1 = ref(1)
     const small = ref(false)
     const background = ref(false)
@@ -222,7 +269,31 @@ export default defineComponent({
         label: '1   (not_entailment)'
       }
     ])
+    const textEditor = ref('')
+    const textEditorChange = ref('')
+    const preview = ref(null);
+    const titles = ref([]);
 
+    function editFun () {
+      textEditorChange.value = textEditor.value
+      isPreview.value = false
+    }
+    async function editCommitFun () {
+      // console.log(textEditorChange.value)
+      listLoad.value = true
+      const timeName = `${'Readme_' + new Date().getTime() + '.md'}`
+      let newFile = new File([textEditorChange.value], timeName)
+      let fd = new FormData()
+      fd.append('file', newFile, timeName)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+      await system.$commonFun.timeout(500)
+      if (uploadRes && uploadRes.status === "success") {
+        if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Update ' + timeName + ' successfully!')
+        else system.$commonFun.messageTip('error', uploadRes.message)
+      } else system.$commonFun.messageTip('error', 'Update failed!')
+      init()
+      isPreview.value = true
+    }
     function handleClick (tab, event) {
       router.push({ name: 'datasetDetail', params: { name: route.params.name, tabs: tab.props.name } })
     }
@@ -246,6 +317,7 @@ export default defineComponent({
         const fileLi = listRes.data.files || []
         fileLi.forEach((element, i) => {
           let el = element.name.split('/')
+          el.shift()
           el.shift()
           // console.log(el.join('/').toLowerCase())
           if (el.join('/').toLowerCase() === 'readme.md') {
@@ -278,16 +350,12 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
-
-    const text = ref('')
-    const preview = ref(null);
-    const titles = ref([]);
     const imgClick = (url, index) => {
       console.log(url, index);
     };
     const getTitle = async () => {
       if (!urlReadme.value) return
-      text.value = await fetch(urlReadme.value)
+      textEditor.value = await fetch(urlReadme.value)
         .then(res => res.arrayBuffer())
         .then(buffer => {
           const decoder = new TextDecoder("gbk")
@@ -328,8 +396,9 @@ export default defineComponent({
       window.scrollTo(0, 0)
       init()
     })
-    onDeactivated(() => {
-      urlReadme.value = ''
+    onDeactivated(() => { })
+    watch(() => props.urlChange, (newValue, oldValue) => {
+      isPreview.value = true
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
@@ -361,7 +430,8 @@ export default defineComponent({
       tableData,
       props,
       urlReadme,
-      text, imgClick, getTitle, titles, preview, handleAnchorClick,
+      isPreview,
+      textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
       init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
     }
   }
@@ -605,11 +675,22 @@ export default defineComponent({
                   opacity: 0.9;
                 }
                 .a_text {
-                  padding: 0.04rem 0.07rem;
+                  padding: 0.03rem 0.07rem;
+                }
+                .a_button {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+                  padding: 0.05rem 0.15rem;
+                  background: linear-gradient(180deg, #fefefe, #f0f0f0);
+                  i {
+                    margin-right: 3px;
+                    font-size: 15px;
+                  }
                 }
                 .icon {
                   width: 0.3rem;
-                  height: 0.22rem;
+                  height: 0.26rem;
                   padding: 0;
                 }
                 .icon_sizes {
@@ -625,6 +706,26 @@ export default defineComponent({
                   width: 0.28rem;
                   background: url(../../../assets/images/icons/icon_21.png)
                     no-repeat right center;
+                  background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
+                }
+                .icon_01 {
+                  background: #fef7ef
+                    url(../../../assets/images/icons/icon_22.png) no-repeat
+                    center;
+                  background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
+                }
+                .icon_02 {
+                  background: #f0f3ff
+                    url(../../../assets/images/icons/icon_29.png) no-repeat
+                    center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
@@ -662,104 +763,104 @@ export default defineComponent({
                     background-color: #eee;
                   }
                 }
-                &:nth-child(1) {
-                  a {
-                    .icon {
-                      background: #fef7ef
-                        url(../../../assets/images/icons/icon_22.png) no-repeat
-                        center;
-                      background-size: 17px;
-                      @media screen and (max-width: 768px) {
-                        width: 25px;
-                        background-size: 15px;
-                      }
-                    }
-                  }
-                }
-                &:nth-child(2) {
-                  a {
-                    .icon {
-                      background: #f0f3ff
-                        url(../../../assets/images/icons/icon_23.png) no-repeat
-                        center;
-                      background-size: 17px;
-                      @media screen and (max-width: 768px) {
-                        width: 25px;
-                        background-size: 15px;
-                      }
-                    }
-                  }
-                }
-                &:nth-child(3) {
-                  a {
-                    .icon {
-                      background: #f6f7ff
-                        url(../../../assets/images/icons/icon_24.png) no-repeat
-                        center;
-                      background-size: 18px;
-                      @media screen and (max-width: 768px) {
-                        width: 25px;
-                        background-size: 15px;
-                      }
-                    }
-                  }
-                }
-                &:nth-child(4) {
-                  a {
-                    .icon {
-                      background: #f1f7ff
-                        url(../../../assets/images/icons/icon_25.png) no-repeat
-                        center;
-                      background-size: 15px;
-                      @media screen and (max-width: 768px) {
-                        width: 25px;
-                        background-size: 15px;
-                      }
-                    }
-                  }
-                }
-                &:nth-child(5) {
-                  a {
-                    .icon {
-                      background: #f2f8ff
-                        url(../../../assets/images/icons/icon_26.png) no-repeat
-                        center;
-                      background-size: 15px;
-                      @media screen and (max-width: 768px) {
-                        width: 25px;
-                        background-size: 15px;
-                      }
-                    }
-                  }
-                }
-                &:nth-child(6) {
-                  a {
-                    .icon {
-                      background: #edfdf6
-                        url(../../../assets/images/icons/icon_27.png) no-repeat
-                        center;
-                      background-size: 15px;
-                      @media screen and (max-width: 768px) {
-                        width: 25px;
-                        background-size: 15px;
-                      }
-                    }
-                  }
-                }
-                &:nth-child(7) {
-                  a {
-                    .icon {
-                      background: #fef3f3
-                        url(../../../assets/images/icons/icon_28.png) no-repeat
-                        center;
-                      background-size: 17px;
-                      @media screen and (max-width: 768px) {
-                        width: 25px;
-                        background-size: 15px;
-                      }
-                    }
-                  }
-                }
+                // &:nth-child(1) {
+                //   a {
+                //     .icon {
+                //       background: #fef7ef
+                //         url(../../../assets/images/icons/icon_22.png) no-repeat
+                //         center;
+                //       background-size: 17px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(2) {
+                //   a {
+                //     .icon {
+                //       background: #f0f3ff
+                //         url(../../../assets/images/icons/icon_23.png) no-repeat
+                //         center;
+                //       background-size: 17px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(3) {
+                //   a {
+                //     .icon {
+                //       background: #f6f7ff
+                //         url(../../../assets/images/icons/icon_24.png) no-repeat
+                //         center;
+                //       background-size: 18px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(4) {
+                //   a {
+                //     .icon {
+                //       background: #f1f7ff
+                //         url(../../../assets/images/icons/icon_25.png) no-repeat
+                //         center;
+                //       background-size: 15px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(5) {
+                //   a {
+                //     .icon {
+                //       background: #f2f8ff
+                //         url(../../../assets/images/icons/icon_26.png) no-repeat
+                //         center;
+                //       background-size: 15px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(6) {
+                //   a {
+                //     .icon {
+                //       background: #edfdf6
+                //         url(../../../assets/images/icons/icon_27.png) no-repeat
+                //         center;
+                //       background-size: 15px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(7) {
+                //   a {
+                //     .icon {
+                //       background: #fef3f3
+                //         url(../../../assets/images/icons/icon_28.png) no-repeat
+                //         center;
+                //       background-size: 17px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
               }
             }
           }

@@ -112,35 +112,22 @@
             </el-tab-pane>
           </el-tabs>
         </div>
-
-        <!-- <el-table v-if="labelTab === 'list'" :data="fileRow.fileResdata" :table-layout="tableLayout" v-loading="listLoad" style="width: 100%">
-          <el-table-column label="name">
-            <template #default="scope">
-              <el-icon>
-                <Document />
-              </el-icon>
-              <span>{{scope.row.name}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="cid">
-            <template #default="scope">
-              {{ scope.row.cid}}
-            </template>
-          </el-table-column>
-          <el-table-column label="url">
-            <template #default="scope">
-              <a :href="scope.row.url" target="_blank">{{scope.row.url}}</a>
-            </template>
-          </el-table-column>
-          <el-table-column label="Created At" align="right">
-            <template #default="scope">
-              <div>
-                <span>{{ momentFilter(scope.row.created_at)}}</span>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table> -->
-
+        <div v-else-if="labelTab === 'create'" class="uploadBody">
+          <el-tabs type="border-card" v-loading="uploadLoad" @tab-click="folderModeOn">
+            <el-tab-pane label="Create new file">
+              <v-md-editor v-model="textEditor"></v-md-editor>
+              <el-form :label-position="'top'" ref="ruleEditName" :model="textInfo" :rules="rulesEdit">
+                <el-form-item label="File name" prop="name">
+                  <el-input v-model="textInfo.name" :placeholder="'Name your file'" />
+                </el-form-item>
+              </el-form>
+              <el-button-group class="ml-4">
+                <el-button @click="commitEditFun" :disabled="!textInfo.name">Commit new file</el-button>
+                <el-button @click="cancelFun">Cancel</el-button>
+              </el-button-group>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
       </div>
     </el-row>
   </section>
@@ -191,16 +178,45 @@ export default defineComponent({
       //   { required: true, message: 'Please fill in this field', trigger: 'blur' }
       // ]
     })
+    const pathList = ref([])
     const ruleFormRef = ref(null)
     const ruleFormFolderRef = ref(null)
     const stateUpload = reactive({
       files: [],
       uploadFolderRef: null
     })
+    const ruleEditName = ref(null)
+    const validateInput = (rule, value, callback) => {
+      if (!checkSpecialKey(value)) {
+        callback(new Error("The file name cannot contain any of the following characters: \\/:*?\"<>|"));
+      } else {
+        callback();
+      }
+    }
+    const textInfo = reactive({
+      name: ''
+    })
+    const rulesEdit = reactive({
+      name: [
+        { required: true, message: 'Please fill in this field', trigger: 'blur' },
+        { validator: validateInput, trigger: "blur" }
+      ]
+    })
+    const textEditor = ref('')
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
+    function checkSpecialKey (str) {
+      let specialKey =
+        "\\/:*?\"<>|";
+      for (let i = 0; i < str.length; i++) {
+        if (specialKey.indexOf(str.substr(i, 1)) != -1) {
+          return false;
+        }
+      }
+      return true;
+    }
     async function init () {
       if (route.name !== 'datasetDetail') return
       listLoad.value = true
@@ -214,7 +230,7 @@ export default defineComponent({
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)
         const r = await treeify(path);
-        fileRow.fileAlldata = r.children[0] ? r.children[0].children : []
+        fileRow.fileAlldata = r.children[0] ? r.children[0].children[0].children : []
         fileRow.filedata = await sortList(fileRow.fileAlldata)
         console.log(fileRow.filedata)
       }
@@ -248,6 +264,7 @@ export default defineComponent({
         fileRow.fileTitle = []
         fold = fileRow.fileAlldata
       }
+      labelTab.value = 'list'
       listLoad.value = true
       if (fileName) {
         fileRow.fileTitle = index === 0 ? fileRow.fileTitle.slice(0, 1) : fold
@@ -258,10 +275,15 @@ export default defineComponent({
       listLoad.value = false
     }
     function handleCommand (command) {
-      if (command === 'upload') {
-        labelTab.value = command
-        getListFolderMain('')
-      }
+      // if (command === 'upload') {
+      labelTab.value = command
+      pathList.value = []
+      fileRow.fileTitle.forEach((element, i) => {
+        pathList.value.push(element.title)
+      })
+      // console.log(pathList.value)
+      // getListFolderMain('')
+      // }
     }
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
@@ -303,9 +325,10 @@ export default defineComponent({
           let fd = new FormData()
           fileList.value.forEach(file => {
             // console.log('file', file)
-            let fileNew = new File([file.raw], file.name)
-            fd.append('file', fileNew, file.name)
-            console.log('file', fileNew, file.name)
+            let name = pathList.value.join('/') || ''
+            let fileNew = new File([file.raw], `${name ? name + '/' : ''}${file.name}`)
+            fd.append('file', fileNew, `${name ? name + '/' : ''}${file.name}`)
+            // console.log('file', fileNew)
           })
           // fd.append("is_public", listdata.value.is_public)
           // fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
@@ -332,9 +355,10 @@ export default defineComponent({
           let fd = new FormData()
           stateUpload.files.forEach(file => {
             // console.log('file', file)
-            let fileNew = new File([file.raw], file.raw.webkitRelativePath)
-            fd.append('file', fileNew, file.raw.webkitRelativePath)
-            console.log('file', fileNew)
+            let name = pathList.value.join('/') || ''
+            let fileNew = new File([file.raw], `${name ? name + '/' : ''}${file.raw.webkitRelativePath}`)
+            fd.append('file', fileNew, `${name ? name + '/' : ''}${file.raw.webkitRelativePath}`)
+            // console.log('file', fileNew)
           })
           // fd.append("is_public", listdata.value.is_public)
           // fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
@@ -353,17 +377,43 @@ export default defineComponent({
         }
       })
     }
+    async function commitEditFun () {
+      await ruleEditName.value.validate(async (valid, fields) => {
+        if (valid) {
+          uploadLoad.value = true
+          let name = pathList.value.join('/') || ''
+          let newFile = new File([textEditor.value], `${name ? name + '/' : ''}${textInfo.name}`)
+          let fd = new FormData()
+          fd.append('file', newFile, `${name ? name + '/' : ''}${textInfo.name}`)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+          await system.$commonFun.timeout(500)
+          if (uploadRes && uploadRes.status === "success") {
+            if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Create ' + textInfo.name + ' successfully!')
+            else system.$commonFun.messageTip('error', uploadRes.message)
+          } else system.$commonFun.messageTip('error', 'Create failed!')
+          reset()
+          init()
+        } else {
+          console.log('error submit!', fields)
+          return false
+        }
+      })
+    }
     function cancelFun () {
       labelTab.value = 'list'
       fileList.value = []
       info.name = ''
       stateUpload.files = []
+      textInfo.name = ''
+      textEditor.value = ''
     }
     function reset () {
       labelTab.value = 'list'
       uploadLoad.value = false
       fileList.value = []
       info.name = ''
+      textInfo.name = ''
+      textEditor.value = ''
       stateUpload.files = []
       fileRow.fileAlldata = []
       fileRow.fileResdata = []
@@ -488,12 +538,16 @@ export default defineComponent({
       rules,
       ruleFormRef,
       ruleFormFolderRef,
+      ruleEditName,
       stateUpload,
       uploadLoad,
       system,
       route,
       router,
-      init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun,
+      rulesEdit,
+      textInfo,
+      textEditor,
+      init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain
     }
   }

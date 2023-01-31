@@ -365,7 +365,7 @@ export default defineComponent({
                 }
                 .icon {
                   width: 0.3rem;
-                  height: 0.22rem;
+                  height: 0.26rem;
                   padding: 0;
                 }
                 .icon_sizes {
