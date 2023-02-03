@@ -183,12 +183,12 @@ async function changeNet(rows) {
         blockExplorerUrls: [process.env.VUE_APP_BSCBLOCKURL]
       }
       break
-    case 31415:
+    case 3141:
       text = {
-        chainId: web3Init.utils.numberToHex(31415),
-        chainName: 'Fevm',
-        rpcUrls: [process.env.VUE_APP_FEVMRPC],
-        blockExplorerUrls: [process.env.VUE_APP_FEVMRPC]
+        chainId: web3Init.utils.numberToHex(3141),
+        chainName: 'Filecoin TestNet',
+        rpcUrls: [process.env.VUE_APP_FILECOINRPC],
+        blockExplorerUrls: [process.env.VUE_APP_FILECOINRPC]
       }
       break
   }

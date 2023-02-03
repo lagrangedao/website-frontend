@@ -25,7 +25,7 @@
         <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
           <v-md-editor v-model="textEditorChange"></v-md-editor>
         </el-col>
-        <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="6" class="left">
+        <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="6" class="left left_light">
           <div class="list">
             <div class="title">
               Downloads last month
@@ -289,8 +289,8 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Update ' + timeName + ' successfully!')
-        else system.$commonFun.messageTip('error', uploadRes.message)
-      } else system.$commonFun.messageTip('error', 'Update failed!')
+        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+      } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
       init()
       isPreview.value = true
     }
@@ -586,6 +586,7 @@ export default defineComponent({
           align-items: center;
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
+          font-family: "MYRIADPRO-SEMIBOLD";
           font-size: 16px;
           color: #000;
           border-radius: 0.08rem;
@@ -628,7 +629,7 @@ export default defineComponent({
           small {
             font-size: 14px;
             font-weight: bold;
-            color: #000;
+            color: rgba(0, 0, 0, 0.55);
             @media screen and (min-width: 1800px) {
               font-size: 15px;
             }
@@ -1093,6 +1094,7 @@ export default defineComponent({
                 }
                 .ellipsis {
                   width: calc(100% - 26px);
+                  font-family: "FIRACODE-REGULAR";
                   overflow: hidden;
                   text-overflow: ellipsis;
                   word-spacing: normal;
@@ -1183,9 +1185,14 @@ export default defineComponent({
         }
       }
     }
+    .left_light,
+    .readme_text {
+      font-family: "FIRACODE-LIGHT";
+    }
     .right {
       position: relative;
       padding: 0.4rem 0.2rem;
+      font-family: "FIRACODE-LIGHT";
       .data {
         padding: 0.1rem 0 0;
         margin: 0 0 0.4rem;
@@ -1255,6 +1262,7 @@ export default defineComponent({
               margin: 0 0 0 0.2rem;
               line-height: 1;
               border-radius: 5px;
+              font-family: inherit;
             }
             .span {
               width: 100%;
@@ -1274,6 +1282,7 @@ export default defineComponent({
             padding: 0.05rem 0.15rem;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             border-color: #e1e1e1;
+            font-family: inherit;
             font-size: 14px;
             line-height: 1.2;
             border-radius: 0.09rem;

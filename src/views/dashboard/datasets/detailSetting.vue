@@ -31,13 +31,13 @@
         <div class="title">Delete this dataset</div>
         <div class="tip">This action
           <b>cannot</b> be undone. This will permanently delete the
-          <b>{{route.params.name}}</b> dataset repository and all its files.</div>
+          <b class="b">{{route.params.name}}</b> dataset repository and all its files.</div>
 
         <el-form ref="ruleFormRefDelete" :model="ruleForm" :rules="rulesDelete" class="demo-ruleForm" status-icon>
           <el-form-item prop="delete" style="width:100%">
             <label class="label" for="dataname">
               Please type
-              <b>{{route.params.name}}</b> to confirm.
+              <b class="b">{{route.params.name}}</b> to confirm.
               <div class="flex flex-row">
                 <el-input v-model="ruleForm.delete" placeholder=" " />
               </div>
@@ -246,6 +246,14 @@ export default defineComponent({
       .tip {
         margin: 0 0 0.2rem;
         font-weight: normal;
+        color: #666;
+      }
+      .b {
+        padding: 3px 5px;
+        background-color: #f7f7f7;
+        color: #000;
+        border-radius: 3px;
+        font-weight: bold;
       }
       .demo-ruleForm {
         display: flex;
@@ -277,7 +285,7 @@ export default defineComponent({
               width: 100%;
               text-align: left;
               font-size: 14px;
-              color: #333;
+              color: #666;
               @media screen and (max-width: 768px) {
                 font-size: 13px;
               }
@@ -334,6 +342,7 @@ export default defineComponent({
         padding: 0.1rem;
         margin: 0 0.15rem 0 0;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
+        font-family: inherit;
         font-size: 18px;
         line-height: 1;
         color: #c37af9;

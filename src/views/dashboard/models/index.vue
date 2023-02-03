@@ -579,6 +579,9 @@ export default defineComponent({
         justify-content: space-between;
         color: #606060;
         font-size: 0.19rem;
+        @media screen and (max-width: 600px) {
+          flex-wrap: wrap;
+        }
         .top_text {
           display: flex;
           align-items: center;
@@ -813,6 +816,7 @@ export default defineComponent({
                 }
                 .ellipsis {
                   width: calc(100% - 26px);
+                  font-family: "FIRACODE-REGULAR";
                   overflow: hidden;
                   text-overflow: ellipsis;
                   word-spacing: normal;

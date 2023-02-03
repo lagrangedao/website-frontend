@@ -1,24 +1,47 @@
 @font-face {
-    font-family: 'OpenSauceOne-Bold';
-    src: url(../font/OpenSauceOne-Bold.woff2) format("woff2");
-    /* font-weight: 700; */
+    font-family: 'MYRIADPRO-BOLD';
+    src: url(../font/MYRIADPRO-BOLD_0.OTF);
+    font-weight: 900;
     font-style: normal;
-    font-display: block
+    font-display: block;
 }
 
 @font-face {
-    font-family: 'OpenSauceOne-Regular';
-    src: url(../font/OpenSauceOne-Regular.woff2) format("woff2");
+    font-family: 'MYRIADPRO-SEMIBOLD';
+    src: url(../font/MYRIADPRO-SEMIBOLD_0.OTF);
     font-weight: 400;
     font-style: normal;
-    font-display: block
+    font-display: block;
 }
 
 @font-face {
-    font-family: 'gilroy-bold';
-    src: url(../font/gilroy-bold-4.otf);
+    font-family: 'MYRIADHEBREW-REGULAR';
+    src: url(../font/MYRIADHEBREW-REGULAR.OTF);
     font-style: normal;
-    font-display: block
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'FIRACODE-BOLD';
+    src: url(../font/FIRACODE-BOLD-5.TTF);
+    font-weight: 900;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'FIRACODE-LIGHT';
+    src: url(../font/FIRACODE-LIGHT-4.TTF);
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'FIRACODE-REGULAR';
+    src: url(../font/FIRACODE-REGULAR-1.TTF);
+    font-style: normal;
+    font-display: block;
 }
 
 html,
@@ -29,7 +52,7 @@ body {
     font-size: 100px;
     padding: 0;
     font-family: 'Roboto,sans-serif';
-    font-family: 'OpenSauceOne-Regular';
+    font-family: 'MYRIADPRO-SEMIBOLD';
 }
 
 *,
@@ -74,7 +97,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'gilroy-bold';
+    font-family: 'MYRIADPRO-BOLD';
 }
 
 #app {

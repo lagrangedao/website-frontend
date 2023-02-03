@@ -177,7 +177,7 @@ export default defineComponent({
             background: url(../../../assets/images/icons/icon_15.png) no-repeat
               left center;
             background-size: auto 100%;
-            font-family: "OpenSauceOne-Bold";
+            font-family: "MYRIADPRO-BOLD";
             font-size: 0.44rem;
             color: #000;
             text-align: left;
@@ -309,7 +309,6 @@ export default defineComponent({
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
                 text-transform: capitalize;
                 cursor: pointer;
-                font-family: "OpenSauceOne-Regular";
                 font-size: 0.3rem;
                 font-weight: 100;
                 overflow: hidden;

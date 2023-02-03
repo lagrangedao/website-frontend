@@ -3,7 +3,6 @@
     <el-row class="dataset_body">
       <header>
         <div class="title">
-          <!-- {{route.params.name}}{{labelTab === 'upload'||fileRow.fileTitle?'/'+fileRow.fileTitle:''}} -->
           <a @click="getListFolderMain('')">{{route.params.name}}</a>
           {{labelTab === 'upload'||fileRow.fileTitle?'/':''}}
           <span class="main" v-for="(item, index) in fileRow.fileTitle" :key="index">
@@ -70,10 +69,9 @@
         <div v-else-if="labelTab === 'upload'" class="uploadBody">
           <el-tabs type="border-card" v-loading="uploadLoad" @tab-click="folderModeOn">
             <el-tab-pane label="Upload file(S）">
-              <el-upload class="upload-demo" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" action="#" drag multiple :auto-upload="false">
-                <div class="el-upload__text">
-                  Drop file here or
-                  <em>click to upload</em>
+              <el-upload class="upload-demo" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" action="#" multiple :auto-upload="false">
+                <div class="el-upload__text el-upload-dragger uploadDigFolder">
+                  Drag files/folders here or click to browse from your computer.
                 </div>
                 <!-- <template #tip>
                   <div class="el-upload__tip">
@@ -91,14 +89,9 @@
                 <el-button @click="cancelFun">Cancel</el-button>
               </el-button-group>
             </el-tab-pane>
-            <el-tab-pane label="Upload folder" id="upload-folder">
-              <el-upload class="upload-demo" ref="uploadFolderRef" :file-list="stateUpload.files" :on-change="handleFolderChange" :on-remove="handleFolderRemove" action="#" drag multiple :auto-upload="false" webkitdirectory>
-                <div class="el-upload__text">Browse Folders</div>
-                <!-- <template #tip>
-                  <div class="el-upload__tip">
-                    jpg/png files with a size less than 500kb
-                  </div>
-                </template> -->
+            <!-- <el-tab-pane label="Upload folder" id="upload-folder">
+              <el-upload class="upload-demo" ref="uploadFolderRef" :file-list="stateUpload.files" :on-change="handleFolderChange" :on-remove="handleFolderRemove" action="#" multiple :auto-upload="false" webkitdirectory>
+                <div class="el-upload__text el-upload-dragger uploadDigFolder">Browse Folders</div>
               </el-upload>
               <el-form :label-position="'top'" ref="ruleFormFolderRef" :model="info" :rules="rules">
                 <el-form-item label="Commit changes" prop="name">
@@ -109,11 +102,11 @@
                 <el-button @click="commitFolderFun" :disabled="stateUpload.files.length===0">Commit changes</el-button>
                 <el-button @click="cancelFun">Cancel</el-button>
               </el-button-group>
-            </el-tab-pane>
+            </el-tab-pane> -->
           </el-tabs>
         </div>
         <div v-else-if="labelTab === 'create'" class="uploadBody">
-          <el-tabs type="border-card" v-loading="uploadLoad" @tab-click="folderModeOn">
+          <el-tabs type="border-card" v-loading="uploadLoad">
             <el-tab-pane label="Create new file">
               <v-md-editor v-model="textEditor"></v-md-editor>
               <el-form :label-position="'top'" ref="ruleEditName" :model="textInfo" :rules="rulesEdit">
@@ -231,8 +224,9 @@ export default defineComponent({
         // console.log('path', path)
         const r = await treeify(path);
         fileRow.fileAlldata = r.children[0] ? r.children[0].children[0].children : []
+        // console.log(fileRow.fileAlldata)
         fileRow.filedata = await sortList(fileRow.fileAlldata)
-        console.log(fileRow.filedata)
+        // console.log(fileRow.filedata)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -274,13 +268,14 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }
-    function handleCommand (command) {
-      // if (command === 'upload') {
+    async function handleCommand (command) {
       labelTab.value = command
       pathList.value = []
       fileRow.fileTitle.forEach((element, i) => {
         pathList.value.push(element.title)
       })
+      await system.$commonFun.timeout(1000)
+      if (command === 'upload') addEvent()
       // console.log(pathList.value)
       // getListFolderMain('')
       // }
@@ -291,13 +286,13 @@ export default defineComponent({
     function handleChange (uploadFile, uploadFiles) {
       // console.log(uploadFile, uploadFiles)
       fileList.value = uploadFiles
-      // console.log(fileList.value)
     }
     function handleRemove (file, uploadFiles) {
       // console.log(file, uploadFiles)
       fileList.value = uploadFiles
     }
     function folderModeOn () {
+      addEvent()
       nextTick(() => {
         const uploadEle = document.querySelector('#upload-folder').querySelector('.el-upload__input')
         stateUpload.uploadFolderRef = uploadEle
@@ -309,7 +304,56 @@ export default defineComponent({
     function handleFolderChange (uploadFile, uploadFiles) {
       // console.log(uploadFile, uploadFiles)
       stateUpload.files = uploadFiles
-      // console.log(fileList.value)
+    }
+
+    function addEvent () {
+      const oDragBody = document.querySelector('.uploadDigFolder')
+      oDragBody.addEventListener('dragenter', (e) => {
+        e.preventDefault() // 拖进
+      })
+      oDragBody.addEventListener('dragover', (e) => {
+        e.preventDefault() // 清除默认事件
+      })
+      oDragBody.addEventListener('dragleave', (e) => {
+        e.preventDefault() // 拖离
+      })
+      oDragBody.addEventListener('drop', (e) => {
+        dropHandler(e) // 抛下
+      })
+    }
+    function dropHandler (e) {
+      let items = e.dataTransfer.items
+      // const fileList = e.dataTransfer.files
+      for (let i = 0; i <= items.length - 1; i++) {
+        let item = items[i]
+        if (item.kind === 'file') {
+          let entry = item.webkitGetAsEntry()
+          getFileFromEntryRecursively(entry)
+        }
+      }
+      e.preventDefault()
+    }
+    function getFileFromEntryRecursively (entry) {
+      if (entry.isFile) {
+        entry.file(file => {
+          let path = entry.fullPath.substring(1)
+          let folder = path.split('/').length > 1
+          // console.log('文件夹：' + folder + '，文件名称：' + file.name + '，相对路径：' + path, 'wenjian:' + file)
+          let fileCont = {
+            name: path,
+            size: file.size
+          }
+          fileCont.raw = new File([file], path)
+          // stateUpload.files.push(fileCont)
+          fileList.value.push(fileCont)
+          // console.log(fileList.value)
+        }, e => { console.log(e) })
+      } else {
+        let reader = entry.createReader()
+        reader.readEntries(entries => {
+          entries.forEach(entry => getFileFromEntryRecursively(entry))
+        }, e => { console.log(e) })
+      }
     }
     function handleFolderRemove (file, uploadFiles) {
       // console.log(file, uploadFiles)
@@ -336,8 +380,8 @@ export default defineComponent({
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
-            else system.$commonFun.messageTip('error', uploadRes.message)
-          } else system.$commonFun.messageTip('error', 'Upload failed!')
+            else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+          } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
           init()
         } else {
@@ -356,8 +400,9 @@ export default defineComponent({
           stateUpload.files.forEach(file => {
             // console.log('file', file)
             let name = pathList.value.join('/') || ''
-            let fileNew = new File([file.raw], `${name ? name + '/' : ''}${file.raw.webkitRelativePath}`)
-            fd.append('file', fileNew, `${name ? name + '/' : ''}${file.raw.webkitRelativePath}`)
+            let namepath = file.raw.webkitRelativePath || file.raw.name
+            let fileNew = new File([file.raw], `${name ? name + '/' : ''}${namepath}`)
+            fd.append('file', fileNew, `${name ? name + '/' : ''}${namepath}`)
             // console.log('file', fileNew)
           })
           // fd.append("is_public", listdata.value.is_public)
@@ -366,8 +411,8 @@ export default defineComponent({
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
-            else system.$commonFun.messageTip('error', uploadRes.message)
-          } else system.$commonFun.messageTip('error', 'Upload failed!')
+            else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+          } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
           init()
         } else {
@@ -441,6 +486,8 @@ export default defineComponent({
           _originPath: t.row,
           _pathInfo: pathInfoList,
           _patName: level === 0 ? '/' : isDir ? pathInfoList[pathInfoList.length - 3] : pathInfoList[pathInfoList.length - 2],
+          _patPath: level === 0 ? '/' : isDir ? pathInfoList.slice(0, pathInfoList.length - 2).join('/') : pathInfoList.slice(0, pathInfoList.length - 1).join('/'),
+          _patPathParent: (level === 0 ? '/' : isDir ? pathInfoList.slice(0, pathInfoList.length - 3).join('/') : pathInfoList.slice(0, pathInfoList.length - 2).join('/')) || '/',
           isDir,
           children: isDir ? [] : null,
           key,
@@ -448,12 +495,12 @@ export default defineComponent({
         })
       });
       const getNodeCot = (node, level, root) => {
-        const { _patName } = node;
+        const { _patName, _patPath, _patPathParent } = node;
         let curCot = null;
         if (level === 0) {
           curCot = root.children
         } else {
-          const pat = nodeInLevel[level - 1].find(t => t.isDir && t.title === _patName);
+          const pat = nodeInLevel[level - 1].find(t => t.isDir && t.title === _patName && t._patPath === _patPathParent);
           if (!pat) {
             throw new Error(
               `Node ${node._originPath} cant find parent ${_patName}`,
@@ -465,8 +512,8 @@ export default defineComponent({
       };
       const maxLevel = nodeInLevel.length;
       for (let level = 0; level < maxLevel; level++) {
-        nodeInLevel[level].forEach(node => {
-          const curCot = getNodeCot(node, level, root);
+        nodeInLevel[level].forEach((node, nodexIndex) => {
+          let curCot = getNodeCot(node, level, root);
           curCot.push(node)
         })
       }
@@ -712,6 +759,11 @@ export default defineComponent({
               @media screen and (min-width: 1800px) {
                 font-size: 18px;
               }
+              &.is-active {
+                &::after {
+                  height: 0;
+                }
+              }
             }
           }
         }
@@ -763,6 +815,7 @@ export default defineComponent({
           .el-button {
             margin: 0 0.15rem 0 0;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
+            font-family: inherit;
             font-size: 18px;
             @media screen and (max-width: 1600px) {
               font-size: 16px;

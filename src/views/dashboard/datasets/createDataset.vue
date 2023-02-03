@@ -263,6 +263,7 @@ export default defineComponent({
               }
             }
             .el-button {
+              font-family: inherit;
               cursor: pointer;
               span {
                 cursor: pointer;

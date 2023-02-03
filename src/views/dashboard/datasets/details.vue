@@ -6,7 +6,7 @@
           <i class="icon icon_datasets"></i>
           Datasets:
           <b>{{route.params.name}}</b>
-          <i class="icon icon_copy"></i>
+          <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
           <el-button-group class="ml-4">
             <el-button>
               <i class="icon icon_like"></i>like</el-button>
@@ -206,6 +206,32 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
+    function copyName (text) {
+      var txtArea = document.createElement('textarea')
+      txtArea.id = 'txt'
+      txtArea.style.position = 'fixed'
+      txtArea.style.top = '0'
+      txtArea.style.left = '0'
+      txtArea.style.opacity = '0'
+      txtArea.value = text
+      document.body.appendChild(txtArea)
+      txtArea.select()
+
+      try {
+        var successful = document.execCommand('copy')
+        var msg = successful ? 'successful' : 'unsuccessful'
+        console.log('Copying text command was ' + msg)
+        if (successful) {
+          system.$commonFun.messageTip('success', 'Copied')
+          return true
+        }
+      } catch (err) {
+        console.log('Oops, unable to copy')
+      } finally {
+        document.body.removeChild(txtArea)
+      }
+      return false
+    }
     onActivated(() => {
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
@@ -228,7 +254,7 @@ export default defineComponent({
       route,
       router,
       tableData,
-      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
+      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName
     }
   }
 })
@@ -261,17 +287,22 @@ export default defineComponent({
       .name {
         display: flex;
         align-items: center;
+        font-family: "MYRIADPRO-BOLD";
         font-size: 0.21rem;
         color: #878c93;
         line-height: 1;
+        @media screen and (max-width: 600px) {
+          flex-wrap: wrap;
+        }
         b {
+          font-family: "FIRACODE-BOLD";
           padding: 0 0.07rem 0 0.1rem;
           color: #000;
         }
         .icon {
           width: 0.23rem;
           height: 0.23rem;
-          margin: 0 0.07rem 0 0;
+          margin: -4px 0.07rem 0 0;
         }
         .icon_datasets {
           background: url(../../../assets/images/icons/icon_19.png) no-repeat
@@ -289,6 +320,9 @@ export default defineComponent({
             width: 18px;
             height: 18px;
           }
+          &:hover {
+            opacity: 0.7;
+          }
         }
         .icon_like {
           width: 0.16rem;
@@ -299,6 +333,7 @@ export default defineComponent({
           cursor: pointer;
         }
         .el-button {
+          font-family: inherit;
           font-size: 15px;
           color: #878c93;
           @media screen and (max-width: 1440px) {
@@ -395,6 +430,7 @@ export default defineComponent({
         height: auto;
         padding: 0.15rem 0;
         line-height: 1;
+        font-family: "MYRIADHEBREW-REGULAR";
         font-size: 0.18rem;
         @media screen and (max-width: 1600px) {
           font-size: 16px;
@@ -410,11 +446,11 @@ export default defineComponent({
             height: 16px;
           }
           .el-icon {
-            margin: 0 0.07rem 0 0;
+            margin: -4px 0.07rem 0 0;
           }
           .icon_datasets {
             width: 16px;
-            margin: 0 0.07rem 0 0;
+            margin: -4px 0.07rem 0 0;
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
               left center;
             background-size: auto 100%;
@@ -432,14 +468,26 @@ export default defineComponent({
           }
         }
         &.is-active {
+          font-family: "MYRIADPRO-SEMIBOLD";
           color: #000;
           font-weight: 600;
+          position: relative;
+          &::after {
+            position: absolute;
+            content: "";
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #000;
+          }
         }
         &:hover {
           color: #7405ff;
         }
       }
       .el-tabs__active-bar {
+        display: none;
         background-color: #000;
       }
       .el-tabs__nav-wrap::after {

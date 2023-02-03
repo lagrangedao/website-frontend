@@ -3,7 +3,7 @@
     <el-row class="headerStyle">
       <el-col :xs="20" :sm="20" :md="20" :lg="8" :xl="8" class="logoImg">
         <img :src="logo" @click="header_logo" alt='' />
-        <el-input v-model="searchValue" class="w-50 m-2" placeholder="search models,datasets,users..." />
+        <el-input v-model="searchValue" class="w-50 m-2" placeholder="search models, datasets, users..." />
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
         <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" @select="handleSelect">
@@ -88,6 +88,7 @@ export default defineComponent({
     async function handleSelect (key, keyPath) {
       // console.log(key) //  
       if (key === '/dashboard/personal_center') store.dispatch('setNavLogin', true)
+      else if (key === '4') window.open('https://docs.lagrangedao.org')
       else if (key === 'sign_out') {
         system.$commonFun.signOutFun()
         // await system.$commonFun.timeout(200)
@@ -208,7 +209,7 @@ export default defineComponent({
           .icon {
             width: 21px;
             height: 20px;
-            margin: 0 6px 0 0;
+            margin: -4px 6px 0 0;
           }
           svg {
             width: 21px;

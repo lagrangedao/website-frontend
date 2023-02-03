@@ -24,7 +24,7 @@
           <p class="p"> BERT has originally been released in base and large variations, for cased and uncased input text. The uncased models also strips out an accent markers. </p>
           <p class="p">Chinese and multilingual uncased and cased versions followed shortly after.</p>
         </el-col>
-        <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="7" class="left">
+        <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="7" class="left left_light">
           <div class="list">
             <div class="title">
               Downloads last month
@@ -415,6 +415,7 @@ export default defineComponent({
         .title {
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
+          font-family: "MYRIADPRO-SEMIBOLD";
           font-size: 15px;
           color: #878c93;
           border-radius: 0.08rem;
@@ -850,6 +851,7 @@ export default defineComponent({
                 }
                 .ellipsis {
                   width: calc(100% - 26px);
+                  font-family: "FIRACODE-REGULAR";
                   overflow: hidden;
                   text-overflow: ellipsis;
                   word-spacing: normal;
@@ -940,9 +942,14 @@ export default defineComponent({
         }
       }
     }
+    .left_light,
+    .readme_text {
+      font-family: "FIRACODE-LIGHT";
+    }
     .right {
       position: relative;
       padding: 0.2rem 0.2rem 0.4rem 0;
+      font-family: "FIRACODE-LIGHT";
       .data {
         padding: 0.1rem 0 0;
         margin: 0 0 0.4rem;
@@ -1012,6 +1019,7 @@ export default defineComponent({
               margin: 0 0 0 0.2rem;
               line-height: 1;
               border-radius: 5px;
+              font-family: inherit;
             }
             .span {
               width: 100%;
@@ -1031,6 +1039,7 @@ export default defineComponent({
             padding: 0.05rem 0.15rem;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             border-color: #e1e1e1;
+            font-family: inherit;
             font-size: 14px;
             line-height: 1.2;
             border-radius: 0.09rem;
@@ -1111,6 +1120,7 @@ export default defineComponent({
           background: lighten($color: #f0f0f0, $amount: 0);
           border-radius: 0.07rem;
           color: #606060;
+          font-family: inherit;
           &:hover {
             opacity: 0.95;
           }

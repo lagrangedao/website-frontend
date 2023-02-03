@@ -32,7 +32,7 @@
                   <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> {{$t('fs3Login.Connect_cont_Wallet')}}
                 </el-button>
                 <p v-if="loadingText">please switch to
-                  <span style="text-decoration: underline;" @click="changeNetChange(31415)">FEVM Wallaby</span> or
+                  <span style="text-decoration: underline;" @click="changeNetChange(3141)">Filecoin TestNet</span> or
                   <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span>.</p>
               </div>
             </div>
@@ -70,6 +70,7 @@
           <a href="jacascript:;" target="_blank"><img :src="share_telegram" alt=""></a>
           <a href="https://mobile.twitter.com/lagrangedao" target="_blank"><img :src="share_twitter" alt=""></a>
           <a href="jacascript:;" target="_blank"><img :src="share_discord" alt=""></a>
+          <a href="https://github.com/lagrangedao" target="_blank"><img :src="share_github" alt=""></a>
         </div>
       </footer>
     </div>
@@ -92,6 +93,7 @@ export default defineComponent({
     const share_telegram = require("@/assets/images/icons/media_4.png")
     const share_twitter = require("@/assets/images/icons/media_5.png")
     const share_discord = require("@/assets/images/icons/media_6.png")
+    const share_github = require("@/assets/images/icons/media_7.png")
 
     const loadingText = ref('')
     const prevType = ref(true)
@@ -147,15 +149,15 @@ export default defineComponent({
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
       console.log(parseInt(chainId, 16))
-      if (parseInt(chainId, 16) === 31415 || parseInt(chainId, 16) === 97) {
+      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) active.value = 2
         return false
       } else {
         active.value = 1
-        loadingText.value = 'Switch to FEVM Wallaby or BSC TestNet!'
+        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
       }
-      // system.$commonFun.messageTip('error', 'Switch to FEVM Wallaby!')
+      // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
       store.dispatch('setNavLogin', false)
     }
     function hiddAddress (val) {
@@ -186,13 +188,13 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 31415 || parseInt(accounts, 16) === 97) signFun()
+        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97) signFun()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         active.value = 1
-        loadingText.value = 'Switch to FEVM Wallaby or BSC TestNet!'
+        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
         system.$commonFun.signOutFun()
         // window.location.reload()
       })
@@ -242,6 +244,7 @@ export default defineComponent({
       share_telegram,
       share_twitter,
       share_discord,
+      share_github,
       form,
       ruleFormRef,
       rules,
@@ -317,7 +320,6 @@ export default defineComponent({
           border-radius: 0.2rem;
           .titleCont {
             padding: 0.2rem 0;
-            font-family: "gilroy-bold";
             font-size: 0.286rem;
             font-weight: normal;
             color: #fff;
@@ -336,7 +338,6 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: space-between;
-              font-family: "OpenSauceOne-Regular";
               font-size: 0.223rem;
               font-weight: normal;
               color: #fff;
@@ -443,7 +444,7 @@ export default defineComponent({
               display: block;
               width: 100%;
               max-width: 4rem;
-              font-family: "gilroy-bold";
+              font-family: inherit;
               font-size: 0.25rem;
               font-weight: 600;
               height: calc(30px + 0.3rem);
@@ -522,7 +523,7 @@ export default defineComponent({
                 font-size: 13px;
               }
             }
-            .el-form {
+            :deep(.el-form) {
               padding: 0.1rem 0 0;
               .el-form-item {
                 display: block;
@@ -543,11 +544,12 @@ export default defineComponent({
                     width: 100%;
                     .el-input__inner {
                       height: auto;
-                      padding: 0.2rem 0.15rem;
-                      border-radius: 0.1rem;
+                      padding: 0.1rem 0.15rem;
+                      border-radius: 0.05rem;
                       border-color: #3d6ddb;
                       color: #041417;
                       line-height: 1.2;
+                      font-family: inherit;
                       font-size: inherit;
                     }
                   }
@@ -555,7 +557,7 @@ export default defineComponent({
                     display: block;
                     width: 80%;
                     max-width: 4.4rem;
-                    font-family: "gilroy-bold";
+                    font-family: inherit;
                     font-size: 0.2rem;
                     font-weight: normal;
                     height: auto;
@@ -665,7 +667,6 @@ export default defineComponent({
             }
           }
           h4 {
-            font-family: "OpenSauceOne-Regular";
             font-size: 0.18rem;
             font-weight: normal;
             color: #878c93;
