@@ -51,7 +51,7 @@
           <el-sub-menu index="8" v-else>
             <template #title>
               <router-link to="/dashboard/personal_center" class="loginImg">
-                <img :src="people_img" class="people" width="30" height="30" alt="">
+                <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt="">
               </router-link>
             </template>
             <el-menu-item index="/dashboard/create_dataset">+ New Dataset</el-menu-item>
@@ -72,6 +72,7 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const logo = require("@/assets/images/icons/logo_w.png")
     const people_img = require("@/assets/images/dashboard/people_09.png")
@@ -116,6 +117,7 @@ export default defineComponent({
     })
     return {
       metaAddress,
+      accessAvatar,
       lagLogin,
       logo,
       people_img,

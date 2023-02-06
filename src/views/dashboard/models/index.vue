@@ -117,7 +117,7 @@
               <template #header>
                 <div class="card-header">
                   <div class="name">
-                    <img src="@/assets/images/dashboard/people.png" alt="">
+                    <!-- <img src="@/assets/images/dashboard/people.png" alt=""> -->
                     <b>{{list.name}}</b>
                   </div>
                   <span>27</span>
@@ -739,7 +739,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0.12rem 0 0;
+              padding: 0.05rem 0 0;
               .text {
                 display: flex;
                 justify-content: flex-start;
@@ -751,8 +751,8 @@ export default defineComponent({
                   font-size: 15px;
                 }
                 .icon {
-                  width: 20px;
-                  height: 20px;
+                  width: 18px;
+                  height: 18px;
                   margin: 0 6px 0 0;
                 }
                 .icon_text {

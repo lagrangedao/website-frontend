@@ -23,6 +23,8 @@ const spaces = () =>
     import ("@/views/dashboard/spaces/index");
 const personalCenter = () =>
     import ("@/views/dashboard/personalCenter/index");
+const personalCenterProfile = () =>
+    import ("@/views/dashboard/personalCenter/editProfile");
 
 const routes = [{
         path: '/',
@@ -111,6 +113,14 @@ const routes = [{
                     //     next()
                     //   }
                     // }
+                },
+                {
+                    path: '/dashboard/personal_center/profile',
+                    name: 'personalCenterProfile',
+                    component: personalCenterProfile,
+                    meta: {
+                        keepAlive: true
+                    }
                 }
             ]
         }, ]
