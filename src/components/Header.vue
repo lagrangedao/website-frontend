@@ -211,7 +211,7 @@ export default defineComponent({
           .icon {
             width: 21px;
             height: 20px;
-            margin: -4px 6px 0 0;
+            margin: -1px 6px 0 0;
           }
           svg {
             width: 21px;

@@ -25,14 +25,17 @@
           <p class="p">Chinese and multilingual uncased and cased versions followed shortly after.</p>
         </el-col>
         <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="7" class="left left_light">
-          <div class="list">
+          <div class="list" style="display: flex;justify-content: space-between;">
             <div class="title">
               Downloads last month
               <b>1,149,560</b>
             </div>
+            <div>
+              <div id="maychar"></div>
+            </div>
           </div>
           <div class="list">
-            <div class="title">
+            <div class="title title_top">
               <p>
                 <i class="icon icon_models"></i>
                 Datasets used to train</p>
@@ -45,9 +48,9 @@
                 <template #header>
                   <div class="card-header">
                     <div class="name">
-                      <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
+                      <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
                       <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
-                      <img v-else src="@/assets/images/dashboard/people_03.png" alt="">
+                      <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
                       <b>{{list.name}}</b>
                     </div>
                     <span>27</span>
@@ -85,7 +88,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance, toRefs, nextTick, inject } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
@@ -277,7 +280,52 @@ export default defineComponent({
     onMounted(() => {
       // getTitle()
       init()
+      changetype();
     })
+    let echarts = inject("echarts")
+    const changetype = () => {
+      const machart = echarts.init(document.getElementById("maychar"));
+      const option = {
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          show: false,
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+          type: 'value',
+          show: false
+        },
+        series: [
+          {
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line',
+            // smooth:true,
+            symbolSize: 0,
+            areaStyle: {},
+            itemStyle: {
+              color: '#5d2eff'
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                  offset: 0,
+                  color: '#cdb8ff'
+                },
+                {
+                  offset: 1,
+                  color: '#f3ecff'
+                }
+              ])
+            },
+          }
+        ]
+      }
+      machart.setOption(option);
+      window.addEventListener("resize", function () {
+        machart.resize();
+      })
+    }
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
     })
@@ -300,7 +348,7 @@ export default defineComponent({
       tableData,
       props,
       text, imgClick, getTitle, titles, preview, handleAnchorClick,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
+      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, changetype
     }
   }
 })
@@ -415,7 +463,7 @@ export default defineComponent({
         .title {
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
-          font-family: "MYRIADPRO-SEMIBOLD";
+          font-family: "Helvetica-Neue";
           font-size: 15px;
           color: #878c93;
           border-radius: 0.08rem;
@@ -484,6 +532,29 @@ export default defineComponent({
             .icon {
             }
           }
+        }
+        .title_top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 16px;
+          color: #000;
+          p {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-spacing: normal;
+            white-space: nowrap;
+            text-align: left;
+            line-height: 1;
+            .icon {
+              display: block;
+              float: left;
+            }
+          }
+        }
+        #maychar {
+          width: 150px;
+          height: 70px;
         }
         .cont {
           padding: 0.25rem 0.06rem;
@@ -769,7 +840,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0.12rem 0 0;
+              padding: 0.05rem 0 0;
               .text {
                 display: flex;
                 justify-content: flex-start;

@@ -115,9 +115,9 @@
                 <template #header>
                   <div class="card-header">
                     <div class="name">
-                      <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
+                      <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
                       <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
-                      <img v-else src="@/assets/images/dashboard/people_03.png" alt="">
+                      <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
                       <b>{{list.name}}</b>
                     </div>
                     <span>27</span>
@@ -586,7 +586,7 @@ export default defineComponent({
           align-items: center;
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
-          font-family: "MYRIADPRO-SEMIBOLD";
+          font-family: "Helvetica-Neue";
           font-size: 16px;
           color: #000;
           border-radius: 0.08rem;
@@ -1012,7 +1012,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0.12rem 0 0;
+              padding: 0.05rem 0 0;
               .text {
                 display: flex;
                 justify-content: flex-start;

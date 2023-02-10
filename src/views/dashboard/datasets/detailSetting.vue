@@ -497,7 +497,7 @@ export default defineComponent({
                 border: 1px solid #8842fe;
                 border-radius: 0.05rem;
                 text-transform: uppercase;
-                font-family: "MYRIADPRO-SEMIBOLD";
+                font-family: "Helvetica-Neue";
                 font-size: 14px;
                 line-height: 1;
                 @media screen and (max-width: 768px) {

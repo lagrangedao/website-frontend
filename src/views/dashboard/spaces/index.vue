@@ -177,7 +177,7 @@ export default defineComponent({
             background: url(../../../assets/images/icons/icon_15.png) no-repeat
               left center;
             background-size: auto 100%;
-            font-family: "MYRIADPRO-BOLD";
+            font-family: "Helvetica-Bold";
             font-size: 0.44rem;
             color: #000;
             text-align: left;
@@ -310,7 +310,7 @@ export default defineComponent({
                 text-transform: capitalize;
                 cursor: pointer;
                 font-size: 0.3rem;
-                font-weight: 100;
+                font-weight: 900;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: normal;
@@ -360,7 +360,7 @@ export default defineComponent({
                   }
                 }
                 .small {
-                  font-weight: 600;
+                  font-weight: 500;
                   color: #000;
                 }
               }

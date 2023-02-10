@@ -517,9 +517,9 @@ export default defineComponent({
         .personal {
           margin: 0.2rem 0 0.45rem;
           .title {
-            font-family: "MYRIADPRO-BOLD";
+            font-family: "Helvetica-Bold";
             font-size: 0.28rem;
-            font-weight: normal;
+            font-weight: bold;
             overflow: hidden;
             text-overflow: ellipsis;
             word-spacing: normal;
@@ -555,8 +555,9 @@ export default defineComponent({
             align-items: center;
             margin: 0 0 0.2rem;
             color: #fff;
-            font-family: "MYRIADPRO-BOLD";
+            font-family: "Helvetica-Bold";
             font-size: 0.18rem;
+            font-weight: bold;
             @media screen and (min-width: 1800px) {
               font-size: 0.2rem;
             }
@@ -564,7 +565,7 @@ export default defineComponent({
               display: block;
               width: 25px;
               height: 25px;
-              margin: -4px 0.07rem 0 0;
+              margin: -1px 0.07rem 0 0;
               @media screen and (min-width: 1800px) {
                 width: 30px;
                 height: 30px;
@@ -628,7 +629,7 @@ export default defineComponent({
           align-items: center;
           h3 {
             color: #7405ff;
-            font-family: "MYRIADPRO-SEMIBOLD";
+            font-family: "Helvetica-Neue";
             font-size: 0.22rem;
             font-weight: 500;
             line-height: 1.2;
@@ -762,7 +763,7 @@ export default defineComponent({
           color: #fff;
           h5 {
             padding: 0.1rem 0;
-            font-family: "MYRIADPRO-SEMIBOLD";
+            font-family: "Helvetica-Neue";
             font-size: 0.2rem;
             font-weight: normal;
             line-height: 1;
@@ -790,7 +791,7 @@ export default defineComponent({
           }
           h6 {
             padding: 0.1rem 0;
-            font-family: "MYRIADPRO-SEMIBOLD";
+            font-family: "Helvetica-Neue";
             font-size: 0.18rem;
             font-weight: normal;
             line-height: 1;
@@ -848,7 +849,7 @@ export default defineComponent({
           .icon {
             width: 0.23rem;
             height: 0.23rem;
-            margin: -4px 0.07rem 0 0;
+            margin: -1px 0.07rem 0 0;
           }
           .icon_myProfile {
             background: url(../../../assets/images/icons/icon_16.png) no-repeat
@@ -925,7 +926,7 @@ export default defineComponent({
                 .icon {
                   width: 20px;
                   height: 20px;
-                  margin: -4px 6px 0 0;
+                  margin: -1px 6px 0 0;
                 }
                 .icon_text {
                   background: url(../../../assets/images/icons/icon_10.png)
@@ -940,7 +941,7 @@ export default defineComponent({
                 }
                 .icon_up {
                   width: 15px;
-                  margin: -4px 3px 0 0;
+                  margin: -1px 3px 0 0;
                   background: url(../../../assets/images/icons/icon_20.png)
                     no-repeat left center;
                   background-size: 100%;
@@ -1128,9 +1129,7 @@ export default defineComponent({
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
                 text-transform: capitalize;
                 cursor: pointer;
-                font-family: "MYRIADPRO-SEMIBOLD";
                 font-size: 0.3rem;
-                font-weight: 100;
                 letter-spacing: 1px;
               }
             }
@@ -1155,7 +1154,7 @@ export default defineComponent({
                 .icon {
                   width: 0.25rem;
                   height: 0.25rem;
-                  margin: -4px 0.17rem 0 0;
+                  margin: -1px 0.17rem 0 0;
                   border-radius: 0.04rem;
                 }
                 span {

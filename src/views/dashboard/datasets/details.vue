@@ -287,7 +287,7 @@ export default defineComponent({
       .name {
         display: flex;
         align-items: center;
-        font-family: "MYRIADPRO-BOLD";
+        font-family: "Helvetica-Bold";
         font-size: 0.21rem;
         color: #878c93;
         line-height: 1;
@@ -302,7 +302,7 @@ export default defineComponent({
         .icon {
           width: 0.23rem;
           height: 0.23rem;
-          margin: -4px 0.07rem 0 0;
+          margin: -1px 0.07rem 0 0;
         }
         .icon_datasets {
           background: url(../../../assets/images/icons/icon_19.png) no-repeat
@@ -430,7 +430,7 @@ export default defineComponent({
         height: auto;
         padding: 0.15rem 0;
         line-height: 1;
-        font-family: "MYRIADHEBREW-REGULAR";
+        font-family: "Helvetica-light";
         font-size: 0.18rem;
         @media screen and (max-width: 1600px) {
           font-size: 16px;
@@ -446,11 +446,11 @@ export default defineComponent({
             height: 16px;
           }
           .el-icon {
-            margin: -4px 0.07rem 0 0;
+            margin: -1px 0.07rem 0 0;
           }
           .icon_datasets {
             width: 16px;
-            margin: -4px 0.07rem 0 0;
+            margin: -1px 0.07rem 0 0;
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
               left center;
             background-size: auto 100%;
@@ -468,7 +468,7 @@ export default defineComponent({
           }
         }
         &.is-active {
-          font-family: "MYRIADPRO-SEMIBOLD";
+          font-family: "Helvetica-Neue";
           color: #000;
           font-weight: 600;
           position: relative;

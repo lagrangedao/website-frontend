@@ -11,6 +11,7 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import en from 'element-plus/es/locale/lang/en'
 import Web3 from 'web3'
 import commonFun from '@/utils/common'
+import echarts from '@/utils/echarts';
 // edit
 import VueMarkdownEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
@@ -39,6 +40,7 @@ VueMarkdownEditor.use(githubTheme, {
 const app = createApp(App)
 app.config.globalProperties.$commonFun = commonFun
 app.config.globalProperties.$Web3 = Web3
+app.config.globalProperties.$echarts = echarts
 app.config.globalProperties.$updateTime = "update time: 2022-11-18"
 app.use(ElementPlus, {
         locale: en,

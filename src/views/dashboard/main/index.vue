@@ -668,6 +668,7 @@ export default defineComponent({
           }
           h4 {
             font-size: 0.18rem;
+            font-family: "Helvetica-Neue";
             font-weight: normal;
             color: #878c93;
             @media screen and (max-width: 768px) {

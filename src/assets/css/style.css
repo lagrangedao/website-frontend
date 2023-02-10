@@ -1,22 +1,22 @@
 @font-face {
-    font-family: 'MYRIADPRO-BOLD';
-    src: url(../font/MYRIADPRO-BOLD_0.OTF);
+    font-family: 'Helvetica-Bold';
+    src: url(../font/Helvetica-Bold.ttf);
     font-weight: 900;
     font-style: normal;
     font-display: block;
 }
 
 @font-face {
-    font-family: 'MYRIADPRO-SEMIBOLD';
-    src: url(../font/MYRIADPRO-SEMIBOLD_0.OTF);
+    font-family: 'Helvetica-Neue';
+    src: url(../font/Helvetica-Neue-CE-55-Roman.ttf);
     font-weight: 400;
     font-style: normal;
     font-display: block;
 }
 
 @font-face {
-    font-family: 'MYRIADHEBREW-REGULAR';
-    src: url(../font/MYRIADHEBREW-REGULAR.OTF);
+    font-family: 'Helvetica-light';
+    src: url(../font/helvetica-light.otf);
     font-style: normal;
     font-display: block;
 }
@@ -52,7 +52,7 @@ body {
     font-size: 100px;
     padding: 0;
     font-family: 'Roboto,sans-serif';
-    font-family: 'MYRIADPRO-SEMIBOLD';
+    font-family: 'Helvetica-Neue';
 }
 
 *,
@@ -97,7 +97,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'MYRIADPRO-BOLD';
+    font-family: 'Helvetica-Bold';
 }
 
 #app {
