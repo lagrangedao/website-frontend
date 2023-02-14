@@ -295,7 +295,7 @@ export default defineComponent({
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)
         const r = await treeify(path);
-        fileRow.fileAlldata = r.children[0] ? r.children[0].children[0].children : []
+        fileRow.fileAlldata = r.children[0] ? r.children[0].children[0].children[0].children : []
         // console.log(fileRow.fileAlldata)
         fileRow.filedata = await sortList(fileRow.fileAlldata)
         // console.log(fileRow.filedata)

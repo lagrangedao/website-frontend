@@ -171,6 +171,7 @@ export default defineComponent({
           let el = element.name.split('/')
           el.shift()
           el.shift()
+          el.shift()
           // console.log(el.join('/').toLowerCase())
           if (el.join('/').toLowerCase() === 'readme.md') {
             urlReadme.value = element.url

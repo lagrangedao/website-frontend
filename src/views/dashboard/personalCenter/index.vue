@@ -1157,7 +1157,7 @@ export default defineComponent({
               }
               h1 {
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
-                text-transform: capitalize;
+                // text-transform: capitalize;
                 cursor: pointer;
                 font-size: 0.3rem;
                 letter-spacing: 1px;
