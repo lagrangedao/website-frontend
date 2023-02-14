@@ -8,7 +8,8 @@ export default createStore({
     navLogin: sessionStorage.getItem('navLogin') || false,
     lagLogin: sessionStorage.getItem('loginLag') || false,
     accessToken: sessionStorage.getItem('access_token_lag') || '',
-    accessAvatar: sessionStorage.getItem('access_avatar') || ''
+    accessAvatar: sessionStorage.getItem('access_avatar') || '',
+    accessName: sessionStorage.getItem('access_name') || ''
   },
   mutations: {
     SET_METAADDRESS: (state, metaAddress) => {
@@ -30,6 +31,10 @@ export default createStore({
     SET_ACCESSAVATAR: (state, accessAvatar) => {
       state.accessAvatar = accessAvatar
       sessionStorage.setItem('access_avatar', accessAvatar)
+    },
+    SET_ACCESSNAME: (state, accessName) => {
+      state.accessName = accessName
+      sessionStorage.setItem('access_name', accessName)
     }
   },
   actions: {
@@ -57,6 +62,11 @@ export default createStore({
       commit
     }, accessAvatar) {
       commit('SET_ACCESSAVATAR', accessAvatar)
+    },
+    setAccessName({
+      commit
+    }, accessName) {
+      commit('SET_ACCESSNAME', accessName)
     }
   },
   getters: {

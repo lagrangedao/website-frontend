@@ -1,156 +1,7 @@
 <template>
-  <section id="dataset">
-    <div id="datasetBody">
-      <el-row class="dataset_body" v-loading="listLoad">
-        <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
-          <div class="readme_body">
-            <div>
-              <b>No dataset card yet</b>
-              <p>New: Create and edit this dataset card directly on the website!</p>
-            </div>
-          </div>
-        </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
-          <div class="labelList" id="permiss">
-            <ul>
-              <li v-for="(anchor, index) in titles" :key="index + 'art'">
-                <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
-              </li>
-            </ul>
-          </div>
-        </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
-          <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
-        </el-col>
-        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
-          <v-md-editor v-model="textEditorChange"></v-md-editor>
-        </el-col>
-        <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="6" class="left left_light">
-          <div class="list">
-            <div class="title">
-              Downloads last month
-              <b>1,149,560</b>
-            </div>
-            <div class="cont">
-              <el-row :gutter="12" v-if="urlReadme">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview">
-                  <a>
-                    <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
-                      <el-icon>
-                        <EditPen />
-                      </el-icon>
-                      Edit dataset card
-                    </span>
-                  </a>
-                </el-col>
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
-                  <a>
-                    <span class="a_button" @click="isPreview=true">
-                      <el-icon>
-                        <CircleClose />
-                      </el-icon>
-                      Cancel
-                    </span>
-                  </a>
-                </el-col>
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
-                  <a>
-                    <span class="a_button" @click="editCommitFun">
-                      <el-icon>
-                        <Edit />
-                      </el-icon>
-                      Commit changes
-                    </span>
-                  </a>
-                </el-col>
-              </el-row>
-              <el-row :gutter="12">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="">
-                    <i class="icon icon_01"></i>
-                    <span class="a_text">Image Classification</span>
-                  </router-link>
-                </el-col>
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="">
-                    <i class="icon icon_02"></i>
-                    <span class="a_text">Translation</span>
-                  </router-link>
-                </el-col>
-              </el-row>
-            </div>
-          </div>
-          <div class="labelModel">
-            <ul>
-              <li>
-                <p>Homepage:</p>
-                <b>github.com</b>
-              </li>
-              <li>
-                <p>Size of downloaded dataset files:</p>
-                <b>55.66MB</b>
-              </li>
-              <li>
-                <p>Size of the generated dataset:</p>
-                <b>238.01MB</b>
-              </li>
-              <li>
-                <p>Total amount of disk used:</p>
-                <b>293.67MB</b>
-              </li>
-            </ul>
-          </div>
-          <div class="list">
-            <div class="title">
-              <p :title="'Models trained or fine-tuned on '+route.params.name">
-                <i class="icon icon_datasets"></i>
-                Models trained or fine-tuned on
-                <small>{{route.params.name}}</small>
-              </p>
-            </div>
-          </div>
-          <el-row class="list_body" v-loading="false">
-            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata" :key="l">
-              <el-card class="box-card" @click="detailFun(list, l)">
-                <template #header>
-                  <div class="card-header">
-                    <div class="name">
-                      <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
-                      <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
-                      <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
-                      <b>{{list.name}}</b>
-                    </div>
-                    <span>27</span>
-                  </div>
-                </template>
-                <div class="text">
-                  <i class="icon icon_image"></i>
-                  <p class="ellipsis">argilla/news-summary</p>
-                </div>
-                <!-- <div class="text">
-                                  <el-row :gutter="6">
-                                      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                          <router-link to="" class="ellipsis">
-                                              {{list.license}}
-                                          </router-link>
-                                      </el-col>
-                                  </el-row>
-                              </div> -->
-                <div class="text item">
-                  <div class="item_body">
-                    <i class="icon icon_time"></i>
-                    <span class="small">5 Sept 2022 - 5 Oct 2022</span>
-                  </div>
-                  <div class="item_body">
-                    <i class="icon icon_up"></i>
-                    <span class="small">5.15M</span>
-                  </div>
-                </div>
-              </el-card>
-            </el-col>
-          </el-row>
-        </el-col>
-      </el-row>
+  <section id="space">
+    <div id="spaceBody">
+      <el-row class="space_body"></el-row>
     </div>
   </section>
 </template>
@@ -164,7 +15,7 @@ import {
 import { async } from 'q';
 
 export default defineComponent({
-  name: 'Datasets',
+  name: 'Spaces',
   components: {
     EditPen,
     Edit,
@@ -285,7 +136,7 @@ export default defineComponent({
       let newFile = new File([textEditorChange.value], urlReadmeName.value)
       let fd = new FormData()
       fd.append('file', newFile, urlReadmeName.value)
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files`, 'put', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
@@ -295,7 +146,7 @@ export default defineComponent({
       isPreview.value = true
     }
     function handleClick (tab, event) {
-      router.push({ name: 'datasetDetail', params: { name: route.params.name, tabs: tab.props.name } })
+      router.push({ name: 'spaceDetail', params: { name: route.params.name, tabs: tab.props.name } })
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
@@ -312,7 +163,7 @@ export default defineComponent({
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.value = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         // listdata.value = listRes.data.files || []
         const fileLi = listRes.data.files || []
@@ -346,7 +197,7 @@ export default defineComponent({
       ]
     }
     async function getData () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
       console.log(listRes)
     }
     function detailFun (row, index) {
@@ -400,21 +251,21 @@ export default defineComponent({
     onMounted(() => {
       urlReadme.value = ''
       window.scrollTo(0, 0)
-      init()
+      // init()
     })
     onDeactivated(() => { })
     watch(() => props.urlChange, (newValue, oldValue) => {
       isPreview.value = true
     })
     watch(lagLogin, (newValue, oldValue) => {
-      if (!lagLogin.value) init()
+      // if (!lagLogin.value) init()
     })
     watch(route, (to, from) => {
-      if (to.name !== 'datasetDetail') return
+      if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'card') {
         urlReadme.value = ''
         window.scrollTo(0, 0)
-        init()
+        // init()
       }
     })
     return {
@@ -445,7 +296,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-#dataset {
+#space {
   background: #fff;
   color: #333;
   font-size: 18px;
@@ -460,7 +311,7 @@ export default defineComponent({
       width: 50%;
     }
   }
-  :deep(.dataset_body) {
+  :deep(.space_body) {
     display: flex;
     align-items: stretch;
     padding: 0;
@@ -614,7 +465,7 @@ export default defineComponent({
               left center;
             background-size: 17px;
           }
-          .icon_datasets {
+          .icon_spaces {
             width: 16px;
             height: 16px;
             margin: 0 5px 0 0;

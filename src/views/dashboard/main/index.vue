@@ -33,6 +33,7 @@
                 </el-button>
                 <p v-if="loadingText">please switch to
                   <span style="text-decoration: underline;" @click="changeNetChange(3141)">Filecoin TestNet</span> or
+                  <span style="text-decoration: underline;" @click="changeNetChange(137)">Polygon Mainnet</span> or
                   <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span>.</p>
               </div>
             </div>
@@ -149,7 +150,7 @@ export default defineComponent({
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
       console.log(parseInt(chainId, 16))
-      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97) {
+      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) active.value = 2
         return false
@@ -188,7 +189,7 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97) signFun()
+        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137) signFun()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {

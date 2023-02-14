@@ -21,6 +21,10 @@ const modelsDetail = () =>
     import ("@/views/dashboard/models/details");
 const spaces = () =>
     import ("@/views/dashboard/spaces/index");
+const spaceDetail = () =>
+    import ("@/views/dashboard/spaces/details");
+const spaceCreate = () =>
+    import ("@/views/dashboard/spaces/createSpace");
 const personalCenter = () =>
     import ("@/views/dashboard/personalCenter/index");
 const personalCenterProfile = () =>
@@ -92,6 +96,22 @@ const routes = [{
                     path: '/dashboard/spaces',
                     name: 'spaces',
                     component: spaces,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: '/dashboard/spaces/:name/:tabs',
+                    name: 'spaceDetail',
+                    component: spaceDetail,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: '/dashboard/create_space',
+                    name: 'spaceCreate',
+                    component: spaceCreate,
                     meta: {
                         keepAlive: true
                     }

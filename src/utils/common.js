@@ -183,6 +183,19 @@ async function changeNet(rows) {
         blockExplorerUrls: [process.env.VUE_APP_BSCBLOCKURL]
       }
       break
+    case 137:
+      text = {
+        chainId: web3Init.utils.numberToHex(137),
+        chainName: 'Polygon Mainnet',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: [process.env.VUE_APP_POLYGONRPC],
+        blockExplorerUrls: [process.env.VUE_APP_POLYGONBLOCKURL]
+      }
+      break
     case 3141:
       text = {
         chainId: web3Init.utils.numberToHex(3141),

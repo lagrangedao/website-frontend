@@ -55,6 +55,7 @@
               </router-link>
             </template>
             <el-menu-item index="/dashboard/create_dataset">+ New Dataset</el-menu-item>
+            <el-menu-item index="/dashboard/create_space">+ New Space</el-menu-item>
             <el-menu-item index="sign_out">Sign Out</el-menu-item>
           </el-sub-menu>
         </el-menu>
@@ -98,17 +99,11 @@ export default defineComponent({
       else store.dispatch('setNavLogin', false)
     }
     function activeMenu (row) {
-      // console.log(route.name, row)
-      if (row) {
-        if (row.indexOf('dataset') > -1) activeIndex.value = '/dashboard/dataset'
-        else if (row.indexOf('model') > -1) activeIndex.value = '/dashboard/models'
-        else activeIndex.value = row
-        return
-      }
-      const name = route.name
+      const name = row || route.name
       if (name.indexOf('dataset') > -1) activeIndex.value = '/dashboard/dataset'
       else if (name.indexOf('model') > -1) activeIndex.value = '/dashboard/models'
       else if (name.indexOf('space') > -1) activeIndex.value = '/dashboard/spaces'
+      else activeIndex.value = name
     }
     onMounted(() => activeMenu())
     watch(route, (to, from) => {

@@ -1,6 +1,6 @@
 <template>
-  <section id="dataset">
-    <el-row class="dataset_body">
+  <section id="space">
+    <el-row class="space_body">
       <header>
         <div class="title">
           <a @click="getListFolderMain('')">{{route.params.name}}</a>
@@ -199,7 +199,7 @@ import {
 } from '@element-plus/icons-vue'
 import { async } from 'q';
 export default defineComponent({
-  name: 'Datasets',
+  name: 'Spaces',
   components: {
     CaretBottom,
     Document,
@@ -283,14 +283,14 @@ export default defineComponent({
       return true;
     }
     async function init () {
-      if (route.name !== 'datasetDetail') return
+      if (route.name !== 'spaceDetail') return
       listLoad.value = true
       listdata.value = {}
       fileRow.fileTitle = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         fileRow.fileResdata = listRes.data.files || []
-        listdata.value = listRes.data.dataset || { name: route.params.name }
+        listdata.value = listRes.data.space || { name: route.params.name }
 
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)
@@ -445,7 +445,7 @@ export default defineComponent({
           })
           // fd.append("is_public", listdata.value.is_public)
           // fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
-          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files`, 'put', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
@@ -474,7 +474,7 @@ export default defineComponent({
             fd.append('file', fileNew, `${name ? name + '/' : ''}${namepath}`)
             // console.log('file', fileNew)
           })
-          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files`, 'put', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
@@ -506,7 +506,7 @@ export default defineComponent({
       let newFile = new File([type === 'create' ? textEditor.value : fileTextEditor.value], `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
       let fd = new FormData()
       fd.append('file', newFile, `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files`, 'put', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data.files) system.$commonFun.messageTip('success', `${type === 'create' ? 'Create ' + textInfo.name + ' successfully!' : 'Update ' + fileBody.title + ' successfully!'}`)
@@ -732,14 +732,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-#dataset {
+#space {
   background: #fff;
   color: #333;
   font-size: 18px;
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
-  :deep(.dataset_body) {
+  :deep(.space_body) {
     display: flex;
     align-items: stretch;
     padding: 0.4rem 0;

@@ -77,7 +77,7 @@
               <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt=""> {{accessName||'-'}}
             </div>
             <div class="right">
-              {{calculateDiffTime(fileBody._originPath.created_at)}}
+              {{calculateDiffTime(fileBody._originPath.updated_at)}}
             </div>
           </div>
           <div v-if="!fileTextShow">
@@ -549,6 +549,7 @@ export default defineComponent({
       if (!url) return
       var response = await fetch(url);
       const resType = response.headers.get("content-type")
+      console.log(resType)
       fileTextEditor.value = await new Promise(async resolve => {
         if (resType.indexOf('image') > -1) {
           fileTextType.value = 'image'
@@ -858,9 +859,6 @@ export default defineComponent({
                 &.is_dir {
                   text-decoration: underline;
                   cursor: pointer;
-                }
-                &:hover {
-                  text-decoration: underline;
                 }
               }
             }

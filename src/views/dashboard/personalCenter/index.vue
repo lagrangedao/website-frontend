@@ -4,6 +4,7 @@
       <div slot="title">
         To use our site, please switch to
         <span @click="changeNetChange(3141)">Filecoin TestNet</span> or
+        <span @click="changeNetChange(137)">Polygon Mainnet</span> or
         <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span>.
       </div>
     </el-alert>
@@ -36,9 +37,9 @@
             <div class="desc">None yet</div>
           </div>
           <div class="media">
-            <a href="" target="_blank"></a>
-            <a href="https://mobile.twitter.com/lagrangedao" target="_blank"></a>
-            <a href="https://github.com/lagrangedao" target="_blank"></a>
+            <a v-if="listdata.user.homepage" :href="listdata.user.homepage" target="_blank" class="homepage"></a>
+            <a v-if="listdata.user.twitter_username" :href="'https://twitter.com/'+listdata.user.twitter_username" target="_blank" class="twitter"></a>
+            <a v-if="listdata.user.github_username" :href="'https://github.com/'+listdata.user.github_username" target="_blank" class="github"></a>
           </div>
         </div>
       </el-col>
@@ -61,21 +62,35 @@
           <div class="title">
             <i class="icon icon_spaces"></i>
             Spaces
-            <span>1</span>
+            <span>{{spacesIndex}}</span>
           </div>
         </div>
-        <el-row :gutter="32" class="list_body_spaces">
-          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="list in 1" :key="list">
+        <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
+          <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="spacesIndex>1?12:24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
             <el-card class="box-card">
               <template #header>
                 <div class="card-header">
-                  <span>27</span>
+                  <span>1</span>
                 </div>
-                <h1>Runway Inpainting</h1>
+                <h1>{{list.name}}</h1>
+              </template>
+            </el-card>
+          </el-col>
+          <el-col v-if="listdata.spacesIsShow" :xs="24" :sm="spacesIndex>1?12:24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces" :key="list" @click="detailFun(list, 'space')">
+            <el-card class="box-card">
+              <template #header>
+                <div class="card-header">
+                  <span>1</span>
+                </div>
+                <h1>{{list.name}}</h1>
               </template>
             </el-card>
           </el-col>
         </el-row>
+        <div class="more_style" v-if="listdata.spaces.length>2">
+          <img v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        </div>
         <div class="top">
           <div class="list">
             <div class="title">
@@ -92,7 +107,7 @@
           </el-select>
         </div>
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, l)">
+          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
             <el-card class="box-card">
               <template #header>
                 <!-- <div class="card-header">
@@ -124,7 +139,7 @@
               </div>
             </el-card>
           </el-col>
-          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, l)">
+          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
             <el-card class="box-card">
               <template #header>
               </template>
@@ -252,12 +267,15 @@ export default defineComponent({
     const prevType = ref(true)
     const dataSetIndex = ref(0)
     const modelsIndex = ref(0)
+    const spacesIndex = ref(0)
     const listdata = reactive({
       datasets: [],
       models: [],
+      spaces: [],
       user: {},
       datasetsIsShow: false,
-      modelsIsShow: false
+      modelsIsShow: false,
+      spacesIsShow: false
     })
     const listLoad = ref(false)
     const system = getCurrentInstance().appContext.config.globalProperties
@@ -281,7 +299,7 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97) {
+      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) getdataList()
         return false
@@ -296,16 +314,21 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         listdata.datasets = listRes.data.dataset || []
         listdata.models = listRes.data.model || []
+        listdata.spaces = listRes.data.space || []
         listdata.user = listRes.data.user || {}
         dataSetIndex.value = listRes.data.dataset.length
         modelsIndex.value = listRes.data.model.length
+        spacesIndex.value = listRes.data.space.length
         store.dispatch('setAccessAvatar', listRes.data.user.avatar)
+        store.dispatch('setAccessName', listRes.data.user.full_name)
       } else {
         listdata.datasets = []
         listdata.models = []
+        listdata.spaces = []
         listdata.user = {}
         dataSetIndex.value = 0
         modelsIndex.value = 0
+        spacesIndex.value = 0
         system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
       }
       // await system.$commonFun.timeout(500)
@@ -328,7 +351,7 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97) isLogin()
+        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137) isLogin()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
@@ -345,9 +368,11 @@ export default defineComponent({
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
-    function detailFun (row, index) {
+    function detailFun (row, type) {
       // console.log(row, index)
-      router.push({ name: 'datasetDetail', params: { name: row.name, tabs: 'card' } })
+      if (type === 'dataset') router.push({ name: 'datasetDetail', params: { name: row.name, tabs: 'card' } })
+      else if (type === 'space') router.push({ name: 'spaceDetail', params: { name: row.name, tabs: 'card' } })
+      else if (type === 'model') router.push({ name: 'modelsDetail', params: { name: row.name, tabs: 'card' } })
     }
     function editProfile (row, index) {
       // console.log(row, index)
@@ -361,11 +386,14 @@ export default defineComponent({
     onDeactivated(() => {
       listdata.datasetsIsShow = false
       listdata.modelsIsShow = false
+      listdata.spacesIsShow = false
       listdata.datasets = []
       listdata.models = []
+      listdata.spaces = []
       listdata.user = {}
       dataSetIndex.value = 0
       modelsIndex.value = 0
+      spacesIndex.value = 0
     })
     watch(navLogin, (newValue, oldValue) => {
       if (navLogin.value) isLogin()
@@ -386,6 +414,7 @@ export default defineComponent({
       prevType,
       dataSetIndex,
       modelsIndex,
+      spacesIndex,
       listdata,
       listLoad,
       accessAvatar,
@@ -595,17 +624,17 @@ export default defineComponent({
             width: 25px;
             height: 25px;
             margin: 0 0.1rem 0 0;
-            &:nth-child(1) {
+            &.homepage {
               background: url(../../../assets/images/icons/media_1.png)
                 no-repeat;
               background-size: 100%;
             }
-            &:nth-child(2) {
+            &.twitter {
               background: url(../../../assets/images/icons/media_2.png)
                 no-repeat;
               background-size: 100%;
             }
-            &:nth-child(3) {
+            &.github {
               background: url(../../../assets/images/icons/media_3.png)
                 no-repeat;
               background-size: 100%;
@@ -1086,6 +1115,7 @@ export default defineComponent({
       }
       .list_body_spaces {
         padding: 0.16rem 0;
+        min-height: 80px;
         .el-col {
           margin: 0.16rem 0;
           .box-card {

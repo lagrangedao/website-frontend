@@ -30,8 +30,19 @@
               Downloads last month
               <b>1,149,560</b>
             </div>
-            <div>
+            <div class="echarts">
               <div id="maychar"></div>
+            </div>
+          </div>
+          <div class="list list_border">
+            <div class="title">
+              Hosted inference API
+            </div>
+            <div class="progress">
+              <p>Computation time on Intel Xeon 3rd Gen Scalable cpu: cached</p>
+              <el-progress :percentage="50" :color="'#7405ff'">
+                <span text>0.997</span>
+              </el-progress>
             </div>
           </div>
           <div class="list">
@@ -286,6 +297,13 @@ export default defineComponent({
     const changetype = () => {
       const machart = echarts.init(document.getElementById("maychar"));
       const option = {
+        grid: {
+          top: '0',
+          left: '0',
+          right: '0',
+          bottom: '0',
+          containLabel: true
+        },
         xAxis: {
           type: 'category',
           boundaryGap: false,
@@ -294,11 +312,14 @@ export default defineComponent({
         },
         yAxis: {
           type: 'value',
-          show: false
+          show: false,
+          scale: true,
+          splitNumber: 5,
+          alignTicks: true
         },
         series: [
           {
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            data: [820, 982, 951, 934, 900, 930, 920],
             type: 'line',
             // smooth:true,
             symbolSize: 0,
@@ -552,9 +573,14 @@ export default defineComponent({
             }
           }
         }
-        #maychar {
-          width: 150px;
-          height: 70px;
+        .echarts {
+          display: flex;
+          align-items: center;
+          margin-top: 0.2rem;
+          #maychar {
+            width: 150px;
+            height: 50px;
+          }
         }
         .cont {
           padding: 0.25rem 0.06rem;
@@ -732,6 +758,40 @@ export default defineComponent({
                   }
                 }
               }
+            }
+          }
+        }
+      }
+      .list_border {
+        padding: 0.1rem 0.16rem;
+        margin: 0.2rem 0 0;
+        border-top: 1px solid #f1f1f1;
+        border-bottom: 1px solid #f1f1f1;
+        .title {
+          font-size: 18px;
+          color: #000;
+          @media screen and (min-width: 1800px) {
+            font-size: 19px;
+          }
+          @media screen and (max-width: 1440px) {
+            font-size: 16px;
+          }
+        }
+        .progress {
+          p {
+            margin-bottom: 0.1rem;
+            font-size: 12px;
+            color: #878c93;
+            word-break: break-word;
+            @media screen and (min-width: 1800px) {
+              font-size: 13px;
+            }
+          }
+          .el-progress {
+            font-size: 14px;
+            color: #878c93;
+            @media screen and (min-width: 1800px) {
+              font-size: 15px;
             }
           }
         }

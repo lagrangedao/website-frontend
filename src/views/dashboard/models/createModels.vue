@@ -124,8 +124,7 @@ export default defineComponent({
                     formData.append('license', ruleForm.license)
                     const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'post', formData)
                     await system.$commonFun.timeout(500)
-                    if (listRes && listRes.data) system.$commonFun.messageTip('success', 'Created Dataset successfully!')
-                    else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Created Failed!')
+                    system.$commonFun.messageTip('success', 'Created Dataset successfully!')
                     ruleForm.name = ''
                     ruleForm.license = ''
                     router.push({ name: 'datasets' })
@@ -196,7 +195,7 @@ export default defineComponent({
           font-size: 18px;
           font-weight: 500;
           line-height: 1.5;
-          color: #878c93;
+          color: rgba(107, 124, 108, 1);
           @media screen and (max-width: 1600px) {
             font-size: 16px;
           }
@@ -223,14 +222,6 @@ export default defineComponent({
             .label {
               width: 100%;
               text-align: left;
-              color: #606060;
-              font-size: 16px;
-              @media screen and (max-width: 1440px) {
-                font-size: 14px;
-              }
-              @media screen and (max-width: 1024px) {
-                font-size: 12px;
-              }
               .flex-row {
                 display: flex;
                 width: 100%;
@@ -256,35 +247,17 @@ export default defineComponent({
                   h5,
                   p {
                     text-align: left;
-                    font-size: 18px;
+                    font-size: 16px;
+                    font-weight: 100;
                     color: #333;
                     line-height: 1.5;
                     word-break: break-word;
                     white-space: normal;
-                    @media screen and (max-width: 1600px) {
-                      font-size: 17px;
-                    }
-                    @media screen and (max-width: 1440px) {
-                      font-size: 16px;
-                    }
-                    @media screen and (max-width: 1024px) {
-                      font-size: 14px;
-                    }
                   }
                   p {
-                    font-size: 15px;
-                    font-weight: 100;
+                    font-size: 14px;
                     color: #7e7e7e;
                     line-height: 1.3;
-                    @media screen and (max-width: 1600px) {
-                      font-size: 14px;
-                    }
-                    @media screen and (max-width: 1440px) {
-                      font-size: 13px;
-                    }
-                    @media screen and (max-width: 1024px) {
-                      font-size: 12px;
-                    }
                   }
                 }
               }

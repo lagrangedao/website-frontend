@@ -4,6 +4,7 @@
       <div slot="title">
         To use our site, please switch to
         <span @click="changeNetChange(3141)">Filecoin TestNet</span> or
+        <span @click="changeNetChange(137)">Polygon Mainnet</span> or
         <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span>.
       </div>
     </el-alert>
@@ -133,9 +134,20 @@ export default defineComponent({
       twitter: ''
     })
     const fileList = ref([])
+    const validateInput = (rule, value, callback) => {
+      if (!value) callback()
+      if (!isURL(value)) {
+        callback(new Error("Please enter the web address"));
+      } else {
+        callback();
+      }
+    }
     const rules = reactive({
       name: [
         { required: true, message: 'Please fill in this field', trigger: 'blur' }
+      ],
+      homepage: [
+        { validator: validateInput, trigger: "blur" }
       ]
     })
     const ruleFormRef = ref(null)
@@ -151,6 +163,21 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
 
+    function isURL (str_url) {
+      // var strRegex = "^((https|http|ftp|rtsp|mms)?://)"
+      //   + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" // ftp的user@
+      //   + "(([0-9]{1,3}\.){3}[0-9]{1,3}" // IP形式的URL- 199.194.52.184
+      //   + "|" // 允许IP和DOMAIN（域名）
+      //   + "([0-9a-z_!~*'()-]+\.)*" // 域名- www.
+      //   + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\." // 二级域名
+      //   + "[a-z]{2,6})" // first level domain- .com or .museum
+      //   + "(:[0-9]{1,4})?" // 端口- :80
+      //   + "((/?)|" // a slash isn't required if there is no file name
+      //   + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+      // var re = new RegExp(strRegex);
+      var re = new RegExp('^(?!mailto:)(?:(?:http|https|ftp)://|//)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$', 'i');
+      return re.test(str_url);
+    }
     async function isLogin () {
       loadingText.value = ''
       system.$commonFun.Init(async addr => {
@@ -168,7 +195,7 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97) {
+      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) getdataList()
         return false
@@ -182,6 +209,7 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
       if (listRes && listRes.status === 'success') {
         store.dispatch('setAccessAvatar', listRes.data.user.avatar)
+        store.dispatch('setAccessName', listRes.data.user.full_name)
         profileName.value = listRes.data.user.full_name
         ruleForm.name = listRes.data.user.full_name
         ruleForm.avatar = listRes.data.user.avatar
@@ -212,7 +240,7 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97) isLogin()
+        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137) isLogin()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
