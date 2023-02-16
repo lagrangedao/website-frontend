@@ -20,7 +20,7 @@
             <el-icon class="el-icon--right">
               <Plus />
             </el-icon>
-            Add file
+            Contribute
             <el-icon class="el-icon--right">
               <caret-bottom />
             </el-icon>
@@ -38,15 +38,15 @@
           <el-table-column label="name">
             <template #default="scope">
               <div class="dir_parent" v-if="scope.row.isDir" @click="folderDetails(scope.row)">
-                <el-icon>
-                  <Folder />
-                </el-icon>
+                <div class="i icon_fold">
+                  <img src="@/assets/images/icons/icon_40.png" alt="" />
+                </div>
                 <span class="is_file is_dir" :title="scope.row.title">{{scope.row.title}}</span>
               </div>
               <div class="dir_parent" v-else @click="fileEdit(scope.row)">
-                <el-icon>
-                  <Document />
-                </el-icon>
+                <div class="i icon_file">
+                  <img src="@/assets/images/icons/icon_41.png" alt="" />
+                </div>
                 <span class="is_file">{{scope.row.title}}</span>
                 <!-- <a class="is_file" :href="scope.row._originPath.url" target="_blank" :title="scope.row.title">{{scope.row.title}}</a> -->
               </div>
@@ -66,7 +66,8 @@
           <el-table-column label="Created At" align="right">
             <template #default="scope">
               <div>
-                <span>{{ scope.row.isDir ? '-' :momentFilter(scope.row._originPath.created_at)}}</span>
+                <span v-if="scope.row.isDir">-</span>
+                <span v-else :title="momentFilter(scope.row._originPath.created_at)">{{ calculateDiffTime(scope.row._originPath.created_at)}}</span>
               </div>
             </template>
           </el-table-column>
@@ -107,6 +108,17 @@
                     <path d="M24.59 16.59L17 24.17V4h-2v20.17l-7.59-7.58L6 18l10 10l10-10l-1.41-1.41z" fill="currentColor"></path>
                   </svg>
                   download
+                </a>
+              </li>
+              <li class="disabled">
+                <a>
+                  <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path d="M12 12h2v12h-2z" fill="currentColor"></path>
+                    <path d="M18 12h2v12h-2z" fill="currentColor"></path>
+                    <path d="M4 6v2h2v20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8h2V6zm4 22V8h16v20z" fill="currentColor"></path>
+                    <path d="M12 2h8v2h-8z" fill="currentColor"></path>
+                  </svg>
+                  delete
                 </a>
               </li>
             </ul>
@@ -578,14 +590,18 @@ export default defineComponent({
     function calculateDiffTime (startTime) {
       var endTime = Math.round(new Date() / 1000)
       var timeDiff = endTime - startTime
+      var year = timeDiff > (86400 * 365) ? parseInt(timeDiff / 86400 / 365) : 0
+      var month = timeDiff > (86400 * 30) ? parseInt(timeDiff / 86400 / 30) : 0
       var day = parseInt(timeDiff / 86400)
       var hour = parseInt((timeDiff % 86400) / 3600)
       var minute = parseInt((timeDiff % 3600) / 60)
       var m = parseInt((timeDiff % 60))
-      if (day > 0) return day + ' days ago'
-      else if (hour > 0) return hour + ' hours ago'
-      else if (minute > 0) return minute + ' minutes ago'
-      else if (m > 0) return m + ' seconds ago'
+      if (year > 0) return `about ${year}${year > 1 ? ' years' : ' year'} ago`
+      if (month > 0) return `${month} ${month > 1 ? ' months' : ' month'} ago`
+      if (day > 0) return `${day} ${day > 1 ? ' days' : ' day'} ago`
+      else if (hour > 0) return `${hour} ${hour > 1 ? ' hours' : ' hour'} ago`
+      else if (minute > 0) return `${minute} ${minute > 1 ? ' minutes' : ' minute'} ago`
+      else if (m > 0) return `${m} ${m > 1 ? ' seconds' : ' second'} ago`
       else return '-'
     }
 
@@ -831,9 +847,24 @@ export default defineComponent({
               -webkit-box-orient: vertical;
               line-height: 1.5;
               word-break: break-word;
-              i {
+              i,
+              .i {
+                width: 16px;
                 font-size: 14px;
                 margin-right: 5px;
+                text-align: center;
+                &.icon_fold {
+                  img {
+                    width: 15px;
+                    margin-top: 4px;
+                  }
+                }
+                &.icon_file {
+                  img {
+                    width: 12px;
+                    margin-top: 4px;
+                  }
+                }
               }
               a {
                 color: inherit;
@@ -946,6 +977,15 @@ export default defineComponent({
               }
               &:hover {
                 text-decoration: underline;
+              }
+            }
+            &.disabled {
+              opacity: 0.5;
+              a {
+                cursor: no-drop;
+                &:hover {
+                  text-decoration: unset;
+                }
               }
             }
           }

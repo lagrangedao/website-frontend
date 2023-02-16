@@ -72,7 +72,7 @@ export default defineComponent({
 <style  lang="scss" scoped>
 .footer {
   position: relative;
-  height: 0.9rem;
+  height: 0.8rem;
   font-size: 12px;
   color: #fff;
   @media screen and (min-width: 1800px) {
