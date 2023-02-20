@@ -3,21 +3,24 @@
     <el-alert type="warning" effect="dark" center show-icon v-if="loadingText">
       <div slot="title">
         To use our site, please switch to
-        <span @click="changeNetChange(31415)">FEVM Wallaby</span> or
+        <span @click="changeNetChange(3141)">Filecoin TestNet</span> or
+        <span @click="changeNetChange(137)">Polygon Mainnet</span> or
         <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span>.
       </div>
     </el-alert>
     <el-row class="dataset_body">
-      <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6" class="left">
+      <el-col :xs="24" :sm="8" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
-          <img :src="peopleUrl" class="logo_sidebar" alt="">
+          <div v-loading="false" class="logo_sidebar">
+            <img :src="listdata.user.avatar || accessAvatar || peopleUrl" alt="">
+          </div>
           <div class="personal">
             <div class="title">
-              <!-- {{info.address}} -->
-              Cao
+              {{ listdata.user.full_name || '-'}}
             </div>
-            <div class="desc">Founder, FilSwan</div>
-            <el-button type="" text bg>Edit profile</el-button>
+            <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
+            <div class="desc">Balance: {{info.balance||'-'}}</div>
+            <el-button type="" text bg @click="editProfile">Edit profile</el-button>
           </div>
           <div class="personal">
             <div class="top_text">
@@ -34,16 +37,16 @@
             <div class="desc">None yet</div>
           </div>
           <div class="media">
-            <a href="" target="_blank"></a>
-            <a href="" target="_blank"></a>
-            <a href="" target="_blank"></a>
+            <a v-if="listdata.user.homepage" :href="listdata.user.homepage" target="_blank" class="homepage"></a>
+            <a v-if="listdata.user.twitter_username" :href="'https://twitter.com/'+listdata.user.twitter_username" target="_blank" class="twitter"></a>
+            <a v-if="listdata.user.github_username" :href="'https://github.com/'+listdata.user.github_username" target="_blank" class="github"></a>
           </div>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="18" class="right">
+      <el-col :xs="24" :sm="16" :md="16" :lg="18" :xl="18" class="right">
         <div class="top">
           <div class="top_text">
-            <!-- <h3>Hello {{info.address}}, <br />Welcome to FEVM Wallaby! </h3> -->
+            <!-- <h3>Hello {{info.address}}, <br />Welcome to Filecoin TestNet! </h3> -->
           </div>
           <div class="top_text">
             <el-input v-model="searchValue" class="w-50 m-2" placeholder="search ..." />
@@ -59,21 +62,35 @@
           <div class="title">
             <i class="icon icon_spaces"></i>
             Spaces
-            <span>2</span>
+            <span>{{spacesIndex}}</span>
           </div>
         </div>
-        <el-row :gutter="32" class="list_body_spaces">
-          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="list in 1" :key="list">
+        <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
+          <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="spacesIndex>1?12:24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
             <el-card class="box-card">
               <template #header>
                 <div class="card-header">
-                  <span>27</span>
+                  <span>1</span>
                 </div>
-                <h1>Runway Inpainting</h1>
+                <h1>{{list.name}}</h1>
+              </template>
+            </el-card>
+          </el-col>
+          <el-col v-if="listdata.spacesIsShow" :xs="24" :sm="spacesIndex>1?12:24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces" :key="list" @click="detailFun(list, 'space')">
+            <el-card class="box-card">
+              <template #header>
+                <div class="card-header">
+                  <span>1</span>
+                </div>
+                <h1>{{list.name}}</h1>
               </template>
             </el-card>
           </el-col>
         </el-row>
+        <div class="more_style" v-if="listdata.spaces.length>2">
+          <img v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        </div>
         <div class="top">
           <div class="list">
             <div class="title">
@@ -89,8 +106,8 @@
             <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </div>
-        <el-row :gutter="32" class="list_body" v-loading="listLoad">
-          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
+        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
+          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
             <el-card class="box-card">
               <template #header>
                 <!-- <div class="card-header">
@@ -122,37 +139,65 @@
               </div>
             </el-card>
           </el-col>
+          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
+            <el-card class="box-card">
+              <template #header>
+              </template>
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+                <div class="item_body">
+                  <i class="icon icon_up"></i>
+                  <span class="small">5.15M</span>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
         </el-row>
+        <div class="more_style" v-if="listdata.datasets.length>3">
+          <img v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        </div>
         <div class="top">
           <div class="list">
             <div class="title">
               <i class="icon icon_models"></i>
               Models
-              <span>{{dataSetIndex}}</span>
+              <span>{{modelsIndex}}</span>
             </div>
           </div>
         </div>
-        <el-row :gutter="32" class="list_body" v-loading="listLoad">
-          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
+        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.modelsIsShow}" v-loading="listLoad">
+          <el-col v-show="!listdata.modelsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models.slice(0,3)" :key="l">
             <el-card class="box-card">
-              <template #header>
-                <!-- <div class="card-header">
-                                    <span>27</span>
-                                </div> -->
-              </template>
               <div class="text">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.name}}</p>
               </div>
-              <!-- <div class="text">
-                                <el-row :gutter="6">
-                                    <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                        <router-link to="" class="ellipsis">
-                                            {{list.data_schema}}
-                                        </router-link>
-                                    </el-col>
-                                </el-row>
-                            </div> -->
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+                <div class="item_body">
+                  <i class="icon icon_up"></i>
+                  <span class="small">5.15M</span>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col v-show="listdata.modelsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models" :key="l">
+            <el-card class="box-card">
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
@@ -166,13 +211,17 @@
             </el-card>
           </el-col>
         </el-row>
+        <div class="more_style" v-if="listdata.models.length>3">
+          <img v-if="!listdata.modelsIsShow" @click="listdata.modelsIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img v-else @click="listdata.modelsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        </div>
       </el-col>
     </el-row>
   </section>
 </template>
 <script>
 const ethereum = window.ethereum;
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
@@ -181,6 +230,7 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const accessAvatar = computed(() => (store.state.accessAvatar))
     const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const searchValue = ref('')
@@ -216,7 +266,17 @@ export default defineComponent({
     const loadingText = ref('')
     const prevType = ref(true)
     const dataSetIndex = ref(0)
-    const listdata = ref([])
+    const modelsIndex = ref(0)
+    const spacesIndex = ref(0)
+    const listdata = reactive({
+      datasets: [],
+      models: [],
+      spaces: [],
+      user: {},
+      datasetsIsShow: false,
+      modelsIsShow: false,
+      spacesIsShow: false
+    })
     const listLoad = ref(false)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -239,23 +299,39 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      if (parseInt(chainId, 16) === 31415 || parseInt(chainId, 16) === 97) {
+      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) getdataList()
         return false
-      } else loadingText.value = 'Switch to FEVM Wallaby or BSC TestNet!'
-      // system.$commonFun.messageTip('error', 'Switch to FEVM Wallaby!')
+      } else loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
+      // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
       store.dispatch('setNavLogin', false)
     }
     async function getdataList () {
       loading.value = false
       listLoad.value = true
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'get')
-      if (listRes) {
-        listdata.value = listRes.datasets || []
-        dataSetIndex.value = listRes.datasets.length
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
+      if (listRes && listRes.status === 'success') {
+        listdata.datasets = listRes.data.dataset || []
+        listdata.models = listRes.data.model || []
+        listdata.spaces = listRes.data.space || []
+        listdata.user = listRes.data.user || {}
+        dataSetIndex.value = listRes.data.dataset.length
+        modelsIndex.value = listRes.data.model.length
+        spacesIndex.value = listRes.data.space.length
+        store.dispatch('setAccessAvatar', listRes.data.user.avatar)
+        store.dispatch('setAccessName', listRes.data.user.full_name)
+      } else {
+        listdata.datasets = []
+        listdata.models = []
+        listdata.spaces = []
+        listdata.user = {}
+        dataSetIndex.value = 0
+        modelsIndex.value = 0
+        spacesIndex.value = 0
+        system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
       }
-      await system.$commonFun.timeout(500)
+      // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
     function fn () {
@@ -275,13 +351,13 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 31415 || parseInt(accounts, 16) === 97) isLogin()
+        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137) isLogin()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         loading.value = true
-        loadingText.value = 'Switch to FEVM Wallaby or BSC TestNet!'
+        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
         system.$commonFun.signOutFun()
         // window.location.reload()
       })
@@ -292,10 +368,32 @@ export default defineComponent({
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
-    onMounted(() => {
+    function detailFun (row, type) {
+      // console.log(row, index)
+      if (type === 'dataset') router.push({ name: 'datasetDetail', params: { name: row.name, tabs: 'card' } })
+      else if (type === 'space') router.push({ name: 'spaceDetail', params: { name: row.name, tabs: 'card' } })
+      else if (type === 'model') router.push({ name: 'modelsDetail', params: { name: row.name, tabs: 'card' } })
+    }
+    function editProfile (row, index) {
+      // console.log(row, index)
+      router.push({ name: 'personalCenterProfile' })
+    }
+    onActivated(() => {
       fn()
       if (navLogin.value || !!metaAddress.value) isLogin()
       else router.push({ name: 'main' })
+    })
+    onDeactivated(() => {
+      listdata.datasetsIsShow = false
+      listdata.modelsIsShow = false
+      listdata.spacesIsShow = false
+      listdata.datasets = []
+      listdata.models = []
+      listdata.spaces = []
+      listdata.user = {}
+      dataSetIndex.value = 0
+      modelsIndex.value = 0
+      spacesIndex.value = 0
     })
     watch(navLogin, (newValue, oldValue) => {
       if (navLogin.value) isLogin()
@@ -315,9 +413,12 @@ export default defineComponent({
       loadingText,
       prevType,
       dataSetIndex,
+      modelsIndex,
+      spacesIndex,
       listdata,
       listLoad,
-      isLogin, signIn, getdataList, fn, changeNetChange, momentFilter
+      accessAvatar,
+      isLogin, signIn, getdataList, fn, changeNetChange, momentFilter, detailFun, editProfile
     }
   }
 })
@@ -407,37 +508,65 @@ export default defineComponent({
         text-align: left;
         color: #fff;
         .logo_sidebar {
+          position: relative;
           display: block;
-          width: 60%;
-          max-width: 180px;
+          width: 100px;
+          height: 100px;
           margin: 0.55rem 0 0;
           background-color: #fff;
-          border: 0.1rem solid #fff;
+          border: 0.07rem solid #fff;
           border-radius: 50%;
+          overflow: hidden;
+          @media screen and (min-width: 1800px) {
+            width: 120px;
+            height: 120px;
+            border: 0.1rem solid #fff;
+          }
+          @media screen and (max-width: 768px) {
+            width: 80px;
+            height: 80px;
+          }
+          @media screen and (max-width: 600px) {
+            width: 60px;
+            height: 60px;
+          }
+          img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+          }
+        }
+        .el-loading-mask {
+          background-color: #fff;
+          .el-loading-spinner {
+            top: 50%;
+          }
         }
         .personal {
           margin: 0.2rem 0 0.45rem;
           .title {
-            font-size: 0.32rem;
-            font-weight: normal;
+            font-family: "Helvetica-Bold";
+            font-size: 0.28rem;
+            font-weight: bold;
             overflow: hidden;
             text-overflow: ellipsis;
             word-spacing: normal;
             @media screen and (min-width: 1800px) {
-              font-size: 0.37rem;
+              font-size: 0.33rem;
             }
           }
           .desc {
             margin: 0.05rem 0 0.2rem;
-            font-size: 16px;
+            font-size: 15px;
             @media screen and (min-width: 1800px) {
-              font-size: 18px;
+              font-size: 17px;
             }
             @media screen and (max-width: 1440px) {
-              font-size: 15px;
+              font-size: 14px;
             }
             @media screen and (max-width: 768px) {
-              font-size: 14px;
+              font-size: 13px;
             }
           }
           .el-button {
@@ -445,6 +574,7 @@ export default defineComponent({
             background: lighten($color: #f0f0f0, $amount: 0);
             border-radius: 0.07rem;
             color: #606060;
+            font-family: inherit;
             &:hover {
               opacity: 0.95;
             }
@@ -454,12 +584,17 @@ export default defineComponent({
             align-items: center;
             margin: 0 0 0.2rem;
             color: #fff;
-            font-size: 0.2rem;
+            font-family: "Helvetica-Bold";
+            font-size: 0.18rem;
+            font-weight: bold;
+            @media screen and (min-width: 1800px) {
+              font-size: 0.2rem;
+            }
             .icon {
               display: block;
               width: 25px;
               height: 25px;
-              margin: 0 0.07rem 0 0;
+              margin: -1px 0.07rem 0 0;
               @media screen and (min-width: 1800px) {
                 width: 30px;
                 height: 30px;
@@ -489,17 +624,17 @@ export default defineComponent({
             width: 25px;
             height: 25px;
             margin: 0 0.1rem 0 0;
-            &:nth-child(1) {
+            &.homepage {
               background: url(../../../assets/images/icons/media_1.png)
                 no-repeat;
               background-size: 100%;
             }
-            &:nth-child(2) {
+            &.twitter {
               background: url(../../../assets/images/icons/media_2.png)
                 no-repeat;
               background-size: 100%;
             }
-            &:nth-child(3) {
+            &.github {
               background: url(../../../assets/images/icons/media_3.png)
                 no-repeat;
               background-size: 100%;
@@ -523,7 +658,7 @@ export default defineComponent({
           align-items: center;
           h3 {
             color: #7405ff;
-            font-family: "OpenSauceOne-Regular";
+            font-family: "Helvetica-Neue";
             font-size: 0.22rem;
             font-weight: 500;
             line-height: 1.2;
@@ -657,7 +792,7 @@ export default defineComponent({
           color: #fff;
           h5 {
             padding: 0.1rem 0;
-            font-family: "OpenSauceOne-Regular";
+            font-family: "Helvetica-Neue";
             font-size: 0.2rem;
             font-weight: normal;
             line-height: 1;
@@ -685,7 +820,7 @@ export default defineComponent({
           }
           h6 {
             padding: 0.1rem 0;
-            font-family: "OpenSauceOne-Regular";
+            font-family: "Helvetica-Neue";
             font-size: 0.18rem;
             font-weight: normal;
             line-height: 1;
@@ -737,14 +872,13 @@ export default defineComponent({
           justify-content: flex-start;
           align-items: center;
           padding: 0;
-          //   font-family: "OpenSauceOne-Bold";
           font-size: 0.195rem;
           color: #000;
           border-radius: 0.08rem;
           .icon {
             width: 0.23rem;
             height: 0.23rem;
-            margin: 0 0.07rem 0 0;
+            margin: -1px 0.07rem 0 0;
           }
           .icon_myProfile {
             background: url(../../../assets/images/icons/icon_16.png) no-repeat
@@ -774,6 +908,7 @@ export default defineComponent({
       }
       .list_body {
         padding: 0 0 0.2rem;
+        min-height: 80px;
         .el-col {
           margin: 0.16rem 0;
           .box-card {
@@ -782,6 +917,9 @@ export default defineComponent({
             border-color: #e4e4e4;
             border-radius: 0.1rem;
             box-shadow: 5px 7px 9px rgba(0, 0, 0, 0.15);
+            * {
+              cursor: pointer;
+            }
             .el-card__header {
               padding: 0;
               border: 0;
@@ -804,7 +942,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0 0 0.05rem;
+              padding: 0;
               .text {
                 display: flex;
                 justify-content: flex-start;
@@ -817,7 +955,7 @@ export default defineComponent({
                 .icon {
                   width: 20px;
                   height: 20px;
-                  margin: 0 6px 0 0;
+                  margin: -1px 6px 0 0;
                 }
                 .icon_text {
                   background: url(../../../assets/images/icons/icon_10.png)
@@ -832,7 +970,7 @@ export default defineComponent({
                 }
                 .icon_up {
                   width: 15px;
-                  margin: 0 3px 0 0;
+                  margin: -1px 3px 0 0;
                   background: url(../../../assets/images/icons/icon_20.png)
                     no-repeat left center;
                   background-size: 100%;
@@ -945,8 +1083,39 @@ export default defineComponent({
           }
         }
       }
+      .list_flex {
+        flex-wrap: nowrap;
+        overflow: hidden;
+      }
+      .more_style {
+        display: flex;
+        justify-content: center;
+        img {
+          display: flex;
+          width: 40px;
+          height: 40px;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s;
+          border-radius: 100%;
+          box-shadow: 2px 2px 8px rgba(135, 135, 135, 0.5);
+          @media screen and (max-width: 1600px) {
+            width: 35px;
+            height: 35px;
+          }
+          @media screen and (max-width: 768px) {
+            width: 30px;
+            height: 30px;
+          }
+          &:hover {
+            transform: translateY(5px);
+          }
+        }
+      }
       .list_body_spaces {
         padding: 0.16rem 0;
+        min-height: 80px;
         .el-col {
           margin: 0.16rem 0;
           .box-card {
@@ -988,11 +1157,9 @@ export default defineComponent({
               }
               h1 {
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
-                text-transform: capitalize;
+                // text-transform: capitalize;
                 cursor: pointer;
-                font-family: "OpenSauceOne-Regular";
                 font-size: 0.3rem;
-                font-weight: 100;
                 letter-spacing: 1px;
               }
             }
@@ -1017,7 +1184,7 @@ export default defineComponent({
                 .icon {
                   width: 0.25rem;
                   height: 0.25rem;
-                  margin: 0 0.17rem 0 0;
+                  margin: -1px 0.17rem 0 0;
                   border-radius: 0.04rem;
                 }
                 span {

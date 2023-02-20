@@ -1,121 +1,81 @@
 <template>
   <section id="dataset">
     <div id="datasetBody">
-      <el-row class="dataset_body">
-        <el-col :xs="24" :sm="24" :md="24" :lg="4" :xl="4" class="left">
-          <div class="labelList">
-            <div class="title">Dataset Structure</div>
-            <ul>
-              <li>
-                <router-link to="">Data Instances</router-link>
-              </li>
-              <li>
-                <router-link to="">Data Fields</router-link>
-              </li>
-              <li>
-                <router-link to="">Data Splits</router-link>
-              </li>
-            </ul>
+      <el-row class="dataset_body" v-loading="listLoad">
+        <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
+          <div class="readme_body">
+            <div>
+              <b>No dataset card yet</b>
+              <p>New: Create and edit this dataset card directly on the website!</p>
+            </div>
           </div>
-          <div class="labelList">
-            <div class="title">Dataset Creation</div>
+        </el-col>
+        <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
+          <div class="labelList" id="permiss">
             <ul>
-              <li>
-                <router-link class="disbled" to="">Curation Rationale</router-link>
-              </li>
-              <li>
-                <router-link to="">Source Data</router-link>
-              </li>
-              <li>
-                <router-link to="">Annotations</router-link>
-              </li>
-              <li>
-                <router-link class="disbled" to="">Personal and Sensitive Information</router-link>
-              </li>
-            </ul>
-          </div>
-          <div class="labelList">
-            <div class="title">Dataset Creation</div>
-            <ul>
-              <li>
-                <router-link class="disbled" to="">Curation Rationale</router-link>
-              </li>
-              <li>
-                <router-link to="">Source Data</router-link>
-              </li>
-              <li>
-                <router-link to="">Annotations</router-link>
-              </li>
-              <li>
-                <router-link class="disbled" to="">Personal and Sensitive Information</router-link>
-              </li>
-            </ul>
-          </div>
-          <div class="labelList">
-            <div class="title">Additional Information</div>
-            <ul>
-              <li>
-                <router-link class="disbled" to="">Dataset Curators</router-link>
-              </li>
-              <li>
-                <router-link class="disbled" to="">Licensing Information</router-link>
-              </li>
-              <li>
-                <router-link to="">Citation Information</router-link>
-              </li>
-              <li>
-                <router-link to="">Contributions</router-link>
+              <li v-for="(anchor, index) in titles" :key="index + 'art'">
+                <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
             </ul>
           </div>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="24" :lg="14" :xl="14" class="right">
-          <div class="data">
-            <div class="top">
-              <div class="top_text">
-                Dataset Preview
-                <el-button>API</el-button>
-              </div>
-              <el-button>Text2Text Generation</el-button>
-            </div>
-            <div class="top">
-              <div class="top_text">
-                <span class="span">Subset</span>
-                <el-input v-model="searchValue" class="w-50 m-2" placeholder="Axb" />
-              </div>
-            </div>
-            <el-table :data="tableData" border stripe style="width: 100%" max-height="450">
-              <el-table-column label="sentence1 (string)" prop="sentence1" />
-              <el-table-column label="sentence2 (string)" prop="sentence2" />
-              <el-table-column label="idx (int32)" prop="idx" width="100" />
-              <el-table-column label="label (class label)" prop="label" width="150" />
-            </el-table>
-          </div>
-          <div class="text">
-            <p>Dataset Card for "super_glue"</p>
-            <p>Dataset Summary</p>
-            <p>SuperGLUE (https://super.gluebenchmark.com/) is a new benchmark styled after GLUE with a new set of more difficult language understanding tasks, improved resources, and a new public leaderboard.</p>
-            <br />
-            <p>BoolQ (Boolean Questions, Clark et al., 2019a) is a QA task where each example consists of a short passage and a yes/no question about the passage. The questions are provided anonymously and unsolicited by users of the Google search
-              engine, and afterwards paired with</p>
-          </div>
+        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
+          <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6" class="left">
+        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
+          <v-md-editor v-model="textEditorChange"></v-md-editor>
+        </el-col>
+        <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="6" class="left left_light">
           <div class="list">
             <div class="title">
               Downloads last month
               <b>1,149,560</b>
             </div>
             <div class="cont">
+              <el-row :gutter="12" v-if="urlReadme">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview">
+                  <a>
+                    <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
+                      <el-icon>
+                        <EditPen />
+                      </el-icon>
+                      Edit dataset card
+                    </span>
+                  </a>
+                </el-col>
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
+                  <a>
+                    <span class="a_button" @click="isPreview=true">
+                      <el-icon>
+                        <CircleClose />
+                      </el-icon>
+                      Cancel
+                    </span>
+                  </a>
+                </el-col>
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
+                  <a>
+                    <span class="a_button" @click="editCommitFun">
+                      <el-icon>
+                        <Edit />
+                      </el-icon>
+                      Commit changes
+                    </span>
+                  </a>
+                </el-col>
+              </el-row>
               <el-row :gutter="12">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Tasks" :key="index">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
                   <router-link to="">
-                    <i class="icon"></i>
-                    {{l}}
+                    <i class="icon icon_01"></i>
+                    <span class="a_text">Image Classification</span>
                   </router-link>
                 </el-col>
-                <el-col :span="24">
-                  <div class="more">+ 54 Tasks</div>
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
+                  <router-link to="">
+                    <i class="icon icon_02"></i>
+                    <span class="a_text">Translation</span>
+                  </router-link>
                 </el-col>
               </el-row>
             </div>
@@ -142,10 +102,11 @@
           </div>
           <div class="list">
             <div class="title">
-              <p>
+              <p :title="'Models trained or fine-tuned on '+route.params.name">
                 <i class="icon icon_datasets"></i>
-                Models trained or fine-tuned on</p>
-              <small>super_glue</small>
+                Models trained or fine-tuned on
+                <small>{{route.params.name}}</small>
+              </p>
             </div>
           </div>
           <el-row class="list_body" v-loading="false">
@@ -154,9 +115,9 @@
                 <template #header>
                   <div class="card-header">
                     <div class="name">
-                      <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
+                      <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
                       <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
-                      <img v-else src="@/assets/images/dashboard/people_03.png" alt="">
+                      <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
                       <b>{{list.name}}</b>
                     </div>
                     <span>27</span>
@@ -190,21 +151,29 @@
           </el-row>
         </el-col>
       </el-row>
-      <!-- <detail-files v-else-if="activeName==='files'"></detail-files> -->
     </div>
   </section>
 </template>
 <script>
-// import detailFiles from '@/views/dashboard/datasets/detailFiles.vue'
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import {
+  EditPen, Edit, CircleClose
+} from '@element-plus/icons-vue'
+import { async } from 'q';
+
 export default defineComponent({
   name: 'Datasets',
   components: {
-    // detailFiles
+    EditPen,
+    Edit,
+    CircleClose
   },
-  setup () {
+  props: {
+    urlChange: { type: String, default: 'card' }
+  },
+  setup (props) {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const dataList = reactive({
@@ -244,6 +213,9 @@ export default defineComponent({
         label: 'Most Likes',
       }
     ])
+    const urlReadme = ref('')
+    const urlReadmeName = ref('')
+    const isPreview = ref(true)
     const currentPage1 = ref(1)
     const small = ref(false)
     const background = ref(false)
@@ -254,7 +226,6 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const activeName = ref('card')
     const tableData = ref([
       {
         sentence1: '"The cat sat on the mat."',
@@ -299,7 +270,30 @@ export default defineComponent({
         label: '1   (not_entailment)'
       }
     ])
+    const textEditor = ref('')
+    const textEditorChange = ref('')
+    const preview = ref(null);
+    const titles = ref([]);
 
+    function editFun () {
+      textEditorChange.value = textEditor.value
+      isPreview.value = false
+    }
+    async function editCommitFun () {
+      // console.log(urlReadmeName.value)
+      listLoad.value = true
+      let newFile = new File([textEditorChange.value], urlReadmeName.value)
+      let fd = new FormData()
+      fd.append('file', newFile, urlReadmeName.value)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+      await system.$commonFun.timeout(500)
+      if (uploadRes && uploadRes.status === "success") {
+        if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
+        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+      } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+      init()
+      isPreview.value = true
+    }
     function handleClick (tab, event) {
       router.push({ name: 'datasetDetail', params: { name: route.params.name, tabs: tab.props.name } })
     }
@@ -315,17 +309,28 @@ export default defineComponent({
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
     async function init () {
-      // listLoad.value = true
-      // listdata.value = []
-      // total.value = 0
-      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}dataset`, 'get')
-      // if (listRes) {
-      //   listdata.value = listRes.datasets || []
-      //   total.value = listRes.datasets.length
-      // }
-      // await system.$commonFun.timeout(500)
-      // listLoad.value = false
-
+      if (route.params.tabs !== 'card') return
+      listLoad.value = true
+      listdata.value = []
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        // listdata.value = listRes.data.files || []
+        const fileLi = listRes.data.files || []
+        fileLi.forEach((element, i) => {
+          let el = element.name.split('/')
+          el.shift()
+          el.shift()
+          el.shift()
+          // console.log(el.join('/').toLowerCase())
+          if (el.join('/').toLowerCase() === 'readme.md') {
+            urlReadme.value = element.url
+            urlReadmeName.value = el.join('/').toLowerCase()
+            getTitle()
+          }
+        })
+      }
+      await system.$commonFun.timeout(500)
+      listLoad.value = false
       listdata.value = [
         {
           is_public: "1",
@@ -348,13 +353,70 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
+    const imgClick = (url, index) => {
+      console.log(url, index);
+    };
+    const getTitle = async () => {
+      if (!urlReadme.value) return
+      // textEditor.value = await fetch(urlReadme.value)
+      //   .then(res => res.arrayBuffer())
+      //   .then(buffer => {
+      //     const decoder = new TextDecoder("gbk")
+      //     const text = decoder.decode(buffer)
+      //     return text
+      //   })
+      var response = await fetch(urlReadme.value)
+      textEditor.value = await new Promise(async resolve => {
+        resolve(response.text())
+      })
+      nextTick(() => {
+        const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+        titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+        if (!titles.value.length) {
+          titles.value = [];
+          return;
+        }
+
+        const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+        titles.value = titles.value.map(el => ({
+          title: el.innerText,
+          lineIndex: el.getAttribute('data-v-md-line'),
+          indent: hTags.indexOf(el.tagName)
+        }));
+      });
+    };
+    function handleAnchorClick (anchor) {
+      const { lineIndex } = anchor
+      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
+
+      if (heading) {
+        preview.value.scrollToTarget({
+          target: heading,
+          scrollContainer: window,
+          top: 0,
+        })
+      }
+    }
+    onActivated(() => { })
     onMounted(() => {
-      activeName.value = route.params.tabs || 'card'
+      urlReadme.value = ''
+      window.scrollTo(0, 0)
       init()
-      // getData()
+    })
+    onDeactivated(() => { })
+    watch(() => props.urlChange, (newValue, oldValue) => {
+      isPreview.value = true
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
+    })
+    watch(route, (to, from) => {
+      if (to.name !== 'datasetDetail') return
+      if (to.params.tabs === 'card') {
+        urlReadme.value = ''
+        window.scrollTo(0, 0)
+        init()
+      }
     })
     return {
       lagLogin,
@@ -368,12 +430,15 @@ export default defineComponent({
       listLoad,
       listdata,
       total,
-      activeName,
       bodyWidth,
       system,
       route,
       router,
       tableData,
+      props,
+      urlReadme,
+      isPreview,
+      textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
       init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
     }
   }
@@ -388,182 +453,12 @@ export default defineComponent({
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
-  .dataset_head {
-    padding: 0.7rem 0 0;
-    background-color: #fbfbfc;
-    border-bottom: 1px solid #f1f1f1;
-    .content {
-      display: flex;
-      align-items: stretch;
-      padding: 0 0.16rem;
-      margin: 0 auto 0.25rem;
-      font-size: 14px;
-      @media screen and (min-width: 1280px) {
-        max-width: 1280px;
-      }
-      @media screen and (min-width: 1536px) {
-        max-width: 1536px;
-      }
-      .name {
-        display: flex;
-        align-items: center;
-        font-size: 0.22rem;
-        color: #878c93;
-        line-height: 1;
-        b {
-          padding: 0 0.07rem 0 0.1rem;
-          color: #000;
-        }
-        .icon {
-          width: 0.23rem;
-          height: 0.23rem;
-          margin: 0 0.07rem 0 0;
-        }
-        .icon_datasets {
-          background: url(../../../assets/images/icons/icon_19.png) no-repeat
-            left center;
-          background-size: auto 100%;
-        }
-        .icon_copy {
-          width: 0.18rem;
-          height: 0.18rem;
-          background: url(../../../assets/images/icons/icon_36.png) no-repeat
-            left center;
-          background-size: auto 100%;
-          cursor: pointer;
-        }
-        .icon_like {
-          width: 0.18rem;
-          height: 0.18rem;
-          background: url(../../../assets/images/icons/icon_37.png) no-repeat
-            left center;
-          background-size: auto 100%;
-          cursor: pointer;
-        }
-        .el-button {
-          font-size: 16px;
-          color: #878c93;
-          @media screen and (max-width: 1440px) {
-            font-size: 14px;
-          }
-          @media screen and (max-width: 441px) {
-            font-size: 13px;
-          }
-        }
-      }
-    }
-    .tag {
-      margin: 0 auto;
-      line-height: 0.3rem;
-      font-size: 0.18rem;
-      a {
-        display: flex;
-        align-items: center;
-        padding: 0.03rem 0.07rem;
-        margin: 0 0 0 0.1rem;
-        background-color: transparent;
-        border-radius: 0.05rem;
-        font-size: 13px;
-        color: #606060;
-        border: 2px solid #f1f1f2;
-        line-height: 1;
-        @media screen and (min-width: 1800px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 1440px) {
-          font-size: 12px;
-        }
-        &:hover {
-          opacity: 0.9;
-        }
-        .icon {
-          width: 0.23rem;
-          height: 0.23rem;
-          margin: 0 0.07rem 0 0;
-          background: url(../../../assets/images/icons/icon_22.png) no-repeat
-            left center;
-          background-size: 17px;
-        }
-      }
-      .more {
-        float: left;
-        padding: 5px 8px;
-        margin: 3px 0 0 0;
-        font-size: 13px;
-        color: #9ca3b1;
-        display: inline-block;
-        border-radius: 0.08rem;
-        cursor: pointer;
-        @media screen and (min-width: 1800px) {
-          font-size: 15px;
-        }
-        &:hover {
-          background-color: #f5f6f8;
-        }
-      }
-    }
-    .tag_sub {
-      margin: 0.1rem auto 0.4rem;
-      a {
-        color: #562683;
-        background-color: #f3f1ff;
-      }
-    }
-    :deep(.demo-tabs) {
-      margin: 0 auto;
-      .el-tabs__header {
-        margin: 0;
-      }
-      .el-tabs__item {
-        height: auto;
-        padding: 0.15rem 0;
-        line-height: 1;
-        font-size: 0.18rem;
-        @media screen and (max-width: 1600px) {
-          font-size: 16px;
-        }
-        @media screen and (max-width: 441px) {
-          font-size: 14px;
-        }
-        .custom-tabs-label {
-          display: flex;
-          align-items: center;
-          padding: 0 0.2rem;
-          .icon {
-            height: 16px;
-            margin: 0 0.07rem 0 0;
-          }
-          .icon_datasets {
-            width: 16px;
-            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
-              left center;
-            background-size: auto 100%;
-          }
-          b {
-            display: block;
-            height: auto;
-            padding: 0.03rem;
-            margin: 0 0.07rem;
-            background-color: #7405ff;
-            color: #fff;
-            border-radius: 5px;
-            line-height: 1;
-            font-size: 14px;
-          }
-        }
-        &.is-active {
-          color: #000;
-        }
-        &:hover {
-          color: #7405ff;
-        }
-      }
-      .el-tabs__active-bar {
-        background-color: #000;
-      }
-      .el-tabs__nav-wrap::after {
-        display: none;
-      }
+  .mark {
+    display: flex;
+    flex-wrap: wrap;
+    .left,
+    .right {
+      width: 50%;
     }
   }
   :deep(.dataset_body) {
@@ -582,15 +477,74 @@ export default defineComponent({
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
     }
+    .readme_text {
+      position: relative;
+      padding: 0.5rem 0.3rem 0.3rem 0;
+      @media screen and (max-width: 992px) {
+        padding: 0.3rem 0;
+      }
+      .readme_body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        min-height: 300px;
+        background-color: #fbfbfc;
+        border: 1px solid #f1f1f1;
+        border-radius: 5px;
+        b,
+        p {
+          display: block;
+          width: 100%;
+          margin: 0.1rem auto;
+          text-align: center;
+        }
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: #f1f1f1;
+        @media screen and (max-width: 992px) {
+          width: 0px;
+        }
+      }
+    }
     .left {
       position: relative;
       padding: 0.3rem 0;
       background-color: #fff;
       .labelList {
-        margin: 0 0 0.4rem;
+        margin: 0.2rem 0 0.4rem;
         text-align: left;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0.2rem;
+        width: 100%;
+        .sticky_element {
+          // position: fixed;
+          // top: 10px;
+          // display: block;
+          // max-width: 16.6666666667%;
+        }
         .title {
+          padding: 0.05rem 0;
           margin: 0 0 0.1rem;
+          font-size: 0.2rem;
+          color: #000000;
+          @media screen and (max-width: 1600px) {
+            font-size: 18px;
+          }
+          @media screen and (max-width: 441px) {
+            font-size: 16px;
+          }
+        }
+        .sub_title {
+          padding: 0.05rem 0;
+          margin: 0.1rem 0 0;
           font-size: 0.18rem;
           color: #000000;
           @media screen and (max-width: 1600px) {
@@ -607,9 +561,16 @@ export default defineComponent({
               padding: 0.05rem 0.12rem;
               color: #878c93;
               font-size: 0.16rem;
-              line-height: 1.1;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: normal;
+              display: -webkit-box;
+              -webkit-line-clamp: 1;
+              -webkit-box-orient: vertical;
+              line-height: 1.5;
+              word-break: break-word;
               @media screen and (max-width: 1600px) {
-                font-size: 16px;
+                font-size: 15px;
               }
               @media screen and (max-width: 441px) {
                 font-size: 13px;
@@ -632,6 +593,7 @@ export default defineComponent({
           align-items: center;
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
+          font-family: "Helvetica-Neue";
           font-size: 16px;
           color: #000;
           border-radius: 0.08rem;
@@ -659,7 +621,7 @@ export default defineComponent({
             margin: 0 5px 0 0;
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
               left center;
-            background-size: auto 100%;
+            background-size: 100%;
           }
           b {
             font-size: 17px;
@@ -674,7 +636,7 @@ export default defineComponent({
           small {
             font-size: 14px;
             font-weight: bold;
-            color: #000;
+            color: rgba(0, 0, 0, 0.55);
             @media screen and (min-width: 1800px) {
               font-size: 15px;
             }
@@ -683,11 +645,15 @@ export default defineComponent({
             }
           }
           p {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-spacing: normal;
+            white-space: nowrap;
             text-align: left;
+            line-height: 1;
             .icon {
+              display: block;
+              float: left;
             }
           }
         }
@@ -699,8 +665,8 @@ export default defineComponent({
               width: auto;
               flex: auto;
               a {
-                display: block;
-                padding: 0.03rem 0.07rem;
+                display: flex;
+                padding: 0;
                 margin: 0.03rem auto;
                 background-color: transparent;
                 border-radius: 0.05rem;
@@ -716,20 +682,63 @@ export default defineComponent({
                 &:hover {
                   opacity: 0.9;
                 }
+                .a_text {
+                  padding: 0.03rem 0.07rem;
+                }
+                .a_button {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+                  padding: 0.05rem 0.15rem;
+                  background: linear-gradient(180deg, #fefefe, #f0f0f0);
+                  i {
+                    margin-right: 3px;
+                    font-size: 15px;
+                  }
+                }
                 .icon {
-                  width: 0.22rem;
-                  height: 0.22rem;
-                  margin: 0 0.03rem 0 0;
+                  width: 0.3rem;
+                  height: 0.26rem;
+                  padding: 0;
                 }
                 .icon_sizes {
                   background: url(../../../assets/images/icons/icon_7.png)
                     no-repeat left center;
                   background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
                 }
                 .icon_licenses {
+                  width: 0.28rem;
                   background: url(../../../assets/images/icons/icon_21.png)
-                    no-repeat left center;
+                    no-repeat right center;
                   background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
+                }
+                .icon_01 {
+                  background: #fef7ef
+                    url(../../../assets/images/icons/icon_22.png) no-repeat
+                    center;
+                  background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
+                }
+                .icon_02 {
+                  background: #f0f3ff
+                    url(../../../assets/images/icons/icon_29.png) no-repeat
+                    center;
+                  background-size: 17px;
+                  @media screen and (max-width: 768px) {
+                    width: 25px;
+                    background-size: 15px;
+                  }
                 }
               }
               .more {
@@ -762,69 +771,104 @@ export default defineComponent({
                     background-color: #eee;
                   }
                 }
-                &:nth-child(1) {
-                  a {
-                    .icon {
-                      background: url(../../../assets/images/icons/icon_22.png)
-                        no-repeat left center;
-                      background-size: 17px;
-                    }
-                  }
-                }
-                &:nth-child(2) {
-                  a {
-                    .icon {
-                      background: url(../../../assets/images/icons/icon_23.png)
-                        no-repeat left center;
-                      background-size: 17px;
-                    }
-                  }
-                }
-                &:nth-child(3) {
-                  a {
-                    .icon {
-                      background: url(../../../assets/images/icons/icon_24.png)
-                        no-repeat left center;
-                      background-size: 17px;
-                    }
-                  }
-                }
-                &:nth-child(4) {
-                  a {
-                    .icon {
-                      background: url(../../../assets/images/icons/icon_25.png)
-                        no-repeat left center;
-                      background-size: 17px;
-                    }
-                  }
-                }
-                &:nth-child(5) {
-                  a {
-                    .icon {
-                      background: url(../../../assets/images/icons/icon_26.png)
-                        no-repeat left center;
-                      background-size: 17px;
-                    }
-                  }
-                }
-                &:nth-child(6) {
-                  a {
-                    .icon {
-                      background: url(../../../assets/images/icons/icon_27.png)
-                        no-repeat left center;
-                      background-size: 17px;
-                    }
-                  }
-                }
-                &:nth-child(7) {
-                  a {
-                    .icon {
-                      background: url(../../../assets/images/icons/icon_28.png)
-                        no-repeat left center;
-                      background-size: 17px;
-                    }
-                  }
-                }
+                // &:nth-child(1) {
+                //   a {
+                //     .icon {
+                //       background: #fef7ef
+                //         url(../../../assets/images/icons/icon_22.png) no-repeat
+                //         center;
+                //       background-size: 17px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(2) {
+                //   a {
+                //     .icon {
+                //       background: #f0f3ff
+                //         url(../../../assets/images/icons/icon_23.png) no-repeat
+                //         center;
+                //       background-size: 17px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(3) {
+                //   a {
+                //     .icon {
+                //       background: #f6f7ff
+                //         url(../../../assets/images/icons/icon_24.png) no-repeat
+                //         center;
+                //       background-size: 18px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(4) {
+                //   a {
+                //     .icon {
+                //       background: #f1f7ff
+                //         url(../../../assets/images/icons/icon_25.png) no-repeat
+                //         center;
+                //       background-size: 15px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(5) {
+                //   a {
+                //     .icon {
+                //       background: #f2f8ff
+                //         url(../../../assets/images/icons/icon_26.png) no-repeat
+                //         center;
+                //       background-size: 15px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(6) {
+                //   a {
+                //     .icon {
+                //       background: #edfdf6
+                //         url(../../../assets/images/icons/icon_27.png) no-repeat
+                //         center;
+                //       background-size: 15px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
+                // &:nth-child(7) {
+                //   a {
+                //     .icon {
+                //       background: #fef3f3
+                //         url(../../../assets/images/icons/icon_28.png) no-repeat
+                //         center;
+                //       background-size: 17px;
+                //       @media screen and (max-width: 768px) {
+                //         width: 25px;
+                //         background-size: 15px;
+                //       }
+                //     }
+                //   }
+                // }
               }
             }
           }
@@ -961,11 +1005,11 @@ export default defineComponent({
                 }
                 span {
                   height: 0.25rem;
-                  padding-left: 0.3rem;
+                  padding-left: 0.23rem;
                   background: url(../../../assets/images/icons/icon_9.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
-                  font-size: 14px;
+                    no-repeat left 2px;
+                  background-size: 0.17rem;
+                  font-size: 13px;
                   color: #000;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
@@ -975,7 +1019,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0.15rem 0 0.05rem;
+              padding: 0.05rem 0 0;
               .text {
                 display: flex;
                 justify-content: flex-start;
@@ -1057,15 +1101,17 @@ export default defineComponent({
                 }
                 .ellipsis {
                   width: calc(100% - 26px);
+                  font-family: "FIRACODE-REGULAR";
                   overflow: hidden;
                   text-overflow: ellipsis;
                   word-spacing: normal;
                   text-align: left;
+                  line-height: 1.5;
                 }
               }
               .item {
                 justify-content: space-between;
-                margin: 0.3rem 0 0;
+                margin: 0.2rem 0 0;
                 .item_body {
                   display: flex;
                   align-items: center;
@@ -1075,7 +1121,7 @@ export default defineComponent({
           }
           &:hover {
             .box-card {
-              background-color: #307aff;
+              background-color: #7405ff;
               .el-card__header {
                 .card-header {
                   .name {
@@ -1086,8 +1132,8 @@ export default defineComponent({
                   }
                   span {
                     background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 0px;
-                    background-size: 0.2rem;
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
                     color: #fff;
                   }
                 }
@@ -1146,9 +1192,14 @@ export default defineComponent({
         }
       }
     }
+    .left_light,
+    .readme_text {
+      font-family: "FIRACODE-LIGHT";
+    }
     .right {
       position: relative;
       padding: 0.4rem 0.2rem;
+      font-family: "FIRACODE-LIGHT";
       .data {
         padding: 0.1rem 0 0;
         margin: 0 0 0.4rem;
@@ -1218,6 +1269,7 @@ export default defineComponent({
               margin: 0 0 0 0.2rem;
               line-height: 1;
               border-radius: 5px;
+              font-family: inherit;
             }
             .span {
               width: 100%;
@@ -1237,6 +1289,7 @@ export default defineComponent({
             padding: 0.05rem 0.15rem;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             border-color: #e1e1e1;
+            font-family: inherit;
             font-size: 14px;
             line-height: 1.2;
             border-radius: 0.09rem;
@@ -1298,6 +1351,9 @@ export default defineComponent({
         bottom: 0;
         width: 1px;
         background-color: #f1f1f1;
+        @media screen and (max-width: 992px) {
+          width: 0px;
+        }
       }
       &::before {
         position: absolute;
@@ -1307,6 +1363,9 @@ export default defineComponent({
         bottom: 0;
         width: 1px;
         background-color: #f1f1f1;
+        @media screen and (max-width: 992px) {
+          width: 0px;
+        }
       }
     }
   }

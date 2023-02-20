@@ -17,10 +17,18 @@ const datasetsCreate = () =>
     import ("@/views/dashboard/datasets/createDataset");
 const models = () =>
     import ("@/views/dashboard/models/index");
+const modelsDetail = () =>
+    import ("@/views/dashboard/models/details");
 const spaces = () =>
     import ("@/views/dashboard/spaces/index");
+const spaceDetail = () =>
+    import ("@/views/dashboard/spaces/details");
+const spaceCreate = () =>
+    import ("@/views/dashboard/spaces/createSpace");
 const personalCenter = () =>
     import ("@/views/dashboard/personalCenter/index");
+const personalCenterProfile = () =>
+    import ("@/views/dashboard/personalCenter/editProfile");
 
 const routes = [{
         path: '/',
@@ -39,37 +47,82 @@ const routes = [{
                 {
                     path: '/dashboard/main',
                     name: 'main',
-                    component: main
+                    component: main,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/dataset',
                     name: 'datasets',
-                    component: datasets
+                    component: datasets,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/datasets/:name/:tabs',
                     name: 'datasetDetail',
-                    component: datasetDetail
+                    component: datasetDetail,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/models',
                     name: 'models',
-                    component: models
+                    component: models,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: '/dashboard/models/:name/:tabs',
+                    name: 'modelsDetail',
+                    component: modelsDetail,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/create_dataset',
                     name: 'datasetsCreate',
-                    component: datasetsCreate
+                    component: datasetsCreate,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/spaces',
                     name: 'spaces',
-                    component: spaces
+                    component: spaces,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: '/dashboard/spaces/:name/:tabs',
+                    name: 'spaceDetail',
+                    component: spaceDetail,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: '/dashboard/create_space',
+                    name: 'spaceCreate',
+                    component: spaceCreate,
+                    meta: {
+                        keepAlive: true
+                    }
                 },
                 {
                     path: '/dashboard/personal_center',
                     name: 'personalCenter',
                     component: personalCenter,
+                    meta: {
+                        keepAlive: true
+                    },
                     // beforeEnter: (to, from, next) => {
                     //   if (!sessionStorage.getItem('metaAddressLag')) {
                     //     next({
@@ -80,6 +133,14 @@ const routes = [{
                     //     next()
                     //   }
                     // }
+                },
+                {
+                    path: '/dashboard/personal_center/profile',
+                    name: 'personalCenterProfile',
+                    component: personalCenterProfile,
+                    meta: {
+                        keepAlive: true
+                    }
                 }
             ]
         }, ]

@@ -21,7 +21,7 @@ export default {
         Copied: '已复制',
         Connect_to_MetaMask: 'Connect to MetaMask',
         Connect_cont_Wallet: 'Connect Wallet',
-        Connect_cont_tip: 'Connect your wallet address to create a account',
+        Connect_cont_tip: 'Connect your wallet address to create an account',
         Connect_text: 'Data And Computing',
         Connect_text_desc: 'Easily upload individual files or Bucket storage in one spot to both IPFS and Filecoin. Get your CID and then mint to OpenSea in just one click.',
         Connect_text_btn: 'Enjoy your journey with multichain.storage',

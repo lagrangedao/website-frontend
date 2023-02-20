@@ -13,6 +13,7 @@
                             </keep-alive>
                         </transition>
                     </router-view>
+                    <el-backtop :right="20" :bottom="20" />
                 </div>
             </el-main>
             <el-footer v-if="route.name !== 'main'" :class="{'footer_position': positionStyle}">
@@ -94,9 +95,17 @@ export default defineComponent({
   .el-main {
     padding: 0;
     background-color: #fff;
+    overflow: visible;
     &.main_position {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       height: calc(100% - 0.68rem);
       background-color: #180e1a;
+      .content {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
   .el-footer {

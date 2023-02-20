@@ -21,7 +21,7 @@ export default {
         Copied: '已复制',
         Connect_to_MetaMask: 'Connect to MetaMask',
         Connect_cont_Wallet: 'Connect Wallet',
-        Connect_cont_tip: 'Connect your wallet address to create a account',
+        Connect_cont_tip: 'Connect your wallet address to create an account',
         Connect_text: 'Data And Computing',
         Connect_text_desc: 'Decentralized data science without borders',
         Connect_text_btn: 'Enjoy your journey with multichain.storage',

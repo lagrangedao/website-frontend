@@ -1,24 +1,47 @@
 @font-face {
-    font-family: 'OpenSauceOne-Bold';
-    src: url(../font/OpenSauceOne-Bold.woff2) format("woff2");
-    /* font-weight: 700; */
+    font-family: 'Helvetica-Bold';
+    src: url(../font/Helvetica-Bold.ttf);
+    font-weight: 900;
     font-style: normal;
-    font-display: block
+    font-display: block;
 }
 
 @font-face {
-    font-family: 'OpenSauceOne-Regular';
-    src: url(../font/OpenSauceOne-Regular.woff2) format("woff2");
+    font-family: 'Helvetica-Neue';
+    src: url(../font/Helvetica-Neue-CE-55-Roman.ttf);
     font-weight: 400;
     font-style: normal;
-    font-display: block
+    font-display: block;
 }
 
 @font-face {
-    font-family: 'gilroy-bold';
-    src: url(../font/gilroy-bold-4.otf);
+    font-family: 'Helvetica-light';
+    src: url(../font/helvetica-light.otf);
     font-style: normal;
-    font-display: block
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'FIRACODE-BOLD';
+    src: url(../font/FIRACODE-BOLD-5.TTF);
+    font-weight: 900;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'FIRACODE-LIGHT';
+    src: url(../font/FIRACODE-LIGHT-4.TTF);
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'FIRACODE-REGULAR';
+    src: url(../font/FIRACODE-REGULAR-1.TTF);
+    font-style: normal;
+    font-display: block;
 }
 
 html,
@@ -29,7 +52,7 @@ body {
     font-size: 100px;
     padding: 0;
     font-family: 'Roboto,sans-serif';
-    font-family: 'OpenSauceOne-Regular';
+    font-family: 'Helvetica-Neue';
 }
 
 *,
@@ -65,7 +88,7 @@ td {
 }
 
 span {
-    cursor: pointer;
+    cursor: inherit;
 }
 
 h1,
@@ -74,7 +97,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'gilroy-bold';
+    font-family: 'Helvetica-Bold';
 }
 
 #app {
@@ -153,6 +176,10 @@ a:focus {
     font-size: 35px;
 }
 
+.el-message .el-message__closeBtn {
+    font-size: 18px;
+}
+
 .el-message .el-message__closeBtn .icon {
     width: 20px;
     height: 20px;
@@ -186,6 +213,9 @@ a:focus {
     }
     .landing {
         width: 17.8rem;
+    }
+    .el-message .el-message__closeBtn {
+        font-size: 16px;
     }
 }
 

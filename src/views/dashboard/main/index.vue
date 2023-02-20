@@ -1,19 +1,6 @@
 <template>
   <section id="step">
     <div class="step_body">
-      <!-- <div class="relative group repo-copy-code">
-                <pre v-highlight>
-                    <code class="language-java hljs"></code>
-                </pre>
-                <button class="absolute top-3 right-3 transition opacity-0 group-hover:opacity-80">
-                    <svg class="" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="currentColor" focusable="false" role="img" width="0.9em" height="0.9em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                        <path d="M28,10V28H10V10H28m0-2H10a2,2,0,0,0-2,2V28a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2Z" transform="translate(0)"></path>
-                        <path d="M4,18H2V4A2,2,0,0,1,4,2H18V4H4Z" transform="translate(0)"></path>
-                        <rect fill="none" width="32" height="32"></rect>
-                    </svg>
-                </button>
-            </div> -->
-
       <div class="loginBody width">
         <el-row>
           <el-col :xs="24" :sm="12" :md="13" :lg="13" :xl="13" class="left">
@@ -45,7 +32,8 @@
                   <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> {{$t('fs3Login.Connect_cont_Wallet')}}
                 </el-button>
                 <p v-if="loadingText">please switch to
-                  <span style="text-decoration: underline;" @click="changeNetChange(31415)">FEVM Wallaby</span> or
+                  <span style="text-decoration: underline;" @click="changeNetChange(3141)">Filecoin TestNet</span> or
+                  <span style="text-decoration: underline;" @click="changeNetChange(137)">Polygon Mainnet</span> or
                   <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span>.</p>
               </div>
             </div>
@@ -65,13 +53,13 @@
             </div>
             <div v-loading="loginLoad" class="demo-ruleForm">
               <div class="form_title">Enter your email address to verify login</div>
-              <el-form :model="form" status-icon :rules="rules" ref="form">
+              <el-form :model="form" status-icon :rules="rules" ref="ruleFormRef">
                 <el-form-item prop="email">
-                  <el-input v-model="form.email" placeholder="you@domain.com" ref="bucketEmailRef"></el-input>
+                  <el-input v-model="form.email" placeholder="you@domain.com"></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="submitEmail('form')">{{$t('fs3Login.Connect_form_btn')}}</el-button>
-                  <p style="color:#f40000">Unable to verify captcha. Please try again</p>
+                  <el-button type="primary" @click="submitEmail('ruleFormRef')">{{$t('fs3Login.Connect_form_btn')}}</el-button>
+                  <p v-if="form.tip" style="color:#f40000">Unable to verify captcha. Please try again</p>
                 </el-form-item>
               </el-form>
             </div>
@@ -81,8 +69,9 @@
       <footer>
         <div class="foot_media">
           <a href="jacascript:;" target="_blank"><img :src="share_telegram" alt=""></a>
-          <a href="jacascript:;" target="_blank"><img :src="share_twitter" alt=""></a>
+          <a href="https://mobile.twitter.com/lagrangedao" target="_blank"><img :src="share_twitter" alt=""></a>
           <a href="jacascript:;" target="_blank"><img :src="share_discord" alt=""></a>
+          <a href="https://github.com/lagrangedao" target="_blank"><img :src="share_github" alt=""></a>
         </div>
       </footer>
     </div>
@@ -105,17 +94,31 @@ export default defineComponent({
     const share_telegram = require("@/assets/images/icons/media_4.png")
     const share_twitter = require("@/assets/images/icons/media_5.png")
     const share_discord = require("@/assets/images/icons/media_6.png")
+    const share_github = require("@/assets/images/icons/media_7.png")
 
     const loadingText = ref('')
     const prevType = ref(true)
     const activeIndex = ref('')
     const active = ref(0)
     const loginLoad = ref(false)
+    const ruleFormRef = ref(null)
     const form = reactive({
-      email: ''
+      email: '',
+      tip: false
     })
     const rules = reactive({
-      email: [{ required: true, message: '', trigger: 'blur' }]
+      email: [
+        {
+          required: true,
+          message: 'Please input email address',
+          trigger: 'blur',
+        },
+        {
+          type: 'email',
+          message: 'Please input correct email address',
+          trigger: ['blur', 'change'],
+        },
+      ]
     })
     const info = reactive({
       address: '',
@@ -147,15 +150,15 @@ export default defineComponent({
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
       console.log(parseInt(chainId, 16))
-      if (parseInt(chainId, 16) === 31415 || parseInt(chainId, 16) === 97) {
+      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) active.value = 2
         return false
       } else {
         active.value = 1
-        loadingText.value = 'Switch to FEVM Wallaby or BSC TestNet!'
+        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
       }
-      // system.$commonFun.messageTip('error', 'Switch to FEVM Wallaby!')
+      // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
       store.dispatch('setNavLogin', false)
     }
     function hiddAddress (val) {
@@ -186,15 +189,39 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 31415 || parseInt(accounts, 16) === 97) signFun()
+        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137) signFun()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         active.value = 1
-        loadingText.value = 'Switch to FEVM Wallaby or BSC TestNet!'
+        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
         system.$commonFun.signOutFun()
         // window.location.reload()
+      })
+    }
+    const submitEmail = async (formEl) => {
+      if (!formEl) return
+      await ruleFormRef.value.validate(async (valid, fields) => {
+        if (valid) {
+          form.tip = true
+          // renameLoad.value = true
+          // let formData = new FormData()
+          // formData.append('name', route.params.name)
+          // formData.append('is_public', props.listdata) // public:1, private:0
+          // formData.append('new_name', ruleForm.name)
+          // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'put', formData)
+          // await system.$commonFun.timeout(500)
+          // if (listRes && listRes.status === 'success') {
+          //   system.$commonFun.messageTip('success', 'Update successfully!')
+          //   router.push({ name: 'datasetDetail', params: { name: ruleForm.name, tabs: 'settings' } })
+          // } else system.$commonFun.messageTip('error', 'Upload failed!')
+          // ruleForm.name = ''
+          // renameLoad.value = false
+        } else {
+          console.log('error submit!', fields)
+          return false
+        }
       })
     }
     onMounted(() => {
@@ -218,12 +245,14 @@ export default defineComponent({
       share_telegram,
       share_twitter,
       share_discord,
+      share_github,
       form,
+      ruleFormRef,
       rules,
       system,
       route,
       router,
-      signFun, signIn, hiddAddress, changeNetChange, getStart
+      signFun, signIn, hiddAddress, changeNetChange, getStart, submitEmail
     }
   }
 })
@@ -292,7 +321,6 @@ export default defineComponent({
           border-radius: 0.2rem;
           .titleCont {
             padding: 0.2rem 0;
-            font-family: "gilroy-bold";
             font-size: 0.286rem;
             font-weight: normal;
             color: #fff;
@@ -311,7 +339,6 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: space-between;
-              font-family: "OpenSauceOne-Regular";
               font-size: 0.223rem;
               font-weight: normal;
               color: #fff;
@@ -418,7 +445,7 @@ export default defineComponent({
               display: block;
               width: 100%;
               max-width: 4rem;
-              font-family: "gilroy-bold";
+              font-family: inherit;
               font-size: 0.25rem;
               font-weight: 600;
               height: calc(30px + 0.3rem);
@@ -497,7 +524,7 @@ export default defineComponent({
                 font-size: 13px;
               }
             }
-            .el-form {
+            :deep(.el-form) {
               padding: 0.1rem 0 0;
               .el-form-item {
                 display: block;
@@ -518,11 +545,12 @@ export default defineComponent({
                     width: 100%;
                     .el-input__inner {
                       height: auto;
-                      padding: 0.2rem 0.15rem;
-                      border-radius: 0.1rem;
+                      padding: 0.1rem 0.15rem;
+                      border-radius: 0.05rem;
                       border-color: #3d6ddb;
                       color: #041417;
                       line-height: 1.2;
+                      font-family: inherit;
                       font-size: inherit;
                     }
                   }
@@ -530,7 +558,7 @@ export default defineComponent({
                     display: block;
                     width: 80%;
                     max-width: 4.4rem;
-                    font-family: "gilroy-bold";
+                    font-family: inherit;
                     font-size: 0.2rem;
                     font-weight: normal;
                     height: auto;
@@ -640,8 +668,8 @@ export default defineComponent({
             }
           }
           h4 {
-            font-family: "OpenSauceOne-Regular";
             font-size: 0.18rem;
+            font-family: "Helvetica-Neue";
             font-weight: normal;
             color: #878c93;
             @media screen and (max-width: 768px) {
@@ -722,7 +750,7 @@ export default defineComponent({
       position: absolute;
       bottom: 0;
       right: 0.16rem;
-      min-height: 0.8rem;
+      min-height: 0.5rem;
       .foot_media {
         display: flex;
         justify-content: flex-end;

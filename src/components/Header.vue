@@ -3,7 +3,7 @@
     <el-row class="headerStyle">
       <el-col :xs="20" :sm="20" :md="20" :lg="8" :xl="8" class="logoImg">
         <img :src="logo" @click="header_logo" alt='' />
-        <el-input v-model="searchValue" class="w-50 m-2" placeholder="search models,datasets,users..." />
+        <el-input v-model="searchValue" class="w-50 m-2" placeholder="search models, datasets, users..." />
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
         <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" @select="handleSelect">
@@ -51,11 +51,12 @@
           <el-sub-menu index="8" v-else>
             <template #title>
               <router-link to="/dashboard/personal_center" class="loginImg">
-                <img :src="people_img" class="people" width="30" height="30" alt="">
+                <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt="">
               </router-link>
             </template>
             <el-menu-item index="/dashboard/create_dataset">+ New Dataset</el-menu-item>
-            <!-- <el-menu-item index="sign_out">Sign Out</el-menu-item> -->
+            <el-menu-item index="/dashboard/create_space">+ New Space</el-menu-item>
+            <el-menu-item index="sign_out">Sign Out</el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-col>
@@ -72,9 +73,10 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const logo = require("@/assets/images/icons/logo_w.png")
-    const people_img = require("@/assets/images/dashboard/people.png")
+    const people_img = require("@/assets/images/dashboard/people_09.png")
     const searchValue = ref('')
     const activeIndex = ref('')
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -88,6 +90,7 @@ export default defineComponent({
     async function handleSelect (key, keyPath) {
       // console.log(key) //  
       if (key === '/dashboard/personal_center') store.dispatch('setNavLogin', true)
+      else if (key === '4') window.open('https://docs.lagrangedao.org')
       else if (key === 'sign_out') {
         system.$commonFun.signOutFun()
         // await system.$commonFun.timeout(200)
@@ -96,16 +99,11 @@ export default defineComponent({
       else store.dispatch('setNavLogin', false)
     }
     function activeMenu (row) {
-      // console.log(route.name, row)
-      if (row) {
-        if (row.indexOf('dataset') > -1) activeIndex.value = '/dashboard/dataset'
-        else activeIndex.value = row
-        return
-      }
-      const name = route.name
+      const name = row || route.name
       if (name.indexOf('dataset') > -1) activeIndex.value = '/dashboard/dataset'
       else if (name.indexOf('model') > -1) activeIndex.value = '/dashboard/models'
       else if (name.indexOf('space') > -1) activeIndex.value = '/dashboard/spaces'
+      else activeIndex.value = name
     }
     onMounted(() => activeMenu())
     watch(route, (to, from) => {
@@ -114,6 +112,7 @@ export default defineComponent({
     })
     return {
       metaAddress,
+      accessAvatar,
       lagLogin,
       logo,
       people_img,
@@ -207,7 +206,7 @@ export default defineComponent({
           .icon {
             width: 21px;
             height: 20px;
-            margin: 0 6px 0 0;
+            margin: -1px 6px 0 0;
           }
           svg {
             width: 21px;

@@ -3,12 +3,13 @@
         <el-row class="dataset_body" v-loading="createLoad">
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <div class="text-center">
-                    <svg class="w-12 h-12 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 25 25">
+                    <!-- <svg class="w-12 h-12 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 25 25">
                         <ellipse cx="12.5" cy="5" fill="currentColor" fill-opacity="0.25" rx="7.5" ry="2"></ellipse>
                         <path d="M12.5 15C16.6421 15 20 14.1046 20 13V20C20 21.1046 16.6421 22 12.5 22C8.35786 22 5 21.1046 5 20V13C5 14.1046 8.35786 15 12.5 15Z" fill="currentColor" opacity="0.5"></path>
                         <path d="M12.5 7C16.6421 7 20 6.10457 20 5V11.5C20 12.6046 16.6421 13.5 12.5 13.5C8.35786 13.5 5 12.6046 5 11.5V5C5 6.10457 8.35786 7 12.5 7Z" fill="currentColor" opacity="0.5"></path>
                         <path d="M5.23628 12C5.08204 12.1598 5 12.8273 5 13C5 14.1046 8.35786 15 12.5 15C16.6421 15 20 14.1046 20 13C20 12.8273 19.918 12.1598 19.7637 12C18.9311 12.8626 15.9947 13.5 12.5 13.5C9.0053 13.5 6.06886 12.8626 5.23628 12Z" fill="currentColor"></path>
-                    </svg>
+                    </svg> -->
+                    <img src="@/assets/images/icons/icon_19_1.png" class="img" alt="">
                     <h1 class="text-xl md:text-3xl font-semibold">Create a new dataset repository</h1>
                     <p class="text-lg text-gray-500">A repository contains all dataset files, including the revision history.</p>
                 </div>
@@ -28,7 +29,7 @@
                         <label class="label" for="dataname">
                             Dataset name
                             <div class="flex flex-row">
-                                <el-input v-model="ruleForm.name" placeholder="New dataset name" />
+                                <el-input v-model="ruleForm.name" placeholder="New dataset name" title="Only regular alphanumeric characters, '-', '.' and '_' supported" />
                             </div>
                         </label>
                     </el-form-item>
@@ -80,9 +81,17 @@ export default defineComponent({
             license: '',
             resource: '1'
         })
+        const validateInput = (rule, value, callback) => {
+            if (!checkSpecialKey(value)) {
+                callback(new Error("Only regular alphanumeric characters, '-', '.' and '_' supported"));
+            } else {
+                callback();
+            }
+        }
         const rules = reactive({
             name: [
-                { required: true, message: 'Please fill in this field', trigger: 'blur' }
+                { required: true, message: 'Please fill in this field', trigger: 'blur' },
+                { validator: validateInput, trigger: "blur" }
             ],
             license: [
                 { required: true, message: 'Please fill in this field', trigger: 'blur' }
@@ -94,6 +103,16 @@ export default defineComponent({
         const route = useRoute()
         const router = useRouter()
 
+        function checkSpecialKey (str) {
+            let specialKey =
+                "[~!#$^&*()=|{}':;'\\[\\],<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
+            for (let i = 0; i < str.length; i++) {
+                if (specialKey.indexOf(str.substr(i, 1)) != -1) {
+                    return false;
+                }
+            }
+            return true;
+        }
         const submitForm = async (formEl) => {
             if (!formEl) return
             await ruleFormRef.value.validate(async (valid, fields) => {
@@ -105,7 +124,8 @@ export default defineComponent({
                     formData.append('license', ruleForm.license)
                     const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'post', formData)
                     await system.$commonFun.timeout(500)
-                    system.$commonFun.messageTip('success', 'Created Dataset successfully!')
+                    if (listRes && listRes.data) system.$commonFun.messageTip('success', 'Created Dataset successfully!')
+                    else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Created Failed!')
                     ruleForm.name = ''
                     ruleForm.license = ''
                     router.push({ name: 'datasets' })
@@ -161,9 +181,9 @@ export default defineComponent({
         width: 90%;
         max-width: 600px;
         margin: auto;
-        svg {
-          width: 0.5rem;
-          height: 0.5rem;
+        svg,
+        .img {
+          width: 0.4rem;
           margin: 0 auto 8px;
           color: rgba(239, 68, 68, 1);
         }
@@ -176,7 +196,7 @@ export default defineComponent({
           font-size: 18px;
           font-weight: 500;
           line-height: 1.5;
-          color: rgba(107, 124, 108, 1);
+          color: #878c93;
           @media screen and (max-width: 1600px) {
             font-size: 16px;
           }
@@ -199,9 +219,18 @@ export default defineComponent({
             flex-wrap: wrap;
             align-items: flex-start;
             justify-content: flex-start;
+            text-align: left;
             .label {
               width: 100%;
               text-align: left;
+              color: #606060;
+              font-size: 16px;
+              @media screen and (max-width: 1440px) {
+                font-size: 14px;
+              }
+              @media screen and (max-width: 1024px) {
+                font-size: 12px;
+              }
               .flex-row {
                 display: flex;
                 width: 100%;
@@ -227,22 +256,41 @@ export default defineComponent({
                   h5,
                   p {
                     text-align: left;
-                    font-size: 16px;
-                    font-weight: 100;
+                    font-size: 18px;
                     color: #333;
                     line-height: 1.5;
                     word-break: break-word;
                     white-space: normal;
+                    @media screen and (max-width: 1600px) {
+                      font-size: 17px;
+                    }
+                    @media screen and (max-width: 1440px) {
+                      font-size: 16px;
+                    }
+                    @media screen and (max-width: 1024px) {
+                      font-size: 14px;
+                    }
                   }
                   p {
-                    font-size: 14px;
+                    font-size: 15px;
+                    font-weight: 100;
                     color: #7e7e7e;
                     line-height: 1.3;
+                    @media screen and (max-width: 1600px) {
+                      font-size: 14px;
+                    }
+                    @media screen and (max-width: 1440px) {
+                      font-size: 13px;
+                    }
+                    @media screen and (max-width: 1024px) {
+                      font-size: 12px;
+                    }
                   }
                 }
               }
             }
             .el-button {
+              font-family: inherit;
               cursor: pointer;
               span {
                 cursor: pointer;

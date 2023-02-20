@@ -8,46 +8,47 @@
             <p>Discover amazing ML apps made by the community!</p>
           </div>
           <div class="top_button">
-            <router-link to="" class="button">Create new Space</router-link>
+            <router-link :to="{path: '/dashboard/create_space'}" class="button">Create new Space</router-link>
             or
             <router-link to="">learn more about Spaces</router-link>
           </div>
         </div>
         <div class="top">
           <div class="top_input">
-            <el-input v-model="searchValue" class="w-50 m-2" placeholder="search Space" />
+            <el-input v-model="searchValue" clearable @input="searchChange" class="w-50 m-2" placeholder="search Space" />
           </div>
           <div class="title">
             Spaces of the week
             <i class="icon icon_week"></i>
           </div>
         </div>
-        <el-row :gutter="32" class="list_body">
+        <el-row :gutter="32" class="list_body" v-loading="listLoad">
           <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="list in spaceData" :key="list">
-            <el-card class="box-card">
+            <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
-                  <span>{{list.praise}}</span>
+                  <span>1</span>
                 </div>
-                <h1>{{list.title}}</h1>
+                <h1>{{list.name}}</h1>
               </template>
               <div class="text">
                 <div class="text_left">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{list.name}}</span>
+                  <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
+                  <i class="icon"></i>
+                  <span class="small">{{list.license||'-'}}</span>
                 </div>
-                <span>{{list.time}}</span>
+                <span>{{momentFilter(list.created_at)}}</span>
               </div>
             </el-card>
           </el-col>
         </el-row>
-        <el-pagination :current-page="currentPage1" :page-size="100" :small="small" :background="background" layout="prev, pager, next" :total="1000" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        <!-- <el-pagination :current-page="currentPage1" :page-size="100" :small="small" :background="background" layout="prev, pager, next" :total="1000" @size-change="handleSizeChange" @current-change="handleCurrentChange" /> -->
       </el-col>
     </el-row>
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 export default defineComponent({
@@ -55,86 +56,91 @@ export default defineComponent({
   components: {},
   setup () {
     const store = useStore()
-    const spaceData = ref([
-      {
-        title: 'Runway Inpainting',
-        name: 'W1533606896',
-        praise: 27,
-        time: '17 days ago'
-      },
-      {
-        title: 'bigcode/santacoder-demo',
-        name: 'subhash494',
-        praise: 32,
-        time: '17 days ago'
-      },
-      {
-        title: 'BilalSardar/FaceRecognization',
-        name: 'Evelyn18',
-        praise: 55,
-        time: '18 days ago'
-      },
-      {
-        title: 'Real-CUGAN',
-        name: 'AiswaryaRam',
-        praise: 34,
-        time: '16 days ago'
-      },
-      {
-        title: 'BilalSardar/FaceRecognization',
-        name: 'Firdavs1012',
-        praise: 11,
-        time: '19 days ago'
-      },
-      {
-        title: 'White-box-Cartoonization',
-        name: 'cynika ',
-        praise: 299,
-        time: '21 days ago'
-      },
-      {
-        title: 'demoIAZIKA',
-        name: 'Omnibus',
-        praise: 15,
-        time: '27 days ago'
-      },
-      {
-        title: 'NFT_avatar',
-        name: 'BilalSardar',
-        praise: 10,
-        time: '23 days ago'
-      },
-      {
-        title: 'Entity-Extracation',
-        name: 'ergashevaumida',
-        praise: 25,
-        time: '22 days ago'
-      }
-    ])
+    const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
+    const accessAvatar = computed(() => (store.state.accessAvatar))
+    const accessName = computed(() => (store.state.accessName))
     const searchValue = ref('')
     const value = ref('')
     const currentPage1 = ref(1)
     const small = ref(false)
     const background = ref(false)
     const bodyWidth = ref(document.body.clientWidth < 992)
+    const listLoad = ref(true)
+    const spaceData = ref([])
+    const spaceDataAll = ref([])
+    const total = ref(0)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
     function handleSizeChange (val) { }
     function handleCurrentChange (val) { }
-    onMounted(() => { })
+    async function searchChange (val) {
+      spaceData.value = await filterData(spaceDataAll.value, val)
+    }
+    function filterData (spaceData, val) {
+      if (val === '') return spaceDataAll.value
+      let data = []
+      spaceData.forEach(list => {
+        if (list.name.indexOf(val) > -1) data.push(list)
+      })
+      return data
+    }
+    function NumFormat (value) {
+      if (String(value) === '0') return '0'
+      else if (!value) return '-'
+      var intPartArr = String(value).split('.')
+      var intPartFormat = intPartArr[0]
+        .toString()
+        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
+      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
+    }
+    async function init () {
+      listLoad.value = true
+      spaceData.value = []
+      total.value = 0
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces`, 'get')
+      if (listRes) {
+        spaceData.value = listRes.spaces || []
+        spaceDataAll.value = listRes.spaces || []
+        total.value = listRes.spaces.length
+      }
+      await system.$commonFun.timeout(500)
+      listLoad.value = false
+    }
+    function detailFun (row, index) {
+      // console.log(row, index)
+      router.push({ name: 'spaceDetail', params: { name: row.name, tabs: 'card' } })
+    }
+    function momentFilter (dateItem) {
+      return system.$commonFun.momentFun(dateItem)
+    }
+    onActivated(() => {
+      window.scrollTo(0, 0)
+      init()
+    })
+    onDeactivated(() => {
+      searchValue.value = ''
+    })
+    watch(lagLogin, (newValue, oldValue) => {
+      if (!lagLogin.value) init()
+    })
     return {
-      spaceData,
+      accessAvatar,
+      accessName,
       searchValue,
       value,
       currentPage1,
       small,
       background,
+      listLoad,
+      spaceData,
+      spaceDataAll,
+      total,
       system,
       route,
       router,
-      handleSizeChange, handleCurrentChange
+      handleSizeChange, handleCurrentChange, searchChange, detailFun, momentFilter
     }
   }
 })
@@ -177,7 +183,7 @@ export default defineComponent({
             background: url(../../../assets/images/icons/icon_15.png) no-repeat
               left center;
             background-size: auto 100%;
-            font-family: "OpenSauceOne-Bold";
+            font-family: "Helvetica-Bold";
             font-size: 0.44rem;
             color: #000;
             text-align: left;
@@ -265,7 +271,7 @@ export default defineComponent({
         }
       }
       .list_body {
-        padding: 0.16rem 0;
+        padding: 0.16rem 0 0.5rem;
         .el-col {
           margin: 0.16rem 0;
           .box-card {
@@ -307,11 +313,20 @@ export default defineComponent({
               }
               h1 {
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
-                text-transform: capitalize;
                 cursor: pointer;
-                font-family: "OpenSauceOne-Regular";
                 font-size: 0.3rem;
-                font-weight: 100;
+                font-weight: 900;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                line-height: 1.5;
+                word-break: break-word;
+                @media screen and (max-width: 1440px) {
+                  font-size: 0.25rem;
+                }
               }
             }
             .el-card__body {
@@ -332,7 +347,8 @@ export default defineComponent({
                   justify-content: space-between;
                   align-items: center;
                 }
-                .icon {
+                .icon,
+                .icon_img {
                   width: 0.25rem;
                   height: 0.25rem;
                   margin: 0 0.1rem 0 0;
@@ -342,15 +358,15 @@ export default defineComponent({
                   color: #878c93;
                   font-size: 12px;
                   cursor: pointer;
-                  @media screen and (min-width: 1800px) {
-                    font-size: 14px;
-                  }
                   @media screen and (min-width: 1440px) {
                     font-size: 13px;
                   }
+                  @media screen and (min-width: 1800px) {
+                    font-size: 15px;
+                  }
                 }
                 .small {
-                  font-weight: 600;
+                  font-weight: 500;
                   color: #000;
                 }
               }

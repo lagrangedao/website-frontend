@@ -12,7 +12,7 @@
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Tasks" :key="index">
                 <router-link to="">
                   <i class="icon"></i>
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -31,7 +31,7 @@
               <!-- :xs="6" :sm="6" :md="6" :lg="12" :xl="12" -->
               <el-col v-for="(l, index) in dataList.Libraries" :key="index">
                 <router-link to="">
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -50,7 +50,7 @@
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Datasets" :key="index">
                 <router-link to="">
                   <i class="icon icon_licenses"></i>
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -69,7 +69,7 @@
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Licenses" :key="index">
                 <router-link to="">
                   <i class="icon icon_licenses"></i>
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -88,7 +88,7 @@
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Other" :key="index">
                 <router-link to="">
                   <i class="icon icon_licenses"></i>
-                  {{l}}
+                  <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
               <el-col :span="24">
@@ -113,11 +113,11 @@
         </div>
         <el-row :gutter="32" class="list_body" v-loading="listLoad">
           <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
-            <el-card class="box-card">
+            <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
                   <div class="name">
-                    <img src="@/assets/images/dashboard/people.png" alt="">
+                    <!-- <img src="@/assets/images/dashboard/people.png" alt=""> -->
                     <b>{{list.name}}</b>
                   </div>
                   <span>27</span>
@@ -156,7 +156,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 export default defineComponent({
@@ -228,11 +228,15 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
+    function detailFun (row, index) {
+      // console.log(row, index)
+      router.push({ name: 'modelsDetail', params: { name: row.name, tabs: 'card' } })
+    }
     async function init () {
       listLoad.value = true
       listdata.value = []
       total.value = 0
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}dataset`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'get')
       if (listRes) {
         listdata.value = listRes.datasets || []
         total.value = listRes.datasets.length
@@ -243,7 +247,10 @@ export default defineComponent({
     function momentFilter (data) {
       return system.$commonFun.momentFun(data)
     }
-    onMounted(() => init())
+    onActivated(() => {
+      window.scrollTo(0, 0)
+      init()
+    })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
     })
@@ -261,7 +268,7 @@ export default defineComponent({
       total,
       bodyWidth,
       system,
-      init, NumFormat, handleCurrentChange, handleSizeChange, momentFilter
+      init, NumFormat, handleCurrentChange, handleSizeChange, momentFilter, detailFun
     }
   }
 })
@@ -336,8 +343,8 @@ export default defineComponent({
               width: auto;
               flex: auto;
               a {
-                display: block;
-                padding: 0.03rem 0.07rem;
+                display: flex;
+                padding: 0;
                 margin: 0.03rem auto;
                 background-color: transparent;
                 border-radius: 0.05rem;
@@ -353,26 +360,30 @@ export default defineComponent({
                 &:hover {
                   opacity: 0.9;
                 }
+                .a_text {
+                  padding: 0.04rem 0.07rem;
+                }
                 .icon {
-                  width: 0.22rem;
-                  height: 0.22rem;
-                  margin: 0 0.03rem 0 0;
+                  width: 0.3rem;
+                  height: 0.26rem;
+                  padding: 0;
                 }
                 .icon_sizes {
                   background: url(../../../assets/images/icons/icon_7.png)
-                    no-repeat left center;
+                    no-repeat center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
-                    width: 20px;
+                    width: 25px;
                     background-size: 15px;
                   }
                 }
                 .icon_licenses {
+                  width: 0.28rem;
                   background: url(../../../assets/images/icons/icon_21.png)
-                    no-repeat left center;
+                    no-repeat right center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
-                    width: 20px;
+                    width: 25px;
                     background-size: 15px;
                   }
                 }
@@ -410,11 +421,12 @@ export default defineComponent({
                 &:nth-child(1) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_22.png)
-                        no-repeat left center;
+                      background: #fef7ef
+                        url(../../../assets/images/icons/icon_22.png) no-repeat
+                        center;
                       background-size: 17px;
                       @media screen and (max-width: 768px) {
-                        width: 20px;
+                        width: 25px;
                         background-size: 15px;
                       }
                     }
@@ -423,11 +435,12 @@ export default defineComponent({
                 &:nth-child(2) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_29.png)
-                        no-repeat left center;
+                      background: #f8f9ff
+                        url(../../../assets/images/icons/icon_29.png) no-repeat
+                        center;
                       background-size: 17px;
                       @media screen and (max-width: 768px) {
-                        width: 20px;
+                        width: 25px;
                         background-size: 15px;
                       }
                     }
@@ -436,11 +449,12 @@ export default defineComponent({
                 &:nth-child(3) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_30.png)
-                        no-repeat left center;
+                      background: #f7f8ff
+                        url(../../../assets/images/icons/icon_30.png) no-repeat
+                        center;
                       background-size: 17px;
                       @media screen and (max-width: 768px) {
-                        width: 20px;
+                        width: 25px;
                         background-size: 15px;
                       }
                     }
@@ -449,11 +463,12 @@ export default defineComponent({
                 &:nth-child(4) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_31.png)
-                        no-repeat left center;
+                      background: #fef4f4
+                        url(../../../assets/images/icons/icon_31.png) no-repeat
+                        center;
                       background-size: 17px;
                       @media screen and (max-width: 768px) {
-                        width: 20px;
+                        width: 25px;
                         background-size: 15px;
                       }
                     }
@@ -462,11 +477,12 @@ export default defineComponent({
                 &:nth-child(5) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_32.png)
-                        no-repeat left center;
-                      background-size: 17px;
+                      background: #f3f8ff
+                        url(../../../assets/images/icons/icon_32.png) no-repeat
+                        center;
+                      background-size: 15px;
                       @media screen and (max-width: 768px) {
-                        width: 20px;
+                        width: 25px;
                         background-size: 15px;
                       }
                     }
@@ -475,11 +491,12 @@ export default defineComponent({
                 &:nth-child(6) {
                   a {
                     .icon {
-                      background: url(../../../assets/images/icons/icon_33.png)
-                        no-repeat left center;
+                      background: #effdf7
+                        url(../../../assets/images/icons/icon_33.png) no-repeat
+                        center;
                       background-size: 17px;
                       @media screen and (max-width: 768px) {
-                        width: 20px;
+                        width: 25px;
                         background-size: 15px;
                       }
                     }
@@ -513,9 +530,9 @@ export default defineComponent({
                   color: #5b21c6;
                   border: 0;
                   .icon {
-                    width: 16px;
+                    width: 21px;
                     background: url(../../../assets/images/icons/icon_34.png)
-                      no-repeat left center;
+                      no-repeat right center;
                     background-size: 13px;
                   }
                 }
@@ -562,6 +579,9 @@ export default defineComponent({
         justify-content: space-between;
         color: #606060;
         font-size: 0.19rem;
+        @media screen and (max-width: 600px) {
+          flex-wrap: wrap;
+        }
         .top_text {
           display: flex;
           align-items: center;
@@ -666,11 +686,14 @@ export default defineComponent({
         .el-col {
           margin: 0.16rem 0;
           .box-card {
-            padding: 0.15rem 0.2rem;
+            padding: 0.1rem 0.2rem;
             background-color: #fff;
             border-color: #e4e4e4;
             border-radius: 0.1rem;
             box-shadow: 5px 7px 9px rgba(0, 0, 0, 0.15);
+            * {
+              cursor: pointer;
+            }
             .el-card__header {
               padding: 0;
               border: 0;
@@ -702,11 +725,11 @@ export default defineComponent({
                 }
                 span {
                   height: 0.25rem;
-                  padding-left: 0.3rem;
+                  padding-left: 0.23rem;
                   background: url(../../../assets/images/icons/icon_9.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
-                  font-size: 14px;
+                    no-repeat left 2px;
+                  background-size: 0.17rem;
+                  font-size: 13px;
                   color: #000;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
@@ -716,7 +739,7 @@ export default defineComponent({
               }
             }
             .el-card__body {
-              padding: 0.15rem 0 0.05rem;
+              padding: 0.05rem 0 0;
               .text {
                 display: flex;
                 justify-content: flex-start;
@@ -728,8 +751,8 @@ export default defineComponent({
                   font-size: 15px;
                 }
                 .icon {
-                  width: 20px;
-                  height: 20px;
+                  width: 18px;
+                  height: 18px;
                   margin: 0 6px 0 0;
                 }
                 .icon_text {
@@ -793,6 +816,7 @@ export default defineComponent({
                 }
                 .ellipsis {
                   width: calc(100% - 26px);
+                  font-family: "FIRACODE-REGULAR";
                   overflow: hidden;
                   text-overflow: ellipsis;
                   word-spacing: normal;
@@ -801,7 +825,7 @@ export default defineComponent({
               }
               .item {
                 justify-content: space-between;
-                margin: 0.3rem 0 0;
+                margin: 0.2rem 0 0;
                 .item_body {
                   display: flex;
                   align-items: center;
@@ -811,7 +835,7 @@ export default defineComponent({
           }
           &:hover {
             .box-card {
-              background-color: #307aff;
+              background-color: #7405ff;
               .el-card__header {
                 .card-header {
                   .name {
@@ -822,8 +846,8 @@ export default defineComponent({
                   }
                   span {
                     background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 0px;
-                    background-size: 0.2rem;
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
                     color: #fff;
                   }
                 }

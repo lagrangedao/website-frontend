@@ -1,3 +1,3 @@
 module.exports = {
-  baseTitle: 'Lagrange'
+  baseTitle: 'Lagrange DAO'
 }

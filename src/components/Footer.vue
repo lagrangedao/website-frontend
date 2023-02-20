@@ -33,7 +33,7 @@
                 <router-link to="/dashboard/spaces">
                     Spaces
                 </router-link>
-                <a href="" target="_blank">
+                <a href="https://docs.lagrangedao.org" target="_blank">
                     Docs
                 </a>
                 <a href="" target="_blank">
@@ -72,7 +72,7 @@ export default defineComponent({
 <style  lang="scss" scoped>
 .footer {
   position: relative;
-  height: 0.9rem;
+  height: 0.8rem;
   font-size: 12px;
   color: #fff;
   @media screen and (min-width: 1800px) {

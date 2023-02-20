@@ -6,7 +6,7 @@
           <i class="icon icon_datasets"></i>
           Datasets:
           <b>{{route.params.name}}</b>
-          <i class="icon icon_copy"></i>
+          <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
           <el-button-group class="ml-4">
             <el-button>
               <i class="icon icon_like"></i>like</el-button>
@@ -18,16 +18,16 @@
         Tasks: &nbsp;
         <router-link to="">
           <i class="icon"></i>
-          Text Classification
+          <span class="a_text">Text Classification</span>
         </router-link>
       </div>
       <div class="tag tag_sub content">
-        Sub-tasks:: &nbsp;
+        Sub-Tasks: &nbsp;
         <router-link to="">
-          language-modeling
+          <span class="a_text">language-modeling</span>
         </router-link>
       </div>
-      <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+      <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
         <el-tab-pane name="card">
           <template #label>
             <span class="custom-tabs-label">
@@ -35,7 +35,7 @@
               <span>Dataset card</span>
             </span>
           </template>
-          <detail-card></detail-card>
+          <detail-card :urlChange="activeName"></detail-card>
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
@@ -44,7 +44,7 @@
               <span>Files and versions</span>
             </span>
           </template>
-          <detail-files></detail-files>
+          <detail-files v-if="activeName === 'files'"></detail-files>
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
@@ -54,6 +54,19 @@
               <b>3</b>
             </span>
           </template>
+          <detail-community v-if="activeName === 'community'"></detail-community>
+        </el-tab-pane>
+        <el-tab-pane name="settings">
+          <template #label>
+            <span class="custom-tabs-label">
+              <!-- <i class="icon icon_datasets"></i> -->
+              <el-icon class="icon">
+                <Setting />
+              </el-icon>
+              <span>Settings</span>
+            </span>
+          </template>
+          <detail-setting v-if="activeName === 'settings'"></detail-setting>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -62,17 +75,26 @@
 <script>
 import detailCard from './detailCard.vue'
 import detailFiles from './detailFiles.vue'
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+import detailCommunity from './detailCommunity.vue'
+import detailSetting from './detailSetting.vue'
+import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import {
+  Setting
+} from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'Datasets',
   components: {
     detailFiles,
-    detailCard
+    detailCard,
+    detailCommunity,
+    detailSetting,
+    Setting
   },
   setup () {
     const store = useStore()
+    const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const dataList = reactive({
       Tasks: [
@@ -115,7 +137,7 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref([])
+    const filedata = ref([])
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
@@ -181,51 +203,37 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
-    async function init () {
-      // listLoad.value = true
-      // listdata.value = []
-      // total.value = 0
-      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}dataset`, 'get')
-      // if (listRes) {
-      //   listdata.value = listRes.datasets || []
-      //   total.value = listRes.datasets.length
-      // }
-      // await system.$commonFun.timeout(500)
-      // listLoad.value = false
-
-      listdata.value = [
-        {
-          is_public: "1",
-          name: "Frigg"
-        },
-        {
-          is_public: "1",
-          name: "Travis"
-        },
-        {
-          is_public: "1",
-          name: "Tyree"
-        }
-      ]
-    }
-    async function getData () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
-      console.log(listRes)
-    }
     function detailFun (row, index) {
       console.log(row, index)
     }
-    onMounted(() => {
+    function copyName (text) {
+      var txtArea = document.createElement('textarea')
+      txtArea.id = 'txt'
+      txtArea.style.position = 'fixed'
+      txtArea.style.top = '0'
+      txtArea.style.left = '0'
+      txtArea.style.opacity = '0'
+      txtArea.value = text
+      document.body.appendChild(txtArea)
+      txtArea.select()
+
+      try {
+        var successful = document.execCommand('copy')
+        var msg = successful ? 'successful' : 'unsuccessful'
+        console.log('Copying text command was ' + msg)
+        if (successful) {
+          system.$commonFun.messageTip('success', 'Copied')
+          return true
+        }
+      } catch (err) {
+        console.log('Oops, unable to copy')
+      } finally {
+        document.body.removeChild(txtArea)
+      }
+      return false
+    }
+    onActivated(() => {
       activeName.value = route.params.tabs || 'card'
-      init()
-      // getData()
-    })
-    watch(lagLogin, (newValue, oldValue) => {
-      if (!lagLogin.value) init()
-    })
-    watch(route, (to, from) => {
-      activeName.value = to.params.tabs || 'card'
-      init()
       window.scrollTo(0, 0)
     })
     return {
@@ -238,7 +246,7 @@ export default defineComponent({
       small,
       background,
       listLoad,
-      listdata,
+      filedata,
       total,
       activeName,
       bodyWidth,
@@ -246,7 +254,7 @@ export default defineComponent({
       route,
       router,
       tableData,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
+      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName
     }
   }
 })
@@ -261,7 +269,7 @@ export default defineComponent({
     font-size: 16px;
   }
   .dataset_head {
-    padding: 0.7rem 0 0;
+    padding: 0.5rem 0 0;
     background-color: #fbfbfc;
     border-bottom: 1px solid #f1f1f1;
     .content {
@@ -279,17 +287,22 @@ export default defineComponent({
       .name {
         display: flex;
         align-items: center;
-        font-size: 0.22rem;
+        font-family: "Helvetica-Bold";
+        font-size: 0.21rem;
         color: #878c93;
         line-height: 1;
+        @media screen and (max-width: 600px) {
+          flex-wrap: wrap;
+        }
         b {
+          font-family: "FIRACODE-BOLD";
           padding: 0 0.07rem 0 0.1rem;
           color: #000;
         }
         .icon {
           width: 0.23rem;
           height: 0.23rem;
-          margin: 0 0.07rem 0 0;
+          margin: -1px 0.07rem 0 0;
         }
         .icon_datasets {
           background: url(../../../assets/images/icons/icon_19.png) no-repeat
@@ -297,23 +310,31 @@ export default defineComponent({
           background-size: auto 100%;
         }
         .icon_copy {
-          width: 0.18rem;
-          height: 0.18rem;
+          width: 16px;
+          height: 16px;
           background: url(../../../assets/images/icons/icon_36.png) no-repeat
             left center;
           background-size: auto 100%;
           cursor: pointer;
+          @media screen and (min-width: 1800px) {
+            width: 18px;
+            height: 18px;
+          }
+          &:hover {
+            opacity: 0.7;
+          }
         }
         .icon_like {
-          width: 0.18rem;
-          height: 0.18rem;
+          width: 0.16rem;
+          height: 0.16rem;
           background: url(../../../assets/images/icons/icon_37.png) no-repeat
             left center;
           background-size: auto 100%;
           cursor: pointer;
         }
         .el-button {
-          font-size: 16px;
+          font-family: inherit;
+          font-size: 15px;
           color: #878c93;
           @media screen and (max-width: 1440px) {
             font-size: 14px;
@@ -331,7 +352,7 @@ export default defineComponent({
       a {
         display: flex;
         align-items: center;
-        padding: 0.03rem 0.07rem;
+        padding: 0;
         margin: 0 0 0 0.1rem;
         background-color: transparent;
         border-radius: 0.05rem;
@@ -348,12 +369,15 @@ export default defineComponent({
         &:hover {
           opacity: 0.9;
         }
+        .a_text {
+          padding: 0.04rem 0.07rem;
+        }
         .icon {
-          width: 0.23rem;
-          height: 0.23rem;
-          margin: 0 0.07rem 0 0;
-          background: url(../../../assets/images/icons/icon_22.png) no-repeat
-            left center;
+          width: 0.3rem;
+          height: 0.26rem;
+          margin: 0;
+          background: #fef7ef url(../../../assets/images/icons/icon_22.png)
+            no-repeat center;
           background-size: 17px;
         }
       }
@@ -400,11 +424,13 @@ export default defineComponent({
       }
       .el-tabs__content {
         border-top: 1px solid #f1f1f1;
+        overflow: visible;
       }
       .el-tabs__item {
         height: auto;
         padding: 0.15rem 0;
         line-height: 1;
+        font-family: "Helvetica-light";
         font-size: 0.18rem;
         @media screen and (max-width: 1600px) {
           font-size: 16px;
@@ -419,9 +445,12 @@ export default defineComponent({
           .icon {
             height: 16px;
           }
+          .el-icon {
+            margin: -1px 0.07rem 0 0;
+          }
           .icon_datasets {
             width: 16px;
-            margin: 0 0.07rem 0 0;
+            margin: -1px 0.07rem 0 0;
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
               left center;
             background-size: auto 100%;
@@ -439,13 +468,26 @@ export default defineComponent({
           }
         }
         &.is-active {
+          font-family: "Helvetica-Neue";
           color: #000;
+          font-weight: 600;
+          position: relative;
+          &::after {
+            position: absolute;
+            content: "";
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #000;
+          }
         }
         &:hover {
           color: #7405ff;
         }
       }
       .el-tabs__active-bar {
+        display: none;
         background-color: #000;
       }
       .el-tabs__nav-wrap::after {

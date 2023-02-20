@@ -7,6 +7,7 @@ import {
 let lastTime = 0
 
 async function sendRequest(apilink, type, jsonObject) {
+  // signOutFun()
   // axios.defaults.timeout = 60000
   axios.defaults.headers.common['Authorization'] = 'Bearer ' + store.state.accessToken
   try {
@@ -28,9 +29,9 @@ async function sendRequest(apilink, type, jsonObject) {
         return response.data
     }
   } catch (err) {
-    console.error(err, err.response, err.response.data)
-    messageTip('error', err.response.data.msg || 'Fail')
-    if (String(err.response.status).indexOf('4') > -1) {
+    console.error(err, err.response)
+    messageTip('error', err.response ? err.response.statusText : 'Fail')
+    if (err.response.status === 401) {
       signOutFun()
     } else if (err.response) {
       // The request has been sent, but the status code of the server response is not within the range of 2xx
@@ -40,7 +41,7 @@ async function sendRequest(apilink, type, jsonObject) {
       return err.response.data
     } else {
       // Something happened in setting up the request that triggered an Error
-      console.log('Error', err.message)
+      // console.log('Error', err.message)
     }
   }
 }
@@ -178,16 +179,29 @@ async function changeNet(rows) {
           symbol: 'tBNB', // 2-6 characters long
           decimals: 18
         },
-        rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
-        blockExplorerUrls: ['https://testnet.bscscan.com']
+        rpcUrls: [process.env.VUE_APP_BSCRPC],
+        blockExplorerUrls: [process.env.VUE_APP_BSCBLOCKURL]
       }
       break
-    case 31415:
+    case 137:
       text = {
-        chainId: web3Init.utils.numberToHex(31415),
-        chainName: 'Fevm',
-        rpcUrls: [process.env.VUE_APP_FEVMRPC],
-        blockExplorerUrls: [process.env.VUE_APP_FEVMRPC]
+        chainId: web3Init.utils.numberToHex(137),
+        chainName: 'Polygon Mainnet',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: [process.env.VUE_APP_POLYGONRPC],
+        blockExplorerUrls: [process.env.VUE_APP_POLYGONBLOCKURL]
+      }
+      break
+    case 3141:
+      text = {
+        chainId: web3Init.utils.numberToHex(3141),
+        chainName: 'Filecoin TestNet',
+        rpcUrls: [process.env.VUE_APP_FILECOINRPC],
+        blockExplorerUrls: [process.env.VUE_APP_FILECOINRPC]
       }
       break
   }
