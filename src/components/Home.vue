@@ -83,6 +83,8 @@ export default defineComponent({
   .container_position {
     @media screen and (min-width: 768px) {
       position: fixed;
+      left: 0;
+      right: 0;
       width: 100%;
       min-height: 100%;
     }
@@ -111,7 +113,6 @@ export default defineComponent({
   .el-footer {
     height: auto;
     padding: 0;
-    background-color: #180e1a;
   }
   .footer_position {
     position: fixed;

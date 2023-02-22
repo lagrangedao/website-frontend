@@ -212,7 +212,6 @@ import {
   UploadFilled,
   EditPen
 } from '@element-plus/icons-vue'
-import { async } from 'q';
 export default defineComponent({
   name: 'Spaces',
   components: {
@@ -585,7 +584,14 @@ export default defineComponent({
       })
       let blob = new Blob([text])
       blobSize.value = blob.size
-      // console.log('sha256', system.$sha256(text))
+
+      // let reader = new FileReader();
+      // reader.readAsArrayBuffer(blob);
+      // reader.onload = function () {
+      //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
+      //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
+      //   console.log('SHA256', hash)
+      // }
       if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
       else if (fileTextType.value === 'text') fileTextEditor.value = text
       else fileTextEditor.value = url

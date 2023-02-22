@@ -1,34 +1,42 @@
 <template>
   <section id="dataset">
     <div id="datasetBody">
-      <el-row class="dataset_body">
-        <el-col :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
-          <div class="button">
-            <el-button type="" text bg>Edit model card</el-button>
+      <el-row class="dataset_body" v-loading="listLoad">
+        <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
+          <div class="readme_body">
+            <div>
+              <b>No model card yet</b>
+              <p>New: Create and edit this model card directly on the website!</p>
+            </div>
           </div>
-          <p class="p title">BERT base model (uncased)</p>
-          <p class="p">Pretrained model on English language using a masked language modeling (MLM) objective. It was introduced in this paper and first released in this repository. This model is uncased: it does not make a difference between english and
-            English. </p>
-          <p class="p title">Disclaimer: The team releasing BERT did not write a model card for this model so this model card has been written by the Hugging Face team. </p>
-          <p class="p title">Model description </p>
-          <p class="p">BERT is a transformers model pretrained on a large corpus of English data in a self-supervised fashion. This means it was pretrained on the raw texts only, with no humans labeling them in any way (which is why it can use lots of publicly
-            available data) with an automatic process to generate inputs and labels from those texts. More precisely, it was pretrained with two objectives: </p>
-          <p class="p title">Masked language modeling (MLM): taking a sentence, the model randomly masks 15% of the words in the input then run the entire masked sentence through the model and has to predict the masked words. This is different from traditional
-            recurrent neural networks (RNNs) that usually see the words one after the other, or from autoregressive models like GPT which internally masks the future tokens. It allows the model to learn a bidirectional representation of the
-            sentence. </p>
-          <p class="p">Next sentence prediction (NSP): the models concatenates two masked sentences as inputs during pretraining. Sometimes they correspond to sentences that were next to each other in the original text, sometimes not. The model then has
-            to predict if the two sentences were following each other or not. </p>
-          <p class="p">This way, the model learns an inner representation of the English language that can then be used to extract features useful for downstream tasks: if you have a dataset of labeled sentences, for instance, you can train a standard classifier
-            using the features produced by the BERT model as inputs. </p>
-          <p class="p title">Model variations</p>
-          <p class="p"> BERT has originally been released in base and large variations, for cased and uncased input text. The uncased models also strips out an accent markers. </p>
-          <p class="p">Chinese and multilingual uncased and cased versions followed shortly after.</p>
+        </el-col>
+        <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="0" :lg="0" :xl="0" class="left">
+          <div class="labelList" id="permiss">
+            <ul>
+              <li v-for="(anchor, index) in titles" :key="index + 'art'">
+                <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
+              </li>
+            </ul>
+          </div>
+        </el-col>
+        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
+          <div class="button">
+            <el-button type="" text bg v-if="urlReadme && isPreview" @click="editFun">Edit model card</el-button>
+          </div>
+          <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
+        </el-col>
+        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
+          <div class="button">
+            <el-button type="" text bg @click="isPreview=true">Cancel</el-button>
+            <el-button type="" text bg @click="editCommitFun">Commit changes</el-button>
+          </div>
+          <v-md-editor v-model="textEditorChange"></v-md-editor>
         </el-col>
         <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="7" class="left left_light">
           <div class="list" style="display: flex;justify-content: space-between;">
             <div class="title">
               Downloads last month
-              <b>1,149,560</b>
+              <b>30,701,057</b>
             </div>
             <div class="echarts">
               <div id="maychar"></div>
@@ -38,11 +46,55 @@
             <div class="title">
               Hosted inference API
             </div>
+            <div class="list_select">
+              <router-link to="">
+                <i class="icon icon_fillMask"></i>
+                <span class="a_text">Fill-Mask</span>
+              </router-link>
+              <el-select v-model="formInline.region" placeholder="">
+                <el-option label="Example 1" value="Example1" />
+              </el-select>
+            </div>
+            <el-form label-position="top" :model="formInline" class="demo-form-inline">
+              <el-form-item label="Mask token: [MASK]">
+                <el-input v-model="formInline.user" placeholder="Paris is the [MASK] of France." />
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary">Compute</el-button>
+              </el-form-item>
+            </el-form>
             <div class="progress">
               <p>Computation time on Intel Xeon 3rd Gen Scalable cpu: cached</p>
-              <el-progress :percentage="50" :color="'#7405ff'">
+            </div>
+            <div class="progress">
+              <el-progress :percentage="90" :color="'#7405ff'">
                 <span text>0.997</span>
               </el-progress>
+              <p>Capital</p>
+            </div>
+            <div class="progress">
+              <el-progress :percentage="3" :color="'#7405ff'">
+                <span text>0.001</span>
+              </el-progress>
+              <p>heart</p>
+            </div>
+            <div class="progress">
+              <el-progress :percentage="1" :color="'#7405ff'">
+                <span text>0.000</span>
+              </el-progress>
+              <p>center</p>
+            </div>
+            <div class="progress">
+              <el-progress :percentage="1" :color="'#7405ff'">
+                <span text>0.000</span>
+              </el-progress>
+              <p>centre</p>
+            </div>
+            <div class="progress">
+              <el-progress :percentage="1" :color="'#7405ff'">
+                <span text>0.000</span>
+              </el-progress>
+              <p>city</p>
             </div>
           </div>
           <div class="list">
@@ -99,15 +151,23 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance, toRefs, nextTick, inject } from 'vue'
+import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance, toRefs, nextTick, inject } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import {
+  EditPen, Edit, CircleClose
+} from '@element-plus/icons-vue'
+import { async } from 'q';
 
 export default defineComponent({
-  name: 'Datasets',
-  components: {},
+  name: 'Models',
+  components: {
+    EditPen,
+    Edit,
+    CircleClose
+  },
   props: {
-    isVisible: { type: Boolean, default: false }
+    urlChange: { type: String, default: 'card' }
   },
   setup (props) {
     const store = useStore()
@@ -149,6 +209,9 @@ export default defineComponent({
         label: 'Most Likes',
       }
     ])
+    const urlReadme = ref('')
+    const urlReadmeName = ref('')
+    const isPreview = ref(true)
     const currentPage1 = ref(1)
     const small = ref(false)
     const background = ref(false)
@@ -203,7 +266,34 @@ export default defineComponent({
         label: '1   (not_entailment)'
       }
     ])
+    const textEditor = ref('')
+    const textEditorChange = ref('')
+    const preview = ref(null);
+    const titles = ref([]);
+    const formInline = reactive({
+      user: '',
+      region: 'Example1',
+    })
 
+    function editFun () {
+      textEditorChange.value = textEditor.value
+      isPreview.value = false
+    }
+    async function editCommitFun () {
+      // console.log(urlReadmeName.value)
+      listLoad.value = true
+      let newFile = new File([textEditorChange.value], urlReadmeName.value)
+      let fd = new FormData()
+      fd.append('file', newFile, urlReadmeName.value)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+      await system.$commonFun.timeout(500)
+      if (uploadRes && uploadRes.status === "success") {
+        if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
+        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+      } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+      init()
+      isPreview.value = true
+    }
     function handleClick (tab, event) {
       router.push({ name: 'modelsDetail', params: { name: route.params.name, tabs: tab.props.name } })
     }
@@ -219,16 +309,28 @@ export default defineComponent({
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
     async function init () {
-      // listLoad.value = true
-      // listdata.value = []
-      // total.value = 0
-      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}dataset`, 'get')
-      // if (listRes) {
-      //   listdata.value = listRes.datasets || []
-      //   total.value = listRes.datasets.length
-      // }
-      // await system.$commonFun.timeout(500)
-      // listLoad.value = false
+      if (route.params.tabs !== 'card') return
+      listLoad.value = true
+      listdata.value = []
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        // listdata.value = listRes.data.files || []
+        const fileLi = listRes.data.files || []
+        fileLi.forEach((element, i) => {
+          let el = element.name.split('/')
+          el.shift()
+          el.shift()
+          el.shift()
+          // console.log(el.join('/').toLowerCase())
+          if (el.join('/').toLowerCase() === 'readme.md') {
+            urlReadme.value = element.url
+            urlReadmeName.value = el.join('/')
+            getTitle()
+          }
+        })
+      }
+      await system.$commonFun.timeout(500)
+      listLoad.value = false
       listdata.value = [
         {
           is_public: "1",
@@ -251,15 +353,22 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
-
-    const text = ref('')
-    const preview = ref(null);
-    const titles = ref([]);
     const imgClick = (url, index) => {
       console.log(url, index);
     };
     const getTitle = async () => {
-      text.value = await system.$commonFun.sendRequest(`${process.env.BASE_URL}Dataset-Card-Template.md`, 'get')
+      if (!urlReadme.value) return
+      // textEditor.value = await fetch(urlReadme.value)
+      //   .then(res => res.arrayBuffer())
+      //   .then(buffer => {
+      //     const decoder = new TextDecoder("gbk")
+      //     const text = decoder.decode(buffer)
+      //     return text
+      //   })
+      var response = await fetch(urlReadme.value)
+      textEditor.value = await new Promise(async resolve => {
+        resolve(response.text())
+      })
       nextTick(() => {
         const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
         titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
@@ -288,11 +397,6 @@ export default defineComponent({
         })
       }
     }
-    onMounted(() => {
-      // getTitle()
-      init()
-      changetype();
-    })
     let echarts = inject("echarts")
     const changetype = () => {
       const machart = echarts.init(document.getElementById("maychar"));
@@ -308,7 +412,7 @@ export default defineComponent({
           type: 'category',
           boundaryGap: false,
           show: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          data: [820, 1100, 1080, 982, 951, 934, 900, 930, 920]
         },
         yAxis: {
           type: 'value',
@@ -319,7 +423,7 @@ export default defineComponent({
         },
         series: [
           {
-            data: [820, 982, 951, 934, 900, 930, 920],
+            data: [920, 1500, 780, 982, 851, 934, 900, 1030, 920],
             type: 'line',
             // smooth:true,
             symbolSize: 0,
@@ -347,8 +451,27 @@ export default defineComponent({
         machart.resize();
       })
     }
+    onActivated(() => { })
+    onMounted(() => {
+      urlReadme.value = ''
+      window.scrollTo(0, 0)
+      init()
+      changetype();
+    })
+    onDeactivated(() => { })
+    watch(() => props.urlChange, (newValue, oldValue) => {
+      isPreview.value = true
+    })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
+    })
+    watch(route, (to, from) => {
+      if (to.name !== 'modelsDetail') return
+      if (to.params.tabs === 'card') {
+        urlReadme.value = ''
+        window.scrollTo(0, 0)
+        init()
+      }
     })
     return {
       lagLogin,
@@ -368,8 +491,11 @@ export default defineComponent({
       router,
       tableData,
       props,
-      text, imgClick, getTitle, titles, preview, handleAnchorClick,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, changetype
+      urlReadme,
+      isPreview,
+      formInline,
+      textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
+      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
     }
   }
 })
@@ -536,7 +662,6 @@ export default defineComponent({
           }
           small {
             font-size: 14px;
-            font-weight: bold;
             color: #000;
             @media screen and (min-width: 1800px) {
               font-size: 15px;
@@ -763,7 +888,7 @@ export default defineComponent({
         }
       }
       .list_border {
-        padding: 0.1rem 0.16rem;
+        padding: 0.1rem 0.16rem 0.2rem;
         margin: 0.2rem 0 0;
         border-top: 1px solid #f1f1f1;
         border-bottom: 1px solid #f1f1f1;
@@ -775,6 +900,87 @@ export default defineComponent({
           }
           @media screen and (max-width: 1440px) {
             font-size: 16px;
+          }
+        }
+        .list_select {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.2rem;
+          a {
+            display: flex;
+            padding: 0;
+            margin: 0.03rem 0;
+            background-color: transparent;
+            border-radius: 0.05rem;
+            font-size: 13px;
+            color: #606060;
+            border: 2px solid #f1f1f2;
+            @media screen and (min-width: 1800px) {
+              font-size: 15px;
+            }
+            @media screen and (max-width: 1440px) {
+              font-size: 12px;
+            }
+            &:hover {
+              opacity: 0.9;
+            }
+            .a_text {
+              align-items: center;
+              display: flex;
+              padding: 0.04rem 0.07rem;
+            }
+            .icon {
+              width: 0.3rem;
+              height: 100%;
+              min-height: 0.26rem;
+              padding: 0;
+            }
+            .icon_fillMask {
+              background: #fef4f4 url(../../../assets/images/icons/icon_31.png)
+                no-repeat center;
+              background-size: 17px;
+              @media screen and (max-width: 768px) {
+                width: 25px;
+                background-size: 15px;
+              }
+            }
+          }
+          .el-select {
+            max-width: 150px;
+            margin: 0.03rem 0;
+            .el-input {
+              .el-input__inner {
+                height: 30px;
+                line-height: 30px;
+              }
+            }
+          }
+        }
+        .el-form {
+          color: #878c93;
+          .el-form-item {
+            margin-bottom: 0.15rem;
+            .el-input {
+              .el-input__inner {
+                height: auto;
+                padding: 0.12rem 0.15rem;
+                font-family: inherit;
+                border-color: #d9d9d9;
+                border-radius: 0.08rem;
+                line-height: 1;
+                color: #8d9298;
+              }
+            }
+            .el-button {
+              padding: 0.18rem 0.15rem;
+              font-family: inherit;
+              background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              border-color: #e1e1e1;
+              font-size: 14px;
+              line-height: 1;
+              border-radius: 0.09rem;
+              color: #606060;
+            }
           }
         }
         .progress {
@@ -792,6 +998,13 @@ export default defineComponent({
             color: #878c93;
             @media screen and (min-width: 1800px) {
               font-size: 15px;
+            }
+            .el-progress-bar__outer {
+              background: transparent;
+              border-radius: 2px;
+              .el-progress-bar__inner {
+                border-radius: 2px;
+              }
             }
           }
         }
@@ -1077,6 +1290,42 @@ export default defineComponent({
     .readme_text {
       font-family: "FIRACODE-LIGHT";
     }
+    .readme_text {
+      position: relative;
+      padding: 0.5rem 0.3rem 0.3rem 0;
+      @media screen and (max-width: 992px) {
+        padding: 0.3rem 0;
+      }
+      .readme_body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        min-height: 300px;
+        background-color: #fbfbfc;
+        border: 1px solid #f1f1f1;
+        border-radius: 5px;
+        b,
+        p {
+          display: block;
+          width: 100%;
+          margin: 0.1rem auto;
+          text-align: center;
+        }
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: #f1f1f1;
+        @media screen and (max-width: 992px) {
+          width: 0px;
+        }
+      }
+    }
     .right {
       position: relative;
       padding: 0.2rem 0.2rem 0.4rem 0;
@@ -1246,9 +1495,11 @@ export default defineComponent({
       .button {
         display: flex;
         justify-content: flex-end;
+        padding: 0 0 0.2rem;
         .el-button {
           padding: 0.15rem 0.2rem;
-          background: lighten($color: #f0f0f0, $amount: 0);
+          background: linear-gradient(180deg, #fefefe, #f0f0f0);
+          border-color: #e1e1e1;
           border-radius: 0.07rem;
           color: #606060;
           font-family: inherit;

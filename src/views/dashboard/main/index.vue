@@ -302,6 +302,18 @@ export default defineComponent({
     @media screen and (min-height: 750px) {
       min-height: 480px;
     }
+    @media screen and (min-height: 900px) {
+      min-height: 600px;
+    }
+    @media screen and (min-height: 1000px) {
+      min-height: 700px;
+    }
+    @media screen and (min-height: 1100px) {
+      min-height: 800px;
+    }
+    @media screen and (min-height: 1200px) {
+      min-height: 900px;
+    }
     .loginBody {
       height: calc(100% - 0.85rem);
       padding: 0.6rem 0 0.25rem;

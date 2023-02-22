@@ -1,5 +1,5 @@
 <template>
-    <div class="footer">
+    <div class="footer landing">
         <el-row class="footer_menu">
             <el-col :xs="24" :sm="24" :md="11" :lg="11" :xl="11">
                 <a href="" target="_blank">
@@ -73,6 +73,7 @@ export default defineComponent({
 .footer {
   position: relative;
   height: 0.8rem;
+  background-color: #180e1a;
   font-size: 12px;
   color: #fff;
   @media screen and (min-width: 1800px) {

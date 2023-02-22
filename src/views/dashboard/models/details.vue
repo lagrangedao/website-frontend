@@ -40,6 +40,7 @@
               <span>Files and versions</span>
             </span>
           </template>
+          <detail-files v-if="activeName === 'files'"></detail-files>
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
@@ -49,6 +50,19 @@
               <b>3</b>
             </span>
           </template>
+          <detail-community v-if="activeName === 'community'"></detail-community>
+        </el-tab-pane>
+        <el-tab-pane name="settings">
+          <template #label>
+            <span class="custom-tabs-label">
+              <!-- <i class="icon icon_datasets"></i> -->
+              <el-icon class="icon">
+                <Setting />
+              </el-icon>
+              <span>Settings</span>
+            </span>
+          </template>
+          <detail-setting v-if="activeName === 'settings'"></detail-setting>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -56,6 +70,9 @@
 </template>
 <script>
 import detailCard from './detailCard.vue'
+import detailFiles from './detailFiles.vue'
+import detailCommunity from './detailCommunity.vue'
+import detailSetting from './detailSetting.vue'
 import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -65,7 +82,10 @@ import {
 export default defineComponent({
   name: 'Datasets',
   components: {
+    detailFiles,
     detailCard,
+    detailCommunity,
+    detailSetting,
     Setting
   },
   setup () {
@@ -239,12 +259,8 @@ export default defineComponent({
       return false
     }
     onActivated(() => {
-      window.scrollTo(0, 0)
       activeName.value = route.params.tabs || 'card'
-      init()
-    })
-    watch(lagLogin, (newValue, oldValue) => {
-      if (!lagLogin.value) init()
+      window.scrollTo(0, 0)
     })
     return {
       lagLogin,
