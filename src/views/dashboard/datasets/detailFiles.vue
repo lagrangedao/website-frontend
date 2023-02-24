@@ -111,8 +111,8 @@
                     download
                   </a>
                 </li>
-                <li class="disabled">
-                  <a>
+                <li>
+                  <a @click="deleteFile">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                       <path d="M12 12h2v12h-2z" fill="currentColor"></path>
                       <path d="M18 12h2v12h-2z" fill="currentColor"></path>
@@ -607,6 +607,16 @@ export default defineComponent({
     function editChange () {
       fileTextShow.value = !fileTextShow.value
     }
+    async function deleteFile () {
+      uploadLoad.value = true
+      let name = pathList.value.join('/') || ''
+      let fileNew = `${name ? name + '/' : ''}${fileBody.title}`
+      const deleteRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/file?filename=${fileNew}`, 'delete')
+      if (deleteRes && deleteRes.status === 'success') system.$commonFun.messageTip('success', deleteRes.message || 'Delete successfully!')
+      else system.$commonFun.messageTip('error', 'Delete failed!')
+      reset()
+      init()
+    }
     function calculateDiffTime (startTime) {
       var endTime = Math.round(new Date() / 1000)
       var timeDiff = endTime - startTime
@@ -773,7 +783,7 @@ export default defineComponent({
       blobSize,
       init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      calculateDiffTime, fileEdit, editChange, downFile, sizeChange
+      calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile
     }
   }
 })
