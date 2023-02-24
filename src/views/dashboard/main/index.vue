@@ -129,7 +129,8 @@ export default defineComponent({
     const router = useRouter()
 
     function getStart () {
-      if (lagLogin.value) active.value = 2
+      // if (lagLogin.value) active.value = 2
+      if (lagLogin.value) router.push({ path: '/dashboard/personal_center' })
       else active.value = 1
     }
     async function signFun (params) {
@@ -143,7 +144,8 @@ export default defineComponent({
           info.balance = Number(balanceAll).toFixed(0)
         })
         // await system.$commonFun.timeout(500)
-        if (lagLogin.value) active.value = 2
+        // if (lagLogin.value) active.value = 2
+        if (lagLogin.value) router.push({ path: '/dashboard/personal_center' })
         else await signIn()
       })
     }
@@ -152,7 +154,8 @@ export default defineComponent({
       console.log(parseInt(chainId, 16))
       if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
-        if (lStatus) active.value = 2
+        // if (lStatus) active.value = 2
+        if (lStatus) router.push({ path: '/dashboard/personal_center' })
         return false
       } else {
         active.value = 1
