@@ -11,13 +11,13 @@ Run the following command to run the latest stable image of lagrange-dao-we
 
 ```bash
 docker build -t lagrangedao/lagrange-dao-web .
-docker run  -p 8082:8080 lagrangedao/lagrange-dao-web
+docker run  -p 8080:8080 lagrangedao/lagrange-dao-web
 ```
 The service will be Available on:
 
-http://127.0.0.1:8082
+http://127.0.0.1:8080
 
-http://172.17.0.2:8082
+http://172.17.0.2:8080
 
 Hit CTRL-C to stop the server
 
