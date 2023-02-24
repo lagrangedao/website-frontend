@@ -1,7 +1,10 @@
 <template>
   <section id="space">
     <div id="spaceBody">
-      <el-row class="space_body"></el-row>
+      <el-row class="space_body">
+        <!-- <iframe src="https://ccao-clayspace.hf.space/?__theme=light" title="Space app" class="space_iframe" allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; clipboard-write; document-domain; encrypted-media; fullscreen; geolocation; gyroscope; layout-animations; legacy-image-formats; magnetometer; microphone; midi; oversized-images; payment; picture-in-picture; publickey-credentials-get; sync-xhr; usb; vr ; wake-lock; xr-spatial-tracking"
+          sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-downloads" scrolling="yes" id="iFrameResizer0" style="overflow: auto;"></iframe> -->
+      </el-row>
     </div>
   </section>
 </template>
@@ -319,14 +322,14 @@ export default defineComponent({
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0 0.16rem;
-    }
     @media screen and (min-width: 1280px) {
       max-width: 1280px;
     }
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
+    }
+    .space_iframe {
+      width: 100%;
     }
     .readme_text {
       position: relative;

@@ -39,7 +39,7 @@
             </div>
           </el-col>
 
-          <el-col :xs="24" :sm="12" :md="11" :lg="11" :xl="11" class="metamask" v-else-if="active === 2">
+          <!-- <el-col :xs="24" :sm="12" :md="11" :lg="11" :xl="11" class="metamask" v-else-if="active === 2">
             <div class="titleCont">
               <div class="address">
                 <div class="address_left">
@@ -63,7 +63,7 @@
                 </el-form-item>
               </el-form>
             </div>
-          </el-col>
+          </el-col> -->
         </el-row>
       </div>
       <footer>
