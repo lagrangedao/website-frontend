@@ -12,9 +12,7 @@ import en from 'element-plus/es/locale/lang/en'
 import Web3 from 'web3'
 import commonFun from '@/utils/common'
 import echarts from '@/utils/echarts'
-import {
-    sha256
-} from 'js-sha256'
+import CryptoJS from 'crypto-js'
 // edit
 import VueMarkdownEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
@@ -45,7 +43,7 @@ app.config.globalProperties.$commonFun = commonFun
 app.config.globalProperties.$Web3 = Web3
 app.config.globalProperties.$echarts = echarts
 app.config.globalProperties.$updateTime = "update time: 2022-11-18"
-app.config.globalProperties.$sha256 = sha256
+app.config.globalProperties.$CryptoJS = CryptoJS
 app.use(ElementPlus, {
         locale: en,
     })

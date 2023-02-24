@@ -324,7 +324,7 @@ export default defineComponent({
           // console.log(el.join('/').toLowerCase())
           if (el.join('/').toLowerCase() === 'readme.md') {
             urlReadme.value = element.url
-            urlReadmeName.value = el.join('/').toLowerCase()
+            urlReadmeName.value = el.join('/')
             getTitle()
           }
         })

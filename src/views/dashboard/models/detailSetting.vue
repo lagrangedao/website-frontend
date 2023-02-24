@@ -196,7 +196,7 @@ export default defineComponent({
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) {
               system.$commonFun.messageTip('success', 'Update successfully!')
-              router.push({ name: 'datasetDetail', params: { name: ruleForm.name, tabs: 'settings' } })
+              router.push({ name: 'modelsDetail', params: { name: ruleForm.name, tabs: 'settings' } })
             }
             else system.$commonFun.messageTip('error', listRes.data.message)
           } else system.$commonFun.messageTip('error', 'Upload failed!')
@@ -232,7 +232,7 @@ export default defineComponent({
       })
     }
     async function init () {
-      if (route.name !== 'datasetDetail') return
+      if (route.name !== 'modelsDetail') return
       listLoad.value = true
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
