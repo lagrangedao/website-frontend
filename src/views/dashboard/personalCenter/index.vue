@@ -261,7 +261,7 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const logoUrl = require("@/assets/images/icons/logo_w.png")
-    const peopleUrl = require("@/assets/images/dashboard/people_09.png")
+    const peopleUrl = require("@/assets/images/dashboard/people_default.png")
     const loading = ref(true)
     const loadingText = ref('')
     const prevType = ref(true)
@@ -290,7 +290,7 @@ export default defineComponent({
           // console.log(balance)
           const myBalance = balance
           const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
-          info.balance = Number(balanceAll).toFixed(0)
+          info.balance = Number(balanceAll).toFixed(4)
         })
         // await system.$commonFun.timeout(500)
         if (lagLogin.value) getdataList()
