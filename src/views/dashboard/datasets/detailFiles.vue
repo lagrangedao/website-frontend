@@ -229,7 +229,7 @@ export default defineComponent({
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const accessName = computed(() => (store.state.accessName))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-    const people_img = require("@/assets/images/dashboard/people_09.png")
+    const people_img = require("@/assets/images/dashboard/people_default.png")
     const tableLayout = ref('fixed')
     const labelTab = ref('list')
     const listdata = reactive({})

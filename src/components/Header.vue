@@ -76,7 +76,7 @@ export default defineComponent({
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const logo = require("@/assets/images/icons/logo_w.png")
-    const people_img = require("@/assets/images/dashboard/people_09.png")
+    const people_img = require("@/assets/images/dashboard/people_default.png")
     const searchValue = ref('')
     const activeIndex = ref('')
     const bodyWidth = ref(document.body.clientWidth < 992)
