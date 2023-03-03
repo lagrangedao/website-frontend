@@ -4,7 +4,7 @@
             <el-header>
                 <v-head></v-head>
             </el-header>
-            <el-main :class="{'main_position': route.name === 'main'}">
+            <el-main :class="{'main_position': route.name === 'main', 'main_app': route.name === 'spaceDetail'}">
                 <div class="content">
                     <router-view v-slot="{ Component }">
                         <transition name="move" mode="out-in">
@@ -104,6 +104,16 @@ export default defineComponent({
       align-items: center;
       height: calc(100% - 0.68rem);
       background-color: #180e1a;
+      .content {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    &.main_app {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100% - 1.48rem);
       .content {
         width: 100%;
         height: 100%;

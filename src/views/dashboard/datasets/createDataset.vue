@@ -37,7 +37,12 @@
                         <label class="label" for="license">
                             License
                             <div class="flex flex-row">
-                                <el-input v-model="ruleForm.license" placeholder="License" />
+                                <el-select v-model="ruleForm.license" filterable :filter-method="licenseQuery" allow-create default-first-option popper-class="license_style" placeholder="License" @blur="ModelChangeSelect" @change="licenseChange">
+                                    <el-option v-for="item in ruleForm.licenseOptions" :key="item.value" :label="item.value" :value="item.value">
+                                        <p>{{ item.value }}</p>
+                                        <small>{{ item.label }}</small>
+                                    </el-option>
+                                </el-select>
                             </div>
                         </label>
                     </el-form-item>
@@ -66,6 +71,7 @@ import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentI
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import { FormInstance, FormRules } from 'element-plus'
+import licenseList from '@/utils/License-list.js'
 export default defineComponent({
     name: "Create Dataset",
     setup () {
@@ -79,7 +85,9 @@ export default defineComponent({
         const ruleForm = reactive({
             name: '',
             license: '',
-            resource: '1'
+            resource: '1',
+            licenseOptions: [],
+            oldOptions: []
         })
         const validateInput = (rule, value, callback) => {
             if (!checkSpecialKey(value)) {
@@ -136,9 +144,34 @@ export default defineComponent({
                 }
             })
         }
-        onMounted(() => {
-            ruleForm.name = ''
-            ruleForm.license = ''
+        const licenseChange = (value) => {
+            // console.log(value)
+        }
+        function ModelChangeSelect (e) {
+            let value = e.target.value
+            if (value) ruleForm.license = value
+        }
+        async function licenseQuery (value) {
+            let result = await ruleForm.oldOptions.filter(item => {
+                if (item.label.indexOf(value) > -1 || item.value.indexOf(value) > -1) return item
+            })
+            ruleForm.licenseOptions = result
+        }
+        function licenseSelect () {
+            let list = []
+            for (let key in licenseList) {
+                // console.log(key, ',', licenseList[key]);
+                list.push({
+                    value: key,
+                    label: licenseList[key]
+                })
+            }
+            return list
+        }
+        onMounted(async () => {
+            ruleFormRef.value.resetFields()
+            ruleForm.licenseOptions = await licenseSelect()
+            ruleForm.oldOptions = await licenseSelect()
         })
         return {
             metaAddress,
@@ -149,7 +182,7 @@ export default defineComponent({
             rules,
             createLoad,
             system,
-            submitForm
+            submitForm, licenseChange, licenseQuery, ModelChangeSelect
         }
     },
 });
@@ -212,6 +245,11 @@ export default defineComponent({
           width: 100%;
           &.flex_form {
             width: 50%;
+            padding-bottom: 0;
+            border-bottom: 0;
+            .el-select {
+              width: calc(100% - 30px);
+            }
           }
           .el-form-item__content {
             width: 100%;
@@ -235,7 +273,7 @@ export default defineComponent({
                 display: flex;
                 width: 100%;
                 .el-select {
-                  width: calc(100% - 30px);
+                  width: 100%;
                 }
                 .self-end {
                   width: 30px;
@@ -306,7 +344,26 @@ export default defineComponent({
   }
 }
 </style>
-
+<style lang="scss">
+.license_style {
+  .el-select-dropdown__item {
+    height: auto;
+    padding: 8px 3%;
+    line-height: 1;
+    p {
+      margin: 0 0 5px;
+      font-size: 14px;
+      color: #000;
+      line-height: 1.2;
+    }
+    small {
+      font-size: 13px;
+      color: #979797;
+      line-height: 1.2;
+    }
+  }
+}
+</style>
 
 <i18n>
 {
