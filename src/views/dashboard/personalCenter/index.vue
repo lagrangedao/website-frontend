@@ -321,6 +321,12 @@ export default defineComponent({
         spacesIndex.value = listRes.data.space.length
         store.dispatch('setAccessAvatar', listRes.data.user.avatar)
         store.dispatch('setAccessName', listRes.data.user.full_name)
+        let spaceList = []
+        let datasetList = []
+        listdata.spaces.forEach(space => spaceList.push(space.name))
+        listdata.datasets.forEach(space => datasetList.push(space.name))
+        store.dispatch('setAccessSpace', JSON.stringify(spaceList))
+        store.dispatch('setAccessDataset', JSON.stringify(datasetList))
       } else {
         listdata.datasets = []
         listdata.models = []
@@ -338,16 +344,16 @@ export default defineComponent({
       document.addEventListener('visibilitychange', function () {
         prevType.value = !document.hidden
       })
-      ethereum.on('accountsChanged', function (account) {
-        // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
-        if (!prevType.value) return false
-        loading.value = true
-        store.dispatch('setMetaAddress', account[0])
-        store.dispatch('setNavLogin', false)
-        store.dispatch('setLogin', false)
-        store.dispatch('setAccessToken', '')
-        window.location.reload()
-      })
+      // ethereum.on('accountsChanged', function (account) {
+      //   // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
+      //   if (!prevType.value) return false
+      //   loading.value = true
+      //   store.dispatch('setMetaAddress', account[0])
+      //   store.dispatch('setNavLogin', false)
+      //   store.dispatch('setLogin', false)
+      //   store.dispatch('setAccessToken', '')
+      //   window.location.reload()
+      // })
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false

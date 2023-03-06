@@ -166,6 +166,8 @@ async function signOutFun() {
   store.dispatch('setLogin', false)
   store.dispatch('setNavLogin', false)
   store.dispatch('setMetaAddress', '')
+  store.dispatch('setAccessSpace', '')
+  store.dispatch('setAccessDataset', '')
 }
 
 async function changeNet(rows) {

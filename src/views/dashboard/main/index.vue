@@ -179,16 +179,16 @@ export default defineComponent({
       document.addEventListener('visibilitychange', function () {
         prevType.value = !document.hidden
       })
-      ethereum.on('accountsChanged', function (account) {
-        // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
-        if (!prevType.value) return false
-        loginLoad.value = true
-        store.dispatch('setMetaAddress', account[0])
-        store.dispatch('setNavLogin', false)
-        store.dispatch('setLogin', false)
-        store.dispatch('setAccessToken', '')
-        window.location.reload()
-      })
+      // ethereum.on('accountsChanged', function (account) {
+      //   // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
+      //   if (!prevType.value) return false
+      //   loginLoad.value = true
+      //   store.dispatch('setMetaAddress', account[0])
+      //   store.dispatch('setNavLogin', false)
+      //   store.dispatch('setLogin', false)
+      //   store.dispatch('setAccessToken', '')
+      //   window.location.reload()
+      // })
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false

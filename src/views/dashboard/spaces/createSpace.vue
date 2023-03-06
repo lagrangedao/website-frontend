@@ -140,6 +140,7 @@ export default defineComponent({
             let val = store.state.metaAddress || ''
             return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
         })
+        const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
         const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
         const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
         const ruleForm = reactive({
@@ -246,7 +247,7 @@ export default defineComponent({
                     else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Created Failed!')
                     ruleForm.name = ''
                     ruleForm.license = ''
-                    router.push({ name: 'spaces' })
+                    router.push({ name: 'personalCenter' })
                     loading.createLoad = false
                 } else {
                     console.log('error submit!', fields)

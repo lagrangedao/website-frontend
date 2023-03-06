@@ -127,7 +127,7 @@ export default defineComponent({
                     system.$commonFun.messageTip('success', 'Created Dataset successfully!')
                     ruleForm.name = ''
                     ruleForm.license = ''
-                    router.push({ name: 'datasets' })
+                    router.push({ name: 'personalCenter' })
                     createLoad.value = false
                 } else {
                     console.log('error submit!', fields)
