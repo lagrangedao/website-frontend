@@ -333,3 +333,10 @@ export default defineComponent({
   }
 }
 </style>
+<style>
+.loginImg {
+  display: flex;
+  cursor: pointer;
+}
+</style>
+

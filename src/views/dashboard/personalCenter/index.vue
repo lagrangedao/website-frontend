@@ -160,7 +160,7 @@
             </el-card>
           </el-col>
         </el-row>
-        <div class="more_style" v-if="listdata.datasets.length>3">
+        <div class="more_style" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">
           <img v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
@@ -278,6 +278,7 @@ export default defineComponent({
       spacesIsShow: false
     })
     const listLoad = ref(false)
+    const bodyWidth = ref(document.body.clientWidth < 768)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -384,6 +385,13 @@ export default defineComponent({
       // console.log(row, index)
       router.push({ name: 'personalCenterProfile' })
     }
+    onMounted(() => {
+      window.onresize = () => {
+        return (() => {
+          bodyWidth.value = document.body.clientWidth < 768
+        })()
+      }
+    })
     onActivated(() => {
       fn()
       if (navLogin.value || !!metaAddress.value) isLogin()
@@ -403,6 +411,9 @@ export default defineComponent({
     })
     watch(navLogin, (newValue, oldValue) => {
       if (navLogin.value) isLogin()
+    })
+    watch(() => bodyWidth, (val) => {
+      bodyWidth.value = val
     })
     return {
       metaAddress,
@@ -424,6 +435,7 @@ export default defineComponent({
       listdata,
       listLoad,
       accessAvatar,
+      bodyWidth,
       isLogin, signIn, getdataList, fn, changeNetChange, momentFilter, detailFun, editProfile
     }
   }
@@ -1147,6 +1159,9 @@ export default defineComponent({
                 top: 0.1rem;
                 display: flex;
                 align-items: center;
+                @media screen and (max-width: 768px) {
+                  right: 0.2rem;
+                }
                 span {
                   height: 0.25rem;
                   padding-left: 0.3rem;
@@ -1167,6 +1182,13 @@ export default defineComponent({
                 cursor: pointer;
                 font-size: 0.3rem;
                 letter-spacing: 1px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                word-break: break-word;
               }
             }
             .el-card__body {

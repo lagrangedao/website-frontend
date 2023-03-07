@@ -151,7 +151,7 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      console.log(parseInt(chainId, 16))
+      // console.log(parseInt(chainId, 16))
       if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
         // if (lStatus) active.value = 2
@@ -302,8 +302,17 @@ export default defineComponent({
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
     }
+    @media screen and (min-height: 600px) {
+      min-height: 381px;
+    }
+    @media screen and (min-height: 700px) {
+      min-height: 510px;
+    }
     @media screen and (min-height: 750px) {
       min-height: 480px;
+    }
+    @media screen and (min-height: 768px) {
+      min-height: 546px;
     }
     @media screen and (min-height: 900px) {
       min-height: 600px;

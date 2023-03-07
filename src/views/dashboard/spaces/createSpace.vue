@@ -568,7 +568,7 @@ export default defineComponent({
                   @media screen and (max-width: 1024px) {
                     width: 48%;
                   }
-                  @media screen and (max-width: 768px) {
+                  @media screen and (max-width: 320px) {
                     width: 98%;
                   }
                   .el-radio__input {

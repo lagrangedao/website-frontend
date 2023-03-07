@@ -364,6 +364,7 @@ export default defineComponent({
     const listLoad = ref(false)
     const dialogDOIVisible = ref(false)
     const settingIndex = ref(0)
+    const gutterRow = ref(document.body.clientWidth < 992 ? '0' : '30')
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -473,6 +474,7 @@ export default defineComponent({
       listLoad,
       dialogDOIVisible,
       system,
+      gutterRow,
       route,
       router,
       sleepVisible,
@@ -656,6 +658,8 @@ export default defineComponent({
         font-size: 16px;
         line-height: 1;
         color: #c37af9;
+        word-break: break-word;
+        white-space: normal;
         @media screen and (max-width: 1600px) {
           font-size: 14px;
         }
@@ -924,6 +928,9 @@ export default defineComponent({
           }
         }
         .space_hardware_list {
+          @media screen and (max-width: 1200px) {
+            padding: 0;
+          }
           .el-card {
             position: relative;
             padding: 0.1rem;
@@ -1020,6 +1027,9 @@ export default defineComponent({
           }
           &:nth-child(2) {
             margin-top: -0.25rem;
+            @media screen and (max-width: 1200px) {
+              margin-top: 0.2rem;
+            }
           }
         }
       }

@@ -319,6 +319,7 @@ export default defineComponent({
   :deep(.space_body) {
     display: flex;
     align-items: stretch;
+    min-height: 80px;
     padding: 0;
     margin: auto;
     font-size: 14px;

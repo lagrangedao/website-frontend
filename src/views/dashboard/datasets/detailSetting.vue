@@ -454,6 +454,8 @@ export default defineComponent({
         font-size: 16px;
         line-height: 1;
         color: #c37af9;
+        word-break: break-word;
+        white-space: normal;
         @media screen and (max-width: 1600px) {
           font-size: 14px;
         }
