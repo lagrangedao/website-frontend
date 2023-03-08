@@ -3,17 +3,11 @@
         <el-row class="space_body" v-loading="loading.createLoad" :element-loading-text="loading.createText">
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <div class="text-center">
-                    <!-- <svg class="w-12 h-12 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 25 25">
-                        <ellipse cx="12.5" cy="5" fill="currentColor" fill-opacity="0.25" rx="7.5" ry="2"></ellipse>
-                        <path d="M12.5 15C16.6421 15 20 14.1046 20 13V20C20 21.1046 16.6421 22 12.5 22C8.35786 22 5 21.1046 5 20V13C5 14.1046 8.35786 15 12.5 15Z" fill="currentColor" opacity="0.5"></path>
-                        <path d="M12.5 7C16.6421 7 20 6.10457 20 5V11.5C20 12.6046 16.6421 13.5 12.5 13.5C8.35786 13.5 5 12.6046 5 11.5V5C5 6.10457 8.35786 7 12.5 7Z" fill="currentColor" opacity="0.5"></path>
-                        <path d="M5.23628 12C5.08204 12.1598 5 12.8273 5 13C5 14.1046 8.35786 15 12.5 15C16.6421 15 20 14.1046 20 13C20 12.8273 19.918 12.1598 19.7637 12C18.9311 12.8626 15.9947 13.5 12.5 13.5C9.0053 13.5 6.06886 12.8626 5.23628 12Z" fill="currentColor"></path>
-                    </svg> -->
                     <img src="@/assets/images/icons/icon_2_3.png" class="img" alt="">
                     <h1 class="text-xl md:text-3xl font-semibold">Create a new Space</h1>
                     <p class="text-lg text-gray-500">A Space is a special kind of repository that hosts application code for Machine Learning demos Those applications can be written using Python libraries like Streamlit or Gradio</p>
                 </div>
-                <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
+                <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon scroll-to-error>
                     <el-form-item prop="" class="flex_form">
                         <label class="label" for="owner">
                             Owner
@@ -37,7 +31,12 @@
                         <label class="label" for="license">
                             License
                             <div class="flex flex-row">
-                                <el-input v-model="ruleForm.license" placeholder="License" />
+                                <el-select v-model="ruleForm.license" filterable :filter-method="licenseQuery" allow-create default-first-option popper-class="license_style" placeholder="License" @blur="ModelChangeSelect" @change="licenseChange">
+                                    <el-option v-for="item in ruleForm.licenseOptions" :key="item.value" :label="item.value" :value="item.value">
+                                        <p>{{ item.value }}</p>
+                                        <small>{{ item.label }}</small>
+                                    </el-option>
+                                </el-select>
                             </div>
                         </label>
                     </el-form-item>
@@ -125,11 +124,15 @@ import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentI
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import { FormInstance, FormRules } from 'element-plus'
+import { Unlock } from '@element-plus/icons-vue'
 import tokenABI from '@/utils/abi/LagrangeDAOToken.json'
 import hyperspaceABI from '@/utils/abi/SpacePayment.json'
-import { async } from 'q';
+import licenseList from '@/utils/License-list.js'
 export default defineComponent({
     name: "Create Space",
+    components: {
+        Unlock
+    },
     setup () {
         const store = useStore()
         const metaAddress = computed(() => (store.state.metaAddress))
@@ -137,6 +140,7 @@ export default defineComponent({
             let val = store.state.metaAddress || ''
             return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
         })
+        const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
         const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
         const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
         const ruleForm = reactive({
@@ -146,7 +150,9 @@ export default defineComponent({
             hardware: '0',
             sdk: 'Docker',
             hours: '1',
-            payment_hash: ''
+            payment_hash: '',
+            licenseOptions: [],
+            oldOptions: []
         })
         const hardwareOptions = ref([
             {
@@ -241,13 +247,29 @@ export default defineComponent({
                     else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Created Failed!')
                     ruleForm.name = ''
                     ruleForm.license = ''
-                    router.push({ name: 'spaces' })
+                    router.push({ name: 'personalCenter' })
                     loading.createLoad = false
                 } else {
                     console.log('error submit!', fields)
                     return false
                 }
             })
+        }
+        const handleChange = (value) => {
+            // console.log(value)
+        }
+        const licenseChange = (value) => {
+            // console.log(value)
+        }
+        function ModelChangeSelect (e) {
+            let value = e.target.value
+            if (value) ruleForm.license = value
+        }
+        async function licenseQuery (value) {
+            let result = await ruleForm.oldOptions.filter(item => {
+                if (item.label.indexOf(value) > -1 || item.value.indexOf(value) > -1) return item
+            })
+            ruleForm.licenseOptions = result
         }
         function radioChange (val) { }
 
@@ -265,6 +287,12 @@ export default defineComponent({
 
         const init = async () => {
             try {
+                if (ruleForm.hardware === '0') return false
+                const chainId = await ethereum.request({ method: 'eth_chainId' })
+                if (parseInt(chainId, 16) !== 3141) {
+                    await errFun('please switch to Filecoin TestNet.')
+                    return false
+                }
                 loading.createText = 'Please wait until the process completed.'
                 const token_name = await token_contract.methods.name().call().then()
                 const token_symbol = await token_contract.methods.symbol().call().then()
@@ -284,8 +312,7 @@ export default defineComponent({
                 // console.log(`Confirm purchasing hardware type ${ruleForm.hardware} for ${blocks} blocks (${price} ${token_symbol})?`)
                 console.log('LAD approved:', lad_allowance / (10 ** token_decimals), ',user_balance:', user_balance / (10 ** token_decimals), ',token_balance:', token_balance, ',price_in_wei:', price_in_wei)
                 if (token_balance < price_in_wei) {
-                    system.$commonFun.messageTip('error', 'Not enough LAD tokens!')
-                    loading.createLoad = false
+                    await errFun('Not enough LAD tokens!')
                     return false
                 }
 
@@ -324,6 +351,10 @@ export default defineComponent({
                 return false
             }
         }
+        async function errFun (text) {
+            system.$commonFun.messageTip('error', text)
+            loading.createLoad = false
+        }
         function toFixed (x) {
             if (Math.abs(x) < 1.0) {
                 var e = parseInt(x.toString().split('e-')[1]);
@@ -341,11 +372,21 @@ export default defineComponent({
             }
             return x;
         }
-        onMounted(() => {
-            ruleForm.name = ''
-            ruleForm.license = ''
-            ruleForm.hardware = '0'
-            ruleForm.sdk = 'Docker'
+        function licenseSelect () {
+            let list = []
+            for (let key in licenseList) {
+                // console.log(key, ',', licenseList[key]);
+                list.push({
+                    value: key,
+                    label: licenseList[key]
+                })
+            }
+            return list
+        }
+        onMounted(async () => {
+            ruleFormRef.value.resetFields()
+            ruleForm.licenseOptions = await licenseSelect()
+            ruleForm.oldOptions = await licenseSelect()
         })
         return {
             metaAddress,
@@ -358,7 +399,7 @@ export default defineComponent({
             loading,
             system,
             hardwareOptions,
-            submitForm, radioChange
+            submitForm, radioChange, handleChange, licenseChange, licenseQuery, ModelChangeSelect
         }
     },
 });
@@ -527,7 +568,7 @@ export default defineComponent({
                   @media screen and (max-width: 1024px) {
                     width: 48%;
                   }
-                  @media screen and (max-width: 768px) {
+                  @media screen and (max-width: 320px) {
                     width: 98%;
                   }
                   .el-radio__input {
@@ -592,6 +633,26 @@ export default defineComponent({
           }
         }
       }
+    }
+  }
+}
+</style>
+<style lang="scss">
+.license_style {
+  .el-select-dropdown__item {
+    height: auto;
+    padding: 8px 3%;
+    line-height: 1;
+    p {
+      margin: 0 0 5px;
+      font-size: 14px;
+      color: #000;
+      line-height: 1.2;
+    }
+    small {
+      font-size: 13px;
+      color: #979797;
+      line-height: 1.2;
     }
   }
 }

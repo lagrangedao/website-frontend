@@ -568,6 +568,9 @@ export default defineComponent({
         .top_text {
           display: flex;
           align-items: center;
+          @media screen and (max-width: 600px) {
+            margin-bottom: 0.1rem;
+          }
           b {
             padding: 0.08rem 0.25rem;
             margin: 0 0.17rem 0 0;

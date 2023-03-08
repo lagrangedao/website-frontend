@@ -145,6 +145,7 @@ export default defineComponent({
       let val = store.state.metaAddress || ''
       return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
     })
+    const accessDataset = computed(() => (store.state.accessDataset ? JSON.parse(store.state.accessDataset) : []))
     const ruleForm = reactive({
       name: '',
       delete: '',
@@ -175,6 +176,7 @@ export default defineComponent({
     ])
     const listLoad = ref(false)
     const dialogDOIVisible = ref(false)
+    const settingIndex = ref(0)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -195,6 +197,8 @@ export default defineComponent({
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) {
+              accessDataset.value.splice(settingIndex.value, 1, ruleForm.name)
+              store.dispatch('setAccessDataset', JSON.stringify(accessDataset.value))
               system.$commonFun.messageTip('success', 'Update successfully!')
               router.push({ name: 'datasetDetail', params: { name: ruleForm.name, tabs: 'settings' } })
             }
@@ -220,7 +224,7 @@ export default defineComponent({
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) system.$commonFun.messageTip('success', 'Delete successfully!')
             else system.$commonFun.messageTip('error', listRes.data.message)
-            router.push({ name: 'datasets' })
+            router.push({ name: 'personalCenter' })
           } else system.$commonFun.messageTip('error', 'Delete failed!')
           ruleForm.name = ''
           ruleForm.delete = ''
@@ -242,9 +246,17 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }
-    onMounted(() => {
+    async function datasetIndex () {
+      let index = 0
+      accessDataset.value.forEach((ele, i) => {
+        if (ele === route.params.name) index = i
+      })
+      return index
+    }
+    onMounted(async () => {
       window.scrollTo(0, 0)
       init()
+      settingIndex.value = await datasetIndex()
     })
     onDeactivated(() => {
       ruleForm.name = ''
@@ -303,6 +315,7 @@ export default defineComponent({
     .fileList {
       width: 100%;
       margin: 0.15rem 0;
+      font-family: "Helvetica-light";
       border: 1px solid #e4e4e4;
       border-radius: 0.1rem;
       color: #606060;
@@ -311,6 +324,7 @@ export default defineComponent({
         padding: 0.2rem 0.2rem 0;
         margin: 0 0 0.2rem;
         font-size: 17px;
+        font-weight: 600;
         color: #000;
         @media screen and (max-width: 768px) {
           font-size: 15px;
@@ -440,6 +454,8 @@ export default defineComponent({
         font-size: 16px;
         line-height: 1;
         color: #c37af9;
+        word-break: break-word;
+        white-space: normal;
         @media screen and (max-width: 1600px) {
           font-size: 14px;
         }

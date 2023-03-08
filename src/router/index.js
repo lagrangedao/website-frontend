@@ -29,6 +29,8 @@ const personalCenter = () =>
     import ("@/views/dashboard/personalCenter/index");
 const personalCenterProfile = () =>
     import ("@/views/dashboard/personalCenter/editProfile");
+const personalCenterBilling = () =>
+    import ("@/views/dashboard/personalCenter/editBilling");
 
 const routes = [{
         path: '/',
@@ -138,6 +140,14 @@ const routes = [{
                     path: '/dashboard/personal_center/profile',
                     name: 'personalCenterProfile',
                     component: personalCenterProfile,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: '/dashboard/personal_center/billing',
+                    name: 'personalCenterBilling',
+                    component: personalCenterBilling,
                     meta: {
                         keepAlive: true
                     }

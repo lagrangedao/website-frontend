@@ -35,7 +35,7 @@
       </header>
       <div class="fileList">
         <el-table v-if="labelTab === 'list'" :data="fileRow.filedata" :table-layout="tableLayout" v-loading="listLoad" style="width: 100%">
-          <el-table-column label="name">
+          <el-table-column label="name" min-width="120">
             <template #default="scope">
               <div class="dir_parent" v-if="scope.row.isDir" @click="folderDetails(scope.row)">
                 <div class="i icon_fold">
@@ -52,18 +52,18 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="cid">
+          <el-table-column label="cid" min-width="140">
             <template #default="scope">
               {{ scope.row.isDir ? '-' :scope.row._originPath.cid}}
             </template>
           </el-table-column>
-          <el-table-column label="url">
+          <el-table-column label="url" min-width="140">
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
               <a v-else :href="scope.row._originPath.url" target="_blank">{{scope.row._originPath.url}}</a>
             </template>
           </el-table-column>
-          <el-table-column label="Created At" align="right">
+          <el-table-column label="Created At" align="right" min-width="110">
             <template #default="scope">
               <div>
                 <span v-if="scope.row.isDir">-</span>
@@ -925,7 +925,7 @@ export default defineComponent({
               .dir_parent {
                 display: flex;
                 align-items: center;
-                flex-wrap: wrap;
+                // flex-wrap: wrap;
               }
               .is_file {
                 word-break: break-all;

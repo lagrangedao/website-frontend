@@ -56,7 +56,7 @@
           </template>
           <detail-community v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
-        <el-tab-pane name="settings">
+        <el-tab-pane name="settings" v-if="settingOneself">
           <template #label>
             <span class="custom-tabs-label">
               <!-- <i class="icon icon_datasets"></i> -->
@@ -96,6 +96,7 @@ export default defineComponent({
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
+    const accessDataset = computed(() => (store.state.accessDataset ? JSON.parse(store.state.accessDataset) : []))
     const dataList = reactive({
       Tasks: [
         'Text Classification', 'Text Retrieval', 'Text Generation', 'Question Answering',
@@ -188,6 +189,7 @@ export default defineComponent({
         label: '1   (not_entailment)'
       }
     ])
+    const settingOneself = ref(false)
 
     function handleClick (tab, event) {
       router.push({ name: 'datasetDetail', params: { name: route.params.name, tabs: tab.props.name } })
@@ -235,8 +237,10 @@ export default defineComponent({
     onActivated(() => {
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
+      settingOneself.value = accessDataset.value.some(ele => ele === route.params.name)
     })
     return {
+      settingOneself,
       lagLogin,
       dataList,
       searchValue,
@@ -340,6 +344,7 @@ export default defineComponent({
             font-size: 14px;
           }
           @media screen and (max-width: 441px) {
+            padding: 0 5px;
             font-size: 13px;
           }
         }

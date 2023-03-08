@@ -43,7 +43,7 @@
           </template>
           <detail-community v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
-        <el-tab-pane name="settings">
+        <el-tab-pane name="settings" v-if="settingOneself">
           <template #label>
             <span class="custom-tabs-label">
               <!-- <i class="icon icon_spaces"></i> -->
@@ -82,6 +82,7 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const dataList = reactive({
       Tasks: [
@@ -175,6 +176,7 @@ export default defineComponent({
         label: '1   (not_entailment)'
       }
     ])
+    const settingOneself = ref(false)
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { name: route.params.name, tabs: tab.props.name } })
@@ -222,8 +224,10 @@ export default defineComponent({
     onActivated(() => {
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
+      settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
     })
     return {
+      accessSpace,
       lagLogin,
       dataList,
       searchValue,
@@ -240,6 +244,7 @@ export default defineComponent({
       system,
       route,
       router,
+      settingOneself,
       tableData,
       NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName
     }
@@ -327,6 +332,7 @@ export default defineComponent({
             font-size: 14px;
           }
           @media screen and (max-width: 441px) {
+            padding: 0 5px;
             font-size: 13px;
           }
         }

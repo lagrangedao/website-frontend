@@ -169,6 +169,9 @@ export default defineComponent({
     .space_area {
       position: relative;
       padding: 0.74rem 0 0.45rem;
+      @media screen and (max-width: 768px) {
+        padding: 0.45rem 0;
+      }
       .top {
         display: flex;
         align-items: center;
@@ -187,6 +190,10 @@ export default defineComponent({
             font-size: 0.44rem;
             color: #000;
             text-align: left;
+            @media screen and (max-width: 441px) {
+              padding: 0 0 0 0.65rem;
+              font-size: 0.34rem;
+            }
           }
           p {
             margin: 0.15rem 0;
@@ -201,6 +208,12 @@ export default defineComponent({
           color: #9ca3b1;
           @media screen and (min-width: 1800px) {
             font-size: 15px;
+          }
+          @media screen and (max-width: 600px) {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 0.1rem 0;
           }
           a {
             margin: 0 0.07rem;
@@ -227,6 +240,9 @@ export default defineComponent({
           .el-input {
             max-width: 3.4rem;
             margin: 0.65rem 0 0.32rem;
+            @media screen and (max-width: 768px) {
+              margin: 0.32rem 0;
+            }
             .el-input__inner {
               padding-left: 0.35rem;
               background: url(../../../assets/images/icons/icon_13_1.png)
@@ -260,6 +276,9 @@ export default defineComponent({
           color: #fff;
           border-radius: 0.1rem;
           line-height: 1.4;
+          @media screen and (max-width: 768px) {
+            font-size: 14px;
+          }
           .icon_week {
             width: 0.25rem;
             height: 0.25rem;

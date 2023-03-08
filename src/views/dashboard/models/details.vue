@@ -363,6 +363,7 @@ export default defineComponent({
             font-size: 14px;
           }
           @media screen and (max-width: 441px) {
+            padding: 0 5px;
             font-size: 13px;
           }
         }
