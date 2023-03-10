@@ -117,6 +117,27 @@
                 </el-form>
             </el-col>
         </el-row>
+
+        <el-dialog custom-class="depost_body" v-model="depostVisible" title="Deposit" :width="dialogWidth" :close-on-click-modal="false" destroy-on-close center>
+            <el-form :model="depostForm" label-position="top">
+                <el-form-item label="Amount / asset" :label-width="formLabelWidth">
+                    <el-input-number v-model="depostForm.num" :min="1" :max="10" controls-position="right" size="large" @change="handleChange" /> LAD
+                </el-form-item>
+                <el-form-item>
+                    <p class="tips">You should frstly unlock selected tokenin order to authorize deposits for LAD</p>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button type="primary" @click="depostVisible = false">
+                        <el-icon class="icon">
+                            <Unlock />
+                        </el-icon>
+                        Unlock
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
     </section>
 </template>
 <script>
@@ -128,6 +149,7 @@ import { Unlock } from '@element-plus/icons-vue'
 import tokenABI from '@/utils/abi/LagrangeDAOToken.json'
 import hyperspaceABI from '@/utils/abi/SpacePayment.json'
 import licenseList from '@/utils/License-list.js'
+import hardwareList from '@/utils/hardware-list.js'
 export default defineComponent({
     name: "Create Space",
     components: {
@@ -154,42 +176,7 @@ export default defineComponent({
             licenseOptions: [],
             oldOptions: []
         })
-        const hardwareOptions = ref([
-            {
-                label: 'CPU',
-                options: [
-                    {
-                        value: '0',
-                        label: 'CPU only · 2 vCPU · 16 GiB · FREE',
-                    },
-                    {
-                        value: '1',
-                        label: 'CPU only · 8 vCPU · 32 GiB · 1 LAD per block',
-                    },
-                ],
-            },
-            {
-                label: 'GPU',
-                options: [
-                    {
-                        value: '2',
-                        label: 'Nvidia T4 · 4 vCPU · 15 GiB · 20 LAD per block',
-                    },
-                    {
-                        value: '3',
-                        label: 'Nvidia T4 · 8 vCPU · 30 GiB · 30 LAD per block',
-                    },
-                    {
-                        value: '4',
-                        label: 'Nvidia A10G · 4 vCPU · 15 GiB · 35 LAD per block',
-                    },
-                    {
-                        value: '5',
-                        label: 'Nvidia A10G · 12 vCPU · 46 GiB · 105 LAD per block',
-                    },
-                ],
-            },
-        ])
+        const hardwareOptions = ref([])
         const validateInput = (rule, value, callback) => {
             if (!checkSpecialKey(value)) {
                 callback(new Error("Only regular alphanumeric characters, '-', '.' and '_' supported"));
@@ -214,6 +201,12 @@ export default defineComponent({
         const system = getCurrentInstance().appContext.config.globalProperties
         const route = useRoute()
         const router = useRouter()
+        const depostVisible = ref(false)
+        const formLabelWidth = '140px'
+        const depostForm = reactive({
+            num: 1
+        })
+        const dialogWidth = ref(document.body.clientWidth < 600 ? '90%' : '400px')
 
         function checkSpecialKey (str) {
             let specialKey =
@@ -385,6 +378,7 @@ export default defineComponent({
         }
         onMounted(async () => {
             ruleFormRef.value.resetFields()
+            hardwareOptions.value = hardwareList
             ruleForm.licenseOptions = await licenseSelect()
             ruleForm.oldOptions = await licenseSelect()
         })
@@ -398,6 +392,10 @@ export default defineComponent({
             rules,
             loading,
             system,
+            depostVisible,
+            formLabelWidth,
+            depostForm,
+            dialogWidth,
             hardwareOptions,
             submitForm, radioChange, handleChange, licenseChange, licenseQuery, ModelChangeSelect
         }

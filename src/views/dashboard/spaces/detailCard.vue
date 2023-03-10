@@ -808,6 +808,9 @@ export default defineComponent({
         .el-col {
           margin: 0.05rem 0;
           max-width: 350px;
+          @media screen and (max-width: 768px) {
+            max-width: none;
+          }
           .box-card {
             padding: 0.1rem 0.2rem;
             background-color: #fff;
