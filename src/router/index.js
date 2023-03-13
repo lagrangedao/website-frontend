@@ -162,6 +162,7 @@ const routes = [{
 ]
 
 const router = createRouter({
+    // history: createWebHistory(),
     history: createWebHashHistory(process.env.BASE_URL),
     routes
 })

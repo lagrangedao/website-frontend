@@ -233,7 +233,7 @@ export default defineComponent({
                     formData.append('hardware', ruleForm.hardware)
                     formData.append('sdk', ruleForm.sdk)
                     formData.append('hours', ruleForm.hours)
-                    formData.append('payment_hash', ruleForm.payment_hash)
+                    formData.append('payment_hash', !ruleForm.payment_hash ? '' : ruleForm.payment_hash)
                     const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces`, 'post', formData)
                     await system.$commonFun.timeout(500)
                     if (listRes && listRes.data) system.$commonFun.messageTip('success', 'Created Space successfully!')
