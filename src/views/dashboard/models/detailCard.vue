@@ -32,7 +32,7 @@
           </div>
           <v-md-editor v-model="textEditorChange"></v-md-editor>
         </el-col>
-        <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="7" class="left left_light">
+        <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7" class="left left_light">
           <div class="list" style="display: flex;justify-content: space-between;">
             <div class="title">
               Downloads last month
@@ -1046,6 +1046,9 @@ export default defineComponent({
         .el-col {
           margin: 0.05rem 0;
           max-width: 350px;
+          @media screen and (max-width: 768px) {
+            max-width: none;
+          }
           .box-card {
             padding: 0.1rem 0.2rem;
             background-color: #fff;

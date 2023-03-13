@@ -1,10 +1,9 @@
 <template>
   <section id="space">
     <div id="spaceBody">
-      <el-row class="space_body">
-        <!-- https://ccao-clayspace.hf.space/?__theme=light -->
-        <!-- <iframe src="" title="Space app" class="space_iframe" allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; clipboard-write; document-domain; encrypted-media; fullscreen; geolocation; gyroscope; layout-animations; legacy-image-formats; magnetometer; microphone; midi; oversized-images; payment; picture-in-picture; publickey-credentials-get; sync-xhr; usb; vr ; wake-lock; xr-spatial-tracking"
-          sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-downloads" scrolling="yes" id="iFrameResizer0" style="overflow: auto;"></iframe> -->
+      <el-row class="space_body" v-loading="listLoad">
+        <iframe v-if="listdata.job_result_uri" :src="listdata.job_result_uri" title="Space app" class="space_iframe" allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; clipboard-write; document-domain; encrypted-media; fullscreen; geolocation; gyroscope; layout-animations; legacy-image-formats; magnetometer; microphone; midi; oversized-images; payment; picture-in-picture; publickey-credentials-get; sync-xhr; usb; vr ; wake-lock; xr-spatial-tracking"
+          sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-downloads" scrolling="yes" id="iFrameResizer0" style="overflow: auto;"></iframe>
       </el-row>
     </div>
   </section>
@@ -16,7 +15,6 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   EditPen, Edit, CircleClose
 } from '@element-plus/icons-vue'
-import { async } from 'q';
 
 export default defineComponent({
   name: 'Spaces',
@@ -28,273 +26,60 @@ export default defineComponent({
   props: {
     urlChange: { type: String, default: 'card' }
   },
-  setup (props) {
+  setup (props, context) {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-    const dataList = reactive({
-      Tasks: [
-        'Text Classification', 'Text Retrieval', 'Text Generation', 'Question Answering',
-        'Token Classification', 'Text2Text Generation', 'Voice Activity Detection'
-      ],
-      SubTasks: [
-        'language-modeling', 'multi-class-classification', 'named-entity-recognition',
-        'extractive-qa', 'natural-language-inference'
-      ],
-      Sizes: [
-        'n<1K', '1K<n<10K', '10K<n<100K', '100K<n<1M', '1M<n<10M', '10M<n<100M', '100M<n<1B', '1B<n<10B',
-        '10B<b<100B', '100B<n<1T', 'n>1T'
-      ],
-      Licenses: [
-        'mit', 'apache-2.0', 'cc-by-4.0', 'other', 'cc-by-sa-4.0'
-      ]
-    })
-    const searchValue = ref('')
-    const value = ref('')
-    const options = ref([
-      {
-        value: 'Option1',
-        label: 'Most Downloads',
-      },
-      {
-        value: 'Option2',
-        label: 'Alphabetical',
-      },
-      {
-        value: 'Option3',
-        label: 'Recently Updated',
-      },
-      {
-        value: 'Option4',
-        label: 'Most Likes',
-      }
-    ])
-    const urlReadme = ref('')
-    const urlReadmeName = ref('')
-    const isPreview = ref(true)
-    const currentPage1 = ref(1)
-    const small = ref(false)
-    const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref([])
-    const total = ref(0)
+    const listdata = reactive({
+      job_result_uri: ''
+    })
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const tableData = ref([
-      {
-        sentence1: '"The cat sat on the mat."',
-        sentence2: '"The cat did not sit on the mat."',
-        idx: '0',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"The cat did not sit on the mat."',
-        sentence2: '"The cat sat on the mat."',
-        idx: '1',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"When you\'ve got no snow,  it\'s really hard to...',
-        sentence2: '"When you\'ve got snow, it\'s really hard to learn a snowy...',
-        idx: '2',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '3',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '4',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya supports Twitch.tv...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '5',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouy supports media apps...',
-        sentence2: '"Out of the box, Ouya supports Twitch.tv and XBMC media player."',
-        idx: '6',
-        label: '1   (not_entailment)'
-      }
-    ])
-    const textEditor = ref('')
-    const textEditorChange = ref('')
-    const preview = ref(null);
-    const titles = ref([]);
 
-    function editFun () {
-      textEditorChange.value = textEditor.value
-      isPreview.value = false
-    }
-    async function editCommitFun () {
-      // console.log(urlReadmeName.value)
-      listLoad.value = true
-      let newFile = new File([textEditorChange.value], urlReadmeName.value)
-      let fd = new FormData()
-      fd.append('file', newFile, urlReadmeName.value)
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files`, 'put', fd)
-      await system.$commonFun.timeout(500)
-      if (uploadRes && uploadRes.status === "success") {
-        if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
-        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
-      } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
-      init()
-      isPreview.value = true
-    }
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { name: route.params.name, tabs: tab.props.name } })
-    }
-    async function handleSizeChange (val) { }
-    async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
     async function init () {
       if (route.params.tabs !== 'card') return
       listLoad.value = true
-      listdata.value = []
+      listdata.job_result_uri = ''
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        // listdata.value = listRes.data.files || []
-        const fileLi = listRes.data.files || []
-        fileLi.forEach((element, i) => {
-          let el = element.name.split('/')
-          el.shift()
-          el.shift()
-          el.shift()
-          // console.log(el.join('/').toLowerCase())
-          if (el.join('/').toLowerCase() === 'readme.md') {
-            urlReadme.value = element.url
-            urlReadmeName.value = el.join('/')
-            getTitle()
-          }
-        })
+        const jobData = listRes.data.job || { job_result_uri: '' }
+        listdata.job_result_uri = jobData.job_result_uri
+        context.emit('handleValue', listRes.data.space.status)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
-      listdata.value = [
-        {
-          is_public: "1",
-          name: "Frigg"
-        },
-        {
-          is_public: "1",
-          name: "Travis"
-        },
-        {
-          is_public: "1",
-          name: "Tyree"
-        }
-      ]
     }
     async function getData () {
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
       console.log(listRes)
     }
-    function detailFun (row, index) {
-      console.log(row, index)
-    }
-    const imgClick = (url, index) => {
-      console.log(url, index);
-    };
-    const getTitle = async () => {
-      if (!urlReadme.value) return
-      // textEditor.value = await fetch(urlReadme.value)
-      //   .then(res => res.arrayBuffer())
-      //   .then(buffer => {
-      //     const decoder = new TextDecoder("gbk")
-      //     const text = decoder.decode(buffer)
-      //     return text
-      //   })
-      var response = await fetch(urlReadme.value)
-      textEditor.value = await new Promise(async resolve => {
-        resolve(response.text())
-      })
-      nextTick(() => {
-        const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-        titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-        if (!titles.value.length) {
-          titles.value = [];
-          return;
-        }
-
-        const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-        titles.value = titles.value.map(el => ({
-          title: el.innerText,
-          lineIndex: el.getAttribute('data-v-md-line'),
-          indent: hTags.indexOf(el.tagName)
-        }));
-      });
-    };
-    function handleAnchorClick (anchor) {
-      const { lineIndex } = anchor
-      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
-
-      if (heading) {
-        preview.value.scrollToTarget({
-          target: heading,
-          scrollContainer: window,
-          top: 0,
-        })
-      }
-    }
     onActivated(() => { })
     onMounted(() => {
-      urlReadme.value = ''
       window.scrollTo(0, 0)
-      // init()
+      init()
     })
     onDeactivated(() => { })
-    watch(() => props.urlChange, (newValue, oldValue) => {
-      isPreview.value = true
-    })
-    watch(lagLogin, (newValue, oldValue) => {
-      // if (!lagLogin.value) init()
-    })
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'card') {
-        urlReadme.value = ''
         window.scrollTo(0, 0)
-        // init()
+        init()
       }
     })
     return {
       lagLogin,
-      dataList,
-      searchValue,
-      value,
-      options,
-      currentPage1,
-      small,
-      background,
       listLoad,
       listdata,
-      total,
       bodyWidth,
       system,
       route,
       router,
-      tableData,
-      props,
-      urlReadme,
-      isPreview,
-      textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
+      init, getData, handleClick
     }
   }
 })
@@ -332,6 +117,36 @@ export default defineComponent({
     }
     .space_iframe {
       width: 100%;
+      @media screen and (min-height: 500px) and (min-width: 769px) {
+        min-height: 215px;
+      }
+      @media screen and (min-height: 600px) and (min-width: 769px) {
+        min-height: 315px;
+      }
+      @media screen and (min-height: 680px) and (min-width: 769px) {
+        min-height: 395px;
+      }
+      @media screen and (min-height: 700px) and (min-width: 769px) {
+        min-height: 495px;
+      }
+      @media screen and (min-height: 750px) and (min-width: 769px) {
+        min-height: 465px;
+      }
+      @media screen and (min-height: 768px) and (min-width: 769px) {
+        min-height: 495px;
+      }
+      @media screen and (min-height: 900px) and (min-width: 769px) {
+        min-height: 585px;
+      }
+      @media screen and (min-height: 1000px) and (min-width: 769px) {
+        min-height: 655px;
+      }
+      @media screen and (min-height: 1100px) and (min-width: 769px) {
+        min-height: 825px;
+      }
+      @media screen and (min-height: 1200px) and (min-width: 769px) {
+        min-height: 885px;
+      }
     }
     .readme_text {
       position: relative;
@@ -808,6 +623,9 @@ export default defineComponent({
         .el-col {
           margin: 0.05rem 0;
           max-width: 350px;
+          @media screen and (max-width: 768px) {
+            max-width: none;
+          }
           .box-card {
             padding: 0.1rem 0.2rem;
             background-color: #fff;

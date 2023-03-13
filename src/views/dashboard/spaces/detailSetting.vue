@@ -64,10 +64,10 @@
           <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="18">
             <div class="price_switch flex">
               Display price:
-              <el-switch v-model="ruleForm.displayPrice" size="small" active-text="per hour" inactive-text="per month" />
+              <el-switch v-model="ruleForm.displayPrice" size="small" active-text="per month" inactive-text="per hour" />
             </div>
             <el-row :gutter="25" class="space_hardware_list" v-for="(item,index) in hardwareOptions" :key="index">
-              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.options" :key="o">
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.options.concat(item.options_setting)" :key="o">
                 <el-card class="box-card" :class="{'active': listdata.hardware === ol.value}" @click="sleepChange(ol)">
                   <div class="abo" v-if="listdata.hardware === ol.value">
                     <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
@@ -78,7 +78,7 @@
                     </svg>
                   </div>
                   <h5>{{ol.type}}</h5>
-                  <div class="desc">{{ol.label}}</div>
+                  <div class="desc">{{ol.label_short}}</div>
                   <div class="price">
                     <b>{{ol.price}}</b>
                   </div>
@@ -170,7 +170,7 @@
         <span>{{accessName || metaAddress}}/{{route.params.name}}</span> will be switched to:</div>
       <el-card class="box-card">
         <h5>{{sleepSelect.type}}</h5>
-        <div class="desc">{{sleepSelect.label}}</div>
+        <div class="desc">{{sleepSelect.label_short}}</div>
         <div class="price">
           <b>{{sleepSelect.price}}</b>
         </div>
@@ -189,7 +189,7 @@
         </div>
         <div class="time flex">
           Sleep after
-          <el-select v-model="ruleForm.sleepTime" disabled class="m-2" placeholder="Select" size="small">
+          <el-select v-model="ruleForm.sleepTime" class="m-2" placeholder="Select" size="small">
             <el-option v-for="item in ruleForm.sleepTimeOption" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
           of inactivity
@@ -219,6 +219,9 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   CaretBottom
 } from '@element-plus/icons-vue'
+import tokenABI from '@/utils/abi/LagrangeDAOToken.json'
+import hyperspaceABI from '@/utils/abi/SpacePayment.json'
+import hardwareList from '@/utils/hardware-list.js'
 export default defineComponent({
   name: 'Spaces',
   components: {
@@ -227,7 +230,7 @@ export default defineComponent({
   props: {
     // listdata: { type: Number, default: 1 }
   },
-  setup (props) {
+  setup (props, context) {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const metaAddress = computed(() => {
@@ -280,66 +283,7 @@ export default defineComponent({
         { required: true, message: ' ', trigger: 'blur' }
       ]
     })
-    const hardwareOptions = ref([
-      {
-        label: 'CPU',
-        options: [
-          {
-            value: '0',
-            label: '2 vCPU · 16 GiB RAM',
-            price: 'Free',
-            type: 'CPU basic'
-          },
-          {
-            value: '1',
-            label: '8 vCPU · 32 GiB RAM',
-            price: '1 LAD per block',
-            type: 'CPU upgrade'
-          },
-        ],
-      },
-      {
-        label: 'GPU',
-        options: [
-          {
-            value: '2',
-            label: '4 vCPU · 15 GiB RAM · Nvidia T4',
-            price: '20 LAD per block',
-            type: 'T4 small'
-          },
-          {
-            value: '3',
-            label: '8 vCPU · 30 GiB RAM · Nvidia T4',
-            price: '30 LAD per block',
-            type: 'T4 medium'
-          },
-          {
-            value: '4',
-            label: '4 vCPU · 15 GiB RAM · Nvidia A10G',
-            price: '35 LAD per block',
-            type: 'A10G small'
-          },
-          {
-            value: '5',
-            label: '12 vCPU · 46 GiB RAM · Nvidia A10G',
-            price: '105 LAD per block',
-            type: 'A10G large'
-          },
-          {
-            value: '6',
-            label: '12 vCPU · 142 GiB RAM · Nvidia A100 40GB',
-            price: '* LAD per block',
-            type: 'A100 large'
-          },
-          {
-            value: '7',
-            label: 'HPU · IPU · ...',
-            price: 'Coming soon',
-            type: 'AI Accelerator'
-          },
-        ],
-      },
-    ])
+    const hardwareOptions = ref([])
     const rulesDelete = reactive({
       delete: [
         { required: true, message: ' ', trigger: 'blur' }
@@ -430,6 +374,7 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.space || { name: route.params.name, is_public: '1' }
+        context.emit('handleValue', listRes.data.space.status)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -449,6 +394,7 @@ export default defineComponent({
     onMounted(async () => {
       window.scrollTo(0, 0)
       init()
+      hardwareOptions.value = hardwareList
       settingIndex.value = await spaceIndex()
     })
     onDeactivated(() => {
@@ -733,7 +679,7 @@ export default defineComponent({
       }
       .space_hardware {
         position: relative;
-        padding: 0.2rem;
+        padding: 0.3rem 0.2rem;
         color: #000;
         line-height: 1.5;
         h2 {
@@ -1161,9 +1107,9 @@ export default defineComponent({
         &.active {
           background: linear-gradient(to bottom right, #eff6ff, #fff);
         }
-        &:hover {
-          box-shadow: inset 0 0 0.2rem rgba(0, 0, 0, 0.05);
-        }
+        // &:hover {
+        //   box-shadow: inset 0 0 0.2rem rgba(0, 0, 0, 0.05);
+        // }
         .el-card__body {
           padding: 0;
           .abo {

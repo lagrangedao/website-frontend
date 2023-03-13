@@ -12,6 +12,7 @@
               <i class="icon icon_like"></i>like</el-button>
             <el-button>0</el-button>
           </el-button-group>
+          <div class="status" v-if="parentValue">{{parentValue}}</div>
         </div>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
@@ -22,7 +23,7 @@
               <span>App</span>
             </span>
           </template>
-          <detail-card :urlChange="activeName"></detail-card>
+          <detail-card @handleValue="handleValue" :urlChange="activeName"></detail-card>
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
@@ -31,7 +32,7 @@
               <span>Files and versions</span>
             </span>
           </template>
-          <detail-files v-if="activeName === 'files'"></detail-files>
+          <detail-files @handleValue="handleValue" v-if="activeName === 'files'"></detail-files>
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
@@ -53,7 +54,7 @@
               <span>Settings</span>
             </span>
           </template>
-          <detail-setting v-if="activeName === 'settings'"></detail-setting>
+          <detail-setting @handleValue="handleValue" v-if="activeName === 'settings'"></detail-setting>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -177,6 +178,7 @@ export default defineComponent({
       }
     ])
     const settingOneself = ref(false)
+    const parentValue = ref('')
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { name: route.params.name, tabs: tab.props.name } })
@@ -221,8 +223,14 @@ export default defineComponent({
       }
       return false
     }
+    const handleValue = value => {
+      var numReg = /^[0-9]*$/
+      var numRe = new RegExp(numReg)
+      parentValue.value = numRe.test(value) ? '' : value
+    }
     onActivated(() => {
       activeName.value = route.params.tabs || 'card'
+      parentValue.value = ''
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
     })
@@ -246,6 +254,7 @@ export default defineComponent({
       router,
       settingOneself,
       tableData,
+      parentValue, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName
     }
   }
@@ -325,15 +334,66 @@ export default defineComponent({
           cursor: pointer;
         }
         .el-button {
+          height: auto;
+          padding: 0.05rem 0.1rem;
           font-family: inherit;
-          font-size: 15px;
+          font-size: 14px;
           color: #878c93;
-          @media screen and (max-width: 1440px) {
-            font-size: 14px;
+          line-height: 1;
+          @media screen and (max-width: 1600px) {
+            font-size: 13px;
           }
           @media screen and (max-width: 441px) {
             padding: 0 5px;
+            font-size: 12px;
+          }
+        }
+        .status {
+          position: relative;
+          padding: 0.05rem 0.1rem 0.05rem 0.22rem;
+          margin: 0 0.07rem;
+          background-color: #ecfdf5;
+          color: #047857;
+          border: 1px solid #d1fae5;
+          border-radius: 0.05rem;
+          font-size: 14px;
+          line-height: 1;
+          @media screen and (max-width: 1600px) {
             font-size: 13px;
+          }
+          @media screen and (max-width: 441px) {
+            font-size: 12px;
+          }
+          &::after {
+            position: absolute;
+            left: 0.1rem;
+            top: 50%;
+            bottom: 0;
+            width: 6px;
+            height: 6px;
+            margin-top: -3px;
+            content: "";
+            font-size: 55px;
+            background-color: #11b981;
+            //#11b981   #7edbbb
+            border-radius: 100%;
+            animation: spin 1.5s linear alternate infinite;
+            @keyframes spin {
+              from {
+                opacity: 1;
+              }
+              to {
+                opacity: 0.5;
+              }
+            }
+            @-webkit-keyframes spin {
+              from {
+                opacity: 1;
+              }
+              to {
+                opacity: 0.5;
+              }
+            }
           }
         }
       }
