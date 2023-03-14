@@ -564,11 +564,13 @@ export default defineComponent({
       fileTextShow.value = false
       fileBody._originPath = row._originPath
       fileBody.title = row.title
-      await getTitle(fileBody._originPath.url)
+      // await getTitle(fileBody._originPath.url)
+      await getTitle(fileBody._originPath.cid)
     }
     const getTitle = async (url) => {
       if (!url) return
-      var response = await fetch(url);
+      // var response = await fetch(url);
+      var response = await fetch(`https://ipfs.multichain.storage/ipfs/${url}`);
       const resType = response.headers.get("content-type")
       const text = await new Promise(async resolve => {
         if (resType.indexOf('image') > -1) {
