@@ -334,7 +334,7 @@ export default defineComponent({
           cursor: pointer;
         }
         .el-button {
-          height: auto;
+          height: 28px;
           padding: 0.05rem 0.1rem;
           font-family: inherit;
           font-size: 14px;
