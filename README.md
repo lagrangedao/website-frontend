@@ -28,16 +28,32 @@ Run `npm install` to generate component.
 
 ### Development server
 
-Run `npm run serve` for a dev server. Navigate to `http://localhost:8080/`. The app will automatically reload if you change any of the source files.
+```shell
+# Node version below 17
+$ npm run serve
+
+# Node version 17 and above
+$ npm run serve_t
+```
+
+Navigate to `http://localhost:8080/`. The app will automatically reload if you change any of the source files.
 
 ## Build project
 
 ```shell
+# Node version below 17
 # Build test projects
 $ npm run build:test
 
 # Build semi prod projects
 $ npm run build:prod
+
+# Node version 17 and above
+# Build test projects
+$ npm run build:test_t
+
+# Build semi prod projects
+$ npm run build:prod_t
 ```
 
 The build artifacts will be stored in the `dist_test/dist_prod` directory.
