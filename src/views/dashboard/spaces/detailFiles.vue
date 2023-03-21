@@ -1054,7 +1054,8 @@ export default defineComponent({
         .img_file {
           display: block;
           width: auto;
-          max-width: 100%;
+          width: calc(100% - 0.4rem);
+          max-width: 500px;
           margin: 0.2rem;
         }
         .tip_down {
