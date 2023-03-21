@@ -33,7 +33,8 @@ Run `npm install` to generate component.
 $ npm run serve
 
 # Node version 17 and above
-$ npm run serve_t
+$ npm run serve_t # (windows system)
+$ npm run serve_u
 ```
 
 Navigate to `http://localhost:8080/`. The app will automatically reload if you change any of the source files.
@@ -50,10 +51,12 @@ $ npm run build:prod
 
 # Node version 17 and above
 # Build test projects
-$ npm run build:test_t
+$ npm run build:test_t # (windows system)
+$ npm run build:test_u
 
 # Build semi prod projects
-$ npm run build:prod_t
+$ npm run build:prod_t # (windows system)
+$ npm run build:prod_u
 ```
 
 The build artifacts will be stored in the `dist_test/dist_prod` directory.
