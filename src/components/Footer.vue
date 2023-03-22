@@ -24,13 +24,13 @@
                 </a>
             </el-col>
             <el-col :xs="24" :sm="24" :md="11" :lg="11" :xl="11">
-                <router-link to="/dashboard/dataset">
+                <router-link to="/dataset">
                     Datasets
                 </router-link>
-                <router-link to="/dashboard/models">
+                <router-link to="/models">
                     Models
                 </router-link>
-                <router-link to="/dashboard/spaces">
+                <router-link to="/spaces">
                     Spaces
                 </router-link>
                 <a href="https://docs.lagrangedao.org" target="_blank">

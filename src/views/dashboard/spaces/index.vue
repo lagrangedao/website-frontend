@@ -8,7 +8,7 @@
             <p>Discover amazing ML apps made by the community!</p>
           </div>
           <div class="top_button">
-            <router-link :to="{path: '/dashboard/create_space'}" class="button">Create new Space</router-link>
+            <router-link :to="{path: '/create_space'}" class="button">Create new Space</router-link>
             or
             <router-link to="">learn more about Spaces</router-link>
           </div>
