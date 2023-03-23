@@ -1,6 +1,4 @@
-FROM node:15-alpine
-# install simple http server for serving static content
-RUN npm install -g http-server
+FROM node:15-alpine as builder
 # python2 support
 
 RUN apk add --update \
@@ -14,7 +12,7 @@ RUN apk add --update \
 && rm -rf /var/cache/apk/* \
 
 # make the 'app' folder the current working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # copy both 'package.json' and 'package-lock.json' (if available)
 COPY package*.json ./
@@ -26,7 +24,17 @@ RUN npm install
 COPY . .
 
 # build app for production with minification
-RUN npm run build:test
+RUN npm run build:prod
 
-EXPOSE 8080
-CMD [ "http-server", "dist_test" ]
+FROM nginx:1.15.2-alpine as production-build
+
+
+## Remove default nginx index page
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy from the stahg 1
+COPY --from=builder dist_prod /usr/share/nginx/html
+COPY ./nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
