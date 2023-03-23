@@ -10,8 +10,8 @@ https://docs.docker.com/compose/install/
 Run the following command to run the latest stable image of lagrange-dao-we
 
 ```bash
-docker build -t lagrangedao/lagrange-dao-web .
-docker run  -p 8080:8080 lagrangedao/lagrange-dao-web
+docker build -t lagrangedao/lagrange-dao-web -f Dockerfile .
+docker run -d --name lagrange-dao-web -p 8080:8080 -t lagrangedao/lagrange-dao-web 
 ```
 The service will be Available on:
 
