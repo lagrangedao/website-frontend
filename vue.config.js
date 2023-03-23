@@ -1,8 +1,10 @@
 'use strict'
 const path = require('path')
+const webpack = require('webpack')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin') // gzip压缩
 const productionGzipExtensions = /\.(js|css|json|txt|html|ico|svg)(\?.*)?$/i // gzip匹配文件规则
+const BranchVersionWebpackPlugin = require('./webpack-plugin/branch-version-webpack-plugin');
 const NOT_DEV = process.env.NODE_ENV !== 'development'
 
 const globalConfig = require('./src/config/index.js')
@@ -13,7 +15,7 @@ const addOptions = {
 }
 
 module.exports = {
-  publicPath: '',
+  publicPath: '/',
 
   // 根据环境去打包
   outputDir: process.env.VUE_APP_OUTPUTDIR,
@@ -68,6 +70,7 @@ module.exports = {
         maxEntrypointSize: 10000000,
         maxAssetSize: 30000000
       }
+      config.plugins.push(new BranchVersionWebpackPlugin());
     }
   },
 
