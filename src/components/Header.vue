@@ -7,15 +7,15 @@
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
         <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="/dashboard/dataset">
+          <el-menu-item index="/dataset">
             <i class="icon icon_datasets"></i>
             Datasets
           </el-menu-item>
-          <el-menu-item index="/dashboard/models">
+          <el-menu-item index="/models">
             <i class="icon icon_models"></i>
             Models
           </el-menu-item>
-          <el-menu-item index="/dashboard/spaces">
+          <el-menu-item index="/spaces">
             <i class="icon icon_spaces"></i>
             Spaces
           </el-menu-item>
@@ -44,18 +44,18 @@
                 fill="currentColor"></path>
             </svg>
           </el-menu-item>
-          <el-menu-item index="/dashboard/personal_center" v-if="!lagLogin">
+          <el-menu-item index="/personal_center" v-if="!lagLogin">
             &nbsp;
             <span class="loginBtn">Login</span>
           </el-menu-item>
           <el-sub-menu index="8" v-else>
             <template #title>
-              <router-link to="/dashboard/personal_center" class="loginImg">
+              <router-link to="/personal_center" class="loginImg">
                 <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt="">
               </router-link>
             </template>
-            <el-menu-item index="/dashboard/create_dataset">+ New Dataset</el-menu-item>
-            <el-menu-item index="/dashboard/create_space">+ New Space</el-menu-item>
+            <el-menu-item index="/create_dataset">+ New Dataset</el-menu-item>
+            <el-menu-item index="/create_space">+ New Space</el-menu-item>
             <el-menu-item index="sign_out">Sign Out</el-menu-item>
           </el-sub-menu>
         </el-menu>
@@ -89,7 +89,7 @@ export default defineComponent({
     }
     async function handleSelect (key, keyPath) {
       // console.log(key) //  
-      if (key === '/dashboard/personal_center') store.dispatch('setNavLogin', true)
+      if (key === '/personal_center') store.dispatch('setNavLogin', true)
       else if (key === '4') window.open('https://docs.lagrangedao.org')
       else if (key === 'sign_out') {
         system.$commonFun.signOutFun()
@@ -100,9 +100,9 @@ export default defineComponent({
     }
     function activeMenu (row) {
       const name = row || route.name
-      if (name.indexOf('dataset') > -1) activeIndex.value = '/dashboard/dataset'
-      else if (name.indexOf('model') > -1) activeIndex.value = '/dashboard/models'
-      else if (name.indexOf('space') > -1) activeIndex.value = '/dashboard/spaces'
+      if (name.indexOf('dataset') > -1) activeIndex.value = '/dataset'
+      else if (name.indexOf('model') > -1) activeIndex.value = '/models'
+      else if (name.indexOf('space') > -1) activeIndex.value = '/spaces'
       else activeIndex.value = name
     }
     onMounted(() => activeMenu())
