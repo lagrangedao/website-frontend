@@ -26,13 +26,13 @@
         <div class="left_body">
           <ul>
             <!-- <li :class="{'is_active':route.params.menu === 'profile'}" @click="settingDetail('profile')">Profile</li> -->
-            <li :class="{'is_active':route.params.menu === 'tokens'}" @click="settingDetail('tokens')">Access Tokens</li>
+            <li :class="{'is_active':route.params.menu === 'token'}" @click="settingDetail('token')">Access Tokens</li>
           </ul>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18" class="right">
         <edit-profile v-if="route.params.menu === 'profile'"></edit-profile>
-        <edit-token v-else-if="route.params.menu === 'tokens'"></edit-token>
+        <edit-token v-else-if="route.params.menu === 'token'"></edit-token>
       </el-col>
     </el-row>
   </section>

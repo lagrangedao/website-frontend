@@ -150,7 +150,7 @@ export default defineComponent({
 #access_token {
   position: relative;
   max-width: 620px;
-  padding: 0.15rem 0 0;
+  padding: 0.15rem 0 0.2rem;
   color: #333;
   font-size: 18px;
   text-align: left;

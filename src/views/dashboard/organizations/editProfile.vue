@@ -1,5 +1,5 @@
 <template>
-  <section v-loading="loading" :element-loading-text="loadingText">
+  <section class="profile_body" v-loading="loading" :element-loading-text="loadingText">
     <div class="list">
       <div class="title">
         Profile Settings
@@ -270,6 +270,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.profile_body {
+  padding: 0 0 0.2rem;
+}
 </style>
 
 

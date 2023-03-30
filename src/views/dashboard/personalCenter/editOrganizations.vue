@@ -55,7 +55,7 @@ export default defineComponent({
 
 
     function detailSetting () {
-      router.push({ name: 'organizationsSettings', params: { menu: 'tokens' } })
+      router.push({ name: 'organizationsSettings', params: { menu: 'token' } })
     }
     onMounted(() => { })
     onActivated(() => {
