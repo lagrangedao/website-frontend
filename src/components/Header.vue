@@ -56,6 +56,8 @@
             </template>
             <el-menu-item index="/create_dataset">+ New Dataset</el-menu-item>
             <el-menu-item index="/create_space">+ New Space</el-menu-item>
+            <!-- <el-menu-item index="/create_organizations">+ New Organizations</el-menu-item> -->
+            <el-menu-item index="settings">Settings</el-menu-item>
             <el-menu-item index="sign_out">Sign Out</el-menu-item>
           </el-sub-menu>
         </el-menu>
@@ -91,6 +93,7 @@ export default defineComponent({
       // console.log(key) //  
       if (key === '/personal_center') store.dispatch('setNavLogin', true)
       else if (key === '4') window.open('https://docs.lagrangedao.org')
+      else if (key === 'settings') router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
       else if (key === 'sign_out') {
         system.$commonFun.signOutFun()
         // await system.$commonFun.timeout(200)

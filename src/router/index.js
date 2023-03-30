@@ -25,10 +25,14 @@ const spaceDetail = () =>
     import ("@/views/dashboard/spaces/details");
 const spaceCreate = () =>
     import ("@/views/dashboard/spaces/createSpace");
+const organizationsCreate = () =>
+    import ("@/views/dashboard/organizations/createOrganizations");
+const organizationsSettings = () =>
+    import ("@/views/dashboard/organizations/setting");
 const personalCenter = () =>
     import ("@/views/dashboard/personalCenter/index");
 const personalCenterProfile = () =>
-    import ("@/views/dashboard/personalCenter/editProfile");
+    import ("@/views/dashboard/personalCenter/setting");
 const personalCenterBilling = () =>
     import ("@/views/dashboard/personalCenter/editBilling");
 
@@ -130,7 +134,7 @@ const routes = [{
                 // }
             },
             {
-                path: '/personal_center/profile',
+                path: '/personal_center/setting/:menu',
                 name: 'personalCenterProfile',
                 component: personalCenterProfile,
                 meta: {
@@ -144,7 +148,23 @@ const routes = [{
                 meta: {
                     keepAlive: true
                 }
-            }
+            },
+            {
+                path: '/create_organizations',
+                name: 'organizationsCreate',
+                component: organizationsCreate,
+                meta: {
+                    keepAlive: true
+                }
+            },
+            {
+                path: '/personal_center/organizations/:menu',
+                name: 'organizationsSettings',
+                component: organizationsSettings,
+                meta: {
+                    keepAlive: true
+                }
+            },
         ]
     },
     {

@@ -9,212 +9,30 @@
       </div>
     </el-alert>
     <el-row class="dataset_body">
-      <el-col :xs="24" :sm="8" :md="8" :lg="6" :xl="6" class="left">
+      <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
-          <div v-loading="false" class="logo_sidebar">
-            <img :src="listdata.user.avatar || accessAvatar || peopleUrl" alt="">
-          </div>
-          <div class="personal">
-            <div class="title">
-              {{ listdata.user.full_name || '-'}}
+          <div class="width_div">
+            <div v-loading="false" class="logo_sidebar" @click="settingDetail('organizations', 1)">
+              <img :src="accessAvatar || peopleUrl" alt="">
             </div>
-            <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
-            <div class="desc">Balance: {{info.balance||'-'}}</div>
-            <el-button type="" text bg @click="editProfile">Settings</el-button>
-          </div>
-          <div class="personal">
-            <div class="top_text">
-              <i class="icon icon_interests"></i>
-              Research interests
+            <div class="personal">
+              <div class="title">
+                {{ accessName || '-'}}
+              </div>
+              <div class="desc">Decentralized data science without borders</div>
             </div>
-            <div class="desc">None yet</div>
           </div>
-          <div class="personal">
-            <div class="top_text">
-              <i class="icon icon_organizations"></i>
-              Organizations
-            </div>
-            <div class="desc">None yet</div>
-          </div>
-          <div class="media">
-            <a v-if="listdata.user.homepage" :href="listdata.user.homepage" target="_blank" class="homepage"></a>
-            <a v-if="listdata.user.twitter_username" :href="'https://twitter.com/'+listdata.user.twitter_username" target="_blank" class="twitter"></a>
-            <a v-if="listdata.user.github_username" :href="'https://github.com/'+listdata.user.github_username" target="_blank" class="github"></a>
-          </div>
+        </div>
+        <div class="left_body">
+          <ul>
+            <!-- <li :class="{'is_active':route.params.menu === 'profile'}" @click="settingDetail('profile')">Profile</li> -->
+            <li :class="{'is_active':route.params.menu === 'tokens'}" @click="settingDetail('tokens')">Access Tokens</li>
+          </ul>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="16" :md="16" :lg="18" :xl="18" class="right">
-        <div class="top">
-          <div class="top_text">
-            <!-- <h3>Hello {{info.address}}, <br />Welcome to Filecoin TestNet! </h3> -->
-          </div>
-          <div class="top_text">
-            <el-input v-model="searchValue" class="w-50 m-2" placeholder="search ..." />
-            <el-badge is-dot class="item l">
-              <i class="icon icon_cont"></i>
-            </el-badge>
-            <el-badge class="item l">
-              <i class="icon icon_info"></i>
-            </el-badge>
-          </div>
-        </div>
-        <div class="list">
-          <div class="title">
-            <i class="icon icon_spaces"></i>
-            Spaces
-            <span>{{spacesIndex}}</span>
-          </div>
-        </div>
-        <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
-          <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="spacesIndex>1?12:24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
-            <el-card class="box-card">
-              <template #header>
-                <div class="card-header">
-                  <span>1</span>
-                </div>
-                <h1>{{list.name}}</h1>
-              </template>
-            </el-card>
-          </el-col>
-          <el-col v-if="listdata.spacesIsShow" :xs="24" :sm="spacesIndex>1?12:24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces" :key="list" @click="detailFun(list, 'space')">
-            <el-card class="box-card">
-              <template #header>
-                <div class="card-header">
-                  <span>1</span>
-                </div>
-                <h1>{{list.name}}</h1>
-              </template>
-            </el-card>
-          </el-col>
-        </el-row>
-        <div class="more_style" v-if="listdata.spaces.length>2">
-          <img v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
-          <img v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
-        </div>
-        <div class="top">
-          <div class="list">
-            <div class="title">
-              <i class="icon icon_datasets"></i>
-              Datasets
-              <span>{{dataSetIndex}}</span>
-            </div>
-          </div>
-          <el-select v-model="value" class="m-2" placeholder="Sort: most Downloads">
-            <template #prefix>
-              <i class="el-icon-select"></i>
-            </template>
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </div>
-        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
-            <el-card class="box-card">
-              <template #header>
-                <!-- <div class="card-header">
-                                    <span>27</span>
-                                </div> -->
-              </template>
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <!-- <div class="text">
-                                <el-row :gutter="6">
-                                    <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                        <router-link to="" class="ellipsis">
-                                            {{list.data_schema}}
-                                        </router-link>
-                                    </el-col>
-                                </el-row>
-                            </div> -->
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
-            <el-card class="box-card">
-              <template #header>
-              </template>
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <div class="more_style" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">
-          <img v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
-          <img v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
-        </div>
-        <div class="top">
-          <div class="list">
-            <div class="title">
-              <i class="icon icon_models"></i>
-              Models
-              <span>{{modelsIndex}}</span>
-            </div>
-          </div>
-        </div>
-        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.modelsIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.modelsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models.slice(0,3)" :key="l">
-            <el-card class="box-card">
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col v-show="listdata.modelsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models" :key="l">
-            <el-card class="box-card">
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <div class="more_style" v-if="listdata.models.length>3">
-          <img v-if="!listdata.modelsIsShow" @click="listdata.modelsIsShow = true" src="@/assets/images/icons/icon_38.png" />
-          <img v-else @click="listdata.modelsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
-        </div>
+      <el-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18" class="right">
+        <edit-profile v-if="route.params.menu === 'profile'"></edit-profile>
+        <edit-token v-else-if="route.params.menu === 'tokens'"></edit-token>
       </el-col>
     </el-row>
   </section>
@@ -225,12 +43,21 @@ import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
+import editProfile from './editProfile.vue'
+import editToken from './editToken.vue'
+import {
+  Plus
+} from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'Personal Center',
+  components: {
+    Plus, editProfile, editToken
+  },
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessAvatar = computed(() => (store.state.accessAvatar))
+    const accessName = computed(() => (store.state.accessName))
     const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const searchValue = ref('')
@@ -239,25 +66,31 @@ export default defineComponent({
       address: '',
       balance: ''
     })
-    const options = ref([
-      {
-        value: 'Option1',
-        label: 'Most Downloads',
-      },
-      {
-        value: 'Option2',
-        label: 'Alphabetical',
-      },
-      {
-        value: 'Option3',
-        label: 'Recently Updated',
-      },
-      {
-        value: 'Option4',
-        label: 'Most Likes',
+    const ruleForm = reactive({
+      name: '',
+      avatar: '',
+      homepage: '',
+      github: '',
+      twitter: ''
+    })
+    const fileList = ref([])
+    const validateInput = (rule, value, callback) => {
+      if (!value) callback()
+      if (!isURL(value)) {
+        callback(new Error("Please enter the web address"));
+      } else {
+        callback();
       }
-    ])
-    const currentPage1 = ref(1)
+    }
+    const rules = reactive({
+      name: [
+        { required: true, message: 'Please fill in this field', trigger: 'blur' }
+      ],
+      homepage: [
+        { validator: validateInput, trigger: "blur" }
+      ]
+    })
+    const ruleFormRef = ref(null)
     const small = ref(false)
     const background = ref(false)
     const logoUrl = require("@/assets/images/icons/logo_w.png")
@@ -265,24 +98,26 @@ export default defineComponent({
     const loading = ref(true)
     const loadingText = ref('')
     const prevType = ref(true)
-    const dataSetIndex = ref(0)
-    const modelsIndex = ref(0)
-    const spacesIndex = ref(0)
-    const listdata = reactive({
-      datasets: [],
-      models: [],
-      spaces: [],
-      user: {},
-      datasetsIsShow: false,
-      modelsIsShow: false,
-      spacesIsShow: false
-    })
     const listLoad = ref(false)
-    const bodyWidth = ref(document.body.clientWidth < 768)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
+    function isURL (str_url) {
+      // var strRegex = "^((https|http|ftp|rtsp|mms)?://)"
+      //   + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" // ftp的user@
+      //   + "(([0-9]{1,3}\.){3}[0-9]{1,3}" // IP形式的URL- 199.194.52.184
+      //   + "|" // 允许IP和DOMAIN（域名）
+      //   + "([0-9a-z_!~*'()-]+\.)*" // 域名- www.
+      //   + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\." // 二级域名
+      //   + "[a-z]{2,6})" // first level domain- .com or .museum
+      //   + "(:[0-9]{1,4})?" // 端口- :80
+      //   + "((/?)|" // a slash isn't required if there is no file name
+      //   + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+      // var re = new RegExp(strRegex);
+      var re = new RegExp('^(?!mailto:)(?:(?:http|https|ftp)://|//)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$', 'i');
+      return re.test(str_url);
+    }
     async function isLogin () {
       loadingText.value = ''
       system.$commonFun.Init(async addr => {
@@ -291,10 +126,13 @@ export default defineComponent({
           // console.log(balance)
           const myBalance = balance
           const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
-          info.balance = Number(balanceAll).toFixed(4)
+          info.balance = Number(balanceAll).toFixed(0)
         })
         // await system.$commonFun.timeout(500)
-        if (lagLogin.value) getdataList()
+        if (lagLogin.value) {
+          loading.value = false
+          listLoad.value = false
+        }
         else await signIn()
       })
     }
@@ -302,45 +140,14 @@ export default defineComponent({
       const chainId = await ethereum.request({ method: 'eth_chainId' })
       if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
-        if (lStatus) getdataList()
-        else window.location.reload()
+        if (lStatus) {
+          loading.value = false
+          listLoad.value = false
+        }
         return false
       } else loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
       // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
       store.dispatch('setNavLogin', false)
-    }
-    async function getdataList () {
-      loading.value = false
-      listLoad.value = true
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
-      if (listRes && listRes.status === 'success') {
-        listdata.datasets = listRes.data.dataset || []
-        listdata.models = listRes.data.model || []
-        listdata.spaces = listRes.data.space || []
-        listdata.user = listRes.data.user || {}
-        dataSetIndex.value = listRes.data.dataset.length
-        modelsIndex.value = listRes.data.model.length
-        spacesIndex.value = listRes.data.space.length
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar)
-        store.dispatch('setAccessName', listRes.data.user.full_name)
-        let spaceList = []
-        let datasetList = []
-        listdata.spaces.forEach(space => spaceList.push(space.name))
-        listdata.datasets.forEach(space => datasetList.push(space.name))
-        store.dispatch('setAccessSpace', JSON.stringify(spaceList))
-        store.dispatch('setAccessDataset', JSON.stringify(datasetList))
-      } else {
-        listdata.datasets = []
-        listdata.models = []
-        listdata.spaces = []
-        listdata.user = {}
-        dataSetIndex.value = 0
-        modelsIndex.value = 0
-        spacesIndex.value = 0
-        system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
-      }
-      // await system.$commonFun.timeout(500)
-      listLoad.value = false
     }
     function fn () {
       document.addEventListener('visibilitychange', function () {
@@ -376,52 +183,29 @@ export default defineComponent({
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
-    function detailFun (row, type) {
-      // console.log(row, index)
-      if (type === 'dataset') router.push({ name: 'datasetDetail', params: { name: row.name, tabs: 'card' } })
-      else if (type === 'space') router.push({ name: 'spaceDetail', params: { name: row.name, tabs: 'card' } })
-      else if (type === 'model') router.push({ name: 'modelsDetail', params: { name: row.name, tabs: 'card' } })
+    function settingDetail (row, type) {
+      if (type) router.push({ name: 'personalCenterProfile', params: { menu: 'organizations' } })
+      else router.push({ name: 'organizationsSettings', params: { menu: row } })
     }
-    function editProfile (row, index) {
-      // console.log(row, index)
-      router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
-    }
-    onMounted(() => {
-      window.onresize = () => {
-        return (() => {
-          bodyWidth.value = document.body.clientWidth < 768
-        })()
-      }
-    })
     onActivated(() => {
       fn()
       if (navLogin.value || !!metaAddress.value) isLogin()
       else router.push({ name: 'main' })
     })
-    onDeactivated(() => {
-      listdata.datasetsIsShow = false
-      listdata.modelsIsShow = false
-      listdata.spacesIsShow = false
-      listdata.datasets = []
-      listdata.models = []
-      listdata.spaces = []
-      listdata.user = {}
-      dataSetIndex.value = 0
-      modelsIndex.value = 0
-      spacesIndex.value = 0
-    })
+    onMounted(() => { })
     watch(navLogin, (newValue, oldValue) => {
       if (navLogin.value) isLogin()
     })
-    watch(() => bodyWidth, (val) => {
-      bodyWidth.value = val
-    })
     return {
+      route,
       metaAddress,
+      accessAvatar,
+      accessName,
       navLogin, lagLogin, searchValue, value,
       info,
-      options,
-      currentPage1,
+      ruleForm,
+      ruleFormRef,
+      rules,
       small,
       background,
       logoUrl,
@@ -430,14 +214,9 @@ export default defineComponent({
       loading,
       loadingText,
       prevType,
-      dataSetIndex,
-      modelsIndex,
-      spacesIndex,
-      listdata,
       listLoad,
-      accessAvatar,
-      bodyWidth,
-      isLogin, signIn, getdataList, fn, changeNetChange, momentFilter, detailFun, editProfile
+      fileList,
+      isLogin, signIn, fn, changeNetChange, momentFilter, settingDetail,
     }
   }
 })
@@ -446,6 +225,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 #dataset {
   position: relative;
+  padding: 0.15rem 0 0;
   color: #333;
   font-size: 18px;
   @media screen and (max-width: 1200px) {
@@ -516,39 +296,32 @@ export default defineComponent({
     }
     .left {
       position: relative;
-      padding: 0;
-      background-color: #7405ff;
+      padding: 0.2rem 0;
+      background-color: #fbfbfc;
+      border: 1px solid #eee;
+      border-radius: 0.1rem;
       .left_body {
-        width: 90%;
-        max-width: 280px;
-        padding: 0.25rem 0;
+        padding: 0.15rem 0 0;
         margin: 0 auto;
         border: 0;
         text-align: left;
-        color: #fff;
+        color: #000;
+        .width_div {
+          display: flex;
+          align-items: center;
+          width: 90%;
+          margin: 0 auto;
+        }
         .logo_sidebar {
           position: relative;
           display: block;
-          width: 100px;
-          height: 100px;
-          margin: 0.55rem 0 0;
+          width: 45px;
+          height: 45px;
           background-color: #fff;
-          border: 0.07rem solid #fff;
+          border: 0.03rem solid #7405ff;
           border-radius: 50%;
           overflow: hidden;
-          @media screen and (min-width: 1800px) {
-            width: 120px;
-            height: 120px;
-            border: 0.1rem solid #fff;
-          }
-          @media screen and (max-width: 768px) {
-            width: 80px;
-            height: 80px;
-          }
-          @media screen and (max-width: 600px) {
-            width: 60px;
-            height: 60px;
-          }
+          cursor: pointer;
           img {
             display: block;
             width: 100%;
@@ -563,29 +336,25 @@ export default defineComponent({
           }
         }
         .personal {
-          margin: 0.2rem 0 0.45rem;
+          margin: 0 0 0 0.1rem;
           .title {
             font-family: "Helvetica-Bold";
-            font-size: 0.28rem;
-            font-weight: bold;
+            font-size: 0.2rem;
+            font-weight: normal;
             overflow: hidden;
             text-overflow: ellipsis;
             word-spacing: normal;
             @media screen and (min-width: 1800px) {
-              font-size: 0.33rem;
+              font-size: 0.24rem;
             }
           }
           .desc {
-            margin: 0.05rem 0 0.2rem;
-            font-size: 15px;
+            font-size: 12px;
             @media screen and (min-width: 1800px) {
-              font-size: 17px;
-            }
-            @media screen and (max-width: 1440px) {
               font-size: 14px;
             }
-            @media screen and (max-width: 768px) {
-              font-size: 13px;
+            @media screen and (max-width: 1440px) {
+              font-size: 11px;
             }
           }
           .el-button {
@@ -604,11 +373,7 @@ export default defineComponent({
             margin: 0 0 0.2rem;
             color: #fff;
             font-family: "Helvetica-Bold";
-            font-size: 0.18rem;
-            font-weight: bold;
-            @media screen and (min-width: 1800px) {
-              font-size: 0.2rem;
-            }
+            font-size: 0.2rem;
             .icon {
               display: block;
               width: 25px;
@@ -635,28 +400,26 @@ export default defineComponent({
             }
           }
         }
-        .media {
-          display: flex;
-          align-items: center;
-          a {
-            display: block;
-            width: 25px;
-            height: 25px;
-            margin: 0 0.1rem 0 0;
-            &.homepage {
-              background: url(../../../assets/images/icons/media_1.png)
-                no-repeat;
-              background-size: 100%;
+        ul {
+          width: 100%;
+          border-top: 1px solid #eee;
+          li {
+            padding: 0.12rem 5%;
+            border-bottom: 1px solid #eee;
+            color: #000;
+            font-family: "Helvetica-light";
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            @media screen and (min-width: 1800px) {
+              font-size: 16px;
             }
-            &.twitter {
-              background: url(../../../assets/images/icons/media_2.png)
-                no-repeat;
-              background-size: 100%;
+            @media screen and (max-width: 1440px) {
+              font-size: 13px;
             }
-            &.github {
-              background: url(../../../assets/images/icons/media_3.png)
-                no-repeat;
-              background-size: 100%;
+            &:hover,
+            &.is_active {
+              background-color: #f5f6f8;
             }
           }
         }
@@ -885,13 +648,13 @@ export default defineComponent({
         }
       }
       .list {
-        margin: 0.15rem 0 0;
+        margin: 0.35rem 0 0;
         .title {
           display: flex;
           justify-content: flex-start;
           align-items: center;
           padding: 0;
-          font-size: 0.195rem;
+          font-size: 0.21rem;
           color: #000;
           border-radius: 0.08rem;
           .icon {
@@ -1133,280 +896,152 @@ export default defineComponent({
         }
       }
       .list_body_spaces {
-        padding: 0.16rem 0;
-        min-height: 80px;
-        .el-col {
-          margin: 0.16rem 0;
-          .box-card {
-            background-color: #fff;
-            box-shadow: none;
-            border: 0;
-            border-radius: 0;
-            .el-card__header {
-              position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        margin: 0.4rem 0 0.3rem;
+        text-align: left;
+        .el-form-item {
+          width: 100%;
+          &.flex_form {
+            width: 50%;
+          }
+          .el-form-item__content {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: flex-start;
+            text-align: left;
+            .label {
               display: flex;
               align-items: center;
-              justify-content: center;
-              height: 1.85rem;
-              padding: 0;
-              border: 0;
-              border-radius: 0.1rem;
-              font-size: 0.338rem;
-              color: #fff;
+              width: 100%;
+              text-align: left;
+              color: #565656;
+              .span {
+                margin-left: 0.1rem;
+                color: #aaaaaa;
+              }
+            }
+            .flex-row {
+              display: flex;
+              align-items: center;
+              width: 100%;
+              .el-select {
+                width: calc(100% - 30px);
+              }
+              .self-end {
+                width: 30px;
+                text-align: center;
+              }
+              .img {
+                width: 60px;
+                height: 60px;
+                margin: 0.15rem 0 0;
+              }
+            }
+            .avatar {
+              width: 65px;
+              height: 65px;
+            }
+            .remove {
+              margin: 0.15rem 0 0 0.15rem;
               cursor: pointer;
-              .card-header {
-                position: absolute;
-                right: 0.33rem;
-                top: 0.1rem;
-                display: flex;
-                align-items: center;
-                @media screen and (max-width: 768px) {
-                  right: 0.2rem;
-                }
-                span {
-                  height: 0.25rem;
-                  padding-left: 0.3rem;
-                  background: url(../../../assets/images/icons/icon_9_1.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
-                  font-size: 14px;
-                  color: #fff;
-                  line-height: 0.25rem;
-                  @media screen and (min-width: 1800px) {
-                    font-size: 15px;
+            }
+            .avatar-uploader-icon {
+              padding: 0.15rem 0.2rem;
+              background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              border-radius: 0.07rem;
+              color: #606060;
+              font-family: inherit;
+              &:hover {
+                opacity: 0.95;
+                border-color: #c37af9;
+              }
+            }
+            .el-radio-group {
+              width: 100%;
+              margin: 0.2rem 0 0;
+              border-top: 1px solid #eee;
+              border-bottom: 1px solid #eee;
+              .el-radio {
+                width: 100%;
+                height: auto;
+                margin: 0.2rem 0;
+                .el-radio__label {
+                  h5,
+                  p {
+                    text-align: left;
+                    font-size: 16px;
+                    font-weight: 100;
+                    color: #333;
+                    line-height: 1.5;
+                    word-break: break-word;
+                    white-space: normal;
+                  }
+                  p {
+                    font-size: 14px;
+                    color: #7e7e7e;
+                    line-height: 1.3;
                   }
                 }
               }
-              h1 {
-                // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
-                // text-transform: capitalize;
+            }
+            .el-button {
+              font-family: inherit;
+              cursor: pointer;
+              span {
                 cursor: pointer;
-                font-size: 0.3rem;
-                letter-spacing: 1px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: normal;
-                display: -webkit-box;
-                -webkit-line-clamp: 1;
-                -webkit-box-orient: vertical;
-                word-break: break-word;
               }
             }
-            .el-card__body {
-              padding: 0.1rem 0;
-              cursor: pointer;
-              .text {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                color: #000;
-                line-height: 1;
-                cursor: pointer;
+            .el-input {
+              .el-input__inner {
+                height: auto;
+                padding: 0.03rem 0.1rem;
+                border-radius: 0.07rem;
+                border-color: #f1f1f1;
                 @media screen and (min-width: 1800px) {
                   font-size: 15px;
                 }
-                .text_left {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                }
-                .icon {
-                  width: 0.25rem;
-                  height: 0.25rem;
-                  margin: -1px 0.17rem 0 0;
-                  border-radius: 0.04rem;
-                }
-                span {
-                  color: #9ca3b1;
-                  font-size: 12px;
-                  cursor: pointer;
-                  @media screen and (min-width: 1800px) {
-                    font-size: 13px;
-                  }
-                }
-                .small {
-                  color: #000;
+                &:hover {
+                  border-color: #c37af9;
                 }
               }
-            }
-          }
-          &:hover {
-            .box-card {
-              .el-card__header {
-                opacity: 0.8;
-              }
-            }
-          }
-          &:nth-child(9n + 1) {
-            .box-card {
-              .el-card__header {
-                background: #7405ff
-                  url(../../../assets/images/dashboard/spaces/space_b_08.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_01.png)
-                      no-repeat center;
-                    background-size: 100%;
+              .el-input__prefix {
+                padding: 0;
+                .el-icon {
+                  svg {
+                    width: 0.22rem;
+                    height: 0.22rem;
+                    color: #9ea5b3;
                   }
                 }
               }
             }
-          }
-          &:nth-child(9n + 2) {
-            .box-card {
-              .el-card__header {
-                background: #024ec6
-                  url(../../../assets/images/dashboard/spaces/space_b_02.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_02.png)
-                      no-repeat center;
-                    background-size: 100%;
-                  }
-                }
+            .icon_media {
+              display: inline-block;
+              width: 18px;
+              height: 18px;
+              margin: -1px 0.07rem 0 0;
+              @media screen and (min-width: 1800px) {
+                width: 23px;
+                height: 23px;
               }
             }
-          }
-          &:nth-child(9n + 3) {
-            .box-card {
-              .el-card__header {
-                background: #447dff
-                  url(../../../assets/images/dashboard/spaces/space_b_03.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_03.png)
-                      no-repeat center;
-                    background-size: 100%;
-                  }
-                }
-              }
+            .icon_github {
+              background: url(../../../assets/images/icons/media_8.png)
+                no-repeat left center;
+              background-size: 100%;
+            }
+            .icon_twitter {
+              background: url(../../../assets/images/icons/media_9.png)
+                no-repeat left center;
+              background-size: 100%;
             }
           }
-          &:nth-child(9n + 4) {
-            .box-card {
-              .el-card__header {
-                background: #0050ff
-                  url(../../../assets/images/dashboard/spaces/space_b_04.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_04.png)
-                      no-repeat center;
-                    background-size: 100%;
-                  }
-                }
-              }
-            }
-          }
-          &:nth-child(9n + 5) {
-            .box-card {
-              .el-card__header {
-                background: #0e5ccc
-                  url(../../../assets/images/dashboard/spaces/space_b_05.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_05.png)
-                      no-repeat center;
-                    background-size: 100%;
-                  }
-                }
-              }
-            }
-          }
-          &:nth-child(9n + 6) {
-            .box-card {
-              .el-card__header {
-                background: #024ec6
-                  url(../../../assets/images/dashboard/spaces/space_b_06.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_06.png)
-                      no-repeat center;
-                    background-size: 100%;
-                  }
-                }
-              }
-            }
-          }
-          &:nth-child(9n + 7) {
-            .box-card {
-              .el-card__header {
-                background: #024ec6
-                  url(../../../assets/images/dashboard/spaces/space_b_07.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_07.png)
-                      no-repeat center;
-                    background-size: 100%;
-                  }
-                }
-              }
-            }
-          }
-          &:nth-child(9n + 8) {
-            .box-card {
-              .el-card__header {
-                background: #0234a6
-                  url(../../../assets/images/dashboard/spaces/space_b_08.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_08.png)
-                      no-repeat center;
-                    background-size: 100%;
-                  }
-                }
-              }
-            }
-          }
-          &:nth-child(9n + 9) {
-            .box-card {
-              .el-card__header {
-                background: #002b77
-                  url(../../../assets/images/dashboard/spaces/space_b_09.png)
-                  no-repeat center;
-                background-size: auto 61%;
-              }
-              .el-card__body {
-                .text {
-                  .icon {
-                    background: url(../../../assets/images/dashboard/spaces/space_w_09.png)
-                      no-repeat center;
-                    background-size: 100%;
-                  }
-                }
-              }
-            }
+          .el-form-item__label {
+            display: none;
           }
         }
       }
