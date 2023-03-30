@@ -26,8 +26,8 @@
         <div class="left_body">
           <ul>
             <li :class="{'is_active':route.params.menu === 'profile'}" @click="settingDetail('profile')">Profile</li>
-            <li :class="{'is_active':route.params.menu === 'tokens'}" @click="settingDetail('tokens')">Access Tokens</li>
             <li :class="{'is_active':route.params.menu === 'organizations'}" @click="settingDetail('organizations')">Organizations</li>
+            <li :class="{'is_active':route.params.menu === 'tokens'}" @click="settingDetail('tokens')">Access Tokens</li>
           </ul>
         </div>
       </el-col>
