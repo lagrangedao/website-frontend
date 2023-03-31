@@ -56,7 +56,7 @@
             </template>
             <el-menu-item index="/create_dataset">+ New Dataset</el-menu-item>
             <el-menu-item index="/create_space">+ New Space</el-menu-item>
-            <!-- <el-menu-item index="/create_organizations">+ New Organizations</el-menu-item> -->
+            <el-menu-item index="/create_organizations">Create Organizations</el-menu-item>
             <el-menu-item index="settings">Settings</el-menu-item>
             <el-menu-item index="sign_out">Sign Out</el-menu-item>
           </el-sub-menu>

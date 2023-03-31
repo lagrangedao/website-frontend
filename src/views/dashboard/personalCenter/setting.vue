@@ -26,6 +26,7 @@
         <div class="left_body">
           <ul>
             <li :class="{'is_active':route.params.menu === 'profile'}" @click="settingDetail('profile')">Profile</li>
+            <li :class="{'is_active':route.params.menu === 'account'}" @click="settingDetail('account')">Account</li>
             <li :class="{'is_active':route.params.menu === 'organizations'}" @click="settingDetail('organizations')">Organizations</li>
             <li :class="{'is_active':route.params.menu === 'tokens'}" @click="settingDetail('tokens')">Access Tokens</li>
           </ul>
@@ -33,6 +34,7 @@
       </el-col>
       <el-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18" class="right">
         <edit-profile v-if="route.params.menu === 'profile'"></edit-profile>
+        <edit-account v-else-if="route.params.menu === 'account'"></edit-account>
         <edit-token v-else-if="route.params.menu === 'tokens'"></edit-token>
         <edit-organizations v-else-if="route.params.menu === 'organizations'"></edit-organizations>
       </el-col>
@@ -46,6 +48,7 @@ import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
 import editProfile from './editProfile.vue'
+import editAccount from './editAccount.vue'
 import editToken from './editToken.vue'
 import editOrganizations from './editOrganizations.vue'
 import {
@@ -54,7 +57,7 @@ import {
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    Plus, editProfile, editToken, editOrganizations
+    Plus, editProfile, editAccount, editToken, editOrganizations
   },
   setup () {
     const store = useStore()
@@ -928,6 +931,7 @@ export default defineComponent({
             .flex-row {
               display: flex;
               align-items: center;
+              flex-wrap: wrap;
               width: 100%;
               .el-select {
                 width: calc(100% - 30px);
@@ -940,6 +944,12 @@ export default defineComponent({
                 width: 60px;
                 height: 60px;
                 margin: 0.15rem 0 0;
+              }
+              small {
+                display: block;
+                width: 100%;
+                font-size: 12px;
+                color: #afafaf;
               }
             }
             .avatar {

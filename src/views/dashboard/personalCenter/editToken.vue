@@ -6,7 +6,7 @@
 
     <div class="token_list">
       <div class="title">User Access Tokens</div>
-      <div class="desc">Access tokens programmatically authenticate your identity to the Hugging Face Hub, allowing applications to perform specific actions specified by the scope of permissions (read, write, or admin) granted. Visit the documentation to discover
+      <div class="desc">Access tokens programmatically authenticate your identity to the Lagrange DAO, allowing applications to perform specific actions specified by the scope of permissions (read, write, or admin) granted. Visit the documentation to discover
         how to use them.</div>
       <el-button size="large" class="token_button" @click="createToken">New token</el-button>
 

@@ -2,87 +2,94 @@
   <section class="profile_body" v-loading="loading" :element-loading-text="loadingText">
     <div class="list">
       <div class="title">
-        Profile Settings
+        Account Settings
       </div>
     </div>
 
     <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" v-loading="listLoad" class="demo-ruleForm list_body_spaces" status-icon>
       <el-form-item prop="name">
         <label class="label" for="dataname">
-          Full name
+          Organization Username
         </label>
         <div class="flex flex-row">
-          <el-input v-model="ruleForm.name" placeholder="Full name" />
+          <el-input v-model="ruleForm.name" placeholder="Organization Username" />
+          <small>This is present in the url and will serve as the namespace for your models, datasets, spaces.</small>
+        </div>
+      </el-form-item>
+      <el-form-item prop="email">
+        <label class="label" for="dataname">
+          Email
+          <span class="span">(optional)</span>
+        </label>
+        <div class="flex flex-row">
+          <el-input v-model="ruleForm.email" placeholder="Primary email" />
+          <small>Mainly used for billing</small>
         </div>
       </el-form-item>
       <el-form-item prop="avatar">
         <label class="label">
-          Logo
+          Organization domain name
           <span class="span">(optional)</span>
         </label>
         <div class="flex flex-row">
-          <el-upload class="avatar-uploader" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" action="#" :auto-upload="false">
-            <!-- <img v-if="ruleForm.avatar" :src="ruleForm.avatar" class="avatar" /> -->
-            <el-button class="avatar-uploader-icon" type="" text bg>Upload file</el-button>
-          </el-upload>
+          <el-input v-model="ruleForm.password" placeholder="Organization domain name" />
+          <small>Alows users to join this org with one click if their emailis verihed and ends with this organization domain. One of your ema addresses needs to be a match. This will also display a Verifed badge on your organization page.</small>
         </div>
-        <div class="flex flex-row" v-if="ruleForm.avatar">
-          <img class="img" :src="ruleForm.avatar" />
-          <div class="remove" @click="removeAvatar">Remove</div>
-        </div>
-      </el-form-item>
-      <el-form-item prop="homepage">
-        <label class="label">
-          Website
-          <span class="span">(optional)</span>
-        </label>
+
         <div class="flex flex-row">
-          <el-input v-model="ruleForm.homepage" placeholder="Homepage" />
+          <div class="avatar-uploader">
+            <el-button class="avatar-uploader-icon" type="" text bg>Save changes</el-button>
+          </div>
         </div>
       </el-form-item>
-      <el-form-item prop="type">
-        <label class="label" for="owner">
-          Organization type
+      <el-form-item prop="additional">
+        <label class="label label_title">
+          Delete this organization
         </label>
-        <div class="flex flex-row">
-          <el-select v-model="ruleForm.type" placeholder=" ">
-            <el-option v-for="item in ruleForm.typeOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
+        <div class="lable_desc">
+          Delete this organization permanently, this action is irreversible.
+          <br /> All its repositories (models, datasets, & Spaces) will be deleted.
         </div>
-      </el-form-item>
-      <el-form-item prop="research">
-        <label class="label">
-          Research interests
-          <span class="span">(optional)</span>
-        </label>
         <div class="flex flex-row">
-          <el-input v-model="ruleForm.research" :rows="2" type="textarea" placeholder="Research interests" />
+          <div class="avatar-uploader">
+            <el-button class="avatar-uploader-icon" type="" text bg @click="deleteVisible=true">Delete Organization</el-button>
+          </div>
         </div>
-      </el-form-item>
-      <el-form-item prop="github">
-        <label class="label">
-          <i class="icon_media icon_github"></i>
-          GitHub username
-          <span class="span">(optional)</span>
-        </label>
-        <div class="flex flex-row">
-          <el-input v-model="ruleForm.github" placeholder="GitHub username" />
-        </div>
-      </el-form-item>
-      <el-form-item prop="twitter">
-        <label class="label">
-          <i class="icon_media icon_twitter"></i>
-          Twitter username
-          <span class="span">(optional)</span>
-        </label>
-        <div class="flex flex-row">
-          <el-input v-model="ruleForm.twitter" placeholder="Twitter username" />
-        </div>
-      </el-form-item>
-      <el-form-item>
-        <el-button size="large" @click="submitForm('ruleFormRef')">Save changes </el-button>
       </el-form-item>
     </el-form>
+
+    <el-dialog v-model="deleteVisible" title="Delete this organization" :show-close="false" custom-class="delete_body">
+      <div class="tip">
+        Deleting this oraanization will delete all its repositories (models, datasets, and Spaces). This orqanization name will be instantly available for other users. You will be immediately billed for any usageof paid services (such as AutoTrain)
+        for the current month.
+      </div>
+      <el-form ref="ruleFormRefDelete" status-icon>
+        <el-form-item prop="agreeDoi" style="width:100%">
+          <label class="label" for="dataname">
+            Enter organization name
+          </label>
+          <div class="flex flex-row">
+            <el-input v-model="ruleForm.organization_name" placeholder=" " />
+          </div>
+        </el-form-item>
+        <el-form-item prop="agreeDoi" style="width:100%">
+          <label class="label" for="dataname">
+            Type "delete organization"
+          </label>
+          <div class="flex flex-row">
+            <el-input v-model="ruleForm.organization_type" placeholder=" " />
+          </div>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" :disabled="ruleForm.organization_name && ruleForm.organization_type !== 'delete organization'" @click="deleteVisible = false">
+            Delete organization
+          </el-button>
+          <el-button @click="deleteVisible = false">Cancel</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </section>
 </template>
 <script>
@@ -103,6 +110,7 @@ export default defineComponent({
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessAvatar = computed(() => (store.state.accessAvatar))
+    const accessName = computed(() => (store.state.accessName))
     const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const searchValue = ref('')
@@ -113,35 +121,15 @@ export default defineComponent({
     })
     const profileName = ref('-')
     const ruleForm = reactive({
-      name: '',
+      name: store.state.accessName,
+      email: '',
+      password: '111',
       avatar: '',
-      research: '',
       homepage: '',
       github: '',
       twitter: '',
-      type: 'Non-profit',
-      typeOptions: [
-        {
-          value: 'Company',
-          label: 'Company '
-        },
-        {
-          value: 'University',
-          label: 'University'
-        },
-        {
-          value: 'Classroom',
-          label: 'Classroom'
-        },
-        {
-          value: 'Non-profit',
-          label: 'Non-profit'
-        },
-        {
-          value: 'Community',
-          label: 'Community'
-        }
-      ]
+      organization_name: '',
+      organization_type: ''
     })
     const fileList = ref([])
     const validateInput = (rule, value, callback) => {
@@ -163,6 +151,7 @@ export default defineComponent({
     const ruleFormRef = ref(null)
     const small = ref(false)
     const background = ref(false)
+    const deleteVisible = ref(false)
     const logoUrl = require("@/assets/images/icons/logo_w.png")
     const peopleUrl = require("@/assets/images/dashboard/people_default.png")
     const loading = ref(true)
@@ -281,7 +270,8 @@ export default defineComponent({
       fileList.value = []
     }
     onMounted(() => {
-      getdataList()
+      // getdataList()
+      loading.value = false
     })
     onActivated(() => {
       reset()
@@ -289,6 +279,7 @@ export default defineComponent({
     return {
       metaAddress,
       accessAvatar,
+      accessName,
       navLogin, lagLogin, searchValue, value,
       info,
       ruleForm,
@@ -305,6 +296,7 @@ export default defineComponent({
       prevType,
       listLoad,
       fileList,
+      deleteVisible,
       getdataList, changeNetChange, momentFilter, detailFun, submitForm, editAvatar,
       handleChange, handleRemove, removeAvatar
     }
@@ -316,6 +308,121 @@ export default defineComponent({
 .profile_body {
   max-width: 850px;
   padding: 0 0 0.2rem;
+  .label {
+    font-size: 0.18rem;
+    &.label_title {
+      color: #000 !important;
+    }
+  }
+  .lable_desc {
+    display: block;
+    width: 100%;
+    max-width: 500px;
+    font-size: 0.16rem;
+    color: #606060;
+    line-height: 1.5;
+  }
+  .avatar-uploader {
+    margin-top: 0.15rem;
+  }
+
+  :deep(.delete_body) {
+    width: 40%;
+    max-width: 770px;
+    min-width: 300px;
+    border-radius: 0.13rem;
+    text-align: left;
+    .el-dialog__header {
+      padding: 0.17rem 0.25rem 0.1rem;
+      font-size: 17px;
+      color: #000;
+      @media screen and (max-width: 768px) {
+        font-size: 15px;
+      }
+      @media screen and (min-width: 1800px) {
+        font-size: 18px;
+      }
+    }
+    .el-dialog__body {
+      padding: 0;
+      .tip,
+      .tip_black {
+        padding: 0.1rem 0.25rem;
+        background-color: #f3f1ff;
+        color: #562683;
+        font-size: 15px;
+        word-break: break-word;
+        line-height: 1.3;
+        @media screen and (max-width: 768px) {
+          font-size: 14px;
+        }
+        @media screen and (min-width: 1800px) {
+          font-size: 17px;
+        }
+      }
+      .tip_black {
+        background-color: transparent;
+        color: #000;
+        a {
+          text-decoration: underline;
+        }
+      }
+      .el-form {
+        padding: 0.15rem 0.25rem 0;
+        .el-form-item {
+          .el-form-item__content {
+            .label {
+              color: #000;
+              font-size: 15px;
+              @media screen and (max-width: 768px) {
+                font-size: 14px;
+              }
+              @media screen and (min-width: 1800px) {
+                font-size: 17px;
+              }
+            }
+            .flex-row {
+              width: 100%;
+            }
+            .el-input {
+              .el-input__inner {
+                // background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              }
+            }
+          }
+        }
+      }
+    }
+    .el-dialog__footer {
+      padding: 0 0.25rem 0.25rem;
+      text-align: left;
+      .el-button {
+        width: auto;
+        height: auto;
+        padding: 0.07rem 0.15rem;
+        margin: 0 0.15rem 0 0;
+        background: linear-gradient(180deg, #fefefe, #f0f0f0);
+        font-family: inherit;
+        font-size: 16px;
+        line-height: 1;
+        color: #000;
+        border-radius: 0.07rem;
+        @media screen and (max-width: 1600px) {
+          font-size: 14px;
+        }
+        &:hover {
+          opacity: 0.9;
+          span {
+            cursor: pointer;
+          }
+        }
+        &.is-disabled {
+          opacity: 0.5;
+          border-color: #e3e6eb;
+        }
+      }
+    }
+  }
 }
 </style>
 
