@@ -6,10 +6,11 @@ import {
 } from 'element-plus'
 let lastTime = 0
 
-async function sendRequest(apilink, type, jsonObject) {
+async function sendRequest(apilink, type, jsonObject, api_token) {
   // signOutFun()
   // axios.defaults.timeout = 60000
-  axios.defaults.headers.common['Authorization'] = 'Bearer ' + store.state.accessToken
+  if (api_token) axios.defaults.headers.common['Authorization'] = 'Bearer ' + api_token
+  else axios.defaults.headers.common['Authorization'] = 'Bearer ' + store.state.accessToken
   try {
     let response
     switch (type) {

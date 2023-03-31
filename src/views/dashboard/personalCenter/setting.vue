@@ -29,6 +29,7 @@
             <li :class="{'is_active':route.params.menu === 'account'}" @click="settingDetail('account')">Account</li>
             <li :class="{'is_active':route.params.menu === 'organizations'}" @click="settingDetail('organizations')">Organizations</li>
             <li :class="{'is_active':route.params.menu === 'tokens'}" @click="settingDetail('tokens')">Access Tokens</li>
+            <li :class="{'is_active':route.params.menu === 'computing'}" @click="settingDetail('computing')">As Computing Provider</li>
           </ul>
         </div>
       </el-col>
@@ -37,6 +38,7 @@
         <edit-account v-else-if="route.params.menu === 'account'"></edit-account>
         <edit-token v-else-if="route.params.menu === 'tokens'"></edit-token>
         <edit-organizations v-else-if="route.params.menu === 'organizations'"></edit-organizations>
+        <edit-computing v-else-if="route.params.menu === 'computing'"></edit-computing>
       </el-col>
     </el-row>
   </section>
@@ -51,13 +53,14 @@ import editProfile from './editProfile.vue'
 import editAccount from './editAccount.vue'
 import editToken from './editToken.vue'
 import editOrganizations from './editOrganizations.vue'
+import editComputing from './editComputing.vue'
 import {
   Plus
 } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    Plus, editProfile, editAccount, editToken, editOrganizations
+    Plus, editProfile, editAccount, editToken, editOrganizations, editComputing
   },
   setup () {
     const store = useStore()
