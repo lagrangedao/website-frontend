@@ -271,6 +271,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .profile_body {
+  max-width: 850px;
   padding: 0 0 0.2rem;
 }
 </style>

@@ -325,7 +325,7 @@ export default defineComponent({
           if (el.join('/').toLowerCase() === 'readme.md') {
             urlReadme.value = element.url
             urlReadmeName.value = el.join('/')
-            getTitle(element.cid)
+            getTitle(urlReadme.value)
           }
         })
       }
@@ -358,15 +358,7 @@ export default defineComponent({
     };
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
-      // textEditor.value = await fetch(urlReadme.value)
-      //   .then(res => res.arrayBuffer())
-      //   .then(buffer => {
-      //     const decoder = new TextDecoder("gbk")
-      //     const text = decoder.decode(buffer)
-      //     return text
-      //   })
-      var response = await fetch(`https://ipfs.multichain.storage/ipfs/${cid}`)
-      // var response = await fetch(urlReadme.value)
+      var response = await fetch(urlReadme.value)
       textEditor.value = await new Promise(async resolve => {
         resolve(response.text())
       })

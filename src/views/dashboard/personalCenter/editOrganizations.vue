@@ -12,10 +12,13 @@
             <small>Non-Profit</small>
           </div>
           <div class="card_right">
-            <el-button size="large" class="token_button" @click="detailSetting">
+            <el-button size="large" class="token_button token_setting" @click="detailSetting">
               <el-icon>
                 <Setting />
               </el-icon>
+            </el-button>
+            <el-button size="large" class="token_button">
+              Leave Organization
             </el-button>
           </div>
         </div>
@@ -55,7 +58,7 @@ export default defineComponent({
 
 
     function detailSetting () {
-      router.push({ name: 'organizationsSettings', params: { menu: 'token' } })
+      router.push({ name: 'organizationsSettings', params: { submenu: 'profile' } })
     }
     onMounted(() => { })
     onActivated(() => {
@@ -112,16 +115,16 @@ export default defineComponent({
       }
     }
     .token_button {
-      padding: 0.13rem 0.3rem;
-      margin: 0.15rem 0;
+      padding: 0.13rem 0.15rem;
+      margin: 0.15rem 0.05rem;
       background: linear-gradient(180deg, #fefefe, #f0f0f0);
       border-color: #e1e1e1;
       border-radius: 0.08rem;
-      font-size: 0.16rem;
+      font-size: 0.15rem;
       color: #606060;
       line-height: 1;
       @media screen and (min-width: 1800px) {
-        font-size: 0.2rem;
+        font-size: 0.17rem;
       }
       span,
       svg,
@@ -156,7 +159,7 @@ export default defineComponent({
         .card_right {
           display: flex;
           align-items: center;
-          .token_button {
+          .token_setting {
             padding: 0.12rem;
             font-size: 0.22rem;
             cursor: pointer;

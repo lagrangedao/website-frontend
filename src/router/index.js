@@ -158,7 +158,7 @@ const routes = [{
                 }
             },
             {
-                path: '/personal_center/organizations/:menu',
+                path: '/personal_center/organizations/:submenu',
                 name: 'organizationsSettings',
                 component: organizationsSettings,
                 meta: {

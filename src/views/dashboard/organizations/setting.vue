@@ -13,26 +13,28 @@
         <div class="left_body">
           <div class="width_div">
             <div v-loading="false" class="logo_sidebar" @click="settingDetail('organizations', 1)">
-              <img :src="accessAvatar || peopleUrl" alt="">
+              <img :src="peopleUrl" alt="">
             </div>
             <div class="personal">
               <div class="title">
-                {{ accessName || '-'}}
+                Organizations name
               </div>
-              <div class="desc">Decentralized data science without borders</div>
+              <div class="desc">Non-Profit</div>
             </div>
           </div>
         </div>
         <div class="left_body">
           <ul>
-            <!-- <li :class="{'is_active':route.params.menu === 'profile'}" @click="settingDetail('profile')">Profile</li> -->
-            <li :class="{'is_active':route.params.menu === 'token'}" @click="settingDetail('token')">Access Tokens</li>
+            <li :class="{'is_active':route.params.submenu === 'profile'}" @click="settingDetail('profile')">Profile</li>
+            <li :class="{'is_active':route.params.submenu === 'account'}" @click="settingDetail('account')">Account</li>
+            <li :class="{'is_active':route.params.submenu === 'token'}" @click="settingDetail('token')">Access Tokens</li>
           </ul>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18" class="right">
-        <edit-profile v-if="route.params.menu === 'profile'"></edit-profile>
-        <edit-token v-else-if="route.params.menu === 'token'"></edit-token>
+        <edit-profile v-if="route.params.submenu === 'profile'"></edit-profile>
+        <edit-account v-else-if="route.params.submenu === 'account'"></edit-account>
+        <edit-token v-else-if="route.params.submenu === 'token'"></edit-token>
       </el-col>
     </el-row>
   </section>
@@ -44,6 +46,7 @@ import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
 import editProfile from './editProfile.vue'
+import editAccount from './editAccount.vue'
 import editToken from './editToken.vue'
 import {
   Plus
@@ -51,7 +54,7 @@ import {
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    Plus, editProfile, editToken
+    Plus, editProfile, editAccount, editToken
   },
   setup () {
     const store = useStore()
@@ -94,7 +97,7 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const logoUrl = require("@/assets/images/icons/logo_w.png")
-    const peopleUrl = require("@/assets/images/dashboard/people_default.png")
+    const peopleUrl = require("@/assets/images/dashboard/setting.png")
     const loading = ref(true)
     const loadingText = ref('')
     const prevType = ref(true)
@@ -185,7 +188,7 @@ export default defineComponent({
     }
     function settingDetail (row, type) {
       if (type) router.push({ name: 'personalCenterProfile', params: { menu: 'organizations' } })
-      else router.push({ name: 'organizationsSettings', params: { menu: row } })
+      else router.push({ name: 'organizationsSettings', params: { submenu: row } })
     }
     onActivated(() => {
       fn()
@@ -318,15 +321,16 @@ export default defineComponent({
           width: 45px;
           height: 45px;
           background-color: #fff;
-          border: 0.03rem solid #7405ff;
-          border-radius: 50%;
+          // border: 0.03rem solid #7405ff;
+          border-radius: 10px;
           overflow: hidden;
           cursor: pointer;
           img {
             display: block;
             width: 100%;
             height: 100%;
-            border-radius: 50%;
+            border-radius: 10px;
+            cursor: pointer;
           }
         }
         .el-loading-mask {
@@ -927,9 +931,10 @@ export default defineComponent({
             .flex-row {
               display: flex;
               align-items: center;
+              flex-wrap: wrap;
               width: 100%;
               .el-select {
-                width: calc(100% - 30px);
+                width: 100%;
               }
               .self-end {
                 width: 30px;
@@ -939,6 +944,13 @@ export default defineComponent({
                 width: 60px;
                 height: 60px;
                 margin: 0.15rem 0 0;
+              }
+              small {
+                display: block;
+                width: 100%;
+                font-size: 12px;
+                color: #afafaf;
+                line-height: 1.5;
               }
             }
             .avatar {
