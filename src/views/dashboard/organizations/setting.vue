@@ -923,6 +923,9 @@ export default defineComponent({
               width: 100%;
               text-align: left;
               color: #565656;
+              @media screen and (min-width: 1800px) {
+                font-size: 16px;
+              }
               .span {
                 margin-left: 0.1rem;
                 color: #aaaaaa;
@@ -951,6 +954,9 @@ export default defineComponent({
                 font-size: 12px;
                 color: #afafaf;
                 line-height: 1.5;
+                @media screen and (min-width: 1800px) {
+                  font-size: 14px;
+                }
               }
             }
             .avatar {
@@ -1003,6 +1009,9 @@ export default defineComponent({
             .el-button {
               font-family: inherit;
               cursor: pointer;
+              @media screen and (min-width: 1800px) {
+                font-size: 16px;
+              }
               span {
                 cursor: pointer;
               }
@@ -1076,7 +1085,7 @@ export default defineComponent({
         right: 0;
         top: 0;
         bottom: 0;
-        width: 1px;
+        width: 0;
         background-color: #c6c6c6;
       }
     }

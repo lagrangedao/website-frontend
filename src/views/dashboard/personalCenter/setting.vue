@@ -29,7 +29,8 @@
             <li :class="{'is_active':route.params.menu === 'account'}" @click="settingDetail('account')">Account</li>
             <li :class="{'is_active':route.params.menu === 'organizations'}" @click="settingDetail('organizations')">Organizations</li>
             <li :class="{'is_active':route.params.menu === 'tokens'}" @click="settingDetail('tokens')">Access Tokens</li>
-            <li :class="{'is_active':route.params.menu === 'computing'}" @click="settingDetail('computing')">As Computing Provider</li>
+            <li :class="{'is_active':route.params.menu === 'client'}" @click="settingDetail('client')">As Client</li>
+            <li :class="{'is_active':route.params.menu === 'computing'}" @click="settingDetail('computing')">Computing Provider</li>
           </ul>
         </div>
       </el-col>
@@ -38,6 +39,7 @@
         <edit-account v-else-if="route.params.menu === 'account'"></edit-account>
         <edit-token v-else-if="route.params.menu === 'tokens'"></edit-token>
         <edit-organizations v-else-if="route.params.menu === 'organizations'"></edit-organizations>
+        <edit-client v-else-if="route.params.menu === 'client'"></edit-client>
         <edit-computing v-else-if="route.params.menu === 'computing'"></edit-computing>
       </el-col>
     </el-row>
@@ -53,6 +55,7 @@ import editProfile from './editProfile.vue'
 import editAccount from './editAccount.vue'
 import editToken from './editToken.vue'
 import editOrganizations from './editOrganizations.vue'
+import editClient from './editClient.vue'
 import editComputing from './editComputing.vue'
 import {
   Plus
@@ -60,7 +63,7 @@ import {
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    Plus, editProfile, editAccount, editToken, editOrganizations, editComputing
+    Plus, editProfile, editAccount, editToken, editOrganizations, editClient, editComputing
   },
   setup () {
     const store = useStore()
@@ -370,6 +373,9 @@ export default defineComponent({
             border-radius: 0.07rem;
             color: #606060;
             font-family: inherit;
+            @media screen and (min-width: 1800px) {
+              font-size: 16px;
+            }
             &:hover {
               opacity: 0.95;
             }
@@ -769,6 +775,7 @@ export default defineComponent({
                   color: #9ca3b1;
                   font-size: 12px;
                   text-align: left;
+                  line-height: 1.3;
                   @media screen and (min-width: 1800px) {
                     font-size: 13px;
                   }
@@ -926,6 +933,9 @@ export default defineComponent({
               width: 100%;
               text-align: left;
               color: #565656;
+              @media screen and (min-width: 1800px) {
+                font-size: 16px;
+              }
               .span {
                 margin-left: 0.1rem;
                 color: #aaaaaa;
@@ -953,6 +963,10 @@ export default defineComponent({
                 width: 100%;
                 font-size: 12px;
                 color: #afafaf;
+                line-height: 1.3;
+                @media screen and (min-width: 1800px) {
+                  font-size: 14px;
+                }
               }
             }
             .avatar {
@@ -969,6 +983,9 @@ export default defineComponent({
               border-radius: 0.07rem;
               color: #606060;
               font-family: inherit;
+              @media screen and (min-width: 1800px) {
+                font-size: 16px;
+              }
               &:hover {
                 opacity: 0.95;
                 border-color: #c37af9;
@@ -1005,6 +1022,9 @@ export default defineComponent({
             .el-button {
               font-family: inherit;
               cursor: pointer;
+              @media screen and (min-width: 1800px) {
+                font-size: 16px;
+              }
               span {
                 cursor: pointer;
               }
@@ -1078,7 +1098,7 @@ export default defineComponent({
         right: 0;
         top: 0;
         bottom: 0;
-        width: 1px;
+        width: 0;
         background-color: #c6c6c6;
       }
     }
