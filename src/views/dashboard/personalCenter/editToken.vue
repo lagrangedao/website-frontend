@@ -169,7 +169,7 @@ export default defineComponent({
       font-size: 0.18rem;
       line-height: 1.5;
       @media screen and (min-width: 1800px) {
-        font-size: 0.22rem;
+        font-size: 0.2rem;
       }
     }
     .desc {
@@ -178,7 +178,7 @@ export default defineComponent({
       line-height: 1.5;
       color: #606060;
       @media screen and (min-width: 1800px) {
-        font-size: 0.2rem;
+        font-size: 0.18rem;
       }
     }
     .token_button {
@@ -191,7 +191,7 @@ export default defineComponent({
       color: #606060;
       line-height: 1;
       @media screen and (min-width: 1800px) {
-        font-size: 0.2rem;
+        font-size: 0.18rem;
       }
     }
     .card {
@@ -208,7 +208,7 @@ export default defineComponent({
         font-size: 0.18rem;
         color: #565656;
         @media screen and (min-width: 1800px) {
-          font-size: 0.22rem;
+          font-size: 0.2rem;
         }
         .face {
           width: 0.3rem;

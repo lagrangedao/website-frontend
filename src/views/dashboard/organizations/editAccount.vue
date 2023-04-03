@@ -309,7 +309,7 @@ export default defineComponent({
   max-width: 850px;
   padding: 0 0 0.2rem;
   .label {
-    font-size: 0.18rem;
+    font-size: 0.16rem;
     &.label_title {
       color: #000 !important;
     }
@@ -329,9 +329,15 @@ export default defineComponent({
   :deep(.delete_body) {
     width: 40%;
     max-width: 770px;
-    min-width: 300px;
+    min-width: 310px;
     border-radius: 0.13rem;
     text-align: left;
+    @media screen and (max-width: 768px) {
+      width: 60%;
+    }
+    @media screen and (max-width: 441px) {
+      width: 90%;
+    }
     .el-dialog__header {
       padding: 0.17rem 0.25rem 0.1rem;
       font-size: 17px;
