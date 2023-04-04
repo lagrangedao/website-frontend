@@ -303,7 +303,7 @@ export default defineComponent({
       if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) getdataList()
-        else window.location.reload()
+        // else window.location.reload()
         return false
       } else loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
       // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')

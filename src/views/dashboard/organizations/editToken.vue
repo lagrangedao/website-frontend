@@ -180,7 +180,7 @@ export default defineComponent({
       font-size: 0.18rem;
       line-height: 1.5;
       @media screen and (min-width: 1800px) {
-        font-size: 0.22rem;
+        font-size: 0.2rem;
       }
     }
     .desc {
@@ -189,7 +189,7 @@ export default defineComponent({
       line-height: 1.5;
       color: #606060;
       @media screen and (min-width: 1800px) {
-        font-size: 0.2rem;
+        font-size: 0.18rem;
       }
       a {
         text-decoration: underline;
@@ -223,7 +223,7 @@ export default defineComponent({
         font-size: 0.18rem;
         color: #565656;
         @media screen and (min-width: 1800px) {
-          font-size: 0.22rem;
+          font-size: 0.2rem;
         }
         .face {
           width: 0.3rem;
@@ -237,6 +237,9 @@ export default defineComponent({
           background: linear-gradient(180deg, #fefefe, #f0f0f0);
           border-color: #e1e1e1;
           border-radius: 0.08rem;
+          @media screen and (min-width: 1800px) {
+            font-size: 16px;
+          }
           .el-input {
             border-color: #ececed;
             .el-input__inner {
@@ -244,6 +247,9 @@ export default defineComponent({
               background: linear-gradient(180deg, #fefefe, #f0f0f0);
               border-color: #e1e1e1;
               border-radius: 0.05rem;
+              @media screen and (min-width: 1800px) {
+                font-size: 16px;
+              }
             }
           }
         }
