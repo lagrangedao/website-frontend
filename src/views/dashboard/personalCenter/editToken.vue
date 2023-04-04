@@ -180,6 +180,9 @@ export default defineComponent({
       @media screen and (min-width: 1800px) {
         font-size: 0.18rem;
       }
+      @media screen and (max-width: 441px) {
+        font-size: 14px;
+      }
     }
     .token_button {
       padding: 0.13rem 0.3rem;
@@ -192,6 +195,9 @@ export default defineComponent({
       line-height: 1;
       @media screen and (min-width: 1800px) {
         font-size: 0.18rem;
+      }
+      @media screen and (max-width: 441px) {
+        font-size: 14px;
       }
     }
     .card {

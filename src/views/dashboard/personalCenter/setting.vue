@@ -309,8 +309,35 @@ export default defineComponent({
       position: relative;
       padding: 0.2rem 0;
       background-color: #fbfbfc;
-      border: 1px solid #eee;
+      border: 1px solid #e0e1e2;
       border-radius: 0.1rem;
+      @media screen and (min-height: 600px) {
+        min-height: 480px;
+      }
+      @media screen and (min-height: 700px) {
+        min-height: 610px;
+      }
+      @media screen and (min-height: 750px) {
+        min-height: 580px;
+      }
+      @media screen and (min-height: 768px) {
+        min-height: 600px;
+      }
+      @media screen and (min-height: 900px) {
+        min-height: 700px;
+      }
+      @media screen and (min-height: 1000px) {
+        min-height: 820px;
+      }
+      @media screen and (min-height: 1100px) {
+        min-height: 900px;
+      }
+      @media screen and (min-height: 1200px) {
+        min-height: 1000px;
+      }
+      @media screen and (max-width: 992px) {
+        min-height: auto;
+      }
       .left_body {
         padding: 0.15rem 0 0;
         margin: 0 auto;
@@ -415,10 +442,10 @@ export default defineComponent({
         }
         ul {
           width: 100%;
-          border-top: 1px solid #eee;
+          border-top: 1px solid #e0e1e2;
           li {
             padding: 0.12rem 5%;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e0e1e2;
             color: #000;
             font-family: "Helvetica-light";
             font-size: 14px;
@@ -777,7 +804,7 @@ export default defineComponent({
                   text-align: left;
                   line-height: 1.3;
                   @media screen and (min-width: 1800px) {
-                    font-size: 13px;
+                    font-size: 14px;
                   }
                 }
                 .el-row {
@@ -931,10 +958,11 @@ export default defineComponent({
               display: flex;
               align-items: center;
               width: 100%;
+              font-size: 16px;
               text-align: left;
               color: #565656;
               @media screen and (min-width: 1800px) {
-                font-size: 16px;
+                font-size: 18px;
               }
               .span {
                 margin-left: 0.1rem;
@@ -990,12 +1018,15 @@ export default defineComponent({
                 opacity: 0.95;
                 border-color: #c37af9;
               }
+              &.is-disabled {
+                opacity: 0.7;
+              }
             }
             .el-radio-group {
               width: 100%;
               margin: 0.2rem 0 0;
-              border-top: 1px solid #eee;
-              border-bottom: 1px solid #eee;
+              border-top: 1px solid #e0e1e2;
+              border-bottom: 1px solid #e0e1e2;
               .el-radio {
                 width: 100%;
                 height: auto;

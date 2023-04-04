@@ -310,6 +310,9 @@ export default defineComponent({
   padding: 0 0 0.2rem;
   .label {
     font-size: 0.16rem;
+    @media screen and (max-width: 441px) {
+      font-size: 14px;
+    }
     &.label_title {
       color: #000 !important;
     }
@@ -321,6 +324,9 @@ export default defineComponent({
     font-size: 0.16rem;
     color: #606060;
     line-height: 1.5;
+    @media screen and (max-width: 441px) {
+      font-size: 14px;
+    }
   }
   .avatar-uploader {
     margin-top: 0.15rem;
