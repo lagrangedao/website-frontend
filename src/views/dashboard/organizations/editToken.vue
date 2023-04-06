@@ -191,6 +191,9 @@ export default defineComponent({
       @media screen and (min-width: 1800px) {
         font-size: 0.18rem;
       }
+      @media screen and (max-width: 441px) {
+        font-size: 14px;
+      }
       a {
         text-decoration: underline;
       }
@@ -206,6 +209,9 @@ export default defineComponent({
       line-height: 1;
       @media screen and (min-width: 1800px) {
         font-size: 0.2rem;
+      }
+      @media screen and (max-width: 441px) {
+        font-size: 14px;
       }
     }
     .card {

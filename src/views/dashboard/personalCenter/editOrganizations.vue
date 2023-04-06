@@ -113,6 +113,9 @@ export default defineComponent({
       @media screen and (min-width: 1800px) {
         font-size: 0.2rem;
       }
+      @media screen and (max-width: 441px) {
+        font-size: 14px;
+      }
     }
     .token_button {
       padding: 0.13rem 0.15rem;
@@ -154,6 +157,10 @@ export default defineComponent({
           margin-right: 0.05rem;
           background-color: #7405ff;
           border-radius: 0.05rem;
+          @media screen and (max-width: 441px) {
+            width: 0.45rem;
+            height: 0.45rem;
+          }
         }
         .card_left,
         .card_right {

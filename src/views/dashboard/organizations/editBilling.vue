@@ -3,200 +3,64 @@
     <el-row>
       <el-col :span="24">
         <div class="list">
-          <div class="title">As Client</div>
+          <div class="title">Billing</div>
         </div>
         <div class="token_list">
           <el-tabs v-model="activeName" class="demo-tabs">
-            <el-tab-pane label="Profile" name="profile">
+            <el-tab-pane label="Overview" name="overview">
               <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
-                <el-form-item prop="name">
-                  <label class="label" for="dataname">
-                    Username
-                  </label>
-                  <div class="flex flex-row">
-                    <el-input v-model="ruleForm.name" placeholder="Username" />
-                  </div>
-                </el-form-item>
                 <el-form-item prop="email">
                   <label class="label" for="dataname">
-                    Primary email
+                    Email
                   </label>
                   <div class="flex flex-row">
-                    <el-input v-model="ruleForm.email" placeholder="Primary email" />
-                    <small>We will use this email to communicate with you. This is also the email to use to authenticate on hf.co.</small>
-                  </div>
-                </el-form-item>
-                <el-form-item prop="avatar">
-                  <label class="label">
-                    Logo
-                    <span class="span">(optional)</span>
-                  </label>
-                  <div class="flex flex-row">
-                    <el-upload class="avatar-uploader" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" action="#" :auto-upload="false">
-                      <!-- <img v-if="ruleForm.avatar" :src="ruleForm.avatar" class="avatar" /> -->
-                      <el-button class="avatar-uploader-icon" type="" text bg>Upload file</el-button>
-                    </el-upload>
+                    <el-input v-model="ruleForm.email" placeholder="Email address" />
+                    <small>Add an email address to this organization to start using our services </small>
                   </div>
                 </el-form-item>
                 <el-form-item prop="">
                   <div class="flex flex-row">
                     <div class="avatar-uploader">
-                      <el-button class="avatar-uploader-icon uploader-btn" type="" text bg>Save changes</el-button>
+                      <el-button class="avatar-uploader-icon uploader-btn" type="" text bg>Add Email address</el-button>
                     </div>
                   </div>
                 </el-form-item>
               </el-form>
             </el-tab-pane>
-            <el-tab-pane label="Password" name="password">
+            <el-tab-pane label="Payment information" name="payment_information">
               <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
-                <el-form-item prop="name">
-                  <label class="label" for="password">
-                    Current Password
+                <el-form-item prop="email">
+                  <label class="label" for="dataname">
+                    Email
                   </label>
                   <div class="flex flex-row">
-                    <el-input v-model="ruleForm.password" placeholder="Old Password" />
-                  </div>
-                </el-form-item>
-                <el-form-item prop="new_password">
-                  <label class="label" for="new_password">
-                    New Password
-                  </label>
-                  <div class="flex flex-row">
-                    <el-input v-model="ruleForm.new_password" placeholder="New Password" />
-                  </div>
-                </el-form-item>
-                <el-form-item prop="new_password_again">
-                  <label class="label" for="new_password_again">
-                    Reenter New Password
-                  </label>
-                  <div class="flex flex-row">
-                    <el-input v-model="ruleForm.new_password_again" placeholder="Confirm Password" />
+                    <el-input v-model="ruleForm.email" placeholder="Email address" />
+                    <small>Add an email address to this organization to start using our services </small>
                   </div>
                 </el-form-item>
                 <el-form-item prop="">
                   <div class="flex flex-row">
                     <div class="avatar-uploader">
-                      <el-button class="avatar-uploader-icon uploader-btn" type="" text bg>Save changes</el-button>
+                      <el-button class="avatar-uploader-icon uploader-btn" type="" text bg>Add Email address</el-button>
+                    </div>
+                  </div>
+                </el-form-item>
+                <el-form-item prop="">
+                  <div class="card">
+                    <div class="card_header">
+                      <h4>Payment method </h4>
+                      <h5>There is no payment method for this account. </h5>
+                    </div>
+                  </div>
+                </el-form-item>
+                <el-form-item prop="">
+                  <div class="flex flex-row">
+                    <div class="avatar-uploader">
+                      <el-button class="avatar-uploader-icon uploader-btn" type="" text bg disabled>Add a Payment method</el-button>
                     </div>
                   </div>
                 </el-form-item>
               </el-form>
-            </el-tab-pane>
-            <el-tab-pane label="Payment" name="payment">
-              <div class="card">
-                <div class="card_header">
-                  <div class="card_left">
-                    <div class="face"></div>
-                    <div class="name">
-                      User Name
-                      <small>No Data</small>
-                    </div>
-                  </div>
-                  <div class="card_right">
-                    <el-button size="large" class="token_button token_setting" @click="settingShow=true">
-                      <el-icon>
-                        <Setting />
-                      </el-icon>
-                    </el-button>
-                  </div>
-                </div>
-              </div>
-            </el-tab-pane>
-            <el-tab-pane label="Developer Setting" name="developer_setting">
-              <div class="user_contRight">
-                <h4>Your API keys</h4>
-                <h6>API keys provide full access to your swan account, so keep them safe.
-                  <a href="javascript:;" @click="apiTips=true">Tips on keeping API keys secure.</a>
-                  <a href="javascript:;" target="_blank">How to use API key.</a>
-                </h6>
-                <div class="form_table">
-                  <el-button type="primary" class="new_api" @click="addVisible=true">New API Key</el-button>
-                  <el-table :data="toolData" style="width: 100%" empty-text="No Data" class="table_cell">
-                    <el-table-column prop="key_name" label="NAME"></el-table-column>
-
-                    <el-table-column prop="apikey" label="KEY"></el-table-column>
-                    <el-table-column prop="token" label="ACCESS TOKEN">
-                      <template>*******</template>
-                    </el-table-column>
-                    <el-table-column prop="created_on" label="DATA CREATED">
-                      <template #default="scope">
-                        <div style="">
-                          {{scope.row.created_on}}
-                        </div>
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="status" label="STATUS" width="85"></el-table-column>
-                    <el-table-column prop="qr_code" width="85" label="">
-                      <template #default="scope">
-                        <div class="revoke">
-                          <el-button type="danger" :disabled="scope.row.status == 'Deleted'?true:false" @click="deleteApiKey(scope.row.apikey)">{{$t('my_profile.apiKey_btn_02')}}</el-button>
-                        </div>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </div>
-              </div>
-            </el-tab-pane>
-            <el-tab-pane label="Payment Method" name="payment_method">
-              <div class="rightCont">
-                <h3>NBAI Wallet</h3>
-                <div class="main_second">
-                  <el-button type="primary">
-                    <el-icon>
-                      <CirclePlusFilled />
-                    </el-icon>
-                    Add a card</el-button>
-                  <div class="main_second_right">
-                    <h5>*You can only add a Canadian credit cards.</h5>
-                    <h5>*To verify your credit card, we will charge $0.01 from your card.</h5>
-                  </div>
-                </div>
-                <div class="main_six">
-                  <h2>Credit Cards</h2>
-                </div>
-
-                <el-form :model="ruleFormSecond" status-icon :rules="rulesSecond" ref="ruleFormSecond" class="demo-ruleForm">
-                  <el-form-item label="Card number*" prop="cardNumber" :class="{'borderColor': ruleFormSecond.cardNumber_tip}">
-                    <el-input v-model="ruleFormSecond.cardNumber" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" autocomplete="off"></el-input>
-                  </el-form-item>
-                  <el-form-item label="Expiration date*" prop="expiration">
-                    <el-col :span="24" style="display: flex;justify-content: space-between;">
-                      <el-select v-model="expiration_month" placeholder="">
-                        <el-option v-for="item in expiration_month_options" :key="item.value" :label="item.label" :value="item.value">
-                        </el-option>
-                      </el-select>
-
-                      <el-select v-model="expiration_year" placeholder="">
-                        <el-option v-for="item in expiration_year_options" :key="item.value" :label="item.label" :value="item.value">
-                        </el-option>
-                      </el-select>
-                    </el-col>
-                  </el-form-item>
-                  <el-form-item label="CVV*" prop="cvd">
-                    <el-input type="text" v-model="ruleFormSecond.cvd" autocomplete="off"></el-input>
-                  </el-form-item>
-                  <el-form-item label="Phone*" prop="cphone" :class="{'borderColor': ruleFormSecond.cphone_tip}">
-                    <el-input v-model="ruleFormSecond.cphone" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" autocomplete="off"></el-input>
-                  </el-form-item>
-                  <el-form-item label="Email*" prop="cemail">
-                    <el-input type="text" v-model="ruleFormSecond.cemail" autocomplete="off"></el-input>
-                  </el-form-item>
-                  <el-form-item label="Street number*" prop="streetnumber">
-                    <el-input type="text" v-model="ruleFormSecond.streetnumber" autocomplete="off"></el-input>
-                  </el-form-item>
-                  <el-form-item label="Street name*" prop="streetname">
-                    <el-input type="text" v-model="ruleFormSecond.streetname" autocomplete="off"></el-input>
-                  </el-form-item>
-                  <el-form-item label="ZIP*" prop="postcode">
-                    <el-input type="text" v-model="ruleFormSecond.postcode" autocomplete="off"></el-input>
-                  </el-form-item>
-
-                  <el-form-item label=" " class="">
-                    <el-button class="avatar-uploader-icon" type="" text bg disabled>Add Credit card</el-button>
-                    <el-button class="avatar-uploader-icon" type="" text bg>Cancel</el-button>
-                  </el-form-item>
-                </el-form>
-              </div>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -276,7 +140,7 @@ export default defineComponent({
     const settingShow = ref(false)
     const apiToken = ref('')
     const spData = ref([])
-    const activeName = ref('profile')
+    const activeName = ref('overview')
     const multipleSelection = ref([])
     const multipleTableRef = ref(null)
     const ruleForm = reactive({
@@ -586,51 +450,40 @@ export default defineComponent({
       }
     }
     .card {
-      width: calc(100% - 0.24rem - 2px);
-      padding: 0.12rem;
-      margin: 0.2rem 0;
-      background: linear-gradient(180deg, #fefefe, #f0f0f0);
+      width: calc(100% - 0.4rem - 2px);
+      padding: 0.12rem 0.2rem;
+      margin: 0.2rem 0 0;
+      background: #fff;
       border: 1px solid #e1e1e1;
       border-radius: 0.05rem;
       .card_header {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        flex-wrap: wrap;
         font-size: 0.18rem;
         color: #565656;
         @media screen and (min-width: 1800px) {
           font-size: 0.22rem;
         }
-        .face {
-          width: 0.6rem;
-          height: 0.6rem;
-          margin-right: 0.05rem;
-          background-color: #7405ff;
-          border-radius: 0.05rem;
-        }
-        .card_left,
-        .card_right {
-          display: flex;
-          align-items: center;
-          .token_setting {
-            padding: 0.12rem;
-            font-size: 0.22rem;
-            cursor: pointer;
+        h4 {
+          width: 100%;
+          font-size: 0.18rem;
+          font-weight: normal;
+          color: #000;
+          line-height: 1.5;
+          @media screen and (min-width: 1800px) {
+            font-size: 0.2rem;
           }
         }
-        .card_left {
-          align-items: stretch;
-          color: #606060;
-          .name {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-left: 0.1rem;
-            color: #565656;
-            small {
-              display: block;
-              width: 100%;
-            }
+        h5 {
+          width: 100%;
+          font-size: 0.1514rem;
+          font-weight: normal;
+          color: #000;
+          line-height: 1.5;
+          @media screen and (min-width: 1800px) {
+            font-size: 0.175rem;
           }
         }
       }
@@ -899,6 +752,9 @@ export default defineComponent({
           font-size: 0.16rem;
           @media screen and (max-width: 768px) {
             font-size: 14px;
+          }
+          &.is-disabled {
+            opacity: 0.7;
           }
         }
         .revoke {

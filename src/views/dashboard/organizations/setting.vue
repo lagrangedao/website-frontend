@@ -27,6 +27,8 @@
           <ul>
             <li :class="{'is_active':route.params.submenu === 'profile'}" @click="settingDetail('profile')">Profile</li>
             <li :class="{'is_active':route.params.submenu === 'account'}" @click="settingDetail('account')">Account</li>
+            <li :class="{'is_active':route.params.submenu === 'members'}" @click="settingDetail('members')">Members</li>
+            <li :class="{'is_active':route.params.submenu === 'billing'}" @click="settingDetail('billing')">Billing</li>
             <li :class="{'is_active':route.params.submenu === 'token'}" @click="settingDetail('token')">Access Tokens</li>
           </ul>
         </div>
@@ -34,6 +36,8 @@
       <el-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18" class="right">
         <edit-profile v-if="route.params.submenu === 'profile'"></edit-profile>
         <edit-account v-else-if="route.params.submenu === 'account'"></edit-account>
+        <edit-members v-else-if="route.params.submenu === 'members'"></edit-members>
+        <edit-billing v-else-if="route.params.submenu === 'billing'"></edit-billing>
         <edit-token v-else-if="route.params.submenu === 'token'"></edit-token>
       </el-col>
     </el-row>
@@ -47,6 +51,8 @@ import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
 import editProfile from './editProfile.vue'
 import editAccount from './editAccount.vue'
+import editMembers from './editMembers.vue'
+import editBilling from './editBilling.vue'
 import editToken from './editToken.vue'
 import {
   Plus
@@ -54,7 +60,7 @@ import {
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    Plus, editProfile, editAccount, editToken
+    Plus, editProfile, editAccount, editMembers, editBilling, editToken
   },
   setup () {
     const store = useStore()
@@ -301,8 +307,35 @@ export default defineComponent({
       position: relative;
       padding: 0.2rem 0;
       background-color: #fbfbfc;
-      border: 1px solid #eee;
+      border: 1px solid #e0e1e2;
       border-radius: 0.1rem;
+      @media screen and (min-height: 600px) {
+        min-height: 480px;
+      }
+      @media screen and (min-height: 700px) {
+        min-height: 610px;
+      }
+      @media screen and (min-height: 750px) {
+        min-height: 580px;
+      }
+      @media screen and (min-height: 768px) {
+        min-height: 600px;
+      }
+      @media screen and (min-height: 900px) {
+        min-height: 700px;
+      }
+      @media screen and (min-height: 1000px) {
+        min-height: 820px;
+      }
+      @media screen and (min-height: 1100px) {
+        min-height: 900px;
+      }
+      @media screen and (min-height: 1200px) {
+        min-height: 1000px;
+      }
+      @media screen and (max-width: 992px) {
+        min-height: auto;
+      }
       .left_body {
         padding: 0.15rem 0 0;
         margin: 0 auto;
@@ -406,10 +439,10 @@ export default defineComponent({
         }
         ul {
           width: 100%;
-          border-top: 1px solid #eee;
+          border-top: 1px solid #e0e1e2;
           li {
             padding: 0.12rem 5%;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e0e1e2;
             color: #000;
             font-family: "Helvetica-light";
             font-size: 14px;
@@ -767,7 +800,7 @@ export default defineComponent({
                   font-size: 12px;
                   text-align: left;
                   @media screen and (min-width: 1800px) {
-                    font-size: 13px;
+                    font-size: 14px;
                   }
                 }
                 .el-row {
@@ -921,10 +954,11 @@ export default defineComponent({
               display: flex;
               align-items: center;
               width: 100%;
+              font-size: 16px;
               text-align: left;
               color: #565656;
               @media screen and (min-width: 1800px) {
-                font-size: 16px;
+                font-size: 18px;
               }
               .span {
                 margin-left: 0.1rem;
@@ -977,12 +1011,15 @@ export default defineComponent({
                 opacity: 0.95;
                 border-color: #c37af9;
               }
+              &.is-disabled {
+                opacity: 0.7;
+              }
             }
             .el-radio-group {
               width: 100%;
               margin: 0.2rem 0 0;
-              border-top: 1px solid #eee;
-              border-bottom: 1px solid #eee;
+              border-top: 1px solid #e0e1e2;
+              border-bottom: 1px solid #e0e1e2;
               .el-radio {
                 width: 100%;
                 height: auto;
