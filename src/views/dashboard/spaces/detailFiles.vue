@@ -453,24 +453,21 @@ export default defineComponent({
       if (fileList.value.length === 0) return
       await ruleFormRef.value.validate(async (valid, fields) => {
         if (valid) {
-          // console.log('fileTitle:',fileRow.fileTitle)
-          //           return
           uploadLoad.value = true
           let fd = new FormData()
           fileList.value.forEach(file => {
-            // console.log('file', file)
             let name = pathList.value.join('/') || ''
             let fileNew = new File([file.raw], `${name ? name + '/' : ''}${file.name}`)
             fd.append('file', fileNew, `${name ? name + '/' : ''}${file.name}`)
-            // console.log('file', fileNew)
           })
           // fd.append("is_public", listdata.value.is_public)
           // fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
           const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files`, 'put', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
-            if (uploadRes.data.job) system.$commonFun.messageTip('success', 'Upload files successfully!')
-            else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+            system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
+            // if (uploadRes.data.job) system.$commonFun.messageTip('success', 'Upload files successfully!')
+            // else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
           init()
@@ -498,8 +495,9 @@ export default defineComponent({
           const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files`, 'put', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
-            if (uploadRes.data.job) system.$commonFun.messageTip('success', 'Upload files successfully!')
-            else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+            system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
+            // if (uploadRes.data.job) system.$commonFun.messageTip('success', 'Upload files successfully!')
+            // else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
           init()
@@ -530,8 +528,9 @@ export default defineComponent({
       const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files`, 'put', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
-        if (uploadRes.data.job) system.$commonFun.messageTip('success', `${type === 'create' ? 'Create ' + textInfo.name + ' successfully!' : 'Update ' + fileBody.title + ' successfully!'}`)
-        else system.$commonFun.messageTip('error', uploadRes.message)
+        system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
+        // if (uploadRes.data.job) system.$commonFun.messageTip('success', `${type === 'create' ? 'Create ' + textInfo.name + ' successfully!' : 'Update ' + fileBody.title + ' successfully!'}`)
+        // else system.$commonFun.messageTip('error', uploadRes.message)
       } else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
       reset()
       init()

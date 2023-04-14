@@ -2,8 +2,7 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body" v-loading="listLoad">
-        <iframe v-if="listdata.job_result_uri" :src="listdata.job_result_uri" title="Space app" class="space_iframe" allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; clipboard-write; document-domain; encrypted-media; fullscreen; geolocation; gyroscope; layout-animations; legacy-image-formats; magnetometer; microphone; midi; oversized-images; payment; picture-in-picture; publickey-credentials-get; sync-xhr; usb; vr ; wake-lock; xr-spatial-tracking"
-          sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-downloads" scrolling="yes" id="iFrameResizer0" style="overflow: auto;"></iframe>
+        <iframe v-if="listdata.job_result_uri" :src="listdata.job_result_uri" title="Space app" class="space_iframe"></iframe>
       </el-row>
     </div>
   </section>
@@ -54,10 +53,6 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }
-    async function getData () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
-      console.log(listRes)
-    }
     onActivated(() => { })
     onMounted(() => {
       window.scrollTo(0, 0)
@@ -79,7 +74,7 @@ export default defineComponent({
       system,
       route,
       router,
-      init, getData, handleClick
+      init, handleClick
     }
   }
 })
@@ -117,6 +112,7 @@ export default defineComponent({
     }
     .space_iframe {
       width: 100%;
+      overflow: auto;
       @media screen and (min-height: 500px) and (min-width: 769px) {
         min-height: 215px;
       }
