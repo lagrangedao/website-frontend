@@ -70,7 +70,7 @@
         <div class="foot_media">
           <a href="https://t.me/datadao" target="_blank"><img :src="share_telegram" alt=""></a>
           <a href="https://twitter.com/lagrangedao" target="_blank"><img :src="share_twitter" alt=""></a>
-          <a href="https://discord.gg/65EDgfKgVS" target="_blank"><img :src="share_discord" alt=""></a>
+          <a href="https://discord.gg/8vaB6rKSAu" target="_blank"><img :src="share_discord" alt=""></a>
           <a href="https://github.com/lagrangedao" target="_blank"><img :src="share_github" alt=""></a>
         </div>
       </footer>

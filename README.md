@@ -44,21 +44,13 @@ Navigate to `http://localhost:8080/`. The app will automatically reload if you c
 ## Build project
 
 ```shell
-# Node version below 17
 # Build test projects
-$ npm run build:test
+$ npm run build:test_t / npm run build:test_u / npm run build:test
 
-# Build semi prod projects
-$ npm run build:prod
-
-# Node version 17 and above
-# Build test projects
-$ npm run build:test_t # (windows system)
-$ npm run build:test_u
-
-# Build semi prod projects
-$ npm run build:prod_t # (windows system)
-$ npm run build:prod_u
+# Build production projects
+$ npm run build:prod_t / npm run build:prod_u / npm run build:prod
+# You can use the npm run build command without any suffix if you are using a version of Node lower than 16, or you should use the command with the suffix name if you are using a version higher than 16
+# The only difference between _t and _u is that _t uses the set keyword while _u uses the export keyword, and how you use it depends on which keyword your system supports.
 ```
 
 The build artifacts will be stored in the `dist_test/dist_prod` directory.
