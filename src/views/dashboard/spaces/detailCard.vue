@@ -2,9 +2,7 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body" v-loading="listLoad">
-        <el-col :span="24" class="space_iframe space_text" v-if="listdata.job_result_uri">
-          {{listdata.job_result_uri}}
-        </el-col>
+        <iframe v-if="listdata.job_result_uri" :src="listdata.job_result_uri" title="Space app" class="space_iframe"></iframe>
       </el-row>
     </div>
   </section>
@@ -49,7 +47,13 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         const jobData = listRes.data.job || { job_result_uri: '' }
-        listdata.job_result_uri = jobData.job_result_uri
+        if (jobData.job_result_uri) {
+          const response = await fetch(jobData.job_result_uri)
+          const textUri = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          listdata.job_result_uri = JSON.parse(textUri).job_result_uri
+        } else listdata.job_result_uri = jobData.job_result_uri
         context.emit('handleValue', listRes.data.space.status)
       }
       await system.$commonFun.timeout(500)
