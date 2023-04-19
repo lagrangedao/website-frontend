@@ -2,7 +2,9 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body" v-loading="listLoad">
-        <iframe v-if="listdata.job_result_uri" :src="listdata.job_result_uri" title="Space app" class="space_iframe"></iframe>
+        <el-col :span="24" class="space_iframe space_text" v-if="listdata.job_result_uri">
+          {{listdata.job_result_uri}}
+        </el-col>
       </el-row>
     </div>
   </section>
@@ -142,6 +144,21 @@ export default defineComponent({
       }
       @media screen and (min-height: 1200px) and (min-width: 769px) {
         min-height: 885px;
+      }
+      &.space_text {
+        padding: 11px;
+        background-color: #000;
+        font-size: 14px;
+        color: #fff;
+        box-shadow: inset 0 5px 5px rgba(204, 204, 204, 0.55);
+        cursor: text;
+        word-break: break-all;
+        @media screen and (min-width: 1800px) {
+          font-size: 16px;
+        }
+        @media screen and (max-width: 600px) {
+          font-size: 13px;
+        }
       }
     }
     .readme_text {
