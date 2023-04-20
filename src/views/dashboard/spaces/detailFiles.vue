@@ -306,7 +306,7 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         fileRow.fileResdata = listRes.data.files || []
         listdata.value = listRes.data.space || { name: route.params.name }
-        context.emit('handleValue', listRes.data.space.status)
+        context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '')
 
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)

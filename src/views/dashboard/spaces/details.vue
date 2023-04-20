@@ -13,6 +13,11 @@
             <el-button>0</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
+          <div class="logs_style" v-if="logsValue" @click="drawer = true">
+            <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+              <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+            </svg> Logs
+          </div>
         </div>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
@@ -58,6 +63,15 @@
         </el-tab-pane>
       </el-tabs>
     </div>
+
+    <el-drawer title="Logs" v-model="drawer" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style">
+      <template #default>
+        <div>
+          {{logsCont.data.job}}
+          <br /> {{logsCont.data.task}}
+        </div>
+      </template>
+    </el-drawer>
   </section>
 </template>
 <script>
@@ -179,6 +193,12 @@ export default defineComponent({
     ])
     const settingOneself = ref(false)
     const parentValue = ref('')
+    const drawer = ref(false)
+    const direction = ref('btt')
+    const logsValue = ref('')
+    const logsCont = reactive({
+      data: {}
+    })
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { name: route.params.name, tabs: tab.props.name } })
@@ -223,14 +243,24 @@ export default defineComponent({
       }
       return false
     }
-    const handleValue = value => {
+    const handleValue = async (value, log) => {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
+      if (log) {
+        const response = await fetch(log)
+        const textUri = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        logsValue.value = log
+        logsCont.data = textUri ? JSON.parse(textUri).data : {}
+      } else logsValue.value = ''
       parentValue.value = numRe.test(value) ? '' : value
     }
     onActivated(() => {
       activeName.value = route.params.tabs || 'card'
       parentValue.value = ''
+      logsValue.value = ''
+      logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
     })
@@ -254,7 +284,7 @@ export default defineComponent({
       router,
       settingOneself,
       tableData,
-      parentValue, handleValue,
+      parentValue, drawer, direction, logsValue, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName
     }
   }
@@ -393,6 +423,42 @@ export default defineComponent({
               to {
                 opacity: 0.5;
               }
+            }
+          }
+        }
+        .logs_style {
+          position: relative;
+          display: flex;
+          align-items: center;
+          padding: 0.05rem 0.05rem;
+          margin: 0 0.07rem 0 0;
+          background-color: transparent;
+          color: #878c93;
+          border: 1px solid rgba(229, 231, 235, 1);
+          border-radius: 0.05rem;
+          font-size: 14px;
+          line-height: 1;
+          cursor: pointer;
+          @media screen and (max-width: 1600px) {
+            font-size: 13px;
+          }
+          @media screen and (max-width: 441px) {
+            font-size: 12px;
+          }
+          &:hover {
+            background-color: #f7f7f7;
+          }
+          svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 0.05rem;
+            @media screen and (max-width: 1600px) {
+              width: 13px;
+              height: 13px;
+            }
+            @media screen and (max-width: 441px) {
+              width: 12px;
+              height: 12px;
             }
           }
         }
@@ -550,6 +616,22 @@ export default defineComponent({
   }
 }
 </style>
+<style lang="scss">
+.drawer_style {
+  padding-bottom: 15px;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.5;
+  .el-drawer__header {
+    padding-top: 15px;
+    font-size: 16px;
+    margin-bottom: 0;
+    line-height: 1;
+    color: #000;
+  }
+}
+</style>
+
 
 
 <i18n>
