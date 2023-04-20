@@ -54,7 +54,7 @@ export default defineComponent({
           })
           listdata.job_result_uri = JSON.parse(textUri).job_result_uri
         } else listdata.job_result_uri = jobData.job_result_uri
-        context.emit('handleValue', listRes.data.space.status)
+        context.emit('handleValue', listRes.data.space.status, jobData ? jobData.job_source_uri : '')
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
