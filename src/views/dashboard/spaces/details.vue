@@ -201,7 +201,7 @@ export default defineComponent({
     })
 
     function handleClick (tab, event) {
-      router.push({ name: 'spaceDetail', params: { name: route.params.name, tabs: tab.props.name } })
+      router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }

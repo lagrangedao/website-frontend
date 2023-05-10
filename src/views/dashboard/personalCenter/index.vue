@@ -377,9 +377,8 @@ export default defineComponent({
       return system.$commonFun.momentFun(dateItem)
     }
     function detailFun (row, type) {
-      // console.log(row, index)
       if (type === 'dataset') router.push({ name: 'datasetDetail', params: { name: row.name, tabs: 'card' } })
-      else if (type === 'space') router.push({ name: 'spaceDetail', params: { name: row.name, tabs: 'card' } })
+      else if (type === 'space') router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'model') router.push({ name: 'modelsDetail', params: { name: row.name, tabs: 'card' } })
     }
     function editProfile (row, index) {

@@ -98,7 +98,7 @@ const routes = [{
                 }
             },
             {
-                path: '/spaces/:name/:tabs',
+                path: '/spaces/:wallet_address/:name/:tabs',
                 name: 'spaceDetail',
                 component: spaceDetail,
                 meta: {
