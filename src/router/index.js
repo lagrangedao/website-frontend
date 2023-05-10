@@ -58,7 +58,7 @@ const routes = [{
                 }
             },
             {
-                path: '/datasets/:name/:tabs',
+                path: '/datasets/:wallet_address/:name/:tabs',
                 name: 'datasetDetail',
                 component: datasetDetail,
                 meta: {
