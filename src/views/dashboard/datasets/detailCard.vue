@@ -347,7 +347,7 @@ export default defineComponent({
       ]
     }
     async function getData () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       console.log(listRes)
     }
     function detailFun (row, index) {

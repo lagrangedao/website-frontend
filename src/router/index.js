@@ -74,7 +74,7 @@ const routes = [{
                 }
             },
             {
-                path: '/models/:name/:tabs',
+                path: '/models/:wallet_address/:name/:tabs',
                 name: 'modelsDetail',
                 component: modelsDetail,
                 meta: {
