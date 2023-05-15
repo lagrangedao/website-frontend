@@ -230,7 +230,7 @@ export default defineComponent({
     }
     function detailFun (row, index) {
       // console.log(row, index)
-      router.push({ name: 'modelsDetail', params: { name: row.name, tabs: 'card' } })
+      router.push({ name: 'modelsDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
     }
     async function init () {
       listLoad.value = true
