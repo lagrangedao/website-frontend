@@ -192,7 +192,7 @@ export default defineComponent({
     const settingOneself = ref(false)
 
     function handleClick (tab, event) {
-      router.push({ name: 'datasetDetail', params: { name: route.params.name, tabs: tab.props.name } })
+      router.push({ name: 'datasetDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }

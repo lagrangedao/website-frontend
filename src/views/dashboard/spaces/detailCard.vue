@@ -38,13 +38,13 @@ export default defineComponent({
     const router = useRouter()
 
     function handleClick (tab, event) {
-      router.push({ name: 'spaceDetail', params: { name: route.params.name, tabs: tab.props.name } })
+      router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
     }
     async function init () {
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.job_result_uri = ''
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         const jobData = listRes.data.job || { job_result_uri: '' }
         if (jobData.job_result_uri) {

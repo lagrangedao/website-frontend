@@ -200,7 +200,7 @@ export default defineComponent({
               accessDataset.value.splice(settingIndex.value, 1, ruleForm.name)
               store.dispatch('setAccessDataset', JSON.stringify(accessDataset.value))
               system.$commonFun.messageTip('success', 'Update successfully!')
-              router.push({ name: 'modelsDetail', params: { name: ruleForm.name, tabs: 'settings' } })
+              router.push({ name: 'modelsDetail', params: { wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings' } })
             }
             else system.$commonFun.messageTip('error', listRes.data.message)
           } else system.$commonFun.messageTip('error', 'Upload failed!')
@@ -239,7 +239,7 @@ export default defineComponent({
       if (route.name !== 'modelsDetail') return
       listLoad.value = true
       listdata.value = {}
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1' }
       }

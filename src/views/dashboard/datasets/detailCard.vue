@@ -295,7 +295,7 @@ export default defineComponent({
       isPreview.value = true
     }
     function handleClick (tab, event) {
-      router.push({ name: 'datasetDetail', params: { name: route.params.name, tabs: tab.props.name } })
+      router.push({ name: 'datasetDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
@@ -312,7 +312,7 @@ export default defineComponent({
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.value = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         // listdata.value = listRes.data.files || []
         const fileLi = listRes.data.files || []
@@ -347,7 +347,7 @@ export default defineComponent({
       ]
     }
     async function getData () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       console.log(listRes)
     }
     function detailFun (row, index) {

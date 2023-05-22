@@ -205,7 +205,7 @@ export default defineComponent({
     }
     function detailFun (row, index) {
       // console.log(row, index)
-      router.push({ name: 'datasetDetail', params: { name: row.name, tabs: 'card' } })
+      router.push({ name: 'datasetDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
     }
     const submitForm = async (formEl) => {
       if (!formEl) return

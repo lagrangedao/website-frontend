@@ -58,7 +58,7 @@ const routes = [{
                 }
             },
             {
-                path: '/datasets/:name/:tabs',
+                path: '/datasets/:wallet_address/:name/:tabs',
                 name: 'datasetDetail',
                 component: datasetDetail,
                 meta: {
@@ -74,7 +74,7 @@ const routes = [{
                 }
             },
             {
-                path: '/models/:name/:tabs',
+                path: '/models/:wallet_address/:name/:tabs',
                 name: 'modelsDetail',
                 component: modelsDetail,
                 meta: {
@@ -98,7 +98,7 @@ const routes = [{
                 }
             },
             {
-                path: '/spaces/:name/:tabs',
+                path: '/spaces/:wallet_address/:name/:tabs',
                 name: 'spaceDetail',
                 component: spaceDetail,
                 meta: {

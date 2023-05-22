@@ -332,7 +332,7 @@ export default defineComponent({
               accessSpace.value.splice(settingIndex.value, 1, ruleForm.name)
               store.dispatch('setAccessSpace', JSON.stringify(accessSpace.value))
               system.$commonFun.messageTip('success', 'Update successfully!')
-              router.push({ name: 'spaceDetail', params: { name: ruleForm.name, tabs: 'settings' } })
+              router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings' } })
             }
             else system.$commonFun.messageTip('error', listRes.data.message)
           } else system.$commonFun.messageTip('error', 'Upload failed!')
@@ -371,7 +371,7 @@ export default defineComponent({
       if (route.name !== 'spaceDetail') return
       listLoad.value = true
       listdata.value = {}
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.space || { name: route.params.name, is_public: '1' }
         context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '')
