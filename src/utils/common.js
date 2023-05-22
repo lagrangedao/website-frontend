@@ -245,6 +245,7 @@ function momentFun(dateItem) {
 }
 
 const Web3 = require('web3');
+const web3NFT = new Web3(process.env.VUE_APP_FILECOINRPC)
 let web3Init
 if (typeof window.ethereum === 'undefined') {
   window.open('https://metamask.io/download.html')
@@ -270,6 +271,7 @@ export default {
   timeout,
   Init,
   web3Init,
+  web3NFT,
   login,
   messageTip,
   signOutFun,
