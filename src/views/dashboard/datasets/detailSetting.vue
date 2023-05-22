@@ -92,29 +92,41 @@
       </div>
     </el-row>
 
-    <el-dialog v-model="dialogDOIVisible" title="DNFT Agreement" :show-close="false" custom-class="doi_body">
-      <div class="tip">
-        Generating a DNFT restricts certain features of the dataset: it will no longer be possible to rename, transfer, delete or change the visibility to private.
+    <el-dialog v-model="dialogDOIVisible" title="DNFT Agreement" :show-close="false" custom-class="doi_body" @close="beforeClose">
+      <div v-if="manageDOI">
+        <div class="tip">
+          Generating a DNFT restricts certain features of the dataset: it will no longer be possible to rename, transfer, delete or change the visibility to private.
+        </div>
+        <div class="tip_black">
+          By using this feature, you agree to transfer metadata about your dataset and your name to
+          <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
+          <a href="mailto:team@filswan.com">team@filswan.com</a>
+        </div>
+        <el-form ref="ruleFormRefDelete" status-icon>
+          <el-form-item prop="agreeDoi" style="width:100%">
+            <label class="label" for="dataname">
+              Type
+              <b class="b">agree</b> to confirm
+            </label>
+            <div class="flex flex-row">
+              <el-input v-model="ruleForm.agreeDoi" placeholder=" " />
+            </div>
+          </el-form-item>
+        </el-form>
       </div>
-      <div class="tip_black">
-        By using this feature, you agree to transfer metadata about your dataset and your name to
-        <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
-        <a href="mailto:team@filswan.com">team@filswan.com</a>
+      <div v-else>
+        <div class="tip_text">
+          <p>
+            <label>owner:</label> {{eventArgs.owner}}</p>
+          <p>
+            <label>dataset name:</label> {{eventArgs.datasetName}} </p>
+          <p>
+            <label>dataNFT address:</label> {{eventArgs.dataNFTAddress}}</p>
+        </div>
       </div>
-      <el-form ref="ruleFormRefDelete" status-icon>
-        <el-form-item prop="agreeDoi" style="width:100%">
-          <label class="label" for="dataname">
-            Type
-            <b class="b">I agree</b> to confirm
-          </label>
-          <div class="flex flex-row">
-            <el-input v-model="ruleForm.agreeDoi" placeholder=" " />
-          </div>
-        </el-form-item>
-      </el-form>
       <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'I agree'" @click="dialogDOIVisible = false">
+        <span class="dialog-footer" v-loading="generateLoad">
+          <el-button type="primary" v-if="manageDOI" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'agree'" @click="generateSub">
             Generate DNFT
           </el-button>
           <el-button @click="dialogDOIVisible = false">Cancel</el-button>
@@ -130,6 +142,7 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   CaretBottom
 } from '@element-plus/icons-vue'
+const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
 export default defineComponent({
   name: 'Datasets',
   components: {
@@ -161,11 +174,14 @@ export default defineComponent({
         { required: true, message: ' ', trigger: 'blur' }
       ]
     })
+    const eventArgs = reactive({})
     const ruleFormRef = ref(null)
     const listdata = ref({})
     const ruleFormRefDelete = ref(null)
     const renameLoad = ref(false)
     const deleteLoad = ref(false)
+    const generateLoad = ref(false)
+    const manageDOI = ref(true)
     const doiLoad = ref(false)
     const doiIndex = ref(1)
     const doiData = ref([
@@ -235,6 +251,62 @@ export default defineComponent({
         }
       })
     }
+    async function generateSub () {
+      generateLoad.value = true
+      const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post', {})
+      console.log(generateRes)
+      if (generateRes && generateRes.status === 'success') {
+        claimDataNFT(generateRes.ipfs_url)
+        return
+      } else system.$commonFun.messageTip('error', generateRes.message ? generateRes.message : 'Failed!')
+      generateLoad.value = false
+      // dialogDOIVisible.value = false
+    }
+    async function claimDataNFT (uri) {
+      const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
+      // estimate gas
+      let estimatedGas = await factory.methods
+        .claimDataNFT(route.params.name, uri)
+        .estimateGas({ from: store.state.metaAddress })
+
+      // we will use estimated gas * 1.5
+      let gasLimit = Math.floor(estimatedGas * 1.5)
+
+      console.log('estimated gas:', estimatedGas)
+      console.log('gas limit:', gasLimit)
+
+      // call contract
+      console.log('Deploying Data NFT...')
+      const tx = await factory.methods
+        .claimDataNFT(route.params.name, uri)
+        .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+        .on('transactionHash', async (transactionHash) => console.log('transactionHash:', transactionHash))
+        .on('error', () => generateLoad.value = false)
+
+      // display results
+      console.log('tx hash:', tx.transactionHash)
+
+      let eventArgsList = tx.events.CreateDataNFT.returnValues
+      console.log('owner:', eventArgsList.owner)
+      console.log('dataset name:', eventArgsList.datasetName)
+      console.log('dataNFT address:', eventArgsList.dataNFTAddress)
+      eventArgs.owner = eventArgsList.owner
+      eventArgs.datasetName = eventArgsList.datasetName
+      eventArgs.dataNFTAddress = eventArgsList.dataNFTAddress
+      generateLoad.value = false
+      manageDOI.value = false
+      generateMintHash(tx.transactionHash)
+    }
+    async function generateMintHash (tx_hash) {
+      let fd = new FormData()
+      const getID = await system.$commonFun.web3Init.eth.net.getId()
+      fd.append('tx_hash', tx_hash)
+      fd.append('chain_id', getID)
+      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'post', fd)
+    }
+    function beforeClose () {
+      manageDOI.value = true
+    }
     async function init () {
       if (route.name !== 'datasetDetail') return
       listLoad.value = true
@@ -267,11 +339,14 @@ export default defineComponent({
       metaAddress,
       renameLoad,
       deleteLoad,
+      generateLoad,
+      manageDOI,
       doiLoad,
       doiIndex,
       doiData,
       ruleForm,
       listdata,
+      eventArgs,
       rules,
       rulesDelete,
       ruleFormRef,
@@ -281,7 +356,7 @@ export default defineComponent({
       system,
       route,
       router,
-      props, submitForm, submitDeleteForm, momentFilter
+      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose
     }
   }
 })
@@ -548,7 +623,8 @@ export default defineComponent({
     .el-dialog__body {
       padding: 0;
       .tip,
-      .tip_black {
+      .tip_black,
+      .tip_text {
         padding: 0.1rem 0.25rem;
         background-color: #f3f1ff;
         color: #562683;
@@ -562,11 +638,19 @@ export default defineComponent({
           font-size: 17px;
         }
       }
-      .tip_black {
+      .tip_black,
+      .tip_text {
         background-color: transparent;
         color: #000;
         a {
           text-decoration: underline;
+        }
+        p {
+          padding: 0.05rem 0;
+          label {
+            display: inline-block;
+            width: 135px;
+          }
         }
       }
       .el-form {
@@ -598,6 +682,9 @@ export default defineComponent({
     .el-dialog__footer {
       padding: 0 0.25rem 0.25rem;
       text-align: left;
+      .dialog-footer {
+        display: flex;
+      }
       .el-button {
         width: auto;
         height: auto;
