@@ -33,9 +33,17 @@
           <div class="tip">
             Generate a DNFT for this dataset. Learn more about Data NFT
             <br /> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.</div>
-          <el-button size="large" class="generateDOI" @click="dialogDOIVisible = true">Generate DNFT</el-button>
+          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success'" stripe style="width: 100%">
+            <el-table-column prop="token_name" label="Token Name" />
+          </el-table>
+          <el-popover v-else-if="nftdata.status === 'processing'" placement="top-start" :width="200" trigger="hover" content="Please wait for the transaction to complete">
+            <template #reference>
+              <el-button size="large" class="generateDOI is-disabled">Generate DNFT</el-button>
+            </template>
+          </el-popover>
+          <el-button size="large" v-else class="generateDOI" @click="dialogDOIVisible = true">Generate DNFT</el-button>
         </div>
-        <div v-if="doiIndex === 2">
+        <!-- <div v-if="doiIndex === 2">
           <div class="tip">
             DNFT is active for this dataset. Learn more about Data NFT
           </div>
@@ -69,7 +77,7 @@
             Your dataset has been updated, do you want to generate a new DNFT?
           </div>
           <el-button size="large" class="generateDOI" @click="dialogDOIVisible = true">Generate DNFT</el-button>
-        </div>
+        </div> -->
       </div>
       <div class="fileList" v-loading="deleteLoad">
         <div class="title">Delete this dataset</div>
@@ -177,6 +185,7 @@ export default defineComponent({
     const eventArgs = reactive({})
     const ruleFormRef = ref(null)
     const listdata = ref({})
+    const nftdata = ref({})
     const ruleFormRefDelete = ref(null)
     const renameLoad = ref(false)
     const deleteLoad = ref(false)
@@ -280,7 +289,13 @@ export default defineComponent({
       const tx = await factory.methods
         .claimDataNFT(route.params.name, uri)
         .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-        .on('transactionHash', async (transactionHash) => console.log('transactionHash:', transactionHash))
+        .on('transactionHash', async (transactionHash) => {
+          console.log('transactionHash:', transactionHash)
+          await generateMintHash(transactionHash)
+          generateLoad.value = false
+          dialogDOIVisible.value = false
+          init()
+        })
         .on('error', () => generateLoad.value = false)
 
       // display results
@@ -293,9 +308,7 @@ export default defineComponent({
       eventArgs.owner = eventArgsList.owner
       eventArgs.datasetName = eventArgsList.datasetName
       eventArgs.dataNFTAddress = eventArgsList.dataNFTAddress
-      generateLoad.value = false
-      manageDOI.value = false
-      generateMintHash(tx.transactionHash)
+      // manageDOI.value = false
     }
     async function generateMintHash (tx_hash) {
       let fd = new FormData()
@@ -306,6 +319,7 @@ export default defineComponent({
     }
     function beforeClose () {
       manageDOI.value = true
+      ruleForm.agreeDoi = ''
     }
     async function init () {
       if (route.name !== 'datasetDetail') return
@@ -314,6 +328,7 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1' }
+        nftdata.value = listRes.data.nft || { tokens: [], status: 'ungenerate' }
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -346,6 +361,7 @@ export default defineComponent({
       doiData,
       ruleForm,
       listdata,
+      nftdata,
       eventArgs,
       rules,
       rulesDelete,
@@ -538,7 +554,7 @@ export default defineComponent({
           opacity: 0.9;
           border-color: #e3e6eb;
           span {
-            cursor: pointer;
+            cursor: inherit;
           }
         }
         &.is-disabled {
@@ -702,7 +718,7 @@ export default defineComponent({
         &:hover {
           opacity: 0.9;
           span {
-            cursor: pointer;
+            cursor: inherit;
           }
         }
         &.is-disabled {
