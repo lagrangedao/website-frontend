@@ -10,7 +10,7 @@
               New owner
               <div class="flex flex-row">
                 <el-select v-model="metaAddress" placeholder="">
-                  <el-option :label="metaAddress" :value="metaAddress" />
+                  <el-option :label="metaAddress" :value="metaAddress"/>
                 </el-select>
                 <span class="text-2xl text-gray-400 self-end pb-2">/</span>
               </div>
@@ -20,39 +20,52 @@
             <label class="label" for="dataname">
               New name
               <div class="flex flex-row">
-                <el-input v-model="ruleForm.name" placeholder="New dataset name" />
+                <el-input v-model="ruleForm.name" placeholder="New dataset name"/>
               </div>
             </label>
           </el-form-item>
         </el-form>
-        <el-button size="large" :disabled="!ruleForm.name" @click="submitForm('ruleFormRef')">I understand the consequences, rename this dataset</el-button>
+        <el-button size="large" :disabled="!ruleForm.name" @click="submitForm('ruleFormRef')">I understand the
+          consequences, rename this dataset
+        </el-button>
       </div>
       <div class="fileList" v-loading="doiLoad">
-        <div class="title">{{doiIndex === 3?'DNFT':'Data NFT (DNFT)'}}</div>
+        <div class="title">{{ doiIndex === 3 ? 'DNFT' : 'Data NFT (DNFT)' }}</div>
         <div v-if="doiIndex === 1">
           <div class="tip">
             Generate a DNFT for this dataset. Learn more about Data NFT
-            <br /> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.</div>
+            <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the
+            visibility to private.
+          </div>
           <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success'" stripe style="width: 100%">
-            <el-table-column prop="chain_id" label="Chain ID" />
-            <el-table-column prop="token_id" label="Token ID" />
+            <el-table-column prop="chain_id" label="Chain ID"/>
+            <el-table-column prop="token_id" label="Token ID"/>
             <el-table-column label="Mint Hash">
               <template #default="scope">
-                <a :href="`https://hyperspace.filfox.info/en/message/${scope.row.mint_hash}`" target="_blank" class="link">{{scope.row.mint_hash}}</a>
+                <a :href="`https://hyperspace.filfox.info/en/message/${scope.row.mint_hash}`" target="_blank"
+                   class="link">{{ scope.row.mint_hash }}</a>
               </template>
             </el-table-column>
-            <el-table-column label="Created At" >
+            <el-table-column label="Created At">
               <template #default="scope">
-                {{momentFilter(scope.row.created_at)}}
+                {{ momentFilter(scope.row.created_at) }}
               </template>
             </el-table-column>
             <el-table-column label="Contract Address">
               <template #default="scope">
-                <a :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank" class="link">{{scope.row.contract_address}}</a>
+                <a :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank"
+                   class="link">{{ scope.row.contract_address }}</a>
+              </template>
+            </el-table-column>
+            <el-table-column label="Ipfs URL">
+              <template #default="scope">
+                <el-button size="large" @click="getTokenURI(scope.row.contract_address, scope.row.token_id)">Copy IPFS URL
+                </el-button>
               </template>
             </el-table-column>
           </el-table>
-          <el-popover v-else-if="nftdata.status === 'processing'" placement="top-start" :width="200" trigger="hover" content="Please wait for the transaction to complete">
+          <el-popover v-else-if="nftdata.status === 'processing'" placement="top-start" :width="200" trigger="hover"
+                      content="Please wait for the transaction to complete">
             <template #reference>
               <el-button size="large" class="generateDOI is-disabled">Generate DNFT</el-button>
             </template>
@@ -99,31 +112,37 @@
         <div class="title">Delete this dataset</div>
         <div class="tip">This action
           <b>cannot</b> be undone. This will permanently delete the
-          <b class="b">{{route.params.name}}</b> dataset repository and all its files.</div>
+          <b class="b">{{ route.params.name }}</b> dataset repository and all its files.
+        </div>
 
         <el-form ref="ruleFormRefDelete" :model="ruleForm" :rules="rulesDelete" class="demo-ruleForm" status-icon>
           <el-form-item prop="delete" style="width:100%">
             <label class="label" for="dataname">
               Please type
-              <b class="b">{{route.params.name}}</b> to confirm.
+              <b class="b">{{ route.params.name }}</b> to confirm.
               <div class="flex flex-row">
-                <el-input v-model="ruleForm.delete" placeholder=" " />
+                <el-input v-model="ruleForm.delete" placeholder=" "/>
               </div>
             </label>
           </el-form-item>
         </el-form>
-        <el-button size="large" :disabled="ruleForm.delete && ruleForm.delete !== route.params.name" @click="submitDeleteForm('ruleFormRefDelete')">I understand the consequences, delete this dataset</el-button>
+        <el-button size="large" :disabled="ruleForm.delete && ruleForm.delete !== route.params.name"
+                   @click="submitDeleteForm('ruleFormRefDelete')">I understand the consequences, delete this dataset
+        </el-button>
       </div>
     </el-row>
 
-    <el-dialog v-model="dialogDOIVisible" title="DNFT Agreement" :show-close="false" custom-class="doi_body" @close="beforeClose">
+    <el-dialog v-model="dialogDOIVisible" title="DNFT Agreement" :show-close="false" custom-class="doi_body"
+               @close="beforeClose">
       <div v-if="manageDOI">
         <div class="tip">
-          Generating a DNFT restricts certain features of the dataset: it will no longer be possible to rename, transfer, delete or change the visibility to private.
+          Generating a DNFT restricts certain features of the dataset: it will no longer be possible to rename,
+          transfer, delete or change the visibility to private.
         </div>
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your dataset and your name to
-          <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
+          <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please
+          contact
           <a href="mailto:team@filswan.com">team@filswan.com</a>
         </div>
         <el-form ref="ruleFormRefDelete" status-icon>
@@ -133,7 +152,7 @@
               <b class="b">agree</b> to confirm
             </label>
             <div class="flex flex-row">
-              <el-input v-model="ruleForm.agreeDoi" placeholder=" " />
+              <el-input v-model="ruleForm.agreeDoi" placeholder=" "/>
             </div>
           </el-form-item>
         </el-form>
@@ -141,16 +160,17 @@
       <div v-else>
         <div class="tip_text">
           <p>
-            <label>owner:</label> {{eventArgs.owner}}</p>
+            <label>owner:</label> {{ eventArgs.owner }}</p>
           <p>
-            <label>dataset name:</label> {{eventArgs.datasetName}} </p>
+            <label>dataset name:</label> {{ eventArgs.datasetName }} </p>
           <p>
-            <label>dataNFT address:</label> {{eventArgs.dataNFTAddress}}</p>
+            <label>dataNFT address:</label> {{ eventArgs.dataNFTAddress }}</p>
         </div>
       </div>
       <template #footer>
         <span class="dialog-footer" v-loading="generateLoad">
-          <el-button type="primary" v-if="manageDOI" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'agree'" @click="generateSub">
+          <el-button type="primary" v-if="manageDOI" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'agree'"
+                     @click="generateSub">
             Generate DNFT
           </el-button>
           <el-button @click="dialogDOIVisible = false">Cancel</el-button>
@@ -160,13 +180,25 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
-import { useStore } from "vuex"
-import { useRouter, useRoute } from 'vue-router'
+import {
+  defineComponent,
+  computed,
+  onMounted,
+  onActivated,
+  onDeactivated,
+  watch,
+  ref,
+  reactive,
+  getCurrentInstance
+} from 'vue'
+import {useStore} from "vuex"
+import {useRouter, useRoute} from 'vue-router'
 import {
   CaretBottom
 } from '@element-plus/icons-vue'
+
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
+const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
   name: 'Datasets',
   components: {
@@ -175,9 +207,11 @@ export default defineComponent({
   props: {
     // listdata: { type: Number, default: 1 }
   },
-  setup (props) {
+  setup(props) {
     const store = useStore()
-    const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
+    const lagLogin = computed(() => {
+      return String(store.state.lagLogin) === 'true'
+    })
     const metaAddress = computed(() => {
       let val = store.state.metaAddress || ''
       return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
@@ -190,12 +224,12 @@ export default defineComponent({
     })
     const rules = reactive({
       name: [
-        { required: true, message: ' ', trigger: 'blur' }
+        {required: true, message: ' ', trigger: 'blur'}
       ]
     })
     const rulesDelete = reactive({
       delete: [
-        { required: true, message: ' ', trigger: 'blur' }
+        {required: true, message: ' ', trigger: 'blur'}
       ]
     })
     const eventArgs = reactive({})
@@ -222,9 +256,10 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
 
-    function momentFilter (dateItem) {
+    function momentFilter(dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
+
     const submitForm = async (formEl) => {
       if (!formEl) return
       await ruleFormRef.value.validate(async (valid, fields) => {
@@ -241,9 +276,11 @@ export default defineComponent({
               accessDataset.value.splice(settingIndex.value, 1, ruleForm.name)
               store.dispatch('setAccessDataset', JSON.stringify(accessDataset.value))
               system.$commonFun.messageTip('success', 'Update successfully!')
-              router.push({ name: 'datasetDetail', params: { wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings' } })
-            }
-            else system.$commonFun.messageTip('error', listRes.data.message)
+              router.push({
+                name: 'datasetDetail',
+                params: {wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings'}
+              })
+            } else system.$commonFun.messageTip('error', listRes.data.message)
           } else system.$commonFun.messageTip('error', 'Upload failed!')
           ruleForm.name = ''
           renameLoad.value = false
@@ -265,7 +302,7 @@ export default defineComponent({
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) system.$commonFun.messageTip('success', 'Delete successfully!')
             else system.$commonFun.messageTip('error', listRes.data.message)
-            router.push({ name: 'personalCenter' })
+            router.push({name: 'personalCenter'})
           } else system.$commonFun.messageTip('error', 'Delete failed!')
           ruleForm.name = ''
           ruleForm.delete = ''
@@ -276,7 +313,8 @@ export default defineComponent({
         }
       })
     }
-    async function generateSub () {
+
+    async function generateSub() {
       generateLoad.value = true
       const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post', {})
       console.log(generateRes)
@@ -287,12 +325,30 @@ export default defineComponent({
       generateLoad.value = false
       // dialogDOIVisible.value = false
     }
-    async function claimDataNFT (uri) {
+
+    async function getTokenURI(contractAddress, tokenId) {
+      // create contract obj
+      const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contractAddress)
+      const ipfs_url = await nft_contract.methods.tokenURI(tokenId).call()
+      console.log('ipfs_url:', ipfs_url)
+      if (navigator.clipboard){
+        try {
+          await navigator.clipboard.writeText(ipfs_url)
+          alert('Copy success, The url is: ' + ipfs_url)
+          console.log('Copy success')
+        } catch (err){
+          alert('Copy failed')
+          console.log('Copy failed', err)
+        }
+      }
+    }
+
+    async function claimDataNFT(uri) {
       const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
       // estimate gas
       let estimatedGas = await factory.methods
-        .claimDataNFT(route.params.name, uri)
-        .estimateGas({ from: store.state.metaAddress })
+          .claimDataNFT(route.params.name, uri)
+          .estimateGas({from: store.state.metaAddress})
 
       // we will use estimated gas * 1.5
       let gasLimit = Math.floor(estimatedGas * 1.5)
@@ -303,16 +359,16 @@ export default defineComponent({
       // call contract
       console.log('Deploying Data NFT...')
       const tx = await factory.methods
-        .claimDataNFT(route.params.name, uri)
-        .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-        .on('transactionHash', async (transactionHash) => {
-          console.log('transactionHash:', transactionHash)
-          await generateMintHash(transactionHash)
-          generateLoad.value = false
-          dialogDOIVisible.value = false
-          init()
-        })
-        .on('error', () => generateLoad.value = false)
+          .claimDataNFT(route.params.name, uri)
+          .send({from: store.state.metaAddress, gasLimit: gasLimit})
+          .on('transactionHash', async (transactionHash) => {
+            console.log('transactionHash:', transactionHash)
+            await generateMintHash(transactionHash)
+            generateLoad.value = false
+            dialogDOIVisible.value = false
+            init()
+          })
+          .on('error', () => generateLoad.value = false)
 
       // display results
       console.log('tx hash:', tx.transactionHash)
@@ -326,43 +382,48 @@ export default defineComponent({
       eventArgs.dataNFTAddress = eventArgsList.dataNFTAddress
       // manageDOI.value = false
     }
-    async function generateMintHash (tx_hash) {
+
+    async function generateMintHash(tx_hash) {
       let fd = new FormData()
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
       const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'post', fd)
     }
-    function beforeClose () {
+
+    function beforeClose() {
       manageDOI.value = true
       ruleForm.agreeDoi = ''
     }
-    async function init () {
+
+    async function init() {
       if (route.name !== 'datasetDetail') return
       listLoad.value = true
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1' }
-        if (listRes.data.nft){
+        listdata.value = listRes.data.dataset || {name: route.params.name, is_public: '1'}
+        if (listRes.data.nft) {
           let contract_address = listRes.data.nft.contract_address;
           listRes.data.nft.tokens = listRes.data.nft.tokens.map((token) => {
             token.contract_address = contract_address
             return token
           })
         }
-        nftdata.value = listRes.data.nft || { tokens: [], status: 'ungenerate' }
+        nftdata.value = listRes.data.nft || {tokens: [], status: 'ungenerate'}
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }
-    async function datasetIndex () {
+
+    async function datasetIndex() {
       let index = 0
       accessDataset.value.forEach((ele, i) => {
         if (ele === route.params.name) index = i
       })
       return index
     }
+
     onMounted(async () => {
       window.scrollTo(0, 0)
       init()
@@ -395,7 +456,7 @@ export default defineComponent({
       system,
       route,
       router,
-      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose
+      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI
     }
   }
 })
@@ -410,6 +471,7 @@ export default defineComponent({
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
+
   :deep(.dataset_body) {
     display: flex;
     align-items: stretch;
@@ -426,6 +488,7 @@ export default defineComponent({
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
     }
+
     .fileList {
       width: 100%;
       margin: 0.15rem 0;
@@ -434,6 +497,7 @@ export default defineComponent({
       border-radius: 0.1rem;
       color: #606060;
       overflow: hidden;
+
       .title {
         padding: 0.2rem 0.2rem 0;
         margin: 0 0 0.2rem;
@@ -447,6 +511,7 @@ export default defineComponent({
           font-size: 18px;
         }
       }
+
       .desc,
       .tip {
         padding: 0 0.2rem;
@@ -459,16 +524,19 @@ export default defineComponent({
           font-size: 17px;
         }
       }
+
       .tip {
         margin: 0 0 0.15rem;
         font-weight: normal;
         color: #666;
         line-height: 1.5;
       }
+
       .tip_new {
         padding-top: 0.2rem;
         color: #562683;
       }
+
       .b {
         // padding: 3px 5px;
         // background-color: #f7f7f7;
@@ -476,11 +544,13 @@ export default defineComponent({
         // border-radius: 3px;
         font-weight: bold;
       }
+
       .demo-ruleForm {
         display: flex;
         flex-wrap: wrap;
         padding: 0 0.2rem;
         margin: 0;
+
         .el-form-item {
           &.flex_left {
             width: 225px;
@@ -488,21 +558,25 @@ export default defineComponent({
               width: 100%;
             }
           }
+
           &.flex_right {
             width: calc(100% - 225px);
             @media screen and (max-width: 768px) {
               width: 100%;
             }
           }
+
           @media screen and (max-width: 768px) {
             width: 100% !important;
           }
+
           .el-form-item__content {
             width: 100%;
             display: flex;
             flex-wrap: wrap;
             align-items: flex-start;
             justify-content: flex-start;
+
             .label {
               width: 100%;
               text-align: left;
@@ -514,15 +588,18 @@ export default defineComponent({
               @media screen and (min-width: 1800px) {
                 font-size: 17px;
               }
+
               .flex-row {
                 display: flex;
                 width: 100%;
+
                 .el-select {
                   width: calc(100% - 30px);
                   @media screen and (max-width: 768px) {
                     width: 100%;
                   }
                 }
+
                 .self-end {
                   width: 30px;
                   text-align: center;
@@ -532,8 +609,10 @@ export default defineComponent({
                 }
               }
             }
+
             .el-input {
               font-size: inherit;
+
               .el-input__inner {
                 height: auto;
                 padding: 0.03rem 0.1rem;
@@ -541,15 +620,18 @@ export default defineComponent({
               }
             }
           }
+
           .el-form-item__label {
             display: none;
           }
+
           &.is-error {
             .el-form-item__content {
               .el-input {
                 .el-input__inner {
                   border-color: #c37af9;
                 }
+
                 .el-input__validateIcon {
                   color: #c37af9;
                 }
@@ -558,6 +640,10 @@ export default defineComponent({
           }
         }
       }
+      .link{
+        text-decoration: underline;
+      }
+
       .el-button {
         width: calc(100% - 0.4rem);
         height: auto;
@@ -573,27 +659,33 @@ export default defineComponent({
         @media screen and (max-width: 1600px) {
           font-size: 14px;
         }
+
         &:hover {
           opacity: 0.9;
           border-color: #e3e6eb;
+
           span {
             cursor: inherit;
           }
         }
+
         &.is-disabled {
           opacity: 0.7;
         }
       }
+
       .generateDOI {
         width: auto;
         color: #606060;
       }
+
       .el-table {
         text-align: left;
         // border-top: 1px solid #e4e4e4;
         tr {
           th {
             padding: 0.05rem 0.2rem;
+
             .cell {
               padding: 0;
               font-family: "FIRACODE-BOLD";
@@ -607,8 +699,10 @@ export default defineComponent({
               }
             }
           }
+
           td {
             padding: 0;
+
             .cell {
               padding: 0.2rem;
               font-family: "FIRACODE-REGULAR";
@@ -620,6 +714,7 @@ export default defineComponent({
               @media screen and (min-width: 1800px) {
                 font-size: 17px;
               }
+
               .current {
                 padding: 0.03rem 0.07rem;
                 background-color: #c37af9;
@@ -643,11 +738,13 @@ export default defineComponent({
       }
     }
   }
+
   :deep(.doi_body) {
     width: 40%;
     max-width: 770px;
     min-width: 300px;
     border-radius: 0.13rem;
+
     .el-dialog__header {
       padding: 0.17rem 0.25rem 0.1rem;
       font-size: 17px;
@@ -659,8 +756,10 @@ export default defineComponent({
         font-size: 18px;
       }
     }
+
     .el-dialog__body {
       padding: 0;
+
       .tip,
       .tip_black,
       .tip_text {
@@ -677,23 +776,29 @@ export default defineComponent({
           font-size: 17px;
         }
       }
+
       .tip_black,
       .tip_text {
         background-color: transparent;
         color: #000;
+
         a {
           text-decoration: underline;
         }
+
         p {
           padding: 0.05rem 0;
+
           label {
             display: inline-block;
             width: 135px;
           }
         }
       }
+
       .el-form {
         padding: 0 0.25rem;
+
         .el-form-item {
           .el-form-item__content {
             .label {
@@ -706,9 +811,11 @@ export default defineComponent({
                 font-size: 17px;
               }
             }
+
             .flex-row {
               width: 100%;
             }
+
             .el-input {
               .el-input__inner {
                 background: linear-gradient(180deg, #fefefe, #f0f0f0);
@@ -718,12 +825,15 @@ export default defineComponent({
         }
       }
     }
+
     .el-dialog__footer {
       padding: 0 0.25rem 0.25rem;
       text-align: left;
+
       .dialog-footer {
         display: flex;
       }
+
       .el-button {
         width: auto;
         height: auto;
@@ -738,12 +848,15 @@ export default defineComponent({
         @media screen and (max-width: 1600px) {
           font-size: 14px;
         }
+
         &:hover {
           opacity: 0.9;
+
           span {
             cursor: inherit;
           }
         }
+
         &.is-disabled {
           opacity: 0.5;
           border-color: #e3e6eb;
