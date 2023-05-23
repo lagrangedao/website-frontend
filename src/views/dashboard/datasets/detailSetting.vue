@@ -34,7 +34,23 @@
             Generate a DNFT for this dataset. Learn more about Data NFT
             <br /> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.</div>
           <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success'" stripe style="width: 100%">
-            <el-table-column prop="token_name" label="Token Name" />
+            <el-table-column prop="chain_id" label="Chain ID" />
+            <el-table-column prop="token_id" label="Token ID" />
+            <el-table-column label="Mint Hash">
+              <template #default="scope">
+                <a :href="`https://hyperspace.filfox.info/en/message/${scope.row.mint_hash}`" target="_blank" class="link">{{scope.row.mint_hash}}</a>
+              </template>
+            </el-table-column>
+            <el-table-column label="Created At" >
+              <template #default="scope">
+                {{momentFilter(scope.row.created_at)}}
+              </template>
+            </el-table-column>
+            <el-table-column label="Contract Address">
+              <template #default="scope">
+                <a :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank" class="link">{{scope.row.contract_address}}</a>
+              </template>
+            </el-table-column>
           </el-table>
           <el-popover v-else-if="nftdata.status === 'processing'" placement="top-start" :width="200" trigger="hover" content="Please wait for the transaction to complete">
             <template #reference>
@@ -328,6 +344,13 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1' }
+        if (listRes.data.nft){
+          let contract_address = listRes.data.nft.contract_address;
+          listRes.data.nft.tokens = listRes.data.nft.tokens.map((token) => {
+            token.contract_address = contract_address
+            return token
+          })
+        }
         nftdata.value = listRes.data.nft || { tokens: [], status: 'ungenerate' }
       }
       await system.$commonFun.timeout(500)
