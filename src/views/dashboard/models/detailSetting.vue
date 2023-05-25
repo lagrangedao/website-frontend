@@ -105,7 +105,7 @@
         <el-form-item prop="agreeDoi" style="width:100%">
           <label class="label" for="dataname">
             Type
-            <b class="b">I agree</b> to confirm
+            <b class="b">agree</b> to confirm
           </label>
           <div class="flex flex-row">
             <el-input v-model="ruleForm.agreeDoi" placeholder=" " />
@@ -114,7 +114,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'I agree'" @click="dialogDOIVisible = false">
+          <el-button type="primary" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'agree'" @click="dialogDOIVisible = false">
             Generate DNFT
           </el-button>
           <el-button @click="dialogDOIVisible = false">Cancel</el-button>

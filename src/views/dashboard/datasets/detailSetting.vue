@@ -10,7 +10,7 @@
               New owner
               <div class="flex flex-row">
                 <el-select v-model="metaAddress" placeholder="">
-                  <el-option :label="metaAddress" :value="metaAddress"/>
+                  <el-option :label="metaAddress" :value="metaAddress" />
                 </el-select>
                 <span class="text-2xl text-gray-400 self-end pb-2">/</span>
               </div>
@@ -20,13 +20,12 @@
             <label class="label" for="dataname">
               New name
               <div class="flex flex-row">
-                <el-input v-model="ruleForm.name" placeholder="New dataset name"/>
+                <el-input v-model="ruleForm.name" placeholder="New dataset name" />
               </div>
             </label>
           </el-form-item>
         </el-form>
-        <el-button size="large" :disabled="!ruleForm.name" @click="submitForm('ruleFormRef')">I understand the
-          consequences, rename this dataset
+        <el-button size="large" :disabled="!ruleForm.name" @click="submitForm('ruleFormRef')">I understand the consequences, rename this dataset
         </el-button>
       </div>
       <div class="fileList" v-loading="doiLoad">
@@ -34,16 +33,14 @@
         <div v-if="doiIndex === 1">
           <div class="tip">
             Generate a DNFT for this dataset. Learn more about Data NFT
-            <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the
-            visibility to private.
+            <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
-          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success'" stripe style="width: 100%">
-            <el-table-column prop="chain_id" label="Chain ID"/>
-            <el-table-column prop="token_id" label="Token ID"/>
+          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success'" stripe style="width: 100%" class="nft_table">
+            <el-table-column prop="chain_id" label="Chain ID" />
+            <el-table-column prop="token_id" label="Token ID" />
             <el-table-column label="Mint Hash">
               <template #default="scope">
-                <a :href="`https://hyperspace.filfox.info/en/message/${scope.row.mint_hash}`" target="_blank"
-                   class="link">{{ scope.row.mint_hash }}</a>
+                <a :href="`https://hyperspace.filfox.info/en/message/${scope.row.mint_hash}`" target="_blank" class="link">{{ scope.row.mint_hash }}</a>
               </template>
             </el-table-column>
             <el-table-column label="Created At">
@@ -53,8 +50,7 @@
             </el-table-column>
             <el-table-column label="Contract Address">
               <template #default="scope">
-                <a :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank"
-                   class="link">{{ scope.row.contract_address }}</a>
+                <a :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank" class="link">{{ scope.row.contract_address }}</a>
               </template>
             </el-table-column>
             <el-table-column label="Ipfs URL">
@@ -64,12 +60,16 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-popover v-else-if="nftdata.status === 'processing'" placement="top-start" :width="200" trigger="hover"
-                      content="Please wait for the transaction to complete">
-            <template #reference>
-              <el-button size="large" class="generateDOI is-disabled">Generate DNFT</el-button>
-            </template>
-          </el-popover>
+          <div v-else-if="nftdata.status === 'processing'" class="process_style">
+            <el-button size="large" class="generateDOI is-disabled">Generate DNFT</el-button>
+            <el-popover placement="top" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Please wait for the transaction to complete">
+              <template #reference>
+                <el-icon>
+                  <Warning />
+                </el-icon>
+              </template>
+            </el-popover>
+          </div>
           <el-button size="large" v-else class="generateDOI" @click="dialogDOIVisible = true">Generate DNFT</el-button>
         </div>
         <!-- <div v-if="doiIndex === 2">
@@ -121,28 +121,24 @@
               Please type
               <b class="b">{{ route.params.name }}</b> to confirm.
               <div class="flex flex-row">
-                <el-input v-model="ruleForm.delete" placeholder=" "/>
+                <el-input v-model="ruleForm.delete" placeholder=" " />
               </div>
             </label>
           </el-form-item>
         </el-form>
-        <el-button size="large" :disabled="ruleForm.delete && ruleForm.delete !== route.params.name"
-                   @click="submitDeleteForm('ruleFormRefDelete')">I understand the consequences, delete this dataset
+        <el-button size="large" :disabled="ruleForm.delete && ruleForm.delete !== route.params.name" @click="submitDeleteForm('ruleFormRefDelete')">I understand the consequences, delete this dataset
         </el-button>
       </div>
     </el-row>
 
-    <el-dialog v-model="dialogDOIVisible" title="DNFT Agreement" :show-close="false" custom-class="doi_body"
-               @close="beforeClose">
+    <el-dialog v-model="dialogDOIVisible" title="DNFT Agreement" :show-close="false" custom-class="doi_body" @close="beforeClose">
       <div v-if="manageDOI">
         <div class="tip">
-          Generating a DNFT restricts certain features of the dataset: it will no longer be possible to rename,
-          transfer, delete or change the visibility to private.
+          Generating a DNFT restricts certain features of the dataset: it will no longer be possible to rename, transfer, delete or change the visibility to private.
         </div>
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your dataset and your name to
-          <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please
-          contact
+          <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
           <a href="mailto:team@filswan.com">team@filswan.com</a>
         </div>
         <el-form ref="ruleFormRefDelete" status-icon>
@@ -152,7 +148,7 @@
               <b class="b">agree</b> to confirm
             </label>
             <div class="flex flex-row">
-              <el-input v-model="ruleForm.agreeDoi" placeholder=" "/>
+              <el-input v-model="ruleForm.agreeDoi" placeholder=" " />
             </div>
           </el-form-item>
         </el-form>
@@ -169,8 +165,7 @@
       </div>
       <template #footer>
         <span class="dialog-footer" v-loading="generateLoad">
-          <el-button type="primary" v-if="manageDOI" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'agree'"
-                     @click="generateSub">
+          <el-button type="primary" v-if="manageDOI" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'agree'" @click="generateSub">
             Generate DNFT
           </el-button>
           <el-button @click="dialogDOIVisible = false">Cancel</el-button>
@@ -191,10 +186,10 @@ import {
   reactive,
   getCurrentInstance
 } from 'vue'
-import {useStore} from "vuex"
-import {useRouter, useRoute} from 'vue-router'
+import { useStore } from "vuex"
+import { useRouter, useRoute } from 'vue-router'
 import {
-  CaretBottom
+  CaretBottom, Warning
 } from '@element-plus/icons-vue'
 
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
@@ -202,12 +197,12 @@ const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
   name: 'Datasets',
   components: {
-    CaretBottom
+    CaretBottom, Warning
   },
   props: {
     // listdata: { type: Number, default: 1 }
   },
-  setup(props) {
+  setup (props) {
     const store = useStore()
     const lagLogin = computed(() => {
       return String(store.state.lagLogin) === 'true'
@@ -224,12 +219,12 @@ export default defineComponent({
     })
     const rules = reactive({
       name: [
-        {required: true, message: ' ', trigger: 'blur'}
+        { required: true, message: ' ', trigger: 'blur' }
       ]
     })
     const rulesDelete = reactive({
       delete: [
-        {required: true, message: ' ', trigger: 'blur'}
+        { required: true, message: ' ', trigger: 'blur' }
       ]
     })
     const eventArgs = reactive({})
@@ -256,7 +251,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
 
-    function momentFilter(dateItem) {
+    function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
 
@@ -278,7 +273,7 @@ export default defineComponent({
               system.$commonFun.messageTip('success', 'Update successfully!')
               router.push({
                 name: 'datasetDetail',
-                params: {wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings'}
+                params: { wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings' }
               })
             } else system.$commonFun.messageTip('error', listRes.data.message)
           } else system.$commonFun.messageTip('error', 'Upload failed!')
@@ -302,7 +297,7 @@ export default defineComponent({
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) system.$commonFun.messageTip('success', 'Delete successfully!')
             else system.$commonFun.messageTip('error', listRes.data.message)
-            router.push({name: 'personalCenter'})
+            router.push({ name: 'personalCenter' })
           } else system.$commonFun.messageTip('error', 'Delete failed!')
           ruleForm.name = ''
           ruleForm.delete = ''
@@ -314,10 +309,9 @@ export default defineComponent({
       })
     }
 
-    async function generateSub() {
+    async function generateSub () {
       generateLoad.value = true
       const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post', {})
-      console.log(generateRes)
       if (generateRes && generateRes.status === 'success') {
         claimDataNFT(generateRes.ipfs_url)
         return
@@ -326,41 +320,65 @@ export default defineComponent({
       // dialogDOIVisible.value = false
     }
 
-    async function getTokenURI(contractAddress, tokenId) {
+    async function getTokenURI (contractAddress, tokenId) {
       // create contract obj
-      const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contractAddress)
-      const ipfs_url = await nft_contract.methods.tokenURI(tokenId).call()
-      console.log('ipfs_url:', ipfs_url)
-      if (navigator.clipboard){
-        try {
-          await navigator.clipboard.writeText(ipfs_url)
-          alert('Copy success, The url is: ' + ipfs_url)
-          console.log('Copy success')
-        } catch (err){
-          alert('Copy failed')
-          console.log('Copy failed', err)
-        }
+      try {
+        const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contractAddress)
+        const ipfs_url = await nft_contract.methods.tokenURI(tokenId).call()
+        console.log('ipfs_url:', ipfs_url)
+        copyName(ipfs_url)
+      } catch (err) {
+        system.$commonFun.messageTip('error', 'Copy failed')
+        console.log('Copy failed', err)
       }
     }
 
-    async function claimDataNFT(uri) {
-      const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
-      // estimate gas
-      let estimatedGas = await factory.methods
+    function copyName (text) {
+      var txtArea = document.createElement('textarea')
+      txtArea.id = 'txt'
+      txtArea.style.position = 'fixed'
+      txtArea.style.top = '0'
+      txtArea.style.left = '0'
+      txtArea.style.opacity = '0'
+      txtArea.value = text
+      document.body.appendChild(txtArea)
+      txtArea.select()
+
+      try {
+        var successful = document.execCommand('copy')
+        var msg = successful ? 'successful' : 'unsuccessful'
+        console.log('Copying text command was ' + msg)
+        if (successful) {
+          system.$commonFun.messageTip('success', 'Copy success, The url is: ' + text)
+          return true
+        }
+      } catch (err) {
+        console.log('Oops, unable to copy')
+      } finally {
+        document.body.removeChild(txtArea)
+      }
+      return false
+    }
+
+    async function claimDataNFT (uri) {
+      try {
+        const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
+        // estimate gas
+        let estimatedGas = await factory.methods
           .claimDataNFT(route.params.name, uri)
-          .estimateGas({from: store.state.metaAddress})
+          .estimateGas({ from: store.state.metaAddress })
 
-      // we will use estimated gas * 1.5
-      let gasLimit = Math.floor(estimatedGas * 1.5)
+        // we will use estimated gas * 1.5
+        let gasLimit = Math.floor(estimatedGas * 1.5)
 
-      console.log('estimated gas:', estimatedGas)
-      console.log('gas limit:', gasLimit)
+        console.log('estimated gas:', estimatedGas)
+        console.log('gas limit:', gasLimit)
 
-      // call contract
-      console.log('Deploying Data NFT...')
-      const tx = await factory.methods
+        // call contract
+        console.log('Deploying Data NFT...')
+        const tx = await factory.methods
           .claimDataNFT(route.params.name, uri)
-          .send({from: store.state.metaAddress, gasLimit: gasLimit})
+          .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
             await generateMintHash(transactionHash)
@@ -370,20 +388,24 @@ export default defineComponent({
           })
           .on('error', () => generateLoad.value = false)
 
-      // display results
-      console.log('tx hash:', tx.transactionHash)
+        // display results
+        console.log('tx hash:', tx.transactionHash)
 
-      let eventArgsList = tx.events.CreateDataNFT.returnValues
-      console.log('owner:', eventArgsList.owner)
-      console.log('dataset name:', eventArgsList.datasetName)
-      console.log('dataNFT address:', eventArgsList.dataNFTAddress)
-      eventArgs.owner = eventArgsList.owner
-      eventArgs.datasetName = eventArgsList.datasetName
-      eventArgs.dataNFTAddress = eventArgsList.dataNFTAddress
-      // manageDOI.value = false
+        let eventArgsList = tx.events.CreateDataNFT.returnValues
+        console.log('owner:', eventArgsList.owner)
+        console.log('dataset name:', eventArgsList.datasetName)
+        console.log('dataNFT address:', eventArgsList.dataNFTAddress)
+        eventArgs.owner = eventArgsList.owner
+        eventArgs.datasetName = eventArgsList.datasetName
+        eventArgs.dataNFTAddress = eventArgsList.dataNFTAddress
+        // manageDOI.value = false
+      } catch (err) {
+        console.log('err', err)
+        if (err && err.message) system.$commonFun.messageTip('error', err.message)
+      }
     }
 
-    async function generateMintHash(tx_hash) {
+    async function generateMintHash (tx_hash) {
       let fd = new FormData()
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       fd.append('tx_hash', tx_hash)
@@ -391,18 +413,18 @@ export default defineComponent({
       const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'post', fd)
     }
 
-    function beforeClose() {
+    function beforeClose () {
       manageDOI.value = true
       ruleForm.agreeDoi = ''
     }
 
-    async function init() {
+    async function init () {
       if (route.name !== 'datasetDetail') return
       listLoad.value = true
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        listdata.value = listRes.data.dataset || {name: route.params.name, is_public: '1'}
+        listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1' }
         if (listRes.data.nft) {
           let contract_address = listRes.data.nft.contract_address;
           listRes.data.nft.tokens = listRes.data.nft.tokens.map((token) => {
@@ -410,13 +432,13 @@ export default defineComponent({
             return token
           })
         }
-        nftdata.value = listRes.data.nft || {tokens: [], status: 'ungenerate'}
+        nftdata.value = listRes.data.nft || { tokens: [], status: 'ungenerate' }
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }
 
-    async function datasetIndex() {
+    async function datasetIndex () {
       let index = 0
       accessDataset.value.forEach((ele, i) => {
         if (ele === route.params.name) index = i
@@ -456,7 +478,7 @@ export default defineComponent({
       system,
       route,
       router,
-      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI
+      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI, copyName
     }
   }
 })
@@ -640,8 +662,12 @@ export default defineComponent({
           }
         }
       }
-      .link{
+      .link {
+        color: #606060;
         text-decoration: underline;
+        &:hover {
+          color: #c37af9;
+        }
       }
 
       .el-button {
@@ -678,6 +704,18 @@ export default defineComponent({
         width: auto;
         color: #606060;
       }
+      .process_style {
+        display: flex;
+        align-items: center;
+        i {
+          margin: 0 0 0.2rem -0.1rem;
+          font-size: 18px;
+          color: #9c9c9c;
+          svg {
+            cursor: pointer;
+          }
+        }
+      }
 
       .el-table {
         text-align: left;
@@ -689,7 +727,7 @@ export default defineComponent({
             .cell {
               padding: 0;
               font-family: "FIRACODE-BOLD";
-              font-size: 17px;
+              font-size: 16px;
               color: #000;
               @media screen and (max-width: 768px) {
                 font-size: 15px;
@@ -706,13 +744,20 @@ export default defineComponent({
             .cell {
               padding: 0.2rem;
               font-family: "FIRACODE-REGULAR";
-              font-size: 15px;
+              font-size: 14px;
               color: #606060;
+              word-break: break-word;
+              line-height: 1.3;
               @media screen and (max-width: 768px) {
-                font-size: 14px;
+                font-size: 13px;
               }
               @media screen and (min-width: 1800px) {
                 font-size: 17px;
+              }
+
+              .el-button {
+                width: auto;
+                margin: 0;
               }
 
               .current {
@@ -732,6 +777,14 @@ export default defineComponent({
                   font-size: 16px;
                 }
               }
+            }
+          }
+        }
+        &.nft_table {
+          padding-top: 0.1rem;
+          tr {
+            th {
+              border-top: 1px solid #ebeef5;
             }
           }
         }
