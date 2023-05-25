@@ -194,6 +194,11 @@ a:focus {
     margin: auto;
 }
 
+.el-popper {
+    word-break: break-word;
+    text-align: left;
+}
+
 @media screen and (max-width:1920px) {
     .landing {
         width: 21.5rem;
