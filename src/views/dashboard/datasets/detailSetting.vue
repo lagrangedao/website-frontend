@@ -326,7 +326,10 @@ export default defineComponent({
         const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contractAddress)
         const ipfs_url = await nft_contract.methods.tokenURI(tokenId).call()
         console.log('ipfs_url:', ipfs_url)
-        copyName(ipfs_url)
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(ipfs_url)
+          system.$commonFun.messageTip('success', 'Copy success, The url is: ' + ipfs_url)
+        } else copyName(ipfs_url)
       } catch (err) {
         system.$commonFun.messageTip('error', 'Copy failed')
         console.log('Copy failed', err)
@@ -478,7 +481,7 @@ export default defineComponent({
       system,
       route,
       router,
-      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI, copyName
+      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI
     }
   }
 })
