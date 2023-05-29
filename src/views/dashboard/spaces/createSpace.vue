@@ -178,8 +178,8 @@ export default defineComponent({
         })
         const hardwareOptions = ref([])
         const validateInput = (rule, value, callback) => {
-            if (!checkSpecialKey(value)) {
-                callback(new Error("Only regular alphanumeric characters, '-', '.' and '_' supported"));
+            if ((/[^a-zA-Z0-9-]/g).test(value)) {
+                callback(new Error("Only regular alphanumeric characters and '-' support"));
             } else {
                 callback();
             }
@@ -210,7 +210,7 @@ export default defineComponent({
 
         function checkSpecialKey (str) {
             let specialKey =
-                "[~!#$^&*()=|{}':;'\\[\\],<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
+                "[~!#$^&*()=_|{}':;'\\[\\],<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
             for (let i = 0; i < str.length; i++) {
                 if (specialKey.indexOf(str.substr(i, 1)) != -1) {
                     return false;

@@ -10,8 +10,9 @@
           <el-button-group class="ml-4">
             <el-button>
               <i class="icon icon_like"></i>like</el-button>
-            <el-button>444</el-button>
+            <el-button>4</el-button>
           </el-button-group>
+          <share-pop></share-pop>
         </div>
       </div>
       <div class="tag content">
@@ -77,11 +78,12 @@ import detailCard from './detailCard.vue'
 import detailFiles from './detailFiles.vue'
 import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
+import sharePop from '@/components/share.vue'
 import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  Setting
+  Setting, Share
 } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'Datasets',
@@ -90,7 +92,7 @@ export default defineComponent({
     detailCard,
     detailCommunity,
     detailSetting,
-    Setting
+    Setting, Share, sharePop
   },
   setup () {
     const store = useStore()

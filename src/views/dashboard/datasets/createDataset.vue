@@ -90,7 +90,7 @@ export default defineComponent({
             oldOptions: []
         })
         const validateInput = (rule, value, callback) => {
-            if (!checkSpecialKey(value)) {
+            if ((/[^a-zA-Z0-9-._]/g).test(value)) {
                 callback(new Error("Only regular alphanumeric characters, '-', '.' and '_' supported"));
             } else {
                 callback();

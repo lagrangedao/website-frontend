@@ -244,6 +244,43 @@ function momentFun(dateItem) {
   return dateNew
 }
 
+function popupwindow(title, url) {
+  return window.open(
+    "https://twitter.com/intent/tweet?text=" +
+    encodeURIComponent(title),
+    "_blank",
+    "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=700, height=600,top=100,left=350"
+  );
+}
+
+
+function copyContent(text) {
+  var txtArea = document.createElement('textarea')
+  txtArea.id = 'txt'
+  txtArea.style.position = 'fixed'
+  txtArea.style.top = '0'
+  txtArea.style.left = '0'
+  txtArea.style.opacity = '0'
+  txtArea.value = text
+  document.body.appendChild(txtArea)
+  txtArea.select()
+
+  try {
+    var successful = document.execCommand('copy')
+    var msg = successful ? 'successful' : 'unsuccessful'
+    console.log('Copying text command was ' + msg)
+    if (successful) {
+      messageTip('success', 'Copied')
+      return true
+    }
+  } catch (err) {
+    console.log('Oops, unable to copy')
+  } finally {
+    document.body.removeChild(txtArea)
+  }
+  return false
+}
+
 const Web3 = require('web3');
 const web3NFT = new Web3(process.env.VUE_APP_FILECOINRPC)
 let web3Init
@@ -276,5 +313,7 @@ export default {
   messageTip,
   signOutFun,
   changeNet,
-  momentFun
+  momentFun,
+  popupwindow,
+  copyContent
 }
