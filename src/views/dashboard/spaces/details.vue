@@ -18,6 +18,7 @@
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
           </div>
+          <share-pop></share-pop>
         </div>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
@@ -79,6 +80,7 @@ import detailCard from './detailCard.vue'
 import detailFiles from './detailFiles.vue'
 import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
+import sharePop from '@/components/share.vue'
 import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -92,7 +94,7 @@ export default defineComponent({
     detailCard,
     detailCommunity,
     detailSetting,
-    Setting
+    Setting, sharePop
   },
   setup () {
     const store = useStore()

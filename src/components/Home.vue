@@ -169,3 +169,35 @@ export default defineComponent({
   }
 }
 </style>
+<style lang="scss">
+.popper_style {
+  padding: 0.05rem 0 !important;
+  word-break: break-word;
+  text-align: left;
+  .demo-rich-conent {
+    li {
+      display: flex;
+      align-items: center;
+      padding: 0.1rem 0.2rem;
+      font-size: 14px;
+      cursor: pointer;
+      color: #767676;
+      svg {
+        margin-right: 0.08rem;
+      }
+      &:nth-child(1) {
+        border-bottom: 1px solid #e6e6e6;
+      }
+      &:hover {
+        color: rgb(41, 41, 41);
+        svg {
+          path {
+            fill: rgb(41, 41, 41);
+          }
+        }
+      }
+    }
+  }
+}
+</style>
+
