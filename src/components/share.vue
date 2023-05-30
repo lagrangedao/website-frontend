@@ -92,8 +92,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 .share_pop {
   .share_style {
-    font-size: 24px;
-    margin: 0 0.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin: 0 0.1rem;
     cursor: pointer;
     svg {
       cursor: pointer;

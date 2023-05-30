@@ -30,7 +30,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
     }
   } catch (err) {
     console.error(err, err.response)
-    messageTip('error', err.response ? err.response.statusText : 'Fail')
+    messageTip('error', err.response ? err.response.statusText : 'Request failed. Please try again later!')
     if (err.response.status === 401) {
       signOutFun()
     } else if (err.response) {

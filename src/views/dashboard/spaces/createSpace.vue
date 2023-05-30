@@ -171,7 +171,7 @@ export default defineComponent({
             resource: '1',
             hardware: '0',
             sdk: 'Docker',
-            hours: '1',
+            hours: '336',
             payment_hash: '',
             licenseOptions: [],
             oldOptions: []
