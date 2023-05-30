@@ -1,5 +1,5 @@
 <template>
-  <section id="space">
+  <section id="space" v-loading="forkLoad" element-loading-text="Please wait...">
     <div class="space_head">
       <div class="content">
         <div class="name">
@@ -17,6 +17,11 @@
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
+          </div>
+          <div class="logs_style" @click="forkOperate" v-if="metaAddress !== route.params.wallet_address">
+            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
+              <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
+            </svg> Fork
           </div>
           <share-pop></share-pop>
         </div>
@@ -50,7 +55,7 @@
           </template>
           <detail-community v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
-        <el-tab-pane name="settings" v-if="settingOneself">
+        <el-tab-pane name="settings" v-if="metaAddress === route.params.wallet_address">
           <template #label>
             <span class="custom-tabs-label">
               <!-- <i class="icon icon_spaces"></i> -->
@@ -194,6 +199,7 @@ export default defineComponent({
       }
     ])
     const settingOneself = ref(false)
+    const forkLoad = ref(false)
     const parentValue = ref('')
     const drawer = ref(false)
     const direction = ref('btt')
@@ -258,16 +264,35 @@ export default defineComponent({
       } else logsValue.value = ''
       parentValue.value = numRe.test(value) ? '' : value
     }
-    onActivated(() => {
+    const forkOperate = async () => {
+      forkLoad.value = true
+      const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/duplicate`, 'post', {})
+      if (forkRes && forkRes.status === 'success') {
+        system.$commonFun.messageTip('success', forkRes.message ? forkRes.message : 'Fork successfully!')
+        router.push({ name: 'spaceDetail', params: { wallet_address: metaAddress.value, name: route.params.name, tabs: 'card' } })
+      } else system.$commonFun.messageTip('error', forkRes.message ? forkRes.message : forkRes.error ? forkRes.error : 'Fork failed!')
+      init()
+    }
+    function init () {
       activeName.value = route.params.tabs || 'card'
+      forkLoad.value = false
       parentValue.value = ''
       logsValue.value = ''
       logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
+    }
+    onActivated(() => init())
+    watch(route, (to, from) => {
+      if (to.name !== 'spaceDetail') return
+      if (to.params.tabs === 'card') {
+        window.scrollTo(0, 0)
+        init()
+      }
     })
     return {
       accessSpace,
+      metaAddress,
       lagLogin,
       dataList,
       searchValue,
@@ -286,8 +311,9 @@ export default defineComponent({
       router,
       settingOneself,
       tableData,
+      forkLoad,
       parentValue, drawer, direction, logsValue, logsCont, handleValue,
-      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName
+      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName, forkOperate
     }
   }
 })
@@ -433,7 +459,7 @@ export default defineComponent({
           display: flex;
           align-items: center;
           padding: 0.05rem 0.05rem;
-          margin: 0 0.07rem 0 0;
+          margin: 0 0 0 0.07rem;
           background-color: transparent;
           color: #878c93;
           border: 1px solid rgba(229, 231, 235, 1);

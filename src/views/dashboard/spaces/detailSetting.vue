@@ -278,9 +278,17 @@ export default defineComponent({
       pauseSpace: false,
       displayPrice: false
     })
+    const validateInput = (rule, value, callback) => {
+      if ((/[^a-zA-Z0-9-]/g).test(value)) {
+        callback(new Error("Only regular alphanumeric characters and '-' support"));
+      } else {
+        callback();
+      }
+    }
     const rules = reactive({
       name: [
-        { required: true, message: ' ', trigger: 'blur' }
+        { required: true, message: ' ', trigger: 'blur' },
+        { validator: validateInput, trigger: "blur" }
       ]
     })
     const hardwareOptions = ref([])
@@ -558,6 +566,9 @@ export default defineComponent({
                   @media screen and (max-width: 768px) {
                     width: 100%;
                   }
+                }
+                .el-form {
+                  width: 100%;
                 }
                 .self-end {
                   width: 30px;

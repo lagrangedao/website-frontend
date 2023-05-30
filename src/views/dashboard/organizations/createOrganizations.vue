@@ -145,7 +145,8 @@ export default defineComponent({
                     value: 'Community',
                     label: 'Community'
                 }
-            ]
+            ],
+            hours: '336'
         })
         const fileList = ref([])
         const validateInput = (rule, value, callback) => {
