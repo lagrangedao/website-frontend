@@ -3,6 +3,7 @@ import {
     createWebHistory,
     createWebHashHistory
 } from 'vue-router'
+import writer from '@/utils/router'
 const home = () =>
     import ("@/components/Home");
 const dashboard = () =>
@@ -46,7 +47,8 @@ const routes = [{
                 name: 'main',
                 component: main,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: ''
                 }
             },
             {
@@ -54,7 +56,8 @@ const routes = [{
                 name: 'datasets',
                 component: datasets,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: 'Datasets - '
                 }
             },
             {
@@ -62,7 +65,8 @@ const routes = [{
                 name: 'datasetDetail',
                 component: datasetDetail,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: 'Datasets at '
                 }
             },
             {
@@ -70,7 +74,8 @@ const routes = [{
                 name: 'models',
                 component: models,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: 'Models - '
                 }
             },
             {
@@ -78,7 +83,8 @@ const routes = [{
                 name: 'modelsDetail',
                 component: modelsDetail,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: 'Models at '
                 }
             },
             {
@@ -86,7 +92,8 @@ const routes = [{
                 name: 'datasetsCreate',
                 component: datasetsCreate,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: ''
                 }
             },
             {
@@ -94,7 +101,8 @@ const routes = [{
                 name: 'spaces',
                 component: spaces,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: 'Spaces - '
                 }
             },
             {
@@ -102,7 +110,8 @@ const routes = [{
                 name: 'spaceDetail',
                 component: spaceDetail,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: 'Spaces at '
                 }
             },
             {
@@ -110,7 +119,8 @@ const routes = [{
                 name: 'spaceCreate',
                 component: spaceCreate,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: ''
                 }
             },
             {
@@ -118,7 +128,8 @@ const routes = [{
                 name: 'personalCenter',
                 component: personalCenter,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: 'Settings - '
                 },
                 // beforeEnter: (to, from, next) => {
                 //   if (!sessionStorage.getItem('metaAddressLag')) {
@@ -136,7 +147,8 @@ const routes = [{
                 name: 'personalCenterProfile',
                 component: personalCenterProfile,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: 'Settings - '
                 }
             },
             {
@@ -144,7 +156,8 @@ const routes = [{
                 name: 'organizationsCreate',
                 component: organizationsCreate,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: ''
                 }
             },
             {
@@ -152,7 +165,8 @@ const routes = [{
                 name: 'organizationsSettings',
                 component: organizationsSettings,
                 meta: {
-                    keepAlive: true
+                    keepAlive: true,
+                    title: ''
                 }
             },
         ]
@@ -169,6 +183,11 @@ const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
     // history: createWebHashHistory(process.env.BASE_URL),
     routes
+})
+
+router.beforeEach((to, from, next) => {
+    writer(to);
+    next();
 })
 
 export default router

@@ -2,7 +2,7 @@
 <html lang="">
 
 <head prefix="og: http://ogp.me/ns#">
-  <meta charset="utf-8">
+  <meta name="referrer" content="no-referrer" charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover"
   />
@@ -24,19 +24,7 @@
   <meta property="og:image:height" content="300">
   <meta property="og:image:alt" content="Lagrange DAO logo">
   <meta property="og:description" content="Lagrange DAO is a DAO for data value realization. It provides data sharing & analytic spaces for Decentralized science(DeSci).">
-  <!-- twitter-->
-  <meta property="twitter:url" content="https://lagrangedao.org" />
-  <meta name="twitter:title" content="Lagrange DAO" />
-  <meta name="twitter:description" content="Lagrange DAO is a DAO for data value realization. It provides data sharing & analytic spaces for Decentralized science(DeSci)."
-  />
-  <meta name="twitter:site" content="@lagrangedao">
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://lagrangedao.org/logo.png" />
-  <meta name="twitter:image:alt" content="Alt text for image">
-  <meta name="twitter:creator" content="@lagrangedao">
-
-  <link rel="icon" href="https://lagrangedao.org/favicon.ico">
-  <!-- <link rel="icon" href="<%= BASE_URL %>favicon.ico"> -->
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
   <!-- <title><%= htmlWebpackPlugin.options.title %></title> -->
   <title>
     <%= webpackConfig.name %>
@@ -54,26 +42,6 @@
 
     gtag('config', 'G-P54L1Z7HKF');
   </script>
-  <!-- twitter -->
-  <script>
-    window.twttr = (function (d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0],
-        t = window.twttr || {};
-      if (d.getElementById(id)) return t;
-      js = d.createElement(s);
-      js.id = id;
-      js.src = "https://platform.twitter.com/widgets.js";
-      fjs.parentNode.insertBefore(js, fjs);
-
-      t._e = [];
-      t.ready = function (f) {
-        t._e.push(f);
-      };
-
-      return t;
-    }(document, "script", "twitter-wjs"));
-  </script>
-
 </head>
 
 <body>
