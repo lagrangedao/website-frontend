@@ -17,6 +17,8 @@ const writer = (to) => {
     })
     const metas = document.createElement("META");
     const creatArr = [{
+            name: "referrer",
+            content: "no-referrer",
             charset: "utf-8"
         },
         {
@@ -26,6 +28,70 @@ const writer = (to) => {
         {
             name: "viewport",
             content: "width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui"
+        },
+        {
+            name: "format-detection",
+            content: "telephone=no"
+        },
+        {
+            name: "renderer",
+            content: "webkit|ie-comp|ie-stand"
+        },
+        {
+            "http-equiv": "X-UA-Compatible",
+            content: "IE=Edge,chrome=1"
+        },
+        {
+            content: "telephone=no",
+            name: "format-detection"
+        },
+        {
+            content: "email=no",
+            name: "format-detection"
+        },
+        {
+            name: "keywords",
+            content: "Lagrange DAO"
+        },
+        {
+            name: "description",
+            content: "Lagrange DAO is a DAO for data value realization. It provides data sharing & analytic spaces for Decentralized science(DeSci)."
+        },
+        {
+            property: "og:title",
+            content: "Lagrange DAO"
+        },
+        {
+            property: "og:type",
+            content: "website"
+        },
+        {
+            property: "og:url",
+            content: "https://lagrangedao.org"
+        },
+        {
+            property: "og:image",
+            content: "https://lagrangedao.org/logo.png"
+        },
+        {
+            property: "og:image:type",
+            content: "image/png"
+        },
+        {
+            property: "og:image:width",
+            content: "300"
+        },
+        {
+            property: "og:image:height",
+            content: "300"
+        },
+        {
+            property: "og:image:alt",
+            content: "Lagrange DAO logo"
+        },
+        {
+            property: "og:description",
+            content: "Lagrange DAO is a DAO for data value realization. It provides data sharing & analytic spaces for Decentralized science(DeSci)."
         }
     ];
     const tmpArr = to.meta.data ? to.meta.data.concat() : [];
