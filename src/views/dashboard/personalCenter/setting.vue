@@ -1,13 +1,6 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <el-alert type="warning" effect="dark" center show-icon v-if="loadingText">
-      <div slot="title">
-        To use our site, please switch to
-        <span @click="changeNetChange(3141)">Filecoin TestNet</span> or
-        <span @click="changeNetChange(137)">Polygon Mainnet</span> or
-        <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span>.
-      </div>
-    </el-alert>
+    <network-alert v-if="loadingText"></network-alert>
     <el-row class="dataset_body">
       <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
@@ -51,6 +44,7 @@ import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
+import networkAlert from '@/components/networkAlert.vue'
 import editProfile from './editProfile.vue'
 import editAccount from './editAccount.vue'
 import editToken from './editToken.vue'
@@ -63,7 +57,7 @@ import {
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    Plus, editProfile, editAccount, editToken, editOrganizations, editClient, editComputing
+    Plus, editProfile, editAccount, editToken, editOrganizations, editClient, editComputing, networkAlert
   },
   setup () {
     const store = useStore()
@@ -150,7 +144,7 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137) {
+      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137 || parseInt(chainId, 16) === 11155111) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) {
           loading.value = false
@@ -178,7 +172,7 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137) isLogin()
+        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137 || parseInt(accounts, 16) === 11155111) isLogin()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
@@ -188,9 +182,6 @@ export default defineComponent({
         system.$commonFun.signOutFun()
         // window.location.reload()
       })
-    }
-    function changeNetChange (rows) {
-      system.$commonFun.changeNet(rows)
     }
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
@@ -227,7 +218,7 @@ export default defineComponent({
       prevType,
       listLoad,
       fileList,
-      isLogin, signIn, fn, changeNetChange, momentFilter, settingDetail,
+      isLogin, signIn, fn, momentFilter, settingDetail,
     }
   }
 })

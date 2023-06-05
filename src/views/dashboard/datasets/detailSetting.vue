@@ -29,7 +29,11 @@
         </el-button>
       </div>
       <div class="fileList" v-loading="doiLoad">
-        <div class="title">{{ doiIndex === 3 ? 'DNFT' : 'Data NFT (DNFT)' }}</div>
+        <div class="title">
+          {{ doiIndex === 3 ? 'DNFT' : 'Data NFT (DNFT)' }}
+
+          <el-button class="request_btn" v-if="nftdata.status === 'success'" @click="dataNFTRequest = true">Generate Metadata License</el-button>
+        </div>
         <div v-if="doiIndex === 1">
           <div class="tip">
             Generate a DNFT for this dataset. Learn more about Data NFT
@@ -172,6 +176,8 @@
         </span>
       </template>
     </el-dialog>
+
+    <data-nft v-if="dataNFTRequest" @handleChange="handleChange" :dataNFTRequest="dataNFTRequest" :createdAt="listdata.created_at" :updatedAt="listdata.updated_at" :contractAddress="nftdata.contract_address"></data-nft>
   </section>
 </template>
 <script>
@@ -191,13 +197,13 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   CaretBottom, Warning
 } from '@element-plus/icons-vue'
-
+import dataNft from '@/components/dataNFT.vue'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
   name: 'Datasets',
   components: {
-    CaretBottom, Warning
+    CaretBottom, Warning, dataNft
   },
   props: {
     // listdata: { type: Number, default: 1 }
@@ -247,6 +253,7 @@ export default defineComponent({
     const listLoad = ref(false)
     const dialogDOIVisible = ref(false)
     const settingIndex = ref(0)
+    const dataNFTRequest = ref(false)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -427,7 +434,7 @@ export default defineComponent({
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1' }
+        listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1', created_at: "", updated_at: "" }
         if (listRes.data.nft) {
           let contract_address = listRes.data.nft.contract_address;
           listRes.data.nft.tokens = listRes.data.nft.tokens.map((token) => {
@@ -435,7 +442,7 @@ export default defineComponent({
             return token
           })
         }
-        nftdata.value = listRes.data.nft || { tokens: [], status: 'ungenerate' }
+        nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'ungenerate' }
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -447,6 +454,11 @@ export default defineComponent({
         if (ele === route.params.name) index = i
       })
       return index
+    }
+
+    function handleChange (val, refresh) {
+      dataNFTRequest.value = val
+      if (refresh) init()
     }
 
     onMounted(async () => {
@@ -478,10 +490,12 @@ export default defineComponent({
       ruleFormRefDelete,
       listLoad,
       dialogDOIVisible,
+      dataNFTRequest,
       system,
       route,
       router,
-      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI
+      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI,
+      handleChange
     }
   }
 })
@@ -685,13 +699,17 @@ export default defineComponent({
         color: #c37af9;
         word-break: break-word;
         white-space: normal;
+        border-color: rgb(220, 223, 230);
         @media screen and (max-width: 1600px) {
           font-size: 14px;
         }
-
+        &.request_btn {
+          width: auto;
+          margin: 0 0.2rem;
+        }
         &:hover {
           opacity: 0.9;
-          border-color: #e3e6eb;
+          border-color: #f3f1ff;
 
           span {
             cursor: inherit;
