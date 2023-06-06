@@ -262,7 +262,7 @@ function popupwindow(title, url) {
 }
 
 
-function copyContent(text) {
+function copyContent(text, tipCont) {
   var txtArea = document.createElement('textarea')
   txtArea.id = 'txt'
   txtArea.style.position = 'fixed'
@@ -278,7 +278,7 @@ function copyContent(text) {
     var msg = successful ? 'successful' : 'unsuccessful'
     console.log('Copying text command was ' + msg)
     if (successful) {
-      messageTip('success', 'Copied')
+      messageTip('success', tipCont)
       return true
     }
   } catch (err) {

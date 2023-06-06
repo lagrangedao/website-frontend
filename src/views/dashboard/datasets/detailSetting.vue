@@ -30,11 +30,11 @@
       </div>
       <div class="fileList" v-loading="doiLoad">
         <div class="title">
-          {{ doiIndex === 3 ? 'DNFT' : 'Data NFT (DNFT)' }}
+          {{ 'Data NFT (DNFT)' }}
 
-          <el-button class="request_btn" v-if="nftdata.status === 'success'" @click="dataNFTRequest = true">Generate Metadata License</el-button>
+          <el-button class="request_btn" v-if="nftdata.status === 'success'" @click="dataNFTRequest = true">Create new License</el-button>
         </div>
-        <div v-if="doiIndex === 1">
+        <div>
           <div class="tip">
             Generate a DNFT for this dataset. Learn more about Data NFT
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
@@ -44,7 +44,7 @@
             <el-table-column prop="token_id" label="Token ID" />
             <el-table-column label="Mint Hash">
               <template #default="scope">
-                <a :href="`https://hyperspace.filfox.info/en/message/${scope.row.mint_hash}`" target="_blank" class="link">{{ scope.row.mint_hash }}</a>
+                <a :href="`https://hyperspace.filfox.info/en/message/${scope.row.transaction_hash}`" target="_blank" class="link">{{ scope.row.transaction_hash }}</a>
               </template>
             </el-table-column>
             <el-table-column label="Created At">
@@ -59,8 +59,8 @@
             </el-table-column>
             <el-table-column label="Ipfs URL">
               <template #default="scope">
-                <el-button size="large" @click="getTokenURI(scope.row.contract_address, scope.row.token_id)">Copy IPFS URL
-                </el-button>
+                <!-- <el-button size="large" @click="getTokenURI(scope.row.contract_address, scope.row.token_id)">Copy IPFS URL</el-button> -->
+                <el-button size="large" @click="getMoreInfo(scope.row)">More Info</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -74,43 +74,18 @@
               </template>
             </el-popover>
           </div>
+          <div v-else-if="refreshExecutable" class="process_style">
+            <el-button size="large" class="generateDOI" @click="requestInitData('refresh')">Refresh</el-button>
+            <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Still waiting for the data oracle">
+              <template #reference>
+                <el-icon>
+                  <Warning />
+                </el-icon>
+              </template>
+            </el-popover>
+          </div>
           <el-button size="large" v-else class="generateDOI" @click="dialogDOIVisible = true">Generate DNFT</el-button>
         </div>
-        <!-- <div v-if="doiIndex === 2">
-          <div class="tip">
-            DNFT is active for this dataset. Learn more about Data NFT
-          </div>
-          <el-table :data="doiData" border stripe style="width: 100%">
-            <el-table-column prop="doi" label="DNFT">
-              <template #default="scope">
-                {{scope.row.doi}}
-                <span class="current">CURRENT</span>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-        <div v-if="doiIndex === 3">
-          <div class="tip">
-            DNFT is active for this dataset.
-          </div>
-          <el-table :data="doiData" border stripe style="width: 100%">
-            <el-table-column prop="doi" label="DNFT">
-              <template #default="scope">
-                {{scope.row.doi}}
-                <span class="current">CURRENT</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="version" label="Version">
-              <template #default="scope">
-                {{scope.row.version}}
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="tip tip_new">
-            Your dataset has been updated, do you want to generate a new DNFT?
-          </div>
-          <el-button size="large" class="generateDOI" @click="dialogDOIVisible = true">Generate DNFT</el-button>
-        </div> -->
       </div>
       <div class="fileList" v-loading="deleteLoad">
         <div class="title">Delete this dataset</div>
@@ -135,7 +110,7 @@
       </div>
     </el-row>
 
-    <el-dialog v-model="dialogDOIVisible" title="DNFT Agreement" :show-close="false" custom-class="doi_body" @close="beforeClose">
+    <el-dialog v-model="dialogDOIVisible" title="DNFT Agreement" :show-close="false" :close-on-click-modal="false" custom-class="doi_body" @close="beforeClose">
       <div v-if="manageDOI">
         <div class="tip">
           Generating a DNFT restricts certain features of the dataset: it will no longer be possible to rename, transfer, delete or change the visibility to private.
@@ -158,18 +133,26 @@
         </el-form>
       </div>
       <div v-else>
-        <div class="tip_text">
+        <div class="tip_text" v-loading="moreLoad">
           <p>
-            <label>owner:</label> {{ eventArgs.owner }}</p>
+            <label>Owner:</label>
+            {{ eventArgs.owner }}
+            <el-icon v-if="eventArgs.owner" @click="copyName(eventArgs.owner, 'Copied')">
+              <DocumentCopy />
+            </el-icon>
+          </p>
           <p>
-            <label>dataset name:</label> {{ eventArgs.datasetName }} </p>
-          <p>
-            <label>dataNFT address:</label> {{ eventArgs.dataNFTAddress }}</p>
+            <label>IPFS URL:</label>
+            {{ eventArgs.ipfs_url }}
+            <el-icon v-if="eventArgs.ipfs_url" @click="copyName(eventArgs.ipfs_url, 'Copied')">
+              <DocumentCopy />
+            </el-icon>
+          </p>
         </div>
       </div>
       <template #footer>
         <span class="dialog-footer" v-loading="generateLoad">
-          <el-button type="primary" v-if="manageDOI" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'agree'" @click="generateSub">
+          <el-button type="primary" v-if="manageDOI" :disabled="ruleForm.agreeDoi && ruleForm.agreeDoi !== 'agree'" @click="requestNFT">
             Generate DNFT
           </el-button>
           <el-button @click="dialogDOIVisible = false">Cancel</el-button>
@@ -195,7 +178,7 @@ import {
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  CaretBottom, Warning
+  CaretBottom, Warning, DocumentCopy
 } from '@element-plus/icons-vue'
 import dataNft from '@/components/dataNFT.vue'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
@@ -203,7 +186,7 @@ const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
   name: 'Datasets',
   components: {
-    CaretBottom, Warning, dataNft
+    CaretBottom, Warning, DocumentCopy, dataNft
   },
   props: {
     // listdata: { type: Number, default: 1 }
@@ -233,7 +216,10 @@ export default defineComponent({
         { required: true, message: ' ', trigger: 'blur' }
       ]
     })
-    const eventArgs = reactive({})
+    const eventArgs = reactive({
+      owner: '',
+      ipfs_url: ''
+    })
     const ruleFormRef = ref(null)
     const listdata = ref({})
     const nftdata = ref({})
@@ -257,6 +243,9 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const refreshExecutable = ref(false)
+    const moreLoad = ref(false)
+    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
 
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
@@ -336,46 +325,22 @@ export default defineComponent({
         if (navigator.clipboard) {
           await navigator.clipboard.writeText(ipfs_url)
           system.$commonFun.messageTip('success', 'Copy success, The url is: ' + ipfs_url)
-        } else copyName(ipfs_url)
+        } else copyName(ipfs_url, 'Copy success, The url is: ' + ipfs_url)
       } catch (err) {
         system.$commonFun.messageTip('error', 'Copy failed')
         console.log('Copy failed', err)
       }
     }
 
-    function copyName (text) {
-      var txtArea = document.createElement('textarea')
-      txtArea.id = 'txt'
-      txtArea.style.position = 'fixed'
-      txtArea.style.top = '0'
-      txtArea.style.left = '0'
-      txtArea.style.opacity = '0'
-      txtArea.value = text
-      document.body.appendChild(txtArea)
-      txtArea.select()
-
-      try {
-        var successful = document.execCommand('copy')
-        var msg = successful ? 'successful' : 'unsuccessful'
-        console.log('Copying text command was ' + msg)
-        if (successful) {
-          system.$commonFun.messageTip('success', 'Copy success, The url is: ' + text)
-          return true
-        }
-      } catch (err) {
-        console.log('Oops, unable to copy')
-      } finally {
-        document.body.removeChild(txtArea)
-      }
-      return false
+    function copyName (text, tipCont) {
+      system.$commonFun.copyContent(text, tipCont)
     }
 
-    async function claimDataNFT (uri) {
+    async function claimDataNFT () {
       try {
-        const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
         // estimate gas
         let estimatedGas = await factory.methods
-          .claimDataNFT(route.params.name, uri)
+          .claimDataNFT(route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         // we will use estimated gas * 1.5
@@ -387,28 +352,19 @@ export default defineComponent({
         // call contract
         console.log('Deploying Data NFT...')
         const tx = await factory.methods
-          .claimDataNFT(route.params.name, uri)
+          .claimDataNFT(route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
             await generateMintHash(transactionHash)
             generateLoad.value = false
             dialogDOIVisible.value = false
-            init()
+            requestInitData()
           })
           .on('error', () => generateLoad.value = false)
 
         // display results
         console.log('tx hash:', tx.transactionHash)
-
-        let eventArgsList = tx.events.CreateDataNFT.returnValues
-        console.log('owner:', eventArgsList.owner)
-        console.log('dataset name:', eventArgsList.datasetName)
-        console.log('dataNFT address:', eventArgsList.dataNFTAddress)
-        eventArgs.owner = eventArgsList.owner
-        eventArgs.datasetName = eventArgsList.datasetName
-        eventArgs.dataNFTAddress = eventArgsList.dataNFTAddress
-        // manageDOI.value = false
       } catch (err) {
         console.log('err', err)
         if (err && err.message) system.$commonFun.messageTip('error', err.message)
@@ -423,17 +379,48 @@ export default defineComponent({
       const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'post', fd)
     }
 
-    function beforeClose () {
+    async function beforeClose () {
+      dialogDOIVisible.value = false
+      await system.$commonFun.timeout(500)
       manageDOI.value = true
       ruleForm.agreeDoi = ''
+      eventArgs.owner = ''
+      eventArgs.ipfs_url = ''
     }
 
-    async function init () {
-      if (route.name !== 'datasetDetail') return
+    async function requestNFT () {
+      generateLoad.value = true
+      try {
+        let estimatedGas = await factory.methods
+          .requestDataNFT(route.params.name)
+          .estimateGas({ from: store.state.metaAddress })
+
+        let gasLimit = Math.floor(estimatedGas * 1.5)
+
+        await factory.methods
+          .requestDataNFT(route.params.name)
+          .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+          .on('transactionHash', async (transactionHash) => {
+            console.log('transactionHash:', transactionHash)
+            generateLoad.value = false
+            dialogDOIVisible.value = false
+            requestInitData()
+          })
+          .on('error', () => generateLoad.value = false)
+      } catch (err) {
+        console.log('err', err)
+        if (err && err.message) system.$commonFun.messageTip('error', err.message)
+      }
+    }
+
+    async function ntfStatus (type) {
       listLoad.value = true
-      listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
+        const status = listRes.data.nft.status || ''
+        refreshExecutable.value = status === 'ungenerate'
+        if (type && status === 'ungenerate') claimDataNFT()
+
         listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1', created_at: "", updated_at: "" }
         if (listRes.data.nft) {
           let contract_address = listRes.data.nft.contract_address;
@@ -444,8 +431,36 @@ export default defineComponent({
         }
         nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'ungenerate' }
       }
-      await system.$commonFun.timeout(500)
       listLoad.value = false
+    }
+
+    async function requestInitData (type) {
+      if (route.name !== 'datasetDetail') return
+      listLoad.value = true
+      try {
+        // const request = await factory.methods.requestData(route.params.wallet_address, route.params.name).call().then()
+        const request = {
+          requestor: '0x0000000000000000000000000000000000000000',
+          datasetName: '',
+          uri: '',
+          fulfilled: false,
+          claimable: false
+        }
+        console.log(request)
+        if (system.$commonFun.web3Init.utils.isAddress(request.requestor) && request.datasetName !== '') {
+          if (request.fulfilled && request.claimable) {
+            ntfStatus(type)
+            return
+          } else {
+            if (type) system.$commonFun.messageTip('warning', 'Still waiting for the data oracle')
+            refreshExecutable.value = true
+          }
+        } else refreshExecutable.value = false
+        listLoad.value = false
+      } catch (err) {
+        console.log('err', err)
+        if (err && err.message) system.$commonFun.messageTip('error', err.message)
+      }
     }
 
     async function datasetIndex () {
@@ -458,12 +473,24 @@ export default defineComponent({
 
     function handleChange (val, refresh) {
       dataNFTRequest.value = val
-      if (refresh) init()
+      if (refresh) requestInitData()
+    }
+
+    async function getMoreInfo (row) {
+      moreLoad.value = true
+      const moreRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'get')
+      if (moreRes && moreRes.status === 'success') {
+        eventArgs.owner = moreRes.data.owner
+        eventArgs.ipfs_url = moreRes.data.ipfs_url
+      }
+      manageDOI.value = false
+      moreLoad.value = false
+      dialogDOIVisible.value = true
     }
 
     onMounted(async () => {
       window.scrollTo(0, 0)
-      init()
+      requestInitData()
       settingIndex.value = await datasetIndex()
     })
     onDeactivated(() => {
@@ -494,8 +521,10 @@ export default defineComponent({
       system,
       route,
       router,
+      refreshExecutable,
+      moreLoad,
       props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI,
-      handleChange
+      handleChange, getMoreInfo, requestInitData, requestNFT, copyName
     }
   }
 })
@@ -837,10 +866,10 @@ export default defineComponent({
       .tip,
       .tip_black,
       .tip_text {
-        padding: 0.1rem 0.25rem;
+        padding: 0.1rem 0.25rem 0.2rem;
         background-color: #f3f1ff;
         color: #562683;
-        font-size: 15px;
+        font-size: 14px;
         word-break: break-word;
         line-height: 1.3;
         @media screen and (max-width: 768px) {
@@ -865,7 +894,11 @@ export default defineComponent({
 
           label {
             display: inline-block;
-            width: 135px;
+            width: 85px;
+          }
+          i,
+          svg {
+            cursor: pointer;
           }
         }
       }

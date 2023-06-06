@@ -47,7 +47,7 @@ export default defineComponent({
     const router = useRouter()
 
     function copyLink () {
-      system.$commonFun.copyContent(document.location.href)
+      system.$commonFun.copyContent(document.location.href, 'Copied')
     }
     function shareTwitter () {
       let typeName = 'Dataset'

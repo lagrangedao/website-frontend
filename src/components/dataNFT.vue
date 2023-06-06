@@ -45,13 +45,13 @@
               </el-button>
             </div>
           </el-form-item>
-          <el-form-item v-for="(info, index) in dataNFTForm.additionalInformation" :key="index" :label="`Additional Info${index>0?index:''}`" :prop="'additionalInformation.' + index + '.value'" class="form-flex">
+          <el-form-item v-for="(info, index) in dataNFTForm.additionalInformation" :key="index" :label="index===0?'Additional Info':''" :prop="'additionalInformation.' + index + '.value'" class="form-flex">
             <el-input v-model="info.key" />
             <span class="m">:</span>
             <el-input v-model="info.value" />
             <span class="m"></span>
             <el-button @click="addInfo">+</el-button>
-            <el-button class="mt-2" v-if="index>0" @click.prevent="removeInfo(info)">-</el-button>
+            <el-button class="mt-2" :disabled="index===0" @click.prevent="removeInfo(info)">-</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -250,7 +250,7 @@ export default defineComponent({
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
-      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'post', fd)
+      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/license/mint_hash`, 'post', fd)
     }
 
     onMounted(() => { })
