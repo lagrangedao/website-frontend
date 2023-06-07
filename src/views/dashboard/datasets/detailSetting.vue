@@ -39,7 +39,10 @@
             Generate a DNFT for this dataset. Learn more about Data NFT
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
-          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success'" stripe style="width: 100%" class="nft_table">
+          <div class="tip" v-if="!refreshExecutable && nftdata.status !== 'success' && nftdata.status !== 'processing'">
+            Please do not repeatedly click on the generate DNFT button, if you click multiple times may cause damage to your property.
+          </div>
+          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success' || (nftdata.tokens&&nftdata.tokens.length>0)" stripe style="width: 100%" class="nft_table">
             <el-table-column prop="chain_id" label="Chain ID" />
             <el-table-column prop="token_id" label="Token ID" />
             <el-table-column label="Mint Hash">
@@ -54,7 +57,8 @@
             </el-table-column>
             <el-table-column label="Contract Address">
               <template #default="scope">
-                <a :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank" class="link">{{ scope.row.contract_address }}</a>
+                <a v-if="scope.row.contract_address" :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank" class="link">{{ scope.row.contract_address }}</a>
+                <span v-else>-</span>
               </template>
             </el-table-column>
             <el-table-column label="Ipfs URL">
@@ -478,7 +482,7 @@ export default defineComponent({
 
     async function getMoreInfo (row) {
       moreLoad.value = true
-      const moreRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'get')
+      const moreRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/more_info`, 'get')
       if (moreRes && moreRes.status === 'success') {
         eventArgs.owner = moreRes.data.owner
         eventArgs.ipfs_url = moreRes.data.ipfs_url

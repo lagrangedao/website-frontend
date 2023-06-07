@@ -30,6 +30,9 @@
                   <span>1</span>
                 </div>
                 <h1>{{list.name}}</h1>
+                <div class="card-owner">
+                  <span>Owner: {{list.wallet_address}}</span>
+                </div>
               </template>
               <div class="text">
                 <div class="text_left">
@@ -327,6 +330,22 @@ export default defineComponent({
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
                     font-size: 15px;
+                  }
+                }
+              }
+              .card-owner {
+                position: absolute;
+                right: 0.15rem;
+                bottom: 0.05rem;
+                display: flex;
+                align-items: center;
+                opacity: 0.8;
+                span {
+                  font-size: 13px;
+                  color: #fff;
+                  line-height: 1.2;
+                  @media screen and (min-width: 1800px) {
+                    font-size: 14px;
                   }
                 }
               }

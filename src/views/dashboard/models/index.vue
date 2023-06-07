@@ -127,15 +127,10 @@
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.license}}</p>
               </div>
-              <!-- <div class="text">
-                                <el-row :gutter="6">
-                                    <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                        <router-link to="" class="ellipsis">
-                                            {{list.license}}
-                                        </router-link>
-                                    </el-col>
-                                </el-row>
-                            </div> -->
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+              </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
@@ -247,6 +242,10 @@ export default defineComponent({
     function momentFilter (data) {
       return system.$commonFun.momentFun(data)
     }
+    function hiddAddress (val) {
+      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
+      else return '-'
+    }
     onActivated(() => {
       window.scrollTo(0, 0)
       init()
@@ -268,7 +267,7 @@ export default defineComponent({
       total,
       bodyWidth,
       system,
-      init, NumFormat, handleCurrentChange, handleSizeChange, momentFilter, detailFun
+      init, NumFormat, handleCurrentChange, handleSizeChange, momentFilter, detailFun, hiddAddress
     }
   }
 })
@@ -745,6 +744,7 @@ export default defineComponent({
                 justify-content: flex-start;
                 align-items: center;
                 flex-wrap: wrap;
+                margin-bottom: 0.1rem;
                 color: #000;
                 line-height: 1;
                 @media screen and (min-width: 1800px) {
@@ -758,6 +758,11 @@ export default defineComponent({
                 .icon_text {
                   background: url(../../../assets/images/icons/icon_10.png)
                     no-repeat left center;
+                  background-size: 100%;
+                }
+                .icon_wallet {
+                  background: url(../../../assets/images/icons/icon_48.png)
+                    no-repeat left -1px;
                   background-size: 100%;
                 }
                 .icon_time {
@@ -858,6 +863,11 @@ export default defineComponent({
                   .icon_text {
                     background: url(../../../assets/images/icons/icon_10_1.png)
                       no-repeat left center;
+                    background-size: 100%;
+                  }
+                  .icon_wallet {
+                    background: url(../../../assets/images/icons/icon_48_1.png)
+                      no-repeat left -1px;
                     background-size: 100%;
                   }
                   .icon_time {
