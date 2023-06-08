@@ -39,23 +39,15 @@
             Generate a DNFT for this dataset. Learn more about Data NFT
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
-          <div class="tip" v-if="!refreshExecutable && nftdata.status !== 'success' && nftdata.status !== 'processing'">
-            Please do not repeatedly click on the generate DNFT button, if you click multiple times may cause damage to your property.
-          </div>
-          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success' || (nftdata.tokens&&nftdata.tokens.length>0)" stripe style="width: 100%" class="nft_table">
+          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success'" stripe style="width: 100%" class="nft_table">
             <el-table-column prop="chain_id" label="Chain ID" />
             <el-table-column prop="token_id" label="Token ID" />
-            <el-table-column label="Mint Hash">
+            <el-table-column prop="owner_address" label="Owner Address">
               <template #default="scope">
-                <a :href="`https://hyperspace.filfox.info/en/message/${scope.row.transaction_hash}`" target="_blank" class="link">{{ scope.row.transaction_hash }}</a>
+                <span>{{ scope.row.owner_address }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="Created At">
-              <template #default="scope">
-                {{ momentFilter(scope.row.created_at) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="Contract Address">
+            <el-table-column prop="contract_address" label="Contract Address">
               <template #default="scope">
                 <a v-if="scope.row.contract_address" :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank" class="link">{{ scope.row.contract_address }}</a>
                 <span v-else>-</span>
@@ -63,14 +55,13 @@
             </el-table-column>
             <el-table-column label="Ipfs URL">
               <template #default="scope">
-                <!-- <el-button size="large" @click="getTokenURI(scope.row.contract_address, scope.row.token_id)">Copy IPFS URL</el-button> -->
-                <el-button size="large" @click="getMoreInfo(scope.row)">More Info</el-button>
+                <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a>
               </template>
             </el-table-column>
           </el-table>
           <div v-else-if="nftdata.status === 'processing'" class="process_style">
-            <el-button size="large" class="generateDOI is-disabled">Generate DNFT</el-button>
-            <el-popover placement="top" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Please wait for the transaction to complete">
+            <el-button size="large" class="generateDOI" @click="refreshContract('refresh')">Refresh</el-button>
+            <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Waiting for the Transaction hash complete">
               <template #reference>
                 <el-icon>
                   <Warning />
@@ -78,8 +69,8 @@
               </template>
             </el-popover>
           </div>
-          <div v-else-if="refreshExecutable" class="process_style">
-            <el-button size="large" class="generateDOI" @click="requestInitData('refresh')">Refresh</el-button>
+          <div v-else-if="nftdata.status === 'waiting for oracle'" class="process_style">
+            <el-button size="large" class="generateDOI" @click="refreshContract()">Refresh</el-button>
             <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Still waiting for the data oracle">
               <template #reference>
                 <el-icon>
@@ -249,6 +240,7 @@ export default defineComponent({
     const router = useRouter()
     const refreshExecutable = ref(false)
     const moreLoad = ref(false)
+    const DATA_NFT_ADDRESS = process.env.VUE_APP_DATANFT_ADDRESS
     const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
 
     function momentFilter (dateItem) {
@@ -309,30 +301,32 @@ export default defineComponent({
       })
     }
 
-    async function generateSub () {
-      generateLoad.value = true
-      const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post', {})
-      if (generateRes && generateRes.status === 'success') {
-        claimDataNFT(generateRes.ipfs_url)
-        return
-      } else system.$commonFun.messageTip('error', generateRes.message ? generateRes.message : 'Failed!')
-      generateLoad.value = false
-      // dialogDOIVisible.value = false
-    }
-
     async function getTokenURI (contractAddress, tokenId) {
       // create contract obj
       try {
+        let tokens = []
+        // get total supply
         const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contractAddress)
-        const ipfs_url = await nft_contract.methods.tokenURI(tokenId).call()
-        console.log('ipfs_url:', ipfs_url)
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(ipfs_url)
-          system.$commonFun.messageTip('success', 'Copy success, The url is: ' + ipfs_url)
-        } else copyName(ipfs_url, 'Copy success, The url is: ' + ipfs_url)
+        let totalSupply = await nft_contract.methods.totalSupply().call()
+
+        for (let i = 1; i <= totalSupply; i++) {
+          let token = {
+            token_id: i,
+            contract_address: contractAddress,
+            chain_id: await system.$commonFun.web3Init.eth.net.getId()
+          }
+
+          token.owner_address = await nft_contract.methods.ownerOf(i).call()
+          token.ipfs_uri = await nft_contract.methods.tokenURI(i).call()
+
+          tokens.push(token)
+        }
+
+        return tokens
       } catch (err) {
         system.$commonFun.messageTip('error', 'Copy failed')
         console.log('Copy failed', err)
+        return []
       }
     }
 
@@ -372,6 +366,7 @@ export default defineComponent({
       } catch (err) {
         console.log('err', err)
         if (err && err.message) system.$commonFun.messageTip('error', err.message)
+        generateLoad.value = false
       }
     }
 
@@ -406,6 +401,7 @@ export default defineComponent({
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
+            await requestDataInfo(transactionHash)
             generateLoad.value = false
             dialogDOIVisible.value = false
             requestInitData()
@@ -414,57 +410,55 @@ export default defineComponent({
       } catch (err) {
         console.log('err', err)
         if (err && err.message) system.$commonFun.messageTip('error', err.message)
+        generateLoad.value = false
       }
     }
 
-    async function ntfStatus (type) {
-      listLoad.value = true
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        const status = listRes.data.nft.status || ''
-        refreshExecutable.value = status === 'ungenerate'
-        if (type && status === 'ungenerate') claimDataNFT()
+    async function requestDataInfo (tx_hash) {
+      let fd = new FormData()
+      const getID = await system.$commonFun.web3Init.eth.net.getId()
+      fd.append('tx_hash', tx_hash)
+      fd.append('chain_id', getID)
+      fd.append('wallet_address', store.state.metaAddress)
+      fd.append('dataset_name', route.params.name)
+      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/request_datanft`, 'post', fd)
+    }
 
-        listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1', created_at: "", updated_at: "" }
-        if (listRes.data.nft) {
-          let contract_address = listRes.data.nft.contract_address;
-          listRes.data.nft.tokens = listRes.data.nft.tokens.map((token) => {
-            token.contract_address = contract_address
-            return token
-          })
+    async function refreshContract (type) {
+      listLoad.value = true
+      if (type) {
+        requestInitData()
+        return
+      }
+      try {
+        const request = await factory.methods.requestData(route.params.wallet_address, route.params.name).call().then()
+        console.log('request:', request)
+        if (request.fulfilled && request.claimable) {
+          claimDataNFT()
+          return
+        } else {
+          system.$commonFun.messageTip('warning', 'Still waiting for the data oracle')
         }
-        nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'ungenerate' }
+      } catch (err) {
+        console.log('err', err)
+        if (err && err.message) system.$commonFun.messageTip('error', err.message)
       }
       listLoad.value = false
     }
 
     async function requestInitData (type) {
-      if (route.name !== 'datasetDetail') return
       listLoad.value = true
-      try {
-        // const request = await factory.methods.requestData(route.params.wallet_address, route.params.name).call().then()
-        const request = {
-          requestor: '0x0000000000000000000000000000000000000000',
-          datasetName: '',
-          uri: '',
-          fulfilled: false,
-          claimable: false
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1', created_at: "", updated_at: "" }
+        if (listRes.data.nft) {
+          let contract_address = listRes.data.nft.contract_address;
+          if (listRes.data.nft.status === 'success') listRes.data.nft.tokens = await getTokenURI(contract_address)
+          else if (listRes.data.nft.status === 'processing') system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
         }
-        console.log(request)
-        if (system.$commonFun.web3Init.utils.isAddress(request.requestor) && request.datasetName !== '') {
-          if (request.fulfilled && request.claimable) {
-            ntfStatus(type)
-            return
-          } else {
-            if (type) system.$commonFun.messageTip('warning', 'Still waiting for the data oracle')
-            refreshExecutable.value = true
-          }
-        } else refreshExecutable.value = false
-        listLoad.value = false
-      } catch (err) {
-        console.log('err', err)
-        if (err && err.message) system.$commonFun.messageTip('error', err.message)
+        nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
       }
+      listLoad.value = false
     }
 
     async function datasetIndex () {
@@ -479,19 +473,6 @@ export default defineComponent({
       dataNFTRequest.value = val
       if (refresh) requestInitData()
     }
-
-    async function getMoreInfo (row) {
-      moreLoad.value = true
-      const moreRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/more_info`, 'get')
-      if (moreRes && moreRes.status === 'success') {
-        eventArgs.owner = moreRes.data.owner
-        eventArgs.ipfs_url = moreRes.data.ipfs_url
-      }
-      manageDOI.value = false
-      moreLoad.value = false
-      dialogDOIVisible.value = true
-    }
-
     onMounted(async () => {
       window.scrollTo(0, 0)
       requestInitData()
@@ -525,10 +506,9 @@ export default defineComponent({
       system,
       route,
       router,
-      refreshExecutable,
       moreLoad,
-      props, submitForm, submitDeleteForm, momentFilter, generateSub, beforeClose, getTokenURI,
-      handleChange, getMoreInfo, requestInitData, requestNFT, copyName
+      props, submitForm, submitDeleteForm, momentFilter, beforeClose,
+      handleChange, requestInitData, requestNFT, copyName, refreshContract
     }
   }
 })
