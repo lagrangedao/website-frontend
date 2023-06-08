@@ -53,10 +53,9 @@
           </template>
           <detail-community v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
-        <el-tab-pane name="settings">
+        <!-- <el-tab-pane name="settings">
           <template #label>
             <span class="custom-tabs-label">
-              <!-- <i class="icon icon_datasets"></i> -->
               <el-icon class="icon">
                 <Setting />
               </el-icon>
@@ -64,7 +63,7 @@
             </span>
           </template>
           <detail-setting v-if="activeName === 'settings'"></detail-setting>
-        </el-tab-pane>
+        </el-tab-pane> -->
       </el-tabs>
     </div>
   </section>

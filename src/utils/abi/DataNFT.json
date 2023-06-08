@@ -1,13 +1,11 @@
-[
-  {
+[{
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
   {
     "anonymous": false,
-    "inputs": [
-      {
+    "inputs": [{
         "indexed": true,
         "internalType": "address",
         "name": "owner",
@@ -31,8 +29,7 @@
   },
   {
     "anonymous": false,
-    "inputs": [
-      {
+    "inputs": [{
         "indexed": true,
         "internalType": "address",
         "name": "owner",
@@ -56,8 +53,31 @@
   },
   {
     "anonymous": false,
-    "inputs": [
+    "inputs": [{
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "uri",
+        "type": "string"
+      }
+    ],
+    "name": "CreateLicense",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{
         "indexed": false,
         "internalType": "uint256",
         "name": "tokenId",
@@ -75,21 +95,18 @@
   },
   {
     "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint8",
-        "name": "version",
-        "type": "uint8"
-      }
-    ],
+    "inputs": [{
+      "indexed": false,
+      "internalType": "uint8",
+      "name": "version",
+      "type": "uint8"
+    }],
     "name": "Initialized",
     "type": "event"
   },
   {
     "anonymous": false,
-    "inputs": [
-      {
+    "inputs": [{
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -107,8 +124,7 @@
   },
   {
     "anonymous": false,
-    "inputs": [
-      {
+    "inputs": [{
         "indexed": true,
         "internalType": "address",
         "name": "from",
@@ -131,8 +147,7 @@
     "type": "event"
   },
   {
-    "inputs": [
-      {
+    "inputs": [{
         "internalType": "address",
         "name": "to",
         "type": "address"
@@ -149,40 +164,50 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
+    "inputs": [{
+      "internalType": "address",
+      "name": "owner",
+      "type": "address"
+    }],
     "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{
+      "internalType": "uint256",
+      "name": "",
+      "type": "uint256"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "contractURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
+    "outputs": [{
+      "internalType": "string",
+      "name": "",
+      "type": "string"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [{
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
       {
+        "internalType": "string",
+        "name": "uri",
+        "type": "string"
+      }
+    ],
+    "name": "createLicense",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -206,57 +231,46 @@
   {
     "inputs": [],
     "name": "factory",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{
+      "internalType": "address",
+      "name": "",
+      "type": "address"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [{
+      "internalType": "uint256",
+      "name": "tokenId",
+      "type": "uint256"
+    }],
     "name": "getApproved",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{
+      "internalType": "address",
+      "name": "",
+      "type": "address"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [{
+      "internalType": "uint256",
+      "name": "",
+      "type": "uint256"
+    }],
     "name": "idToDataToken",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{
+      "internalType": "address",
+      "name": "",
+      "type": "address"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
+    "inputs": [{
         "internalType": "address",
         "name": "owner",
         "type": "address"
@@ -278,8 +292,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
+    "inputs": [{
         "internalType": "address",
         "name": "owner",
         "type": "address"
@@ -291,76 +304,48 @@
       }
     ],
     "name": "isApprovedForAll",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [{
+      "internalType": "bool",
+      "name": "",
+      "type": "bool"
+    }],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "uri",
-        "type": "string"
-      }
-    ],
-    "name": "mint",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "name",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
+    "outputs": [{
+      "internalType": "string",
+      "name": "",
+      "type": "string"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{
+      "internalType": "address",
+      "name": "",
+      "type": "address"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [{
+      "internalType": "uint256",
+      "name": "tokenId",
+      "type": "uint256"
+    }],
     "name": "ownerOf",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{
+      "internalType": "address",
+      "name": "",
+      "type": "address"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -372,8 +357,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
+    "inputs": [{
         "internalType": "address",
         "name": "from",
         "type": "address"
@@ -395,8 +379,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
+    "inputs": [{
         "internalType": "address",
         "name": "from",
         "type": "address"
@@ -423,8 +406,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
+    "inputs": [{
         "internalType": "address",
         "name": "operator",
         "type": "address"
@@ -441,85 +423,70 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "uri",
-        "type": "string"
-      }
-    ],
+    "inputs": [{
+      "internalType": "string",
+      "name": "uri",
+      "type": "string"
+    }],
     "name": "setContractUri",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "interfaceId",
-        "type": "bytes4"
-      }
-    ],
+    "inputs": [{
+      "internalType": "bytes4",
+      "name": "interfaceId",
+      "type": "bytes4"
+    }],
     "name": "supportsInterface",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [{
+      "internalType": "bool",
+      "name": "",
+      "type": "bool"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "symbol",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
+    "outputs": [{
+      "internalType": "string",
+      "name": "",
+      "type": "string"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [{
+      "internalType": "uint256",
+      "name": "tokenId",
+      "type": "uint256"
+    }],
     "name": "tokenURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
+    "outputs": [{
+      "internalType": "string",
+      "name": "",
+      "type": "string"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "totalSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{
+      "internalType": "uint256",
+      "name": "",
+      "type": "uint256"
+    }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
+    "inputs": [{
         "internalType": "address",
         "name": "from",
         "type": "address"
@@ -541,13 +508,11 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
+    "inputs": [{
+      "internalType": "address",
+      "name": "newOwner",
+      "type": "address"
+    }],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",

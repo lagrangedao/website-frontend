@@ -207,6 +207,14 @@ async function changeNet(rows) {
         blockExplorerUrls: [process.env.VUE_APP_FILECOINRPC]
       }
       break
+    case 11155111:
+      text = {
+        chainId: web3Init.utils.numberToHex(11155111),
+        chainName: 'Sepolia Testnet',
+        rpcUrls: [process.env.VUE_APP_SEPOLIARPC],
+        blockExplorerUrls: [process.env.VUE_APP_SEPOLIABLOCKURL]
+      }
+      break
   }
   ethereum.request({
     method: 'wallet_addEthereumChain',
@@ -254,7 +262,7 @@ function popupwindow(title, url) {
 }
 
 
-function copyContent(text) {
+function copyContent(text, tipCont) {
   var txtArea = document.createElement('textarea')
   txtArea.id = 'txt'
   txtArea.style.position = 'fixed'
@@ -270,7 +278,7 @@ function copyContent(text) {
     var msg = successful ? 'successful' : 'unsuccessful'
     console.log('Copying text command was ' + msg)
     if (successful) {
-      messageTip('success', 'Copied')
+      messageTip('success', tipCont)
       return true
     }
   } catch (err) {

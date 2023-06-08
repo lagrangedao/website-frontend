@@ -34,7 +34,8 @@
                 <p v-if="loadingText">please switch to
                   <span style="text-decoration: underline;" @click="changeNetChange(3141)">Filecoin TestNet</span> or
                   <span style="text-decoration: underline;" @click="changeNetChange(137)">Polygon Mainnet</span> or
-                  <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span>.</p>
+                  <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span> or
+                  <span style="text-decoration: underline;" @click="changeNetChange(11155111)">Sepolia Testnet</span>.</p>
               </div>
             </div>
           </el-col>
