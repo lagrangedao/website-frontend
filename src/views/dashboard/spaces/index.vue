@@ -30,15 +30,15 @@
                   <span>1</span>
                 </div>
                 <h1>{{list.name}}</h1>
-                <div class="card-owner">
+                <!-- <div class="card-owner">
                   <span>Owner: {{list.wallet_address}}</span>
-                </div>
+                </div> -->
               </template>
               <div class="text">
                 <div class="text_left">
                   <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
                   <i class="icon"></i>
-                  <span class="small">{{list.license||'-'}}</span>
+                  <span class="small">{{hiddAddress(list.wallet_address)}}</span>
                 </div>
                 <span>{{momentFilter(list.created_at)}}</span>
               </div>
@@ -118,6 +118,10 @@ export default defineComponent({
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
+    function hiddAddress (val) {
+      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
+      else return '-'
+    }
     onActivated(() => {
       window.scrollTo(0, 0)
       init()
@@ -143,7 +147,7 @@ export default defineComponent({
       system,
       route,
       router,
-      handleSizeChange, handleCurrentChange, searchChange, detailFun, momentFilter
+      handleSizeChange, handleCurrentChange, searchChange, detailFun, momentFilter, hiddAddress
     }
   }
 })
