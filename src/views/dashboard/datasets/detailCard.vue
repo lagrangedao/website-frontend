@@ -19,10 +19,10 @@
             </ul>
           </div>
         </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="14" :md="13" :lg="14" :xl="14" class="right">
+        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="24" :md="13" :lg="14" :xl="14" class="right">
           <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
-        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
+        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
           <v-md-editor v-model="textEditorChange"></v-md-editor>
         </el-col>
         <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="left left_light">
@@ -141,10 +141,10 @@
                     <i class="icon icon_time"></i>
                     <span class="small">5 Sept 2022 - 5 Oct 2022</span>
                   </div>
-                  <div class="item_body">
+                  <!-- <div class="item_body">
                     <i class="icon icon_up"></i>
                     <span class="small">5.15M</span>
-                  </div>
+                  </div> -->
                 </div>
               </el-card>
             </el-col>

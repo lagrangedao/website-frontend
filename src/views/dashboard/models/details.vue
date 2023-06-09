@@ -2,6 +2,12 @@
   <section id="dataset">
     <div class="dataset_head">
       <div class="content">
+        <div class="backTo" @click="back">
+          <el-icon>
+            <ArrowLeft />
+          </el-icon>
+          <span>Go Back</span>
+        </div>
         <div class="name">
           <b>{{route.params.name}}</b>
           <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
@@ -48,7 +54,7 @@
             <span class="custom-tabs-label">
               <i class="icon"></i>
               <span>Community</span>
-              <b>3</b>
+              <!-- <b>3</b> -->
             </span>
           </template>
           <detail-community v-if="activeName === 'community'"></detail-community>
@@ -78,7 +84,7 @@ import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, 
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  Setting
+  Setting, ArrowLeft
 } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'Datasets',
@@ -87,7 +93,7 @@ export default defineComponent({
     detailCard,
     detailCommunity,
     detailSetting,
-    Setting, sharePop
+    Setting, sharePop, ArrowLeft
   },
   setup () {
     const store = useStore()
@@ -259,6 +265,9 @@ export default defineComponent({
       }
       return false
     }
+    function back () {
+      router.push({ path: '/models' })
+    }
     onActivated(() => {
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
@@ -282,7 +291,7 @@ export default defineComponent({
       route,
       router,
       tableData,
-      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList, copyName
+      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList, copyName, back
     }
   }
 })
@@ -297,12 +306,13 @@ export default defineComponent({
     font-size: 16px;
   }
   .dataset_head {
-    padding: 0.5rem 0 0;
+    padding: 0.3rem 0 0;
     background-color: #fbfbfc;
     border-bottom: 1px solid #f1f1f1;
     .content {
       display: flex;
       align-items: stretch;
+      flex-wrap: wrap;
       padding: 0 0.16rem;
       margin: 0 auto 0.25rem;
       font-size: 14px;
@@ -312,10 +322,28 @@ export default defineComponent({
       @media screen and (min-width: 1536px) {
         max-width: 1536px;
       }
+      .backTo {
+        display: flex;
+        align-items: center;
+        padding: 0 0 0.25rem;
+        font-size: 0.2rem;
+        text-align: left;
+        cursor: pointer;
+        i {
+          margin-right: 0.05rem;
+          svg {
+            cursor: pointer;
+          }
+        }
+        &:hover {
+          color: #7405ff;
+        }
+      }
       .name {
         display: flex;
         align-items: center;
         font-family: "Helvetica-Bold";
+        width: 100%;
         font-size: 0.21rem;
         color: #878c93;
         line-height: 1;

@@ -270,7 +270,6 @@ export default defineComponent({
   font-display: block;
 }
 #step {
-  min-height: 300px;
   color: #fff;
   background: #180e1a url(../../../assets/images/dashboard/main/bg.jpg)
     no-repeat center;
@@ -290,7 +289,8 @@ export default defineComponent({
   }
   .step_body {
     position: relative;
-    padding: 0.6rem 0.16rem 1.5rem;
+    min-height: calc(100% - 0.6rem);
+    padding: 0.6rem 0.16rem 0;
     margin: auto;
     // background: url(../../../assets/images/dashboard/main/bg_small_1.png),
     //   url(../../../assets/images/dashboard/main/bg_small_2.png);
@@ -303,29 +303,9 @@ export default defineComponent({
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
     }
-    @media screen and (min-height: 600px) {
-      min-height: 381px;
-    }
-    @media screen and (min-height: 700px) {
-      min-height: 510px;
-    }
-    @media screen and (min-height: 750px) {
-      min-height: 480px;
-    }
-    @media screen and (min-height: 768px) {
-      min-height: 546px;
-    }
-    @media screen and (min-height: 900px) {
-      min-height: 600px;
-    }
-    @media screen and (min-height: 1000px) {
-      min-height: 700px;
-    }
-    @media screen and (min-height: 1100px) {
-      min-height: 800px;
-    }
-    @media screen and (min-height: 1200px) {
-      min-height: 900px;
+    @media screen and (max-width: 600px) {
+      min-height: calc(100% - 0.8rem);
+      padding: 0 0.16rem 0.8rem;
     }
     .loginBody {
       height: calc(100% - 0.85rem);
@@ -333,6 +313,10 @@ export default defineComponent({
       display: flex;
       flex-wrap: wrap;
       align-items: center;
+      @media screen and (max-width: 600px) {
+        height: calc(100% - 0.5rem);
+        padding: 0.25rem 0;
+      }
       .el-row {
         display: flex;
         flex-wrap: wrap;
@@ -773,7 +757,8 @@ export default defineComponent({
     }
     footer {
       position: absolute;
-      bottom: 0;
+      width: 100%;
+      bottom: 0.3rem;
       right: 0.16rem;
       min-height: 0.5rem;
       .foot_media {

@@ -19,13 +19,13 @@
             </ul>
           </div>
         </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
+        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
           <div class="button">
             <el-button type="" text bg v-if="urlReadme && isPreview" @click="editFun">Edit model card</el-button>
           </div>
           <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
-        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="14" :md="17" :lg="17" :xl="17" class="right">
+        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
           <div class="button">
             <el-button type="" text bg @click="isPreview=true">Cancel</el-button>
             <el-button type="" text bg @click="editCommitFun">Commit changes</el-button>
@@ -137,10 +137,10 @@
                     <i class="icon icon_time"></i>
                     <span class="small">5 Sept 2022 - 5 Oct 2022</span>
                   </div>
-                  <div class="item_body">
+                  <!-- <div class="item_body">
                     <i class="icon icon_up"></i>
                     <span class="small">5.15M</span>
-                  </div>
+                  </div> -->
                 </div>
               </el-card>
             </el-col>

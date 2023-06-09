@@ -81,7 +81,7 @@
       <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="18" class="right" v-loading="listLoad">
         <div class="top">
           <div class="top_text">
-            <b>Datasets</b> {{NumFormat(total)}}
+            <b>Datasets</b> {{NumFormat(pagin.total)}}
             <el-input v-model="searchValue" clearable @input="searchChange" class="w-50 m-2" placeholder="Filter by name" />
           </div>
           <el-select v-model="value" class="m-2" placeholder="Sort: most Downloads">
@@ -116,16 +116,17 @@
                   <i class="icon icon_time"></i>
                   <span class="small">{{momentFilter(list.created_at)}}</span>
                 </div>
-                <div class="item_body">
+                <!-- <div class="item_body">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
-                </div>
+                </div> -->
               </div>
             </el-card>
           </el-col>
-          <p v-if="total<1 || listdata.length === 0" class="list_nodata">No Data</p>
+          <p v-if="pagin.total<1 || listdata.length === 0" class="list_nodata">No Data</p>
         </el-row>
-        <el-pagination :current-page="currentPage1" v-if="false" :page-size="20" :small="small" :background="background" layout="prev, pager, next" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        <el-pagination v-if="searchValue === '' && false" hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange"
+          @current-change="handleCurrentChange" />
       </el-col>
     </el-row>
   </section>
@@ -177,20 +178,29 @@ export default defineComponent({
         label: 'Most Likes',
       }
     ])
-    const currentPage1 = ref(1)
+    const pagin = reactive({
+      pageSize: 30,
+      pageNo: 1,
+      total: 0
+    })
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
     const listdata = ref([])
     const listdataAll = ref([])
-    const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
-    async function handleSizeChange (val) { }
-    async function handleCurrentChange (val) { }
+    async function handleSizeChange (val) {
+      // console.log('handleSizeChange:', val)
+    }
+    async function handleCurrentChange (currentPage) {
+      // console.log('handleCurrentChange:', currentPage)
+      pagin.pageNo = currentPage
+      router.push({ path: '/dataset', query: { id: currentPage } })
+    }
     async function searchChange (val) {
       listdata.value = await filterData(listdataAll.value, val)
     }
@@ -214,12 +224,14 @@ export default defineComponent({
     async function init () {
       listLoad.value = true
       listdata.value = []
-      total.value = 0
+      pagin.pageNo = Number(route.query.id) > 0 ? Number(route.query.id) : 1
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'get')
       if (listRes) {
-        listdata.value = listRes.datasets || []
         listdataAll.value = listRes.datasets || []
-        total.value = listRes.datasets.length
+        pagin.total = listdataAll.value.length || 0
+        const list = [].concat(listdataAll.value)
+        const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
+        listdata.value = list
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -246,18 +258,20 @@ export default defineComponent({
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
     })
+    watch(() => route.query, (val) => {
+      init()
+    })
     return {
       lagLogin,
       dataList,
       searchValue,
       value,
       options,
-      currentPage1,
       small,
       background,
       listLoad,
       listdata,
-      total,
+      pagin,
       bodyWidth,
       system,
       route,
@@ -293,7 +307,7 @@ export default defineComponent({
       padding: 1rem 1% 0.5rem 0;
       background-color: #fbfbfc;
       @media screen and (max-width: 768px) {
-        padding: 0.4rem 1%;
+        padding: 0 1% 0.2rem;
       }
       .list {
         margin: 0.2rem 0 0;

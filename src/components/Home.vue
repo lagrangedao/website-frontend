@@ -1,10 +1,10 @@
 <template>
   <div class="wrapper" id="wrapper" ref="area">
-    <el-container :class="{'container_position': route.name === 'main'}">
+    <el-container :class="{'container_height':true}">
       <el-header>
         <v-head></v-head>
       </el-header>
-      <el-main :class="{'main_position': route.name === 'main', 'main_app': route.name === 'spaceDetail'}">
+      <el-main>
         <div class="content">
           <router-view v-slot="{ Component }">
             <transition name="move" mode="out-in">
@@ -98,6 +98,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .wrapper {
+  min-height: 100vh;
   .content {
     .el-backtop {
       background-color: #c37af9;
@@ -106,6 +107,9 @@ export default defineComponent({
     .el-calendar-table td.is-today {
       color: #fff;
     }
+  }
+  .container_height {
+    min-height: 100vh;
   }
   .container_position {
     @media screen and (min-width: 768px) {
@@ -122,9 +126,18 @@ export default defineComponent({
     background-color: #180e1a;
   }
   .el-main {
+    display: flex;
+    flex-wrap: wrap;
     padding: 0;
     background-color: #fff;
     overflow: visible;
+    .content {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      min-height: 100%;
+      flex: 1;
+    }
     &.main_position {
       display: flex;
       justify-content: center;
@@ -197,6 +210,17 @@ export default defineComponent({
         }
       }
     }
+  }
+}
+#dataset,
+#space,
+#step {
+  width: 100%;
+  min-height: 100%;
+  .dataset_body,
+  .space_body,
+  .step_body {
+    min-height: 100%;
   }
 }
 </style>

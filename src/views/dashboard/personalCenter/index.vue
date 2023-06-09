@@ -59,7 +59,7 @@
           </div>
         </div>
         <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
-          <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="spacesIndex>1?12:24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
+          <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
             <el-card class="box-card">
               <template #header>
                 <div class="card-header">
@@ -69,7 +69,7 @@
               </template>
             </el-card>
           </el-col>
-          <el-col v-if="listdata.spacesIsShow" :xs="24" :sm="spacesIndex>1?12:24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces" :key="list" @click="detailFun(list, 'space')">
+          <el-col v-if="listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces" :key="list" @click="detailFun(list, 'space')">
             <el-card class="box-card">
               <template #header>
                 <div class="card-header">
@@ -100,7 +100,7 @@
           </el-select>
         </div>
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
+          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
             <el-card class="box-card">
               <template #header>
                 <!-- <div class="card-header">
@@ -111,28 +111,23 @@
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.name}}</p>
               </div>
-              <!-- <div class="text">
-                                <el-row :gutter="6">
-                                    <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                        <router-link to="" class="ellipsis">
-                                            {{list.data_schema}}
-                                        </router-link>
-                                    </el-col>
-                                </el-row>
-                            </div> -->
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+              </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
                   <span class="small">{{momentFilter(list.created_at)}}</span>
                 </div>
-                <div class="item_body">
+                <!-- <div class="item_body">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
-                </div>
+                </div> -->
               </div>
             </el-card>
           </el-col>
-          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
+          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
             <el-card class="box-card">
               <template #header>
               </template>
@@ -140,15 +135,19 @@
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.name}}</p>
               </div>
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+              </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
                   <span class="small">{{momentFilter(list.created_at)}}</span>
                 </div>
-                <div class="item_body">
+                <!-- <div class="item_body">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
-                </div>
+                </div> -->
               </div>
             </el-card>
           </el-col>
@@ -167,39 +166,47 @@
           </div>
         </div>
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.modelsIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.modelsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models.slice(0,3)" :key="l">
+          <el-col v-show="!listdata.modelsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models.slice(0,3)" :key="l">
             <el-card class="box-card">
               <div class="text">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
               </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
                   <span class="small">{{momentFilter(list.created_at)}}</span>
                 </div>
-                <div class="item_body">
+                <!-- <div class="item_body">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
-                </div>
+                </div> -->
               </div>
             </el-card>
           </el-col>
-          <el-col v-show="listdata.modelsIsShow" :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models" :key="l">
+          <el-col v-show="listdata.modelsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models" :key="l">
             <el-card class="box-card">
               <div class="text">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
               </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
                   <span class="small">{{momentFilter(list.created_at)}}</span>
                 </div>
-                <div class="item_body">
+                <!-- <div class="item_body">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
-                </div>
+                </div> -->
               </div>
             </el-card>
           </el-col>
@@ -367,6 +374,10 @@ export default defineComponent({
         // window.location.reload()
       })
     }
+    function hiddAddress (val) {
+      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
+      else return '-'
+    }
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
@@ -430,7 +441,7 @@ export default defineComponent({
       listLoad,
       accessAvatar,
       bodyWidth,
-      isLogin, signIn, getdataList, fn, momentFilter, detailFun, editProfile
+      isLogin, signIn, getdataList, fn, momentFilter, detailFun, editProfile, hiddAddress
     }
   }
 })
@@ -637,7 +648,7 @@ export default defineComponent({
             height: 25px;
             margin: 0 0.1rem 0 0;
             &.homepage {
-              background: url(../../../assets/images/icons/media_1.png)
+              background: url(../../../assets/images/icons/media_10.png)
                 no-repeat;
               background-size: 100%;
             }
@@ -959,6 +970,7 @@ export default defineComponent({
                 display: flex;
                 justify-content: flex-start;
                 align-items: center;
+                margin-bottom: 0.1rem;
                 color: #000;
                 line-height: 1;
                 @media screen and (min-width: 1800px) {
@@ -972,6 +984,11 @@ export default defineComponent({
                 .icon_text {
                   background: url(../../../assets/images/icons/icon_10.png)
                     no-repeat left center;
+                  background-size: 100%;
+                }
+                .icon_wallet {
+                  background: url(../../../assets/images/icons/icon_48.png)
+                    no-repeat left -1px;
                   background-size: 100%;
                 }
                 .icon_time {
@@ -1062,6 +1079,11 @@ export default defineComponent({
                   .icon_text {
                     background: url(../../../assets/images/icons/icon_10_1.png)
                       no-repeat left center;
+                    background-size: 100%;
+                  }
+                  .icon_wallet {
+                    background: url(../../../assets/images/icons/icon_48_1.png)
+                      no-repeat left -1px;
                     background-size: 100%;
                   }
                   .icon_time {
