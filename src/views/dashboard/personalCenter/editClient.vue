@@ -380,7 +380,7 @@ export default defineComponent({
       listLoad.value = true
       let formData = new FormData()
       formData.append('name', comName)
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp`, 'delete', formData, apiToken.value)
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/delete`, 'post', formData, apiToken.value)
       if (listRes && listRes.status === 'success') system.$commonFun.messageTip('success', listRes.message ? listRes.message : 'Delete successfully!')
       else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Delete failed!')
       getdataList()

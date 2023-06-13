@@ -12,7 +12,7 @@
               {{ listdata.user.full_name || '-'}}
             </div>
             <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
-            <div class="desc">Balance: {{info.balance||'-'}}</div>
+            <div class="desc">Balance: {{info.balance||'-'}} {{info.unit}}</div>
             <el-button type="" text bg @click="editProfile">Settings</el-button>
           </div>
           <div class="personal">
@@ -62,6 +62,18 @@
           <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
             <el-card class="box-card">
               <template #header>
+                <div class="card-warn" v-if="list.expireTime <= 7 && list.expireTime > 0">
+                  <el-popover placement="right-start" :width="200" trigger="hover" :content="`This Space will expire in ${list.expireTime} days, please click to the details page to renew`">
+                    <template #reference>
+                      <el-icon>
+                        <Warning />
+                      </el-icon>
+                    </template>
+                  </el-popover>
+                </div>
+                <div class="card-warn" v-else-if="list.expiration_date && list.expireTime < 0">
+                  <p class="expir">Expired</p>
+                </div>
                 <div class="card-header">
                   <span>1</span>
                 </div>
@@ -226,10 +238,13 @@ import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
 import networkAlert from '@/components/networkAlert.vue'
+import {
+  Warning
+} from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    networkAlert
+    networkAlert, Warning
   },
   setup () {
     const store = useStore()
@@ -241,7 +256,8 @@ export default defineComponent({
     const value = ref('')
     const info = reactive({
       address: '',
-      balance: ''
+      balance: '',
+      unit: ''
     })
     const options = ref([
       {
@@ -297,6 +313,8 @@ export default defineComponent({
           const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
           info.balance = Number(balanceAll).toFixed(4)
         })
+        const chainId = await system.$commonFun.web3Init.eth.net.getId()
+        info.unit = await system.$commonFun.getUnit(chainId)
         // await system.$commonFun.timeout(500)
         if (lagLogin.value) getdataList()
         else await signIn()
@@ -309,7 +327,7 @@ export default defineComponent({
         if (lStatus) getdataList()
         // else window.location.reload()
         return false
-      } else loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
+      } else loadingText.value = system.$NetworkPrompt
       // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
       store.dispatch('setNavLogin', false)
     }
@@ -329,7 +347,14 @@ export default defineComponent({
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
         let datasetList = []
-        listdata.spaces.forEach(space => spaceList.push(space.name))
+        listdata.spaces.forEach(space => {
+          if (space.expiration_date) {
+            const current = Math.floor(Date.now() / 1000)
+            const currentTime = (space.expiration_date - current) / 86400
+            space.expireTime = Math.floor(currentTime)
+          } else space.expireTime = -1
+          spaceList.push(space.name)
+        })
         listdata.datasets.forEach(space => datasetList.push(space.name))
         store.dispatch('setAccessSpace', JSON.stringify(spaceList))
         store.dispatch('setAccessDataset', JSON.stringify(datasetList))
@@ -369,7 +394,7 @@ export default defineComponent({
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         loading.value = true
-        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
+        loadingText.value = system.$NetworkPrompt
         system.$commonFun.signOutFun()
         // window.location.reload()
       })
@@ -1169,6 +1194,24 @@ export default defineComponent({
               font-size: 0.338rem;
               color: #fff;
               cursor: pointer;
+              .card-warn {
+                position: absolute;
+                left: 0.33rem;
+                top: 0.1rem;
+                display: flex;
+                align-items: center;
+                @media screen and (max-width: 768px) {
+                  left: 0.2rem;
+                }
+                i {
+                  font-size: 0.25rem;
+                  color: #e6a23c;
+                }
+                .expir {
+                  font-size: 14px;
+                  color: #e6a23c;
+                }
+              }
               .card-header {
                 position: absolute;
                 right: 0.33rem;

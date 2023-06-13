@@ -160,7 +160,7 @@ export default defineComponent({
         return false
       } else {
         active.value = 1
-        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
+        loadingText.value = system.$NetworkPrompt
       }
       // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
       store.dispatch('setNavLogin', false)
@@ -199,7 +199,7 @@ export default defineComponent({
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         active.value = 1
-        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
+        loadingText.value = system.$NetworkPrompt
         system.$commonFun.signOutFun()
         // window.location.reload()
       })
@@ -214,7 +214,7 @@ export default defineComponent({
           // formData.append('name', route.params.name)
           // formData.append('is_public', props.listdata) // public:1, private:0
           // formData.append('new_name', ruleForm.name)
-          // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'put', formData)
+          // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/update`, 'post', formData)
           // await system.$commonFun.timeout(500)
           // if (listRes && listRes.status === 'success') {
           //   system.$commonFun.messageTip('success', 'Update successfully!')

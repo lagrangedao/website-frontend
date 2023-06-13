@@ -42,7 +42,7 @@ const app = createApp(App)
 app.config.globalProperties.$commonFun = commonFun
 app.config.globalProperties.$Web3 = Web3
 app.config.globalProperties.$echarts = echarts
-app.config.globalProperties.$updateTime = "update time: 2022-11-18"
+app.config.globalProperties.$NetworkPrompt = "Switch to Filecoin TestNet, Polygon Mainnet, BSC TestNet or Sepolia TestNet!"
 app.config.globalProperties.$CryptoJS = CryptoJS
 app.use(ElementPlus, {
         locale: en,

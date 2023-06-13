@@ -466,7 +466,7 @@ export default defineComponent({
           })
           // fd.append("is_public", listdata.value.is_public)
           // fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
-          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files/upload`, 'post', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
@@ -495,7 +495,7 @@ export default defineComponent({
             fd.append('file', fileNew, `${name ? name + '/' : ''}${namepath}`)
             // console.log('file', fileNew)
           })
-          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files/upload`, 'post', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
@@ -527,7 +527,7 @@ export default defineComponent({
       let newFile = new File([type === 'create' ? textEditor.value : fileTextEditor.value], `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
       let fd = new FormData()
       fd.append('file', newFile, `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files`, 'put', fd)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files/upload`, 'post', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data.files) system.$commonFun.messageTip('success', `${type === 'create' ? 'Create ' + textInfo.name + ' successfully!' : 'Update ' + fileBody.title + ' successfully!'}`)
@@ -575,7 +575,7 @@ export default defineComponent({
           fileTextType.value = 'image'
           resolve(response.arrayBuffer())
         }
-        else if (resType.indexOf('text') > -1) {
+        else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
           fileTextType.value = 'text'
           resolve(response.text())
         } else {
@@ -611,7 +611,7 @@ export default defineComponent({
       uploadLoad.value = true
       let name = pathList.value.join('/') || ''
       let fileNew = `${name ? name + '/' : ''}${fileBody.title}`
-      const deleteRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/file?filename=${fileNew}`, 'delete')
+      const deleteRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files/delete?filename=${fileNew}`, 'post')
       if (deleteRes && deleteRes.status === 'success') system.$commonFun.messageTip('success', deleteRes.message || 'Delete successfully!')
       else system.$commonFun.messageTip('error', 'Delete failed!')
       reset()

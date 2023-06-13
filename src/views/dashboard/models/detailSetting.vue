@@ -193,7 +193,7 @@ export default defineComponent({
           formData.append('name', route.params.name)
           formData.append('is_public', listdata.value.is_public) // public:1, private:0
           formData.append('new_name', ruleForm.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'put', formData)
+          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/update`, 'post', formData)
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) {
@@ -219,7 +219,7 @@ export default defineComponent({
           deleteLoad.value = true
           let formData = new FormData()
           formData.append('name', route.params.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'delete', formData)
+          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/delete`, 'post', formData)
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) system.$commonFun.messageTip('success', 'Delete successfully!')

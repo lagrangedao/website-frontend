@@ -333,7 +333,7 @@ export default defineComponent({
           formData.append('name', route.params.name)
           formData.append('is_public', listdata.value.is_public) // public:1, private:0
           formData.append('new_name', ruleForm.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces`, 'put', formData)
+          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/update`, 'post', formData)
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
             if (listRes.data.space) {
@@ -359,7 +359,7 @@ export default defineComponent({
           deleteLoad.value = true
           let formData = new FormData()
           formData.append('name', route.params.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces`, 'delete', formData)
+          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/delete`, 'post', formData)
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
             if (listRes.data.space) system.$commonFun.messageTip('success', 'Delete successfully!')
@@ -382,9 +382,15 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.space || { name: route.params.name, is_public: '1' }
-        context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '')
+        let expireTime = -1
+        if (listRes.data.space.expiration_date) {
+          const current = Math.floor(Date.now() / 1000)
+          const currentTime = (listRes.data.space.expiration_date - current) / 86400
+          expireTime = Math.floor(currentTime)
+        }
+        context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime)
       }
-      await system.$commonFun.timeout(500)
+      // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
     function sleepChange (row) {
