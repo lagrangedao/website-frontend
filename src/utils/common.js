@@ -261,6 +261,24 @@ function popupwindow(title, url) {
   );
 }
 
+async function getUnit(id) {
+  let unit = ''
+  switch (id) {
+    case 97:
+      unit = 'tBNB'
+      break
+    case 137:
+      unit = 'MATIC'
+      break
+    case 3141:
+      unit = 'ETH'
+      break
+    case 11155111:
+      unit = 'ETH'
+      break
+  }
+  return unit
+}
 
 function copyContent(text, tipCont) {
   var txtArea = document.createElement('textarea')
@@ -323,5 +341,6 @@ export default {
   changeNet,
   momentFun,
   popupwindow,
-  copyContent
+  copyContent,
+  getUnit
 }

@@ -54,7 +54,13 @@ export default defineComponent({
           })
           listdata.job_result_uri = JSON.parse(textUri).job_result_uri
         } else listdata.job_result_uri = jobData.job_result_uri
-        context.emit('handleValue', listRes.data.space.status, jobData ? jobData.job_source_uri : '')
+        let expireTime = -1
+        if (listRes.data.space.expiration_date) {
+          const current = Math.floor(Date.now() / 1000)
+          const currentTime = (listRes.data.space.expiration_date - current) / 86400
+          expireTime = Math.floor(currentTime)
+        }
+        context.emit('handleValue', listRes.data.space.status, jobData ? jobData.job_source_uri : '', expireTime)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false

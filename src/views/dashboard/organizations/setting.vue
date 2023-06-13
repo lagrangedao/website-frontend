@@ -148,7 +148,7 @@ export default defineComponent({
           listLoad.value = false
         }
         return false
-      } else loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
+      } else loadingText.value = system.$NetworkPrompt
       // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
       store.dispatch('setNavLogin', false)
     }
@@ -175,7 +175,7 @@ export default defineComponent({
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         loading.value = true
-        loadingText.value = 'Switch to Filecoin TestNet or BSC TestNet!'
+        loadingText.value = system.$NetworkPrompt
         system.$commonFun.signOutFun()
         // window.location.reload()
       })

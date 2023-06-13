@@ -19,6 +19,14 @@
             <el-button>0</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
+          <el-button-group class="ml-4" v-if="expireTime <=7 && expireTime >= 0">
+            <el-button type="warning" plain disabled>
+              <el-icon>
+                <WarningFilled />
+              </el-icon>
+              &nbsp;Expires in {{expireTime}} days</el-button>
+            <el-button type="warning" plain @click="renewFun">Renew</el-button>
+          </el-button-group>
           <div class="logs_style" v-if="logsValue" @click="drawer = true">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
@@ -96,7 +104,7 @@ import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, 
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  Setting, ArrowLeft
+  Setting, ArrowLeft, WarningFilled
 } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'Spaces',
@@ -105,7 +113,7 @@ export default defineComponent({
     detailCard,
     detailCommunity,
     detailSetting,
-    Setting, sharePop, ArrowLeft
+    Setting, sharePop, ArrowLeft, WarningFilled
   },
   setup () {
     const store = useStore()
@@ -210,6 +218,7 @@ export default defineComponent({
     const drawer = ref(false)
     const direction = ref('btt')
     const logsValue = ref('')
+    const expireTime = ref(-1)
     const logsCont = reactive({
       data: {}
     })
@@ -227,9 +236,6 @@ export default defineComponent({
         .toString()
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
-    function detailFun (row, index) {
-      console.log(row, index)
     }
     function copyName (text) {
       var txtArea = document.createElement('textarea')
@@ -257,7 +263,7 @@ export default defineComponent({
       }
       return false
     }
-    const handleValue = async (value, log) => {
+    const handleValue = async (value, log, time) => {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
       if (log) {
@@ -266,8 +272,12 @@ export default defineComponent({
           resolve(response.text())
         })
         logsValue.value = log
+        expireTime.value = time
         logsCont.data = textUri ? JSON.parse(textUri).data : {}
-      } else logsValue.value = ''
+      } else {
+        logsValue.value = ''
+        expireTime.value = -1
+      }
       parentValue.value = numRe.test(value) ? '' : value
     }
     const forkOperate = async () => {
@@ -284,12 +294,20 @@ export default defineComponent({
       forkLoad.value = false
       parentValue.value = ''
       logsValue.value = ''
+      expireTime.value = -1
       logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
     }
     function back () {
       router.push({ path: '/spaces' })
+    }
+    async function renewFun () {
+      forkLoad.value = true
+      const renewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/extend`, 'post')
+      if (renewRes && renewRes.status === 'success') window.location.reload()
+      else system.$commonFun.messageTip('error', 'Request failed!')
+      forkLoad.value = false
     }
     onActivated(() => init())
     watch(route, (to, from) => {
@@ -321,8 +339,9 @@ export default defineComponent({
       settingOneself,
       tableData,
       forkLoad,
-      parentValue, drawer, direction, logsValue, logsCont, handleValue,
-      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName, forkOperate, back
+      parentValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
+      NumFormat, handleCurrentChange, handleSizeChange, handleClick, copyName,
+      forkOperate, back, renewFun
     }
   }
 })
@@ -433,6 +452,18 @@ export default defineComponent({
           @media screen and (max-width: 441px) {
             padding: 0 5px;
             font-size: 12px;
+          }
+          &.el-button--warning {
+            border: 1px solid rgba(207, 146, 54, 0.5);
+            // border-left-color: rgb(253, 246, 236);
+            &:hover {
+              color: #fff;
+            }
+          }
+          &.is-disabled {
+            &:hover {
+              color: inherit;
+            }
           }
         }
         .status {

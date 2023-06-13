@@ -256,7 +256,7 @@ export default defineComponent({
           formData.append('name', route.params.name)
           formData.append('is_public', listdata.value.is_public) // public:1, private:0
           formData.append('new_name', ruleForm.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'put', formData)
+          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/update`, 'post', formData)
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) {
@@ -284,7 +284,7 @@ export default defineComponent({
           deleteLoad.value = true
           let formData = new FormData()
           formData.append('name', route.params.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'delete', formData)
+          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/delete`, 'post', formData)
           await system.$commonFun.timeout(500)
           if (listRes && listRes.status === 'success') {
             if (listRes.data.dataset) system.$commonFun.messageTip('success', 'Delete successfully!')
@@ -427,7 +427,7 @@ export default defineComponent({
     async function refreshContract (type) {
       listLoad.value = true
       if (type) {
-        requestInitData()
+        requestInitData(type)
         return
       }
       try {
@@ -454,7 +454,7 @@ export default defineComponent({
         if (listRes.data.nft) {
           let contract_address = listRes.data.nft.contract_address;
           if (listRes.data.nft.status === 'success') listRes.data.nft.tokens = await getTokenURI(contract_address)
-          else if (listRes.data.nft.status === 'processing') system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
+          else if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
         }
         nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
       }

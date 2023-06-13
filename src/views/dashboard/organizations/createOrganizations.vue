@@ -84,7 +84,7 @@
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button size="large" class="create_btn" disabled @click="submitForm('ruleFormRef')">Create Organization</el-button>
+                        <el-button size="large" class="create_btn" disabled @click="submitForm('ruleFormRef')">Come Soon</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
