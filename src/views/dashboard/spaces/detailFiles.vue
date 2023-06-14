@@ -617,7 +617,10 @@ export default defineComponent({
       uploadLoad.value = true
       let name = pathList.value.join('/') || ''
       let fileNew = `${name ? name + '/' : ''}${fileBody.title}`
-      const deleteRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/delete?filename=${fileNew}`, 'post')
+      let paramsBody = {
+        filename: fileNew
+      }
+      const deleteRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/delete`, 'post', paramsBody)
       if (deleteRes && deleteRes.status === 'success') system.$commonFun.messageTip('success', deleteRes.message || 'Delete successfully!')
       else system.$commonFun.messageTip('error', 'Delete failed!')
       reset()
