@@ -209,7 +209,8 @@ export default defineComponent({
           }
           const licenseRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
-            if (licenseRes.ipfs_url) createLicense(licenseRes.ipfs_url)
+            if (licenseRes.data && licenseRes.data.ipfs_url) createLicense(licenseRes.data.ipfs_url)
+            else generateLoad.value = false
             return
           }
           system.$commonFun.messageTip('error', licenseRes.message ? licenseRes.message : 'Failed!')

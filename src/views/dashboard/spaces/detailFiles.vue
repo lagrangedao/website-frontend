@@ -306,9 +306,9 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         fileRow.fileResdata = listRes.data.files || []
         listdata.value = listRes.data.space || { name: route.params.name }
-        let expireTime = -1
+        const current = Math.floor(Date.now() / 1000)
+        let expireTime = current
         if (listRes.data.space.expiration_date) {
-          const current = Math.floor(Date.now() / 1000)
           const currentTime = (listRes.data.space.expiration_date - current) / 86400
           expireTime = Math.floor(currentTime)
         }
@@ -617,7 +617,10 @@ export default defineComponent({
       uploadLoad.value = true
       let name = pathList.value.join('/') || ''
       let fileNew = `${name ? name + '/' : ''}${fileBody.title}`
-      const deleteRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/delete?filename=${fileNew}`, 'post')
+      let paramsBody = {
+        filename: fileNew
+      }
+      const deleteRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/delete`, 'post', paramsBody)
       if (deleteRes && deleteRes.status === 'success') system.$commonFun.messageTip('success', deleteRes.message || 'Delete successfully!')
       else system.$commonFun.messageTip('error', 'Delete failed!')
       reset()
