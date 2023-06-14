@@ -382,9 +382,9 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.space || { name: route.params.name, is_public: '1' }
-        let expireTime = -1
+        const current = Math.floor(Date.now() / 1000)
+        let expireTime = current
         if (listRes.data.space.expiration_date) {
-          const current = Math.floor(Date.now() / 1000)
           const currentTime = (listRes.data.space.expiration_date - current) / 86400
           expireTime = Math.floor(currentTime)
         }

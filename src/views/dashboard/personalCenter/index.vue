@@ -62,17 +62,15 @@
           <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
             <el-card class="box-card">
               <template #header>
-                <div class="card-warn" v-if="list.expireTime <= 7 && list.expireTime > 0">
-                  <el-popover placement="right-start" :width="200" trigger="hover" :content="`This Space will expire in ${list.expireTime} days, please click to the details page to renew`">
+                <div class="card-warn" v-if="list.expiration_date && list.expireTime <= 7">
+                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
+                    popper-style="word-break: break-word; text-align: left;">
                     <template #reference>
                       <el-icon>
                         <Warning />
                       </el-icon>
                     </template>
                   </el-popover>
-                </div>
-                <div class="card-warn" v-else-if="list.expiration_date && list.expireTime < 0">
-                  <p class="expir">Expired</p>
                 </div>
                 <div class="card-header">
                   <span>1</span>
@@ -348,11 +346,11 @@ export default defineComponent({
         let spaceList = []
         let datasetList = []
         listdata.spaces.forEach(space => {
+          const current = Math.floor(Date.now() / 1000)
           if (space.expiration_date) {
-            const current = Math.floor(Date.now() / 1000)
             const currentTime = (space.expiration_date - current) / 86400
             space.expireTime = Math.floor(currentTime)
-          } else space.expireTime = -1
+          } else space.expireTime = current
           spaceList.push(space.name)
         })
         listdata.datasets.forEach(space => datasetList.push(space.name))

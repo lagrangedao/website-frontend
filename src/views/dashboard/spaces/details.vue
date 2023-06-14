@@ -19,7 +19,7 @@
             <el-button>0</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="expireTime <=7 && expireTime >= 0">
+          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime <=7 && expireTime >= 0">
             <el-button type="warning" plain disabled>
               <el-icon>
                 <WarningFilled />
@@ -27,12 +27,15 @@
               &nbsp;Expires in {{expireTime}} days</el-button>
             <el-button type="warning" plain @click="renewFun">Renew</el-button>
           </el-button-group>
+          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime < 0">
+            <el-button type="warning" plain @click="renewFun">Restart</el-button>
+          </el-button-group>
           <div class="logs_style" v-if="logsValue" @click="drawer = true">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
           </div>
-          <div class="logs_style" @click="forkOperate" v-if="metaAddress !== route.params.wallet_address">
+          <div class="logs_style" @click="forkOperate" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
               <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
             </svg> Fork
@@ -218,7 +221,7 @@ export default defineComponent({
     const drawer = ref(false)
     const direction = ref('btt')
     const logsValue = ref('')
-    const expireTime = ref(-1)
+    const expireTime = ref(Math.floor(Date.now() / 1000))
     const logsCont = reactive({
       data: {}
     })
@@ -276,7 +279,7 @@ export default defineComponent({
         logsCont.data = textUri ? JSON.parse(textUri).data : {}
       } else {
         logsValue.value = ''
-        expireTime.value = -1
+        expireTime.value = Math.floor(Date.now() / 1000)
       }
       parentValue.value = numRe.test(value) ? '' : value
     }
@@ -294,7 +297,7 @@ export default defineComponent({
       forkLoad.value = false
       parentValue.value = ''
       logsValue.value = ''
-      expireTime.value = -1
+      expireTime.value = Math.floor(Date.now() / 1000)
       logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
@@ -305,8 +308,10 @@ export default defineComponent({
     async function renewFun () {
       forkLoad.value = true
       const renewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/extend`, 'post')
-      if (renewRes && renewRes.status === 'success') window.location.reload()
-      else system.$commonFun.messageTip('error', 'Request failed!')
+      if (renewRes && renewRes.status === 'success') {
+        await system.$commonFun.timeout(500)
+        window.location.reload()
+      } else system.$commonFun.messageTip('error', 'Request failed!')
       forkLoad.value = false
     }
     onActivated(() => init())

@@ -221,7 +221,7 @@ export default defineComponent({
         fd.append('file', fileNew, `${new Date().getTime() + file.name}`)
         console.log('file', fileNew)
       })
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/profile/files`, 'put', fd)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/profile/files`, 'post', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data.files) return uploadRes.data.files[0].url

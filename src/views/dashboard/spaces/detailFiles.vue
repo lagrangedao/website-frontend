@@ -306,9 +306,9 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         fileRow.fileResdata = listRes.data.files || []
         listdata.value = listRes.data.space || { name: route.params.name }
-        let expireTime = -1
+        const current = Math.floor(Date.now() / 1000)
+        let expireTime = current
         if (listRes.data.space.expiration_date) {
-          const current = Math.floor(Date.now() / 1000)
           const currentTime = (listRes.data.space.expiration_date - current) / 86400
           expireTime = Math.floor(currentTime)
         }

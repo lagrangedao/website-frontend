@@ -421,7 +421,7 @@ export default defineComponent({
       fd.append('chain_id', getID)
       fd.append('wallet_address', store.state.metaAddress)
       fd.append('dataset_name', route.params.name)
-      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/request_datanft`, 'post', fd)
+      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/request_datanft`, 'post', fd)
     }
 
     async function refreshContract (type) {
