@@ -14,8 +14,13 @@
       <div class="desc">Unlike user access tokens, an Organization API token can only be used to provide read access to repos, or for billing access to a compute resource.</div>
       <div class="card" v-if="tokenData.token">
         <div class="card_header">
-          <div class="face"></div>
-          Organization API token
+          <div class="card_left">
+            <div class="face"></div>
+            Organization API token
+          </div>
+          <el-select v-model="selectValue" class="m-2" @change="deleteToken(tokenData.token)" placeholder="Manage" size="small">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
         </div>
         <div class="card_body">
           <el-input v-model="tokenData.token" :type="tokenShow?'text':'password'" readonly placeholder="Access Tokens">
@@ -63,10 +68,17 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const selectValue = ref('')
+    const options = ref([
+      {
+        value: 'Delete',
+        label: 'Delete',
+      }])
 
     async function getdataList () {
       listLoad.value = true
       tokenData.token = ''
+      selectValue.value = ''
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}api_token`, 'get')
       if (listRes && listRes.status === 'success') {
         if (listRes.data) tokenData.token = listRes.data.token.token
@@ -130,6 +142,7 @@ export default defineComponent({
     })
     onActivated(() => {
       tokenData.token = ''
+      selectValue.value = ''
     })
     return {
       metaAddress,
@@ -140,6 +153,8 @@ export default defineComponent({
       tokenData,
       listLoad,
       tokenShow,
+      selectValue,
+      options,
       getdataList, createToken, deleteToken, copyName
     }
   }
@@ -210,11 +225,16 @@ export default defineComponent({
       .card_header {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         margin-bottom: 0.25rem;
         font-size: 0.18rem;
         color: #565656;
         @media screen and (min-width: 1800px) {
           font-size: 0.2rem;
+        }
+        .card_left {
+          display: flex;
+          align-items: center;
         }
         .face {
           width: 0.3rem;
@@ -222,6 +242,27 @@ export default defineComponent({
           margin-right: 0.05rem;
           background-color: #7405ff;
           border-radius: 0.05rem;
+        }
+        .el-select {
+          width: 100px;
+          background: linear-gradient(180deg, #fefefe, #f0f0f0);
+          border-color: #e1e1e1;
+          border-radius: 0.08rem;
+          @media screen and (min-width: 1800px) {
+            font-size: 16px;
+          }
+          .el-input {
+            border-color: #ececed;
+            .el-input__inner {
+              padding: 0.12rem 0.15rem;
+              background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              border-color: #e1e1e1;
+              border-radius: 0.05rem;
+              @media screen and (min-width: 1800px) {
+                font-size: 16px;
+              }
+            }
+          }
         }
       }
       .card_body {
