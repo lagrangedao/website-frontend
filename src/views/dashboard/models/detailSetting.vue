@@ -468,7 +468,11 @@ export default defineComponent({
           }
         }
         &.is-disabled {
-          opacity: 0.9;
+          opacity: 0.5;
+          &:hover {
+            background: linear-gradient(180deg, #fefefe, #f0f0f0);
+            border-color: rgb(220, 223, 230);
+          }
         }
       }
       .generateDOI {
