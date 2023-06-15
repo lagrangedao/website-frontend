@@ -410,7 +410,7 @@ export default defineComponent({
         margin-bottom: 5px;
       }
       &.is-disabled {
-        opacity: 0.7;
+        opacity: 0.9;
       }
     }
     .card {

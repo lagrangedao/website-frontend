@@ -446,7 +446,7 @@ export default defineComponent({
         margin-bottom: 5px;
       }
       &.is-disabled {
-        opacity: 0.7;
+        opacity: 0.9;
       }
     }
     .card {
@@ -754,7 +754,7 @@ export default defineComponent({
             font-size: 14px;
           }
           &.is-disabled {
-            opacity: 0.7;
+            opacity: 0.9;
           }
         }
         .revoke {
@@ -819,7 +819,7 @@ export default defineComponent({
           border-color: #c37af9;
         }
         &.is-disabled {
-          opacity: 0.7;
+          opacity: 0.9;
         }
       }
       h3 {

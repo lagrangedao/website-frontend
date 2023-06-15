@@ -619,8 +619,9 @@ export default defineComponent({
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         font-family: inherit;
         font-size: 16px;
+        font-weight: 500;
         line-height: 1;
-        color: #c37af9;
+        color: #f85149;
         word-break: break-word;
         white-space: normal;
         @media screen and (max-width: 1600px) {
@@ -628,13 +629,14 @@ export default defineComponent({
         }
         &:hover {
           opacity: 0.9;
-          border-color: #e3e6eb;
+          background: #fff;
+          border-color: #f85149;
           span {
-            cursor: pointer;
+            cursor: inherit;
           }
         }
         &.is-disabled {
-          opacity: 0.7;
+          opacity: 0.9;
         }
       }
       .generateDOI {
