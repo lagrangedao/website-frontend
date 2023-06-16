@@ -178,6 +178,7 @@ import {
 import dataNft from '@/components/dataNFT.vue'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
+const linkTokenAbi = require('@/utils/abi/linkToken.json')
 export default defineComponent({
   name: 'Datasets',
   components: {
@@ -240,8 +241,9 @@ export default defineComponent({
     const router = useRouter()
     const refreshExecutable = ref(false)
     const moreLoad = ref(false)
-    const DATA_NFT_ADDRESS = process.env.VUE_APP_DATANFT_ADDRESS
-    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
+    // const DATA_NFT_ADDRESS = process.env.VUE_APP_DATANFT_ADDRESS
+    // const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
+    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_POLYGON_ADDRESS)
 
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
@@ -324,8 +326,8 @@ export default defineComponent({
 
         return tokens
       } catch (err) {
-        system.$commonFun.messageTip('error', 'Copy failed')
-        console.log('Copy failed', err)
+        system.$commonFun.messageTip('error', "Returned values aren't valid error")
+        console.log('err:', err)
         return []
       }
     }
@@ -390,14 +392,22 @@ export default defineComponent({
     async function requestNFT () {
       generateLoad.value = true
       try {
+        let ipfsURL = ''
+        const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post')
+        if (generateRes && generateRes.status === 'success') ipfsURL = generateRes.ipfs_url || ''
+        else {
+          system.$commonFun.messageTip('error', generateRes.message ? generateRes.message : 'Request failed!')
+          return
+        }
+
         let estimatedGas = await factory.methods
-          .requestDataNFT(route.params.name)
+          .requestDataNFT(route.params.name, ipfsURL)
           .estimateGas({ from: store.state.metaAddress })
 
         let gasLimit = Math.floor(estimatedGas * 1.5)
 
         await factory.methods
-          .requestDataNFT(route.params.name)
+          .requestDataNFT(route.params.name, ipfsURL)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)

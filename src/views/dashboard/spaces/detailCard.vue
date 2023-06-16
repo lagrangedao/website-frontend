@@ -56,8 +56,8 @@ export default defineComponent({
         } else listdata.job_result_uri = jobData.job_result_uri
         const current = Math.floor(Date.now() / 1000)
         let expireTime = current
-        if (listRes.data.space.expiration_date) {
-          const currentTime = (listRes.data.space.expiration_date - current) / 86400
+        if (listRes.data.space.expiration_time) {
+          const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
         context.emit('handleValue', listRes.data.space.status, jobData ? jobData.job_source_uri : '', expireTime)

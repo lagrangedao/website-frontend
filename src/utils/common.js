@@ -270,6 +270,9 @@ async function getUnit(id) {
     case 137:
       unit = 'MATIC'
       break
+    case 80001:
+      unit = 'MATIC'
+      break
     case 3141:
       unit = 'ETH'
       break
@@ -278,6 +281,12 @@ async function getUnit(id) {
       break
   }
   return unit
+}
+
+async function changeIDLogin(id) {
+  const list = [97, 137, 3141, 80001, 11155111]
+  const getPast = await list.some(t => t === id)
+  return getPast
 }
 
 function copyContent(text, tipCont) {
@@ -342,5 +351,6 @@ export default {
   momentFun,
   popupwindow,
   copyContent,
-  getUnit
+  getUnit,
+  changeIDLogin
 }

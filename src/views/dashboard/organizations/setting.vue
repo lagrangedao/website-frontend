@@ -141,7 +141,8 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137 || parseInt(chainId, 16) === 11155111) {
+      const loginJudg = await system.$commonFun.changeIDLogin(parseInt(chainId, 16))
+      if (loginJudg) {
         const lStatus = await system.$commonFun.login()
         if (lStatus) {
           loading.value = false
@@ -167,9 +168,10 @@ export default defineComponent({
       //   window.location.reload()
       // })
       // networkChanged
-      ethereum.on('chainChanged', function (accounts) {
+      ethereum.on('chainChanged', async function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137 || parseInt(accounts, 16) === 11155111) isLogin()
+        const loginJudg = await system.$commonFun.changeIDLogin(parseInt(accounts, 16))
+        if (loginJudg) isLogin()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {

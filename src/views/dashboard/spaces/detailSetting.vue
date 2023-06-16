@@ -384,8 +384,8 @@ export default defineComponent({
         listdata.value = listRes.data.space || { name: route.params.name, is_public: '1' }
         const current = Math.floor(Date.now() / 1000)
         let expireTime = current
-        if (listRes.data.space.expiration_date) {
-          const currentTime = (listRes.data.space.expiration_date - current) / 86400
+        if (listRes.data.space.expiration_time) {
+          const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
         context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime)
