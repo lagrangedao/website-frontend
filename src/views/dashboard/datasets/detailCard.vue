@@ -439,6 +439,7 @@ export default defineComponent({
     async function cardAdd (type) {
       if (type === 'create') createLoad.value = true
       else if (type === 'lag' || type === 'hugging') {
+        listLoad.value = true
         var response = await fetch(type === 'lag' ? `/lagrangedao-README.md` : `/huggingface-README.md`)
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
