@@ -212,6 +212,13 @@ export default defineComponent({
             "tags": dataNFTForm.tags,
             "additionalInformation": additionalInformation
           }
+          const getID = await system.$commonFun.web3Init.eth.net.getId()
+          const getNftID = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}`, 'get')
+
+          if (getID.toString() !== getNftID.data.nft.chain_id) {
+            await system.$commonFun.messageTip('error', 'Please switch to the network: ' + getNftID.data.nft.chain_id)
+            return
+          }
           const licenseRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
             if (licenseRes.data && licenseRes.data.ipfs_url) createLicense(licenseRes.data.ipfs_url)
@@ -254,6 +261,11 @@ export default defineComponent({
     async function generateMintHash (tx_hash) {
       let fd = new FormData()
       const getID = await system.$commonFun.web3Init.eth.net.getId()
+      const getNftID = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}`, 'get')
+      if (getID.toString() !== getNftID.data.nft.chain_id) {
+        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + getNftID.data.nft.chain_id)
+        return
+      }
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
       fd.append('contract_address', props.contractAddress)
