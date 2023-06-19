@@ -39,7 +39,7 @@
             Generate a DNFT for this dataset. Learn more about Data NFT
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
-          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success'" stripe style="width: 100%" class="nft_table">
+          <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success' || (nftdata.tokens && nftdata.tokens.length>0)" stripe style="width: 100%" class="nft_table">
             <el-table-column prop="chain_id" label="Chain ID" />
             <el-table-column prop="token_id" label="Token ID" />
             <el-table-column prop="owner_address" label="Owner Address">
@@ -303,35 +303,6 @@ export default defineComponent({
       })
     }
 
-    async function getTokenURI (contractAddress, tokenId) {
-      // create contract obj
-      try {
-        let tokens = []
-        // get total supply
-        const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contractAddress)
-        let totalSupply = await nft_contract.methods.totalSupply().call()
-
-        for (let i = 1; i <= totalSupply; i++) {
-          let token = {
-            token_id: i,
-            contract_address: contractAddress,
-            chain_id: await system.$commonFun.web3Init.eth.net.getId()
-          }
-
-          token.owner_address = await nft_contract.methods.ownerOf(i).call()
-          token.ipfs_uri = await nft_contract.methods.tokenURI(i).call()
-
-          tokens.push(token)
-        }
-
-        return tokens
-      } catch (err) {
-        system.$commonFun.messageTip('error', "Returned values aren't valid error")
-        console.log('err:', err)
-        return []
-      }
-    }
-
     function copyName (text, tipCont) {
       system.$commonFun.copyContent(text, tipCont)
     }
@@ -473,8 +444,11 @@ export default defineComponent({
         listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1', created_at: "", updated_at: "" }
         if (listRes.data.nft) {
           let contract_address = listRes.data.nft.contract_address;
-          if (listRes.data.nft.status === 'success') listRes.data.nft.tokens = await getTokenURI(contract_address)
-          else if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
+          listRes.data.nft.tokens = listRes.data.nft.tokens.map((token) => {
+            token.contract_address = contract_address
+            return token
+          })
+          if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
         }
         nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
       }

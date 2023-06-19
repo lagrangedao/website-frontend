@@ -195,6 +195,11 @@ export default defineComponent({
       if (!formEl) return
       await dataNFTRef.value.validate(async (valid, fields) => {
         if (valid) {
+          const loginJudg = await system.$commonFun.changeIDLogin()
+          if (!loginJudg) {
+            generateLoad.value = false
+            return false
+          }
           generateLoad.value = true
           const additionalInformation = await infoList()
           const params = {
@@ -223,11 +228,6 @@ export default defineComponent({
     }
     async function createLicense (ipfsURL) {
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
-          generateLoad.value = false
-          return false
-        }
         const factory = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, props.contractAddress)
         let estimatedGas = await factory.methods
           .createLicense(dataNFTForm.recipient, ipfsURL)

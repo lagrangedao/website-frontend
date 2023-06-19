@@ -262,7 +262,7 @@ function popupwindow(title, url) {
 }
 
 async function getUnit(id) {
-  let unit = ''
+  let unit = 'ETH'
   switch (id) {
     case 97:
       unit = 'tBNB'
