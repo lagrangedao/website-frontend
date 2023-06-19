@@ -283,9 +283,13 @@ async function getUnit(id) {
   return unit
 }
 
-async function changeIDLogin(id) {
-  const list = [97, 137, 3141, 80001, 11155111]
-  const getPast = await list.some(t => t === id)
+async function changeIDLogin() {
+  const chainId = await ethereum.request({
+    method: 'eth_chainId'
+  })
+  const list = [137, 80001]
+  const getPast = await list.some(t => t === parseInt(chainId, 16))
+  if (!getPast) messageTip('error', 'Switch to Filecoin TestNet or Mumbai Testnet!')
   return getPast
 }
 

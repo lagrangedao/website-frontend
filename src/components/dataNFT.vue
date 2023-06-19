@@ -223,6 +223,11 @@ export default defineComponent({
     }
     async function createLicense (ipfsURL) {
       try {
+        const loginJudg = await system.$commonFun.changeIDLogin()
+        if (!loginJudg) {
+          generateLoad.value = false
+          return false
+        }
         const factory = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, props.contractAddress)
         let estimatedGas = await factory.methods
           .createLicense(dataNFTForm.recipient, ipfsURL)
@@ -251,7 +256,9 @@ export default defineComponent({
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
+      fd.append('contract_address', props.contractAddress)
       const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/license/mint_hash`, 'post', fd)
+      const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/create_license`, 'post', fd)
     }
 
     onMounted(() => { })

@@ -31,11 +31,11 @@
                 <el-button type="primary" @click="signFun">
                   <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> {{$t('fs3Login.Connect_cont_Wallet')}}
                 </el-button>
-                <p v-if="loadingText">please switch to
+                <!-- <p v-if="loadingText">please switch to
                   <span style="text-decoration: underline;" @click="changeNetChange(3141)">Filecoin TestNet</span> or
                   <span style="text-decoration: underline;" @click="changeNetChange(137)">Polygon Mainnet</span> or
                   <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span> or
-                  <span style="text-decoration: underline;" @click="changeNetChange(11155111)">Sepolia Testnet</span>.</p>
+                  <span style="text-decoration: underline;" @click="changeNetChange(11155111)">Sepolia Testnet</span>.</p> -->
               </div>
             </div>
           </el-col>
@@ -152,17 +152,10 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      const loginJudg = await system.$commonFun.changeIDLogin(parseInt(chainId, 16))
-      if (loginJudg) {
-        const lStatus = await system.$commonFun.login()
-        // if (lStatus) active.value = 2
-        if (lStatus) router.push({ path: '/personal_center' })
-        return false
-      } else {
-        active.value = 1
-        loadingText.value = system.$NetworkPrompt
-      }
-      // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
+      const lStatus = await system.$commonFun.login()
+      // if (lStatus) active.value = 2
+      if (lStatus) router.push({ path: '/personal_center' })
+      return false
       store.dispatch('setNavLogin', false)
     }
     function hiddAddress (val) {
@@ -193,14 +186,13 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', async function (accounts) {
         if (!prevType.value) return false
-        const loginJudg = await system.$commonFun.changeIDLogin(parseInt(accounts, 16))
-        if (loginJudg) signFun()
+        signFun()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         active.value = 1
-        loadingText.value = system.$NetworkPrompt
+        // loadingText.value = system.$NetworkPrompt
         system.$commonFun.signOutFun()
         // window.location.reload()
       })

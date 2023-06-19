@@ -444,7 +444,8 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
-        editCommitFun('create')
+        listLoad.value = false
+        createLoad.value = true
       }
     }
     function cancelFun () {

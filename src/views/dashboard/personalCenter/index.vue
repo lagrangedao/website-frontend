@@ -1,6 +1,6 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <network-alert v-if="loadingText"></network-alert>
+    <!-- <network-alert v-if="loadingText"></network-alert> -->
     <el-row class="dataset_body">
       <el-col :xs="24" :sm="8" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
@@ -330,14 +330,10 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      const loginJudg = await system.$commonFun.changeIDLogin(parseInt(chainId, 16))
-      if (loginJudg) {
-        const lStatus = await system.$commonFun.login()
-        if (lStatus) getdataList()
-        // else window.location.reload()
-        return false
-      } else loadingText.value = system.$NetworkPrompt
-      // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
+      const lStatus = await system.$commonFun.login()
+      if (lStatus) getdataList()
+      // else window.location.reload()
+      return false
       store.dispatch('setNavLogin', false)
     }
     async function getdataList () {
@@ -397,14 +393,13 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', async function (accounts) {
         if (!prevType.value) return false
-        const loginJudg = await system.$commonFun.changeIDLogin(parseInt(accounts, 16))
-        if (loginJudg) isLogin()
+        isLogin()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         loading.value = true
-        loadingText.value = system.$NetworkPrompt
+        // loadingText.value = system.$NetworkPrompt
         system.$commonFun.signOutFun()
         // window.location.reload()
       })

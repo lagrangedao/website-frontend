@@ -338,6 +338,11 @@ export default defineComponent({
 
     async function claimDataNFT () {
       try {
+        const loginJudg = await system.$commonFun.changeIDLogin()
+        if (!loginJudg) {
+          generateLoad.value = false
+          return false
+        }
         // estimate gas
         let estimatedGas = await factory.methods
           .claimDataNFT(route.params.name)
@@ -392,6 +397,11 @@ export default defineComponent({
     async function requestNFT () {
       generateLoad.value = true
       try {
+        const loginJudg = await system.$commonFun.changeIDLogin()
+        if (!loginJudg) {
+          generateLoad.value = false
+          return false
+        }
         let ipfsURL = ''
         const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post')
         if (generateRes && generateRes.status === 'success') ipfsURL = generateRes.ipfs_url || ''
