@@ -9,7 +9,7 @@ export default createStore({
     lagLogin: sessionStorage.getItem('loginLag') || false,
     accessToken: sessionStorage.getItem('access_token_lag') || '',
     accessAvatar: sessionStorage.getItem('access_avatar') || '',
-    accessName: sessionStorage.getItem('access_name') || '',
+    accessName: sessionStorage.getItem('access_name') || '-',
     accessSpace: sessionStorage.getItem('access_space') || '',
     accessDataset: sessionStorage.getItem('access_dataset') || '',
   },
