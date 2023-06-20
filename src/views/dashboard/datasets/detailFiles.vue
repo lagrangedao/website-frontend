@@ -223,7 +223,7 @@ export default defineComponent({
     UploadFilled,
     EditPen
   },
-  setup () {
+  setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessAvatar = computed(() => (store.state.accessAvatar))
@@ -320,6 +320,7 @@ export default defineComponent({
         // console.log(fileRow.fileAlldata)
         fileRow.filedata = await sortList(fileRow.fileAlldata)
         // console.log(fileRow.filedata)
+        context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false

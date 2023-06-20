@@ -189,7 +189,7 @@ export default defineComponent({
   props: {
     // listdata: { type: Number, default: 1 }
   },
-  setup (props) {
+  setup (props, context) {
     const store = useStore()
     const lagLogin = computed(() => {
       return String(store.state.lagLogin) === 'true'
@@ -486,6 +486,7 @@ export default defineComponent({
           }
         }
         nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
+        context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false

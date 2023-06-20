@@ -1,5 +1,5 @@
 <template>
-  <section id="dataset">
+  <section id="dataset" v-loading="ntfLoad">
     <div class="dataset_head">
       <div class="content">
         <div class="backTo" @click="back">
@@ -18,6 +18,14 @@
               <i class="icon icon_like"></i>like</el-button>
             <el-button>4</el-button>
           </el-button-group>
+          <div class="logs_style" @click="reqNFT" v-if="nft.contract_address && (metaAddress && metaAddress !== route.params.wallet_address)">
+            <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
+              <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
+                p-id="2675" fill="#878c93"></path>
+              <path d="M830 720.068 830 409.978c0-67.974-20.98-122.004-62.36-160.588-44.222-41.236-108.628-60.776-191.64-58.212L576 64l-192 192 192 192 0-128c53 0 85.34 5.284 104.35 23.008 14.366 13.396 21.65 35.928 21.65 66.97l0 312.392c-37.124 22.434-62 63.178-62 109.628 0 70.58 57.42 128 128 128s128-57.42 128-128C896 783.902 869.324 741.938 830 720.068zM768 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S803.346 896 768 896z"
+                p-id="2676" fill="#878c93"></path>
+            </svg> Request NFT
+          </div>
           <share-pop></share-pop>
         </div>
       </div>
@@ -42,7 +50,7 @@
               <span>Dataset card</span>
             </span>
           </template>
-          <detail-card :urlChange="activeName"></detail-card>
+          <detail-card @handleValue="handleValue" :urlChange="activeName"></detail-card>
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
@@ -51,7 +59,7 @@
               <span>Files and versions</span>
             </span>
           </template>
-          <detail-files v-if="activeName === 'files'"></detail-files>
+          <detail-files @handleValue="handleValue" v-if="activeName === 'files'"></detail-files>
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
@@ -61,7 +69,7 @@
               <!-- <b>3</b> -->
             </span>
           </template>
-          <detail-community v-if="activeName === 'community'"></detail-community>
+          <detail-community @handleValue="handleValue" v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
         <el-tab-pane name="settings" v-if="settingOneself">
           <template #label>
@@ -73,7 +81,7 @@
               <span>Settings</span>
             </span>
           </template>
-          <detail-setting v-if="activeName === 'settings'"></detail-setting>
+          <detail-setting @handleValue="handleValue" v-if="activeName === 'settings'"></detail-setting>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -91,6 +99,7 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   Setting, Share, ArrowLeft
 } from '@element-plus/icons-vue'
+const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
   name: 'Datasets',
   components: {
@@ -198,6 +207,11 @@ export default defineComponent({
       }
     ])
     const settingOneself = ref(false)
+    const nft = reactive({
+      contract_address: null,
+      chain_id: null
+    })
+    const ntfLoad = ref(false)
 
     function handleClick (tab, event) {
       router.push({ name: 'datasetDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -245,6 +259,25 @@ export default defineComponent({
     function back () {
       router.push({ path: '/dataset' })
     }
+    const handleValue = async (value, chainID) => {
+      nft.contract_address = value
+      nft.chain_id = chainID
+    }
+    async function reqNFT () {
+      ntfLoad.value = true
+      const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, nft.contract_address)
+      const ipfs_uri = await nft_contract.methods.tokenURI(1).call()
+      let nftParams = new FormData()
+      nftParams.append('chain_id', nft.chain_id)
+      nftParams.append('wallet_address', route.params.wallet_address)
+      nftParams.append('dataset_name', route.params.name)
+      nftParams.append('ipfs_url', ipfs_uri)
+      const nftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/license/request`, 'post', nftParams)
+      if (nftRes && nftRes.status === 'success') system.$commonFun.messageTip('success', nftRes.message ? nftRes.message : 'Submitted license request!')
+      else system.$commonFun.messageTip('error', nftRes.message ? nftRes.message : 'Failed!')
+      await system.$commonFun.timeout(500)
+      ntfLoad.value = false
+    }
     onActivated(() => {
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
@@ -252,6 +285,7 @@ export default defineComponent({
     })
     return {
       settingOneself,
+      metaAddress,
       lagLogin,
       dataList,
       searchValue,
@@ -269,7 +303,10 @@ export default defineComponent({
       route,
       router,
       tableData,
-      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName, back
+      nft,
+      ntfLoad,
+      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName, back,
+      handleValue, reqNFT
     }
   }
 })
@@ -367,15 +404,66 @@ export default defineComponent({
           cursor: pointer;
         }
         .el-button {
+          height: 28px;
+          padding: 0.05rem 0.1rem;
           font-family: inherit;
-          font-size: 15px;
+          font-size: 14px;
           color: #878c93;
-          @media screen and (max-width: 1440px) {
-            font-size: 14px;
+          line-height: 1;
+          @media screen and (max-width: 1600px) {
+            font-size: 13px;
           }
           @media screen and (max-width: 441px) {
             padding: 0 5px;
+            font-size: 12px;
+          }
+          &.el-button--warning {
+            border: 1px solid rgba(207, 146, 54, 0.5);
+            // border-left-color: rgb(253, 246, 236);
+            &:hover {
+              color: #fff;
+            }
+          }
+          &.is-disabled {
+            &:hover {
+              color: inherit;
+            }
+          }
+        }
+        .logs_style {
+          position: relative;
+          display: flex;
+          align-items: center;
+          padding: 0.05rem 0.05rem;
+          margin: 0 0 0 0.07rem;
+          background-color: transparent;
+          color: #878c93;
+          border: 1px solid rgba(229, 231, 235, 1);
+          border-radius: 0.05rem;
+          font-size: 14px;
+          line-height: 1;
+          cursor: pointer;
+          @media screen and (max-width: 1600px) {
             font-size: 13px;
+          }
+          @media screen and (max-width: 441px) {
+            font-size: 12px;
+          }
+          &:hover {
+            background-color: #f7f7f7;
+          }
+          svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 0.05rem;
+            @media screen and (max-width: 1600px) {
+              width: 13px;
+              height: 13px;
+            }
+            @media screen and (max-width: 441px) {
+              width: 12px;
+              height: 12px;
+            }
           }
         }
       }

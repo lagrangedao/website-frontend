@@ -43,12 +43,30 @@
           </div>
           <div class="top_text">
             <el-input v-model="searchValue" class="w-50 m-2" placeholder="search ..." />
-            <el-badge is-dot class="item l">
+            <el-badge class="item l">
               <i class="icon icon_cont"></i>
             </el-badge>
-            <el-badge class="item l">
+            <el-badge v-if="listdata.license_requests.length === 0" class="item l el-dropdown-link">
               <i class="icon icon_info"></i>
             </el-badge>
+            <el-dropdown v-else @command="handleCommand" max-height="300" popper-class="message_style" :teleported="true">
+              <el-badge :value="listdata.license_requests.length" class="item l el-dropdown-link">
+                <i class="icon icon_info"></i>
+              </el-badge>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests" :key="c">
+                    <div class="drop_body">
+                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your dataset license:
+                        <b>{{child.dataset_name}}</b>
+                      </p>
+                      <el-button @click="licenseFun(child, 'approve')" type="primary" size="small">Approve</el-button>
+                      <el-button @click="licenseFun(child, 'reject')" type="danger" size="small">Reject</el-button>
+                    </div>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
         </div>
         <div class="list">
@@ -300,6 +318,7 @@ export default defineComponent({
       datasets: [],
       models: [],
       spaces: [],
+      license_requests: [],
       user: {},
       datasetsIsShow: false,
       modelsIsShow: false,
@@ -344,6 +363,7 @@ export default defineComponent({
         listdata.datasets = listRes.data.dataset || []
         listdata.models = listRes.data.model || []
         listdata.spaces = listRes.data.space || []
+        listdata.license_requests = listRes.data.license_requests || []
         listdata.user = listRes.data.user || {}
         dataSetIndex.value = listRes.data.dataset.length
         modelsIndex.value = listRes.data.model.length
@@ -367,6 +387,7 @@ export default defineComponent({
         listdata.datasets = []
         listdata.models = []
         listdata.spaces = []
+        listdata.license_requests = []
         listdata.user = {}
         dataSetIndex.value = 0
         modelsIndex.value = 0
@@ -420,6 +441,16 @@ export default defineComponent({
       // console.log(row, index)
       router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
     }
+    const handleCommand = (command) => {
+      // console.log(`click on item ${command}`)
+    }
+    async function licenseFun (row, type) {
+      listLoad.value = true
+      const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
+      if (approveRes && approveRes.status === 'success') system.$commonFun.messageTip('success', approveRes.message ? approveRes.message : 'Request successful.')
+      else system.$commonFun.messageTip('error', approveRes.message ? approveRes.message : 'Request failed!')
+      getdataList()
+    }
     onMounted(() => {
       window.onresize = () => {
         return (() => {
@@ -439,6 +470,7 @@ export default defineComponent({
       listdata.datasets = []
       listdata.models = []
       listdata.spaces = []
+      listdata.license_requests = []
       listdata.user = {}
       dataSetIndex.value = 0
       modelsIndex.value = 0
@@ -471,7 +503,8 @@ export default defineComponent({
       listLoad,
       accessAvatar,
       bodyWidth,
-      isLogin, signIn, getdataList, fn, momentFilter, detailFun, editProfile, hiddAddress
+      isLogin, signIn, getdataList, fn, momentFilter, detailFun, editProfile, hiddAddress,
+      handleCommand, licenseFun
     }
   }
 })
@@ -719,7 +752,7 @@ export default defineComponent({
           }
           .el-input {
             max-width: 2rem;
-            margin: 0 0 0 0.17rem;
+            margin: 0 0.18rem;
             .el-input__inner {
               padding-left: 0.35rem;
               background: url(../../../assets/images/icons/icon_13_1.png)
@@ -777,7 +810,7 @@ export default defineComponent({
             background-size: auto 100%;
           }
           .l {
-            margin-left: 0.35rem;
+            margin: 0 0.18rem;
           }
         }
         .el-select {
@@ -1501,6 +1534,26 @@ export default defineComponent({
     background-color: rgba(255, 255, 255, 1);
     .el-loading-spinner {
       top: 30%;
+    }
+  }
+}
+</style>
+<style lang="scss">
+.message_style {
+  width: 300px;
+  .el-dropdown-menu__item {
+    padding: 0 16px;
+    white-space: normal;
+    .drop_body {
+      width: 100%;
+      padding: 0.1rem 0;
+      word-break: break-word;
+      border-bottom: 1px solid #eee;
+      p {
+        width: 100%;
+        margin-bottom: 0.05rem;
+        line-height: 1.3;
+      }
     }
   }
 }
