@@ -33,6 +33,7 @@
           {{ 'Data NFT (DNFT)' }}
 
           <el-button class="request_btn" v-if="nftdata.status === 'success'" @click="dataNFTRequest = true">Create new License</el-button>
+          <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
           <div class="tip">
@@ -44,7 +45,7 @@
             <el-table-column prop="token_id" label="Token ID" />
             <el-table-column prop="owner_address" label="Owner Address">
               <template #default="scope">
-                <span>{{ scope.row.owner_address }}</span>
+                <span>{{scope.row.owner_address}}</span>
               </template>
             </el-table-column>
             <el-table-column prop="contract_address" label="Contract Address">
@@ -58,6 +59,7 @@
                 <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a>
               </template>
             </el-table-column>
+            <el-table-column prop="status" label="Status" />
           </el-table>
           <div v-else-if="nftdata.status === 'processing'" class="process_style">
             <el-button size="large" class="generateDOI" @click="refreshContract('refresh')">Refresh</el-button>
@@ -437,21 +439,55 @@ export default defineComponent({
       listLoad.value = false
     }
 
+    async function getTokenURI (nft_contract, contractAddress, chainID) {
+      // create contract obj
+      try {
+        let tokens = []
+        // get total supply
+        let totalSupply = await nft_contract.methods.totalSupply().call()
+        let token = {
+          token_id: 1,
+          contract_address: contractAddress,
+          chain_id: chainID,
+          owner_address: await nft_contract.methods.ownerOf(1).call(),
+          ipfs_uri: await nft_contract.methods.tokenURI(1).call(),
+          status: 'Success'
+        }
+        tokens.push(token)
+        return tokens
+      } catch (err) {
+        system.$commonFun.messageTip('error', "Returned values aren't valid error")
+        console.log('err:', err)
+        return []
+      }
+    }
+
     async function requestInitData (type) {
       listLoad.value = true
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.dataset || { name: route.params.name, is_public: '1', created_at: "", updated_at: "" }
         if (listRes.data.nft) {
-          let contract_address = listRes.data.nft.contract_address;
-          listRes.data.nft.tokens = listRes.data.nft.tokens.map((token) => {
-            token.contract_address = contract_address
-            return token
-          })
           if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
+          let contract_address = listRes.data.nft.contract_address
+          const getID = await system.$commonFun.web3Init.eth.net.getId()
+          if (listRes.data.nft.chain_id && getID.toString() !== listRes.data.nft.chain_id) {
+            await system.$commonFun.messageTip('error', 'Please switch to the network: ' + listRes.data.nft.chain_id)
+            listRes.data.nft.tokens = []
+          } else if (contract_address) {
+            const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
+            const tokens_contact = await getTokenURI(nft_contract, contract_address, listRes.data.nft.chain_id)
+            listRes.data.nft.tokens.map(async (token, t) => {
+              token.contract_address = contract_address
+              token.owner_address = await nft_contract.methods.ownerOf(t + 2).call()
+              return token
+            })
+            listRes.data.nft.tokens = tokens_contact.concat(listRes.data.nft.tokens)
+          }
         }
         nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
       }
+      await system.$commonFun.timeout(500)
       listLoad.value = false
     }
 

@@ -287,9 +287,9 @@ async function changeIDLogin() {
   const chainId = await ethereum.request({
     method: 'eth_chainId'
   })
-  const list = [137, 80001]
+  const list = [137, 80001, 11155111]
   const getPast = await list.some(t => t === parseInt(chainId, 16))
-  if (!getPast) messageTip('error', 'Switch to Filecoin TestNet or Mumbai Testnet!')
+  if (!getPast) messageTip('error', 'Switch to Filecoin TestNet, Mumbai Testnet or Sepolia Testnet!')
   return getPast
 }
 
