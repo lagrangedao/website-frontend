@@ -22,7 +22,7 @@ export default defineComponent({
   props: {
     isVisible: { type: Boolean, default: false }
   },
-  setup (props) {
+  setup (props, context) {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const info = reactive({
@@ -37,7 +37,7 @@ export default defineComponent({
       renameLoad.value = true
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-
+        context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
       }
       await system.$commonFun.timeout(500)
       renameLoad.value = false

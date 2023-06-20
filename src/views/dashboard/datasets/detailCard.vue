@@ -201,7 +201,7 @@ export default defineComponent({
   props: {
     urlChange: { type: String, default: 'card' }
   },
-  setup (props) {
+  setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
@@ -375,6 +375,7 @@ export default defineComponent({
             getTitle(urlReadme.value)
           }
         })
+        context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
