@@ -1,6 +1,6 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <network-alert v-if="loadingText"></network-alert>
+    <!-- <network-alert v-if="loadingText"></network-alert> -->
     <el-row class="dataset_body">
       <el-col :xs="24" :sm="8" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
@@ -62,7 +62,7 @@
           <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
             <el-card class="box-card">
               <template #header>
-                <div class="card-warn" v-if="list.expiration_date && list.expireTime <= 7">
+                <div class="card-warn" v-if="list.expiration_time !== null && list.expireTime <= 7">
                   <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
                     popper-style="word-break: break-word; text-align: left;">
                     <template #reference>
@@ -82,6 +82,16 @@
           <el-col v-if="listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces" :key="list" @click="detailFun(list, 'space')">
             <el-card class="box-card">
               <template #header>
+                <div class="card-warn" v-if="list.expiration_time !== null && list.expireTime <= 7">
+                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
+                    popper-style="word-break: break-word; text-align: left;">
+                    <template #reference>
+                      <el-icon>
+                        <Warning />
+                      </el-icon>
+                    </template>
+                  </el-popover>
+                </div>
                 <div class="card-header">
                   <span>1</span>
                 </div>
@@ -320,13 +330,10 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137 || parseInt(chainId, 16) === 11155111) {
-        const lStatus = await system.$commonFun.login()
-        if (lStatus) getdataList()
-        // else window.location.reload()
-        return false
-      } else loadingText.value = system.$NetworkPrompt
-      // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
+      const lStatus = await system.$commonFun.login()
+      if (lStatus) getdataList()
+      // else window.location.reload()
+      return false
       store.dispatch('setNavLogin', false)
     }
     async function getdataList () {
@@ -347,8 +354,8 @@ export default defineComponent({
         let datasetList = []
         listdata.spaces.forEach(space => {
           const current = Math.floor(Date.now() / 1000)
-          if (space.expiration_date) {
-            const currentTime = (space.expiration_date - current) / 86400
+          if (space.expiration_time) {
+            const currentTime = (space.expiration_time - current) / 86400
             space.expireTime = Math.floor(currentTime)
           } else space.expireTime = current
           spaceList.push(space.name)
@@ -384,15 +391,15 @@ export default defineComponent({
       //   window.location.reload()
       // })
       // networkChanged
-      ethereum.on('chainChanged', function (accounts) {
+      ethereum.on('chainChanged', async function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137 || parseInt(accounts, 16) === 11155111) isLogin()
+        isLogin()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         loading.value = true
-        loadingText.value = system.$NetworkPrompt
+        // loadingText.value = system.$NetworkPrompt
         system.$commonFun.signOutFun()
         // window.location.reload()
       })

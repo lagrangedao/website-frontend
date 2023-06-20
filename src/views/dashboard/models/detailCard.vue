@@ -21,7 +21,7 @@
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
           <div class="button">
-            <el-button type="" text bg v-if="urlReadme && isPreview" @click="editFun">Edit model card</el-button>
+            <el-button type="" text bg v-if="urlReadme && isPreview && metaAddress === route.params.wallet_address" @click="editFun">Edit model card</el-button>
           </div>
           <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
@@ -171,6 +171,7 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore()
+    const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const dataList = reactive({
       Tasks: [
@@ -468,6 +469,7 @@ export default defineComponent({
     })
     return {
       lagLogin,
+      metaAddress,
       dataList,
       searchValue,
       value,

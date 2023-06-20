@@ -1,6 +1,6 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <network-alert v-if="loadingText"></network-alert>
+    <!-- <network-alert v-if="loadingText"></network-alert> -->
     <el-row class="dataset_body">
       <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
@@ -144,15 +144,12 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      if (parseInt(chainId, 16) === 3141 || parseInt(chainId, 16) === 97 || parseInt(chainId, 16) === 137 || parseInt(chainId, 16) === 11155111) {
-        const lStatus = await system.$commonFun.login()
-        if (lStatus) {
-          loading.value = false
-          listLoad.value = false
-        }
-        return false
-      } else loadingText.value = system.$NetworkPrompt
-      // system.$commonFun.messageTip('error', 'Switch to Filecoin TestNet!')
+      const lStatus = await system.$commonFun.login()
+      if (lStatus) {
+        loading.value = false
+        listLoad.value = false
+      }
+      return false
       store.dispatch('setNavLogin', false)
     }
     function fn () {
@@ -170,15 +167,15 @@ export default defineComponent({
       //   window.location.reload()
       // })
       // networkChanged
-      ethereum.on('chainChanged', function (accounts) {
+      ethereum.on('chainChanged', async function (accounts) {
         if (!prevType.value) return false
-        if (parseInt(accounts, 16) === 3141 || parseInt(accounts, 16) === 97 || parseInt(accounts, 16) === 137 || parseInt(accounts, 16) === 11155111) isLogin()
+        isLogin()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         loading.value = true
-        loadingText.value = system.$NetworkPrompt
+        // loadingText.value = system.$NetworkPrompt
         system.$commonFun.signOutFun()
         // window.location.reload()
       })

@@ -262,12 +262,15 @@ function popupwindow(title, url) {
 }
 
 async function getUnit(id) {
-  let unit = ''
+  let unit = 'ETH'
   switch (id) {
     case 97:
       unit = 'tBNB'
       break
     case 137:
+      unit = 'MATIC'
+      break
+    case 80001:
       unit = 'MATIC'
       break
     case 3141:
@@ -278,6 +281,16 @@ async function getUnit(id) {
       break
   }
   return unit
+}
+
+async function changeIDLogin() {
+  const chainId = await ethereum.request({
+    method: 'eth_chainId'
+  })
+  const list = [137, 80001, 11155111]
+  const getPast = await list.some(t => t === parseInt(chainId, 16))
+  if (!getPast) messageTip('error', 'Switch to Filecoin TestNet, Mumbai Testnet or Sepolia Testnet!')
+  return getPast
 }
 
 function copyContent(text, tipCont) {
@@ -342,5 +355,6 @@ export default {
   momentFun,
   popupwindow,
   copyContent,
-  getUnit
+  getUnit,
+  changeIDLogin
 }

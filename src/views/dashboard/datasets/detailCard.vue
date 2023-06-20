@@ -3,11 +3,39 @@
     <div id="datasetBody">
       <el-row class="dataset_body" v-loading="listLoad">
         <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
-          <div class="readme_body">
-            <div>
+          <div class="readme_body" v-if="!createLoad">
+            <div class="desc">
               <b>No dataset card yet</b>
-              <p>New: Create and edit this dataset card directly on the website!</p>
+              <p v-if="metaAddress === route.params.wallet_address">Create a new dataset card by using following template</p>
             </div>
+            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address">
+              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" v-for="card in templateData" :key="card">
+                <el-card class="box-card" shadow="hover" @click="cardAdd(card.type)">
+                  <template #header>
+                    <div class="card-header">
+                      <span>{{card.title}}</span>
+                    </div>
+                  </template>
+                  <div class="text item">{{card.desc}}</div>
+                </el-card>
+              </el-col>
+            </el-row>
+          </div>
+          <div class="readme_create" v-else>
+            <el-tabs type="border-card">
+              <el-tab-pane label="Create new file">
+                <v-md-editor v-model="textEditor"></v-md-editor>
+                <el-form :label-position="'top'">
+                  <el-form-item label="File name" prop="name">
+                    <el-input model-value="README.md" disabled />
+                  </el-form-item>
+                </el-form>
+                <el-button-group class="ml-4">
+                  <el-button @click="editCommitFun('create')">Commit new file</el-button>
+                  <el-button @click="cancelFun">Cancel</el-button>
+                </el-button-group>
+              </el-tab-pane>
+            </el-tabs>
           </div>
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
@@ -33,7 +61,7 @@
             </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
                   <a>
                     <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
                       <el-icon>
@@ -175,6 +203,7 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore()
+    const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const dataList = reactive({
       Tasks: [
@@ -272,19 +301,37 @@ export default defineComponent({
     ])
     const textEditor = ref('')
     const textEditorChange = ref('')
-    const preview = ref(null);
-    const titles = ref([]);
+    const preview = ref(null)
+    const titles = ref([])
+    const createLoad = ref(false)
+    const templateData = ref([
+      {
+        title: 'No Template',
+        desc: 'Create your own template',
+        type: 'create'
+      },
+      {
+        title: 'Lagrange Template',
+        desc: 'Create a dataset card by using our template',
+        type: 'lag'
+      },
+      {
+        title: 'Hugging Face Template',
+        desc: 'Create a dataset card by using Hugging Face template',
+        type: 'hugging'
+      }
+    ])
 
     function editFun () {
       textEditorChange.value = textEditor.value
       isPreview.value = false
     }
-    async function editCommitFun () {
+    async function editCommitFun (type) {
       // console.log(urlReadmeName.value)
       listLoad.value = true
-      let newFile = new File([textEditorChange.value], urlReadmeName.value)
+      let newFile = new File([type === 'create' ? textEditor.value : textEditorChange.value], type === 'create' ? 'README.md' : urlReadmeName.value)
       let fd = new FormData()
-      fd.append('file', newFile, urlReadmeName.value)
+      fd.append('file', newFile, type === 'create' ? 'README.md' : urlReadmeName.value)
       const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files/upload`, 'post', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
@@ -390,9 +437,26 @@ export default defineComponent({
         })
       }
     }
+    async function cardAdd (type) {
+      if (type === 'create') createLoad.value = true
+      else if (type === 'lag' || type === 'hugging') {
+        listLoad.value = true
+        var response = await fetch(type === 'lag' ? `/lagrangedao-README.md` : `/huggingface-README.md`)
+        textEditor.value = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        listLoad.value = false
+        createLoad.value = true
+      }
+    }
+    function cancelFun () {
+      createLoad.value = false
+      textEditor.value = ''
+    }
     onActivated(() => { })
     onMounted(() => {
       urlReadme.value = ''
+      createLoad.value = false
       window.scrollTo(0, 0)
       init()
     })
@@ -407,12 +471,14 @@ export default defineComponent({
       if (to.name !== 'datasetDetail') return
       if (to.params.tabs === 'card') {
         urlReadme.value = ''
+        createLoad.value = false
         window.scrollTo(0, 0)
         init()
       }
     })
     return {
       lagLogin,
+      metaAddress,
       dataList,
       searchValue,
       value,
@@ -431,8 +497,11 @@ export default defineComponent({
       props,
       urlReadme,
       isPreview,
+      templateData,
+      createLoad,
       textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
+      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick,
+      cardAdd, cancelFun
     }
   }
 })
@@ -481,7 +550,8 @@ export default defineComponent({
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
-        min-height: 300px;
+        min-height: 230px;
+        padding: 0.5rem 0;
         background-color: #fbfbfc;
         border: 1px solid #f1f1f1;
         border-radius: 5px;
@@ -491,6 +561,116 @@ export default defineComponent({
           width: 100%;
           margin: 0.1rem auto;
           text-align: center;
+        }
+        .desc {
+          width: 100%;
+          text-align: center;
+        }
+        .card {
+          width: 90%;
+          max-width: 900px;
+          margin: auto;
+          .el-card {
+            height: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+            * {
+              cursor: inherit;
+            }
+            .el-card__header {
+              padding-bottom: 0;
+              border-bottom: 0;
+              font-weight: 600;
+            }
+            .el-card__body {
+              padding-top: 0.15rem;
+              .text {
+                font-size: 13px;
+                color: #878c93;
+                line-height: 1.3;
+                @media screen and (min-width: 1800px) {
+                  font-size: 14px;
+                }
+              }
+            }
+          }
+        }
+      }
+      .readme_create {
+        font-family: "Helvetica-light";
+        .el-tabs {
+          .el-tabs__header {
+            max-width: none;
+            padding: 0;
+            background: linear-gradient(180deg, #fefefe, #f0f0f0);
+            .el-tabs__item {
+              padding: 0.15rem;
+              font-size: 16px;
+              @media screen and (min-width: 1800px) {
+                font-size: 18px;
+              }
+              &.is-active {
+                &::after {
+                  height: 0;
+                }
+              }
+            }
+          }
+        }
+        .upload-demo {
+          .el-upload {
+            width: 100%;
+            .el-upload-dragger {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              height: auto;
+              min-height: 140px;
+              font-size: 16px;
+              @media screen and (max-width: 1600px) {
+                font-size: 15px;
+              }
+              .el-upload__text {
+                font-size: inherit;
+              }
+            }
+          }
+        }
+        .el-form {
+          margin: 0.3rem 0 0;
+          .el-form-item {
+            font-size: 18px;
+            @media screen and (max-width: 1600px) {
+              font-size: 16px;
+            }
+            .el-form-item__label {
+              font-size: inherit;
+            }
+            .el-form-item__content {
+              font-size: inherit;
+              .el-input {
+                font-size: inherit;
+                .el-input__inner {
+                  height: auto;
+                  padding: 0.05rem 0.1rem;
+                  font-size: inherit;
+                }
+              }
+            }
+          }
+        }
+        .el-button-group {
+          margin: 0.2rem 0 0;
+          .el-button {
+            margin: 0 0.15rem 0 0;
+            background: linear-gradient(180deg, #fefefe, #f0f0f0);
+            font-family: inherit;
+            font-size: 18px;
+            @media screen and (max-width: 1600px) {
+              font-size: 16px;
+            }
+          }
         }
       }
       &::after {

@@ -195,6 +195,11 @@ export default defineComponent({
       if (!formEl) return
       await dataNFTRef.value.validate(async (valid, fields) => {
         if (valid) {
+          const loginJudg = await system.$commonFun.changeIDLogin()
+          if (!loginJudg) {
+            generateLoad.value = false
+            return false
+          }
           generateLoad.value = true
           const additionalInformation = await infoList()
           const params = {
@@ -206,6 +211,13 @@ export default defineComponent({
             "links": dataNFTForm.links,
             "tags": dataNFTForm.tags,
             "additionalInformation": additionalInformation
+          }
+          const getID = await system.$commonFun.web3Init.eth.net.getId()
+          const getNftID = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}`, 'get')
+
+          if (getID.toString() !== getNftID.data.nft.chain_id) {
+            await system.$commonFun.messageTip('error', 'Please switch to the network: ' + getNftID.data.nft.chain_id)
+            return
           }
           const licenseRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
@@ -249,9 +261,16 @@ export default defineComponent({
     async function generateMintHash (tx_hash) {
       let fd = new FormData()
       const getID = await system.$commonFun.web3Init.eth.net.getId()
+      const getNftID = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}`, 'get')
+      if (getID.toString() !== getNftID.data.nft.chain_id) {
+        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + getNftID.data.nft.chain_id)
+        return
+      }
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
+      fd.append('contract_address', props.contractAddress)
       const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/license/mint_hash`, 'post', fd)
+      const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/create_license`, 'post', fd)
     }
 
     onMounted(() => { })

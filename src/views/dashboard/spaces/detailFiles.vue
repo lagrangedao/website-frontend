@@ -15,7 +15,7 @@
             <p v-else>{{fileBody.title}}</p>
           </span>
         </div>
-        <el-dropdown trigger="click" @command="handleCommand" v-if="labelTab === 'list'">
+        <el-dropdown trigger="click" @command="handleCommand" v-if="labelTab === 'list' && metaAddress === route.params.wallet_address">
           <span class="el-dropdown-link">
             <el-icon class="el-icon--right">
               <Plus />
@@ -75,7 +75,7 @@
         <div v-else-if="labelTab === 'edit'" class="uploadBody">
           <div class="top_title">
             <div class="left">
-              <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt=""> {{accessName||'-'}}
+              <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt=""> {{metaAddress === route.params.wallet_address?accessName:'-'}}
             </div>
             <div class="right" :title="momentFilter(fileBody._originPath.created_at)">
               {{calculateDiffTime(fileBody._originPath.created_at)}}
@@ -95,7 +95,7 @@
                   </a>
                 </li>
                 <li v-if="fileTextType === 'text'">
-                  <a @click="editChange">
+                  <a @click="editChange" :class="{'disable': metaAddress !== route.params.wallet_address}">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                       <path d="M2 26h28v2H2z" fill="currentColor"></path>
                       <path d="M25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10l3.6 3.6l-10 10H6z" fill="currentColor"></path>
@@ -112,7 +112,7 @@
                   </a>
                 </li>
                 <li>
-                  <a @click="deleteFile">
+                  <a @click="deleteFile" :class="{'disable': metaAddress !== route.params.wallet_address}">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                       <path d="M12 12h2v12h-2z" fill="currentColor"></path>
                       <path d="M18 12h2v12h-2z" fill="currentColor"></path>
@@ -308,8 +308,8 @@ export default defineComponent({
         listdata.value = listRes.data.space || { name: route.params.name }
         const current = Math.floor(Date.now() / 1000)
         let expireTime = current
-        if (listRes.data.space.expiration_date) {
-          const currentTime = (listRes.data.space.expiration_date - current) / 86400
+        if (listRes.data.space.expiration_time) {
+          const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
         context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime)
@@ -611,9 +611,11 @@ export default defineComponent({
       window.URL.revokeObjectURL(link.href);
     }
     function editChange () {
+      if (metaAddress.value !== route.params.wallet_address) return
       fileTextShow.value = !fileTextShow.value
     }
     async function deleteFile () {
+      if (metaAddress.value !== route.params.wallet_address) return
       uploadLoad.value = true
       let name = pathList.value.join('/') || ''
       let fileNew = `${name ? name + '/' : ''}${fileBody.title}`
@@ -1042,6 +1044,13 @@ export default defineComponent({
               }
               &:hover {
                 text-decoration: underline;
+              }
+              &.disable {
+                opacity: 0.5;
+                cursor: no-drop;
+                &:hover {
+                  text-decoration: none;
+                }
               }
             }
             &.disabled {
