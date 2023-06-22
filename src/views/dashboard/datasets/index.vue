@@ -240,7 +240,7 @@ export default defineComponent({
         limit: pagin.pageSize,
         offset: page,
         sort: pagin.sort, // alphabetical， updated
-        public_name: searchValue.value
+        name: searchValue.value
       }
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets?${qs.stringify(params)}`, 'get')
       if (listRes) {

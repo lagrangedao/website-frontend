@@ -15,15 +15,18 @@
         </div>
         <div class="top">
           <div class="top_input">
-            <div class="top_input_search">
+            <div>
               <el-input v-model="searchValue" clearable @input="searchChange()" class="search_name w-50 m-2" placeholder="search Space" />
             </div>
-            <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: most Downloads">
-              <template #prefix>
-                <i class="el-icon-select"></i>
-              </template>
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
+            <div class="top_input_search">
+              <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: most Downloads">
+                <template #prefix>
+                  <i class="el-icon-select"></i>
+                </template>
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+              <el-button @click="clearMethod('clear')">Clear</el-button>
+            </div>
           </div>
           <div class="title">
             Spaces of the week
@@ -119,8 +122,16 @@ export default defineComponent({
       pagin.pageNo = 1
       pagin.sort = ''
       optionsValue.value = ''
-      const name = val ? val.full_name || val.wallet_address : ''
+      const name = val ? val.wallet_address : ''
       init(name)
+    }
+    function clearMethod (type) {
+      searchValue.value = ''
+      pagin.pageNo = 1
+      pagin.total = 0
+      pagin.sort = ''
+      optionsValue.value = ''
+      if (type) init()
     }
     function filterData (spaceData, val) {
       if (val === '') return spaceDataAll.value
@@ -152,7 +163,7 @@ export default defineComponent({
         limit: pagin.pageSize,
         offset: page,
         sort: pagin.sort, // alphabetical， updated
-        public_name: searchValue.value,
+        name: searchValue.value,
         public_address: name || ''
       }
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
@@ -181,11 +192,7 @@ export default defineComponent({
       init()
     })
     onDeactivated(() => {
-      searchValue.value = ''
-      pagin.pageNo = 1
-      pagin.total = 0
-      pagin.sort = ''
-      optionsValue.value = ''
+      clearMethod()
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
@@ -206,7 +213,7 @@ export default defineComponent({
       route,
       router,
       handleSizeChange, handleCurrentChange, searchChange, detailFun, momentFilter, hiddAddress,
-      sortChange
+      sortChange, clearMethod
     }
   }
 })
@@ -333,9 +340,26 @@ export default defineComponent({
               }
             }
           }
+          .top_input_search {
+            .el-button {
+              padding: 0.1rem 0.3rem;
+              margin: 0 0 0 0.1rem;
+              color: #000;
+              background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              border-color: #e1e1e1;
+              border-radius: 0.09rem;
+              text-decoration: none;
+              span {
+                cursor: inherit;
+              }
+              &:hover {
+                background: linear-gradient(180deg, #f0f0f0, #f0f0f0);
+              }
+            }
+          }
         }
         .el-select {
-          float: right;
+          // float: right;
           .el-input {
             cursor: pointer;
             .el-input__inner {
