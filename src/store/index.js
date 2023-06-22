@@ -8,7 +8,8 @@ export default createStore({
     navLogin: sessionStorage.getItem('navLogin') || false,
     lagLogin: sessionStorage.getItem('loginLag') || false,
     accessToken: sessionStorage.getItem('access_token_lag') || '',
-    accessAvatar: String(sessionStorage.getItem('access_avatar')) !== 'null' ? sessionStorage.getItem('access_avatar') : '',
+    // accessAvatar: String(sessionStorage.getItem('access_avatar')) !== 'null' ? sessionStorage.getItem('access_avatar') : '',
+    accessAvatar: require("@/assets/images/dashboard/people_default.png"),
     accessName: sessionStorage.getItem('access_name') || '-',
     accessSpace: sessionStorage.getItem('access_space') || '',
     accessDataset: sessionStorage.getItem('access_dataset') || '',
@@ -71,7 +72,8 @@ export default createStore({
     setAccessAvatar({
       commit
     }, accessAvatar) {
-      commit('SET_ACCESSAVATAR', accessAvatar)
+      // commit('SET_ACCESSAVATAR', accessAvatar)
+      commit('SET_ACCESSAVATAR', require("@/assets/images/dashboard/people_default.png"))
     },
     setAccessName({
       commit

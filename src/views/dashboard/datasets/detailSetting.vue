@@ -41,7 +41,11 @@
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
           <el-table :data="nftdata.tokens" v-if="nftdata.status === 'success' || (nftdata.tokens && nftdata.tokens.length>0)" stripe style="width: 100%" class="nft_table">
-            <el-table-column prop="chain_id" label="Chain ID" />
+            <el-table-column prop="chain_id" label="Chain ID">
+              <template #default="scope">
+                <span>{{ scope.row.chain_name}}{{ scope.row.chain_id}}</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="token_id" label="Token ID" />
             <el-table-column prop="owner_address" label="Owner Address">
               <template #default="scope">
@@ -50,7 +54,7 @@
             </el-table-column>
             <el-table-column prop="contract_address" label="Contract Address">
               <template #default="scope">
-                <a v-if="scope.row.contract_address" :href="`https://hyperspace.filfox.info/en/address/${scope.row.contract_address}`" target="_blank" class="link">{{ scope.row.contract_address }}</a>
+                <a v-if="scope.row.contract_address" :href="`${scope.row.chain_url}${scope.row.contract_address}`" target="_blank" class="link">{{ scope.row.contract_address }}</a>
                 <span v-else>-</span>
               </template>
             </el-table-column>
@@ -445,10 +449,13 @@ export default defineComponent({
         let tokens = []
         // get total supply
         let totalSupply = await nft_contract.methods.totalSupply().call()
+        let { name, url } = await system.$commonFun.getUnit(parseInt(chainID), 16)
         let token = {
           token_id: 1,
           contract_address: contractAddress,
           chain_id: chainID,
+          chain_name: name,
+          chain_url: url,
           owner_address: await nft_contract.methods.ownerOf(1).call(),
           ipfs_uri: await nft_contract.methods.tokenURI(1).call(),
           status: 'Success'
@@ -460,6 +467,17 @@ export default defineComponent({
         console.log('err:', err)
         return []
       }
+    }
+
+    async function mapTokens (list, nft_contract, contract_address) {
+      for (let token = 0; token < list.length; token++) {
+        let { name, url } = await system.$commonFun.getUnit(parseInt(list[token].chain_id), 16)
+        list[token].contract_address = contract_address
+        list[token].owner_address = await nft_contract.methods.ownerOf(list[token].token_id).call()
+        list[token].chain_name = name
+        list[token].chain_url = url
+      }
+      return list
     }
 
     async function requestInitData (type) {
@@ -477,18 +495,13 @@ export default defineComponent({
           } else if (contract_address) {
             const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
             const tokens_contact = await getTokenURI(nft_contract, contract_address, listRes.data.nft.chain_id)
-            listRes.data.nft.tokens.map(async (token, t) => {
-              token.contract_address = contract_address
-              token.owner_address = await nft_contract.methods.ownerOf(t + 2).call()
-              return token
-            })
-            listRes.data.nft.tokens = tokens_contact.concat(listRes.data.nft.tokens)
+            const tokens_list = await mapTokens(listRes.data.nft.tokens, nft_contract, contract_address)
+            listRes.data.nft.tokens = tokens_contact.concat(tokens_list)
           }
         }
         nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
         context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
       }
-      await system.$commonFun.timeout(500)
       listLoad.value = false
     }
 
