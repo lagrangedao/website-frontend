@@ -84,7 +84,7 @@
             <b>Datasets</b> {{NumFormat(pagin.total)}}
             <el-input v-model="searchValue" clearable @input="searchChange" class="w-50 m-2" placeholder="Filter by name" />
           </div>
-          <el-select v-model="value" class="m-2" placeholder="Sort: most Downloads">
+          <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: most Downloads">
             <template #prefix>
               <i class="el-icon-select"></i>
             </template>
@@ -92,7 +92,7 @@
           </el-select>
         </div>
         <el-row :gutter="32" class="list_body">
-          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
+          <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
             <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
@@ -123,10 +123,10 @@
               </div>
             </el-card>
           </el-col>
-          <p v-if="pagin.total<1 || listdata.length === 0" class="list_nodata">No Data</p>
+          <p v-if="listdata && listdata.length === 0" class="list_nodata">No Data</p>
         </el-row>
-        <el-pagination v-if="searchValue === '' && false" hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange"
-          @current-change="handleCurrentChange" />
+        <el-pagination hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        />
       </el-col>
     </el-row>
   </section>
@@ -135,6 +135,7 @@
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import qs from 'qs'
 export default defineComponent({
   name: 'Datasets',
   components: {},
@@ -159,29 +160,30 @@ export default defineComponent({
       ]
     })
     const searchValue = ref('')
-    const value = ref('')
+    const optionsValue = ref('')
     const options = ref([
       {
-        value: 'Option1',
+        value: 'downloads',
         label: 'Most Downloads',
       },
       {
-        value: 'Option2',
+        value: 'alphabetical',
         label: 'Alphabetical',
       },
       {
-        value: 'Option3',
+        value: 'updated',
         label: 'Recently Updated',
       },
       {
-        value: 'Option4',
+        value: 'likes',
         label: 'Most Likes',
       }
     ])
     const pagin = reactive({
-      pageSize: 30,
+      pageSize: 12,
       pageNo: 1,
-      total: 0
+      total: 0,
+      sort: ''
     })
     const small = ref(false)
     const background = ref(false)
@@ -199,10 +201,14 @@ export default defineComponent({
     async function handleCurrentChange (currentPage) {
       // console.log('handleCurrentChange:', currentPage)
       pagin.pageNo = currentPage
-      router.push({ path: '/dataset', query: { id: currentPage } })
+      init()
     }
     async function searchChange (val) {
-      listdata.value = await filterData(listdataAll.value, val)
+      // listdata.value = await filterData(listdataAll.value, val)
+      pagin.pageNo = 1
+      pagin.sort = ''
+      optionsValue.value = ''
+      init()
     }
     function filterData (listData, val) {
       if (val === '') return listdataAll.value
@@ -221,17 +227,26 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
+    function sortChange (val) {
+      pagin.sort = val
+      pagin.pageNo = 1
+      init()
+    }
     async function init () {
       listLoad.value = true
       listdata.value = []
-      pagin.pageNo = Number(route.query.id) > 0 ? Number(route.query.id) : 1
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets`, 'get')
+      const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
+      const params = {
+        limit: pagin.pageSize,
+        offset: page,
+        sort: pagin.sort, // alphabetical， updated
+        name: searchValue.value
+      }
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets?${qs.stringify(params)}`, 'get')
       if (listRes) {
         listdataAll.value = listRes.datasets || []
-        pagin.total = listdataAll.value.length || 0
-        const list = [].concat(listdataAll.value)
-        const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
-        listdata.value = list
+        listdata.value = listRes.datasets || []
+        pagin.total = listRes.total || 0
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -254,18 +269,19 @@ export default defineComponent({
     })
     onDeactivated(() => {
       searchValue.value = ''
+      pagin.pageNo = 1
+      pagin.total = 0
+      pagin.sort = ''
+      optionsValue.value = ''
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
-    })
-    watch(() => route.query, (val) => {
-      init()
     })
     return {
       lagLogin,
       dataList,
       searchValue,
-      value,
+      optionsValue,
       options,
       small,
       background,
@@ -276,7 +292,7 @@ export default defineComponent({
       system,
       route,
       router,
-      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, momentFilter, searchChange, hiddAddress
+      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, momentFilter, searchChange, hiddAddress, sortChange
     }
   }
 })

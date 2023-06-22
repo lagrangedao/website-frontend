@@ -15,7 +15,18 @@
         </div>
         <div class="top">
           <div class="top_input">
-            <el-input v-model="searchValue" clearable @input="searchChange" class="w-50 m-2" placeholder="search Space" />
+            <div>
+              <el-input v-model="searchValue" clearable @input="searchChange()" class="search_name w-50 m-2" placeholder="search Space" />
+            </div>
+            <div class="top_input_search">
+              <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: most Downloads">
+                <template #prefix>
+                  <i class="el-icon-select"></i>
+                </template>
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+              <el-button @click="clearMethod('clear')">Clear</el-button>
+            </div>
           </div>
           <div class="title">
             Spaces of the week
@@ -38,14 +49,15 @@
                 <div class="text_left">
                   <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
                   <i class="icon"></i>
-                  <span class="small">{{hiddAddress(list.wallet_address)}}</span>
+                  <span class="small" @click.stop="searchChange(list)">{{list.full_name || hiddAddress(list.wallet_address)}}</span>
                 </div>
                 <span>{{momentFilter(list.created_at)}}</span>
               </div>
             </el-card>
           </el-col>
         </el-row>
-        <!-- <el-pagination :current-page="currentPage1" :page-size="100" :small="small" :background="background" layout="prev, pager, next" :total="1000" @size-change="handleSizeChange" @current-change="handleCurrentChange" /> -->
+        <el-pagination hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        />
       </el-col>
     </el-row>
   </section>
@@ -54,6 +66,7 @@
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import qs from 'qs'
 export default defineComponent({
   name: 'Spaces',
   components: {},
@@ -63,23 +76,62 @@ export default defineComponent({
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const accessName = computed(() => (store.state.accessName))
     const searchValue = ref('')
-    const value = ref('')
-    const currentPage1 = ref(1)
+    const optionsValue = ref('')
     const small = ref(false)
     const background = ref(false)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const listLoad = ref(true)
     const spaceData = ref([])
     const spaceDataAll = ref([])
-    const total = ref(0)
+    const options = ref([
+      {
+        value: 'downloads',
+        label: 'Most Downloads',
+      },
+      {
+        value: 'alphabetical',
+        label: 'Alphabetical',
+      },
+      {
+        value: 'updated',
+        label: 'Recently Updated',
+      },
+      {
+        value: 'likes',
+        label: 'Most Likes',
+      }
+    ])
+    const pagin = reactive({
+      pageSize: 12,
+      pageNo: 1,
+      total: 0,
+      sort: ''
+    })
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
     function handleSizeChange (val) { }
-    function handleCurrentChange (val) { }
+    async function handleCurrentChange (currentPage) {
+      // console.log('handleCurrentChange:', currentPage)
+      pagin.pageNo = currentPage
+      init()
+    }
     async function searchChange (val) {
-      spaceData.value = await filterData(spaceDataAll.value, val)
+      // spaceData.value = await filterData(spaceDataAll.value, val)
+      pagin.pageNo = 1
+      pagin.sort = ''
+      optionsValue.value = ''
+      const name = val ? val.wallet_address : ''
+      init(name)
+    }
+    function clearMethod (type) {
+      searchValue.value = ''
+      pagin.pageNo = 1
+      pagin.total = 0
+      pagin.sort = ''
+      optionsValue.value = ''
+      if (type) init()
     }
     function filterData (spaceData, val) {
       if (val === '') return spaceDataAll.value
@@ -98,15 +150,28 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
-    async function init () {
+    function sortChange (val) {
+      pagin.sort = val
+      pagin.pageNo = 1
+      init()
+    }
+    async function init (name) {
       listLoad.value = true
       spaceData.value = []
-      total.value = 0
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces`, 'get')
+      const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
+      const params = {
+        limit: pagin.pageSize,
+        offset: page,
+        sort: pagin.sort, // alphabetical， updated
+        name: searchValue.value,
+        public_address: name || ''
+      }
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
       if (listRes) {
         spaceData.value = listRes.spaces || []
         spaceDataAll.value = listRes.spaces || []
-        total.value = listRes.spaces.length
+        pagin.total = listRes.total || 0
+        if (listRes.message) system.$commonFun.messageTip('info', listRes.message)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -127,7 +192,7 @@ export default defineComponent({
       init()
     })
     onDeactivated(() => {
-      searchValue.value = ''
+      clearMethod()
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
@@ -136,18 +201,19 @@ export default defineComponent({
       accessAvatar,
       accessName,
       searchValue,
-      value,
-      currentPage1,
+      optionsValue,
+      options,
       small,
       background,
       listLoad,
       spaceData,
       spaceDataAll,
-      total,
+      pagin,
       system,
       route,
       router,
-      handleSizeChange, handleCurrentChange, searchChange, detailFun, momentFilter, hiddAddress
+      handleSizeChange, handleCurrentChange, searchChange, detailFun, momentFilter, hiddAddress,
+      sortChange, clearMethod
     }
   }
 })
@@ -243,13 +309,15 @@ export default defineComponent({
         .top_input {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           width: 100%;
-          .el-input {
+          margin: 0.65rem 0 0.32rem;
+          @media screen and (max-width: 768px) {
+            margin: 0.32rem 0;
+          }
+          .search_name {
             max-width: 3.4rem;
-            margin: 0.65rem 0 0.32rem;
-            @media screen and (max-width: 768px) {
-              margin: 0.32rem 0;
-            }
+            margin: 0;
             .el-input__inner {
               padding-left: 0.35rem;
               background: url(../../../assets/images/icons/icon_13_1.png)
@@ -270,6 +338,66 @@ export default defineComponent({
                   color: #9ea5b3;
                 }
               }
+            }
+          }
+          .top_input_search {
+            .el-button {
+              padding: 0.1rem 0.3rem;
+              margin: 0 0 0 0.1rem;
+              color: #000;
+              background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              border-color: #e1e1e1;
+              border-radius: 0.09rem;
+              text-decoration: none;
+              span {
+                cursor: inherit;
+              }
+              &:hover {
+                background: linear-gradient(180deg, #f0f0f0, #f0f0f0);
+              }
+            }
+          }
+        }
+        .el-select {
+          // float: right;
+          .el-input {
+            cursor: pointer;
+            .el-input__inner {
+              width: 195px;
+              padding: 0 12px 0 40px !important;
+              background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              border-color: #e1e1e1;
+              font-size: 14px;
+              line-height: 1;
+              border-radius: 0.09rem;
+              @media screen and (min-width: 1800px) {
+                font-size: 15px;
+              }
+            }
+            .el-input__prefix {
+              color: #9ca3b1;
+              .el-icon-select {
+                width: 21px;
+                height: 21px;
+                background: url(../../../assets/images/icons/icon_12.png)
+                  no-repeat left center;
+                background-size: 100%;
+              }
+            }
+            .el-input__suffix {
+              display: none;
+            }
+            ::-webkit-input-placeholder {
+              color: #9ca3b1;
+            } /* 使用webkit内核的浏览器 */
+            :-moz-placeholder {
+              color: #9ca3b1;
+            } /* Firefox版本4-18 */
+            ::-moz-placeholder {
+              color: #9ca3b1;
+            } /* Firefox版本19+ */
+            :-ms-input-placeholder {
+              color: #9ca3b1;
             }
           }
         }
@@ -410,6 +538,9 @@ export default defineComponent({
                 .small {
                   font-weight: 500;
                   color: #000;
+                  &:hover {
+                    text-decoration: underline;
+                  }
                 }
               }
             }

@@ -5,7 +5,7 @@
       <el-col :xs="24" :sm="8" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
           <div v-loading="false" class="logo_sidebar">
-            <img :src="listdata.user.avatar || accessAvatar || peopleUrl" alt="">
+            <img :src="accessAvatar || peopleUrl" alt="">
           </div>
           <div class="personal">
             <div class="title">
@@ -43,19 +43,37 @@
           </div>
           <div class="top_text">
             <el-input v-model="searchValue" class="w-50 m-2" placeholder="search ..." />
-            <el-badge class="item l">
+            <el-badge v-if="listdata.outgoing_pending_license_requests.length === 0" class="item l el-dropdown-link">
               <i class="icon icon_cont"></i>
             </el-badge>
-            <el-badge v-if="listdata.license_requests.length === 0" class="item l el-dropdown-link">
+            <el-dropdown v-else max-height="300" popper-class="message_style" :teleported="true">
+              <el-badge :value="listdata.outgoing_pending_license_requests.length" class="item l el-dropdown-link">
+                <i class="icon icon_cont"></i>
+              </el-badge>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <div class="drop_title">Pending requests for approval</div>
+                  <el-dropdown-item :command="c" v-for="(child, c) in listdata.outgoing_pending_license_requests" :key="c">
+                    <div class="drop_body margin">
+                      <p>
+                        {{c+1}}.
+                        <b>{{child.dataset_name}}</b>
+                      </p>
+                    </div>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-badge v-if="listdata.license_requests_notifications.length === 0" class="item l el-dropdown-link">
               <i class="icon icon_info"></i>
             </el-badge>
             <el-dropdown v-else @command="handleCommand" max-height="300" popper-class="message_style" :teleported="true">
-              <el-badge :value="listdata.license_requests.length" class="item l el-dropdown-link">
+              <el-badge :value="listdata.license_requests_notifications.length" class="item l el-dropdown-link">
                 <i class="icon icon_info"></i>
               </el-badge>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests" :key="c">
+                  <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests_notifications" :key="c">
                     <div class="drop_body">
                       <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your dataset license:
                         <b>{{child.dataset_name}}</b>
@@ -130,12 +148,12 @@
               <span>{{dataSetIndex}}</span>
             </div>
           </div>
-          <el-select v-model="value" class="m-2" placeholder="Sort: most Downloads">
+          <!-- <el-select v-model="value" class="m-2" placeholder="Sort: most Downloads">
             <template #prefix>
               <i class="el-icon-select"></i>
             </template>
             <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
+          </el-select> -->
         </div>
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
           <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
@@ -193,6 +211,65 @@
         <div class="more_style" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">
           <img v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        </div>
+        <div class="top">
+          <div class="list">
+            <div class="title">
+              <i class="icon icon_license"></i>
+              Requested License & License given by others
+              <span>{{modelsIndex}}</span>
+            </div>
+          </div>
+        </div>
+        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.licenseIsShow}" v-loading="listLoad">
+          <el-col v-show="!listdata.licenseIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.license.slice(0,3)" :key="l">
+            <el-card class="box-card">
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+                <!-- <div class="item_body">
+                  <i class="icon icon_up"></i>
+                  <span class="small">5.15M</span>
+                </div> -->
+              </div>
+            </el-card>
+          </el-col>
+          <el-col v-show="listdata.licenseIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.license" :key="l">
+            <el-card class="box-card">
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+                <!-- <div class="item_body">
+                  <i class="icon icon_up"></i>
+                  <span class="small">5.15M</span>
+                </div> -->
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+        <div class="more_style" v-if="listdata.license.length>3">
+          <img v-if="!listdata.licenseIsShow" @click="listdata.licenseIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img v-else @click="listdata.licenseIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
         <div class="top">
           <div class="list">
@@ -318,11 +395,14 @@ export default defineComponent({
       datasets: [],
       models: [],
       spaces: [],
-      license_requests: [],
+      license: [],
+      license_requests_notifications: [],
+      outgoing_pending_license_requests: [],
       user: {},
       datasetsIsShow: false,
       modelsIsShow: false,
-      spacesIsShow: false
+      spacesIsShow: false,
+      licenseIsShow: false
     })
     const listLoad = ref(false)
     const bodyWidth = ref(document.body.clientWidth < 768)
@@ -341,7 +421,8 @@ export default defineComponent({
           info.balance = Number(balanceAll).toFixed(4)
         })
         const chainId = await system.$commonFun.web3Init.eth.net.getId()
-        info.unit = await system.$commonFun.getUnit(chainId)
+        const { unit } = await system.$commonFun.getUnit(chainId)
+        info.unit = unit
         // await system.$commonFun.timeout(500)
         if (lagLogin.value) getdataList()
         else await signIn()
@@ -363,7 +444,9 @@ export default defineComponent({
         listdata.datasets = listRes.data.dataset || []
         listdata.models = listRes.data.model || []
         listdata.spaces = listRes.data.space || []
-        listdata.license_requests = listRes.data.license_requests || []
+        listdata.license = listRes.data.license || []
+        listdata.license_requests_notifications = listRes.data.license_requests_notifications || []
+        listdata.outgoing_pending_license_requests = listRes.data.outgoing_pending_license_requests || []
         listdata.user = listRes.data.user || {}
         dataSetIndex.value = listRes.data.dataset.length
         modelsIndex.value = listRes.data.model.length
@@ -387,7 +470,9 @@ export default defineComponent({
         listdata.datasets = []
         listdata.models = []
         listdata.spaces = []
-        listdata.license_requests = []
+        listdata.license = []
+        listdata.license_requests_notifications = []
+        listdata.outgoing_pending_license_requests = []
         listdata.user = {}
         dataSetIndex.value = 0
         modelsIndex.value = 0
@@ -467,10 +552,13 @@ export default defineComponent({
       listdata.datasetsIsShow = false
       listdata.modelsIsShow = false
       listdata.spacesIsShow = false
+      listdata.licenseIsShow = false
       listdata.datasets = []
       listdata.models = []
       listdata.spaces = []
-      listdata.license_requests = []
+      listdata.license = []
+      listdata.license_requests_notifications = []
+      listdata.outgoing_pending_license_requests = []
       listdata.user = {}
       dataSetIndex.value = 0
       modelsIndex.value = 0
@@ -983,6 +1071,11 @@ export default defineComponent({
           }
           .icon_models {
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
+              left center;
+            background-size: auto 100%;
+          }
+          .icon_license {
+            background: url(../../../assets/images/icons/icon_49.png) no-repeat
               left center;
             background-size: auto 100%;
           }
@@ -1541,6 +1634,9 @@ export default defineComponent({
 <style lang="scss">
 .message_style {
   width: 300px;
+  .drop_title {
+    padding: 5px 16px;
+  }
   .el-dropdown-menu__item {
     padding: 0 16px;
     white-space: normal;
@@ -1549,6 +1645,9 @@ export default defineComponent({
       padding: 0.1rem 0;
       word-break: break-word;
       border-bottom: 1px solid #eee;
+      &.margin {
+        padding: 0.05rem 0;
+      }
       p {
         width: 100%;
         margin-bottom: 0.05rem;

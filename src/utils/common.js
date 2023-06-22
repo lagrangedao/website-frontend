@@ -263,24 +263,36 @@ function popupwindow(title, url) {
 
 async function getUnit(id) {
   let unit = 'ETH'
+  let name = ''
+  let url = ''
   switch (id) {
     case 97:
       unit = 'tBNB'
       break
     case 137:
       unit = 'MATIC'
+      name = 'Polygon Mainnet '
+      url = `${process.env.VUE_APP_POLYGONBLOCKURL}/address/`
       break
     case 80001:
       unit = 'MATIC'
+      name = 'Mumbai Testnet '
+      url = 'https://mumbai.polygonscan.com/address/'
       break
     case 3141:
       unit = 'ETH'
       break
     case 11155111:
       unit = 'ETH'
+      name = 'Sepolia Testnet '
+      url = `${process.env.VUE_APP_SEPOLIABLOCKURL}address/`
       break
   }
-  return unit
+  return ({
+    unit,
+    name,
+    url
+  })
 }
 
 async function changeIDLogin() {
@@ -289,7 +301,7 @@ async function changeIDLogin() {
   })
   const list = [137, 80001, 11155111]
   const getPast = await list.some(t => t === parseInt(chainId, 16))
-  if (!getPast) messageTip('error', 'Switch to Filecoin TestNet, Mumbai Testnet or Sepolia Testnet!')
+  if (!getPast) messageTip('error', 'Switch to Polygon Mainnet, Mumbai Testnet or Sepolia Testnet!')
   return getPast
 }
 
