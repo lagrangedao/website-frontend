@@ -23,7 +23,7 @@
                         <label class="label" for="dataname">
                             Space name
                             <div class="flex flex-row">
-                                <el-input v-model="ruleForm.name" placeholder="New Space name" title="Only regular alphanumeric characters, '-', '.' and '_' supported" />
+                                <el-input v-model="ruleForm.name" maxlength="80" show-word-limit placeholder="New Space name" title="Only regular alphanumeric characters, '-', '.' and '_' supported" />
                             </div>
                         </label>
                     </el-form-item>

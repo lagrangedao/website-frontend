@@ -18,7 +18,7 @@
               <i class="icon icon_like"></i>like</el-button>
             <el-button>4</el-button>
           </el-button-group>
-          <div class="logs_style" @click="reqNFT" v-if="nft.contract_address && (metaAddress && metaAddress !== route.params.wallet_address)">
+          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
               <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
                 p-id="2675" fill="#878c93"></path>
@@ -264,6 +264,12 @@ export default defineComponent({
       nft.chain_id = chainID
     }
     async function reqNFT () {
+      if (!nft.contract_address) return
+      const getID = await system.$commonFun.web3Init.eth.net.getId()
+      if (getID.toString() !== nft.chain_id) {
+        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + nft.chain_id)
+        return
+      }
       ntfLoad.value = true
       const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, nft.contract_address)
       const ipfs_uri = await nft_contract.methods.tokenURI(1).call()
@@ -451,6 +457,10 @@ export default defineComponent({
           }
           &:hover {
             background-color: #f7f7f7;
+          }
+          &.is-disabled {
+            opacity: 0.5;
+            cursor: no-drop;
           }
           svg {
             width: 14px;
