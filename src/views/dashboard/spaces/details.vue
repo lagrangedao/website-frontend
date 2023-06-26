@@ -275,12 +275,11 @@ export default defineComponent({
           resolve(response.text())
         })
         logsValue.value = log
-        expireTime.value = time
         logsCont.data = textUri ? JSON.parse(textUri).data : {}
       } else {
         logsValue.value = ''
-        expireTime.value = Math.floor(Date.now() / 1000)
       }
+      expireTime.value = time ? time : Math.floor(Date.now() / 1000)
       parentValue.value = numRe.test(value) ? '' : value
     }
     const forkOperate = async () => {
