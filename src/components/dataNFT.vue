@@ -216,7 +216,9 @@ export default defineComponent({
           const getNftID = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}`, 'get')
 
           if (getID.toString() !== getNftID.data.nft.chain_id) {
-            await system.$commonFun.messageTip('error', 'Please switch to the network: ' + getNftID.data.nft.chain_id)
+            const { name } = await system.$commonFun.getUnit(Number(getNftID.data.nft.chain_id))
+            await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+            generateLoad.value = false
             return
           }
           const licenseRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
@@ -263,7 +265,8 @@ export default defineComponent({
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       const getNftID = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}`, 'get')
       if (getID.toString() !== getNftID.data.nft.chain_id) {
-        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + getNftID.data.nft.chain_id)
+        const { name } = await system.$commonFun.getUnit(Number(getNftID.data.nft.chain_id))
+        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
         return
       }
       fd.append('tx_hash', tx_hash)
