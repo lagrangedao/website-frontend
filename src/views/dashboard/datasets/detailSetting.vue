@@ -166,7 +166,7 @@
       </template>
     </el-dialog>
 
-    <data-nft v-if="dataNFTRequest" @handleChange="handleChange" :dataNFTRequest="dataNFTRequest" :createdAt="listdata.created_at" :updatedAt="listdata.updated_at" :contractAddress="nftdata.contract_address"></data-nft>
+    <data-nft v-if="dataNFTRequest" @handleChange="handleChange" :dataNFTRequest="dataNFTRequest" :createdAt="listdata.created_at" :updatedAt="listdata.updated_at" :contractAddress="nftdata.contract_address" :getNftID="nftdata.chain_id"></data-nft>
   </section>
 </template>
 <script>

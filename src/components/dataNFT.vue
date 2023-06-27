@@ -78,7 +78,8 @@ export default defineComponent({
     dataNFTRequest: { type: Boolean, default: false },
     createdAt: { type: String, default: "" },
     updatedAt: { type: String, default: "" },
-    contractAddress: { type: String, default: "" }
+    contractAddress: { type: String, default: "" },
+    getNftID: { type: String, default: "" }
   },
   setup (props, context) {
     const store = useStore()
@@ -213,15 +214,13 @@ export default defineComponent({
             "additionalInformation": additionalInformation
           }
           const getID = await system.$commonFun.web3Init.eth.net.getId()
-          const getNftID = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}`, 'get')
-
-          if (getID.toString() !== getNftID.data.nft.chain_id) {
-            const { name } = await system.$commonFun.getUnit(Number(getNftID.data.nft.chain_id))
+          if (getID.toString() !== props.getNftID) {
+            const { name } = await system.$commonFun.getUnit(Number(props.getNftID))
             await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
             generateLoad.value = false
             return
           }
-          const licenseRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
+          const licenseRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
             if (licenseRes.data && licenseRes.data.ipfs_url) createLicense(licenseRes.data.ipfs_url)
             else generateLoad.value = false
@@ -263,17 +262,16 @@ export default defineComponent({
     async function generateMintHash (tx_hash) {
       let fd = new FormData()
       const getID = await system.$commonFun.web3Init.eth.net.getId()
-      const getNftID = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}`, 'get')
-      if (getID.toString() !== getNftID.data.nft.chain_id) {
-        const { name } = await system.$commonFun.getUnit(Number(getNftID.data.nft.chain_id))
+      if (getID.toString() !== props.getNftID) {
+        const { name } = await system.$commonFun.getUnit(Number(props.getNftID))
         await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
         return
       }
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
       fd.append('contract_address', props.contractAddress)
-      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/license/mint_hash`, 'post', fd)
-      const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/create_license`, 'post', fd)
+      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${route.params.name}/license/mint_hash`, 'post', fd)
+      const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/create_license`, 'post', fd)
     }
 
     onMounted(() => { })

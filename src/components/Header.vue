@@ -3,18 +3,18 @@
     <el-row class="headerStyle">
       <el-col :xs="20" :sm="20" :md="20" :lg="8" :xl="8" class="logoImg">
         <img :src="logo" @click="header_logo" alt='' />
-        <el-input v-model="searchValue" class="w-50 m-2" placeholder="search models, datasets, users..." />
+        <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." />
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
         <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="/dataset">
+          <!-- <el-menu-item index="/dataset">
             <i class="icon icon_datasets"></i>
             Datasets
           </el-menu-item>
           <el-menu-item index="/models">
             <i class="icon icon_models"></i>
             Models
-          </el-menu-item>
+          </el-menu-item> -->
           <el-menu-item index="/spaces">
             <i class="icon icon_spaces"></i>
             Spaces
@@ -30,7 +30,7 @@
           <el-menu-item index="6">
             Pricing
           </el-menu-item>
-          <el-menu-item index="7">
+          <!-- <el-menu-item index="7">
             &nbsp;
             <svg class="mr-1.5 text-gray-500 w-5 group-hover:text-gray-400 dark:text-gray-300 dark:group-hover:text-gray-400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="21px"
               height="21px" viewBox="0 0 32 18" preserveAspectRatio="xMidYMid meet">
@@ -43,7 +43,7 @@
               <path fill-rule="evenodd" clip-rule="evenodd" d="M1.94549 6.87377C2.27514 6.54411 2.80962 6.54411 3.13928 6.87377L6.23458 9.96907L9.32988 6.87377C9.65954 6.54411 10.194 6.54411 10.5237 6.87377C10.8533 7.20343 10.8533 7.73791 10.5237 8.06756L6.23458 12.3567L1.94549 8.06756C1.61583 7.73791 1.61583 7.20343 1.94549 6.87377Z"
                 fill="currentColor"></path>
             </svg>
-          </el-menu-item>
+          </el-menu-item> -->
           <el-menu-item index="/personal_center" v-if="!lagLogin">
             &nbsp;
             <span class="loginBtn">Login</span>
@@ -54,7 +54,7 @@
                 <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt="">
               </router-link>
             </template>
-            <el-menu-item index="/create_dataset">+ New Dataset</el-menu-item>
+            <!-- <el-menu-item index="/create_dataset">+ New Dataset</el-menu-item> -->
             <el-menu-item index="/create_space">+ New Space</el-menu-item>
             <!-- <el-menu-item index="/create_organizations">Create Organizations</el-menu-item> -->
             <el-menu-item index="settings">Settings</el-menu-item>
