@@ -57,7 +57,7 @@
                     <div class="drop_body margin">
                       <p>
                         {{c+1}}.
-                        <b>{{child.dataset_name}}</b>
+                        <b>{{child.space_name}}</b>
                       </p>
                     </div>
                   </el-dropdown-item>
@@ -75,8 +75,8 @@
                 <el-dropdown-menu>
                   <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests_notifications" :key="c">
                     <div class="drop_body">
-                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your dataset license:
-                        <b>{{child.dataset_name}}</b>
+                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your space license:
+                        <b>{{child.space_name}}</b>
                       </p>
                       <el-button @click="licenseFun(child, 'approve')" type="primary" size="small">Approve</el-button>
                       <el-button @click="licenseFun(child, 'reject')" type="danger" size="small">Reject</el-button>
@@ -143,81 +143,9 @@
         <div class="top">
           <div class="list">
             <div class="title">
-              <i class="icon icon_datasets"></i>
-              Datasets
-              <span>{{dataSetIndex}}</span>
-            </div>
-          </div>
-          <!-- <el-select v-model="value" class="m-2" placeholder="Sort: most Downloads">
-            <template #prefix>
-              <i class="el-icon-select"></i>
-            </template>
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select> -->
-        </div>
-        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
-            <el-card class="box-card">
-              <template #header>
-                <!-- <div class="card-header">
-                                    <span>27</span>
-                                </div> -->
-              </template>
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <div class="text">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <!-- <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div> -->
-              </div>
-            </el-card>
-          </el-col>
-          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
-            <el-card class="box-card">
-              <template #header>
-              </template>
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <div class="text">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <!-- <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div> -->
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <div class="more_style" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">
-          <img v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
-          <img v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
-        </div>
-        <div class="top">
-          <div class="list">
-            <div class="title">
               <i class="icon icon_license"></i>
               Requested License & License given by others
-              <span>{{modelsIndex}}</span>
+              <span>{{licenseIndex}}</span>
             </div>
           </div>
         </div>
@@ -270,65 +198,6 @@
         <div class="more_style" v-if="listdata.license.length>3">
           <img v-if="!listdata.licenseIsShow" @click="listdata.licenseIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img v-else @click="listdata.licenseIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
-        </div>
-        <div class="top">
-          <div class="list">
-            <div class="title">
-              <i class="icon icon_models"></i>
-              Models
-              <span>{{modelsIndex}}</span>
-            </div>
-          </div>
-        </div>
-        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.modelsIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.modelsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models.slice(0,3)" :key="l">
-            <el-card class="box-card">
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <div class="text">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <!-- <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div> -->
-              </div>
-            </el-card>
-          </el-col>
-          <el-col v-show="listdata.modelsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.models" :key="l">
-            <el-card class="box-card">
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <div class="text">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <!-- <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div> -->
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <div class="more_style" v-if="listdata.models.length>3">
-          <img v-if="!listdata.modelsIsShow" @click="listdata.modelsIsShow = true" src="@/assets/images/icons/icon_38.png" />
-          <img v-else @click="listdata.modelsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
       </el-col>
     </el-row>
@@ -388,19 +257,14 @@ export default defineComponent({
     const loading = ref(true)
     const loadingText = ref('')
     const prevType = ref(true)
-    const dataSetIndex = ref(0)
-    const modelsIndex = ref(0)
+    const licenseIndex = ref(0)
     const spacesIndex = ref(0)
     const listdata = reactive({
-      datasets: [],
-      models: [],
       spaces: [],
       license: [],
       license_requests_notifications: [],
       outgoing_pending_license_requests: [],
       user: {},
-      datasetsIsShow: false,
-      modelsIsShow: false,
       spacesIsShow: false,
       licenseIsShow: false
     })
@@ -441,20 +305,16 @@ export default defineComponent({
       listLoad.value = true
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
       if (listRes && listRes.status === 'success') {
-        listdata.datasets = listRes.data.dataset || []
-        listdata.models = listRes.data.model || []
         listdata.spaces = listRes.data.space || []
         listdata.license = listRes.data.license || []
         listdata.license_requests_notifications = listRes.data.license_requests_notifications || []
         listdata.outgoing_pending_license_requests = listRes.data.outgoing_pending_license_requests || []
         listdata.user = listRes.data.user || {}
-        dataSetIndex.value = listRes.data.dataset.length
-        modelsIndex.value = listRes.data.model.length
+        // licenseIndex.value = listRes.data.model.length
         spacesIndex.value = listRes.data.space.length
         store.dispatch('setAccessAvatar', listRes.data.user.avatar)
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
-        let datasetList = []
         listdata.spaces.forEach(space => {
           const current = Math.floor(Date.now() / 1000)
           if (space.expiration_time) {
@@ -463,19 +323,14 @@ export default defineComponent({
           } else space.expireTime = current
           spaceList.push(space.name)
         })
-        listdata.datasets.forEach(space => datasetList.push(space.name))
         store.dispatch('setAccessSpace', JSON.stringify(spaceList))
-        store.dispatch('setAccessDataset', JSON.stringify(datasetList))
       } else {
-        listdata.datasets = []
-        listdata.models = []
         listdata.spaces = []
         listdata.license = []
         listdata.license_requests_notifications = []
         listdata.outgoing_pending_license_requests = []
         listdata.user = {}
-        dataSetIndex.value = 0
-        modelsIndex.value = 0
+        licenseIndex.value = 0
         spacesIndex.value = 0
         system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
       }
@@ -531,7 +386,7 @@ export default defineComponent({
     }
     async function licenseFun (row, type) {
       listLoad.value = true
-      const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
+      const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
       if (approveRes && approveRes.status === 'success') system.$commonFun.messageTip('success', approveRes.message ? approveRes.message : 'Request successful.')
       else system.$commonFun.messageTip('error', approveRes.message ? approveRes.message : 'Request failed!')
       getdataList()
@@ -549,19 +404,14 @@ export default defineComponent({
       else router.push({ name: 'main' })
     })
     onDeactivated(() => {
-      listdata.datasetsIsShow = false
-      listdata.modelsIsShow = false
       listdata.spacesIsShow = false
       listdata.licenseIsShow = false
-      listdata.datasets = []
-      listdata.models = []
       listdata.spaces = []
       listdata.license = []
       listdata.license_requests_notifications = []
       listdata.outgoing_pending_license_requests = []
       listdata.user = {}
-      dataSetIndex.value = 0
-      modelsIndex.value = 0
+      licenseIndex.value = 0
       spacesIndex.value = 0
     })
     watch(navLogin, (newValue, oldValue) => {
@@ -584,8 +434,7 @@ export default defineComponent({
       loading,
       loadingText,
       prevType,
-      dataSetIndex,
-      modelsIndex,
+      licenseIndex,
       spacesIndex,
       listdata,
       listLoad,

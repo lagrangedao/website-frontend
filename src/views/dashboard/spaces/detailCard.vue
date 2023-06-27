@@ -60,7 +60,7 @@ export default defineComponent({
           const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
-        context.emit('handleValue', listRes.data.space.status, jobData ? jobData.job_source_uri : '', expireTime)
+        context.emit('handleValue', listRes.data.space.status, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false

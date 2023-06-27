@@ -312,7 +312,7 @@ export default defineComponent({
           const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
-        context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime)
+        context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
 
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)
