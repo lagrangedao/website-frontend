@@ -1,195 +1,8 @@
 <template>
-  <section id="dataset">
-    <div id="datasetBody">
-      <el-row class="dataset_body" v-loading="listLoad">
-        <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
-          <div class="readme_body" v-if="!createLoad">
-            <div class="desc">
-              <b>No space card yet</b>
-              <p v-if="metaAddress === route.params.wallet_address">Create a new space card by using following template</p>
-            </div>
-            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address">
-              <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="col-title">
-                <b>Start with Space card</b>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" v-for="card in templateData" :key="card">
-                <el-card class="box-card" shadow="hover" @click="cardAdd(card.type)">
-                  <template #header>
-                    <div class="card-header">
-                      <span>{{card.title}}</span>
-                    </div>
-                  </template>
-                  <div class="text item">{{card.desc}}</div>
-                </el-card>
-              </el-col>
-
-              <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="col-title">
-                <b>Start with hello-world</b>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                <el-card class="box-card is-disabled" shadow="hover">
-                  <div class="text item">Create a hello-world docker container</div>
-                </el-card>
-              </el-col>
-            </el-row>
-          </div>
-          <div class="readme_create" v-else>
-            <el-tabs type="border-card">
-              <el-tab-pane label="Create new file">
-                <v-md-editor v-model="textEditor"></v-md-editor>
-                <el-form :label-position="'top'">
-                  <el-form-item label="File name" prop="name">
-                    <el-input model-value="README.md" disabled />
-                  </el-form-item>
-                </el-form>
-                <el-button-group class="ml-4">
-                  <el-button @click="editCommitFun('create')">Commit new file</el-button>
-                  <el-button @click="cancelFun">Cancel</el-button>
-                </el-button-group>
-              </el-tab-pane>
-            </el-tabs>
-          </div>
-        </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
-          <div class="labelList" id="permiss">
-            <ul>
-              <li v-for="(anchor, index) in titles" :key="index + 'art'">
-                <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
-              </li>
-            </ul>
-          </div>
-        </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="24" :md="13" :lg="14" :xl="14" class="right">
-          <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
-        </el-col>
-        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
-          <v-md-editor v-model="textEditorChange"></v-md-editor>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="left left_light">
-          <div class="list">
-            <div class="title">
-              Downloads last month
-              <b>1,149,560</b>
-            </div>
-            <div class="cont">
-              <el-row :gutter="12" v-if="urlReadme">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
-                  <a>
-                    <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
-                      <el-icon>
-                        <EditPen />
-                      </el-icon>
-                      Edit space card
-                    </span>
-                  </a>
-                </el-col>
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
-                  <a>
-                    <span class="a_button" @click="isPreview=true">
-                      <el-icon>
-                        <CircleClose />
-                      </el-icon>
-                      Cancel
-                    </span>
-                  </a>
-                </el-col>
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
-                  <a>
-                    <span class="a_button" @click="editCommitFun">
-                      <el-icon>
-                        <Edit />
-                      </el-icon>
-                      Commit changes
-                    </span>
-                  </a>
-                </el-col>
-              </el-row>
-              <el-row :gutter="12">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="">
-                    <i class="icon icon_01"></i>
-                    <span class="a_text">Image Classification</span>
-                  </router-link>
-                </el-col>
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="">
-                    <i class="icon icon_02"></i>
-                    <span class="a_text">Translation</span>
-                  </router-link>
-                </el-col>
-              </el-row>
-            </div>
-          </div>
-          <div class="labelModel">
-            <ul>
-              <li>
-                <p>Homepage:</p>
-                <b>github.com</b>
-              </li>
-              <li>
-                <p>Size of downloaded space files:</p>
-                <b>55.66MB</b>
-              </li>
-              <li>
-                <p>Size of the generated space:</p>
-                <b>238.01MB</b>
-              </li>
-              <li>
-                <p>Total amount of disk used:</p>
-                <b>293.67MB</b>
-              </li>
-            </ul>
-          </div>
-          <div class="list">
-            <div class="title">
-              <p :title="'Models trained or fine-tuned on '+route.params.name">
-                <i class="icon icon_datasets"></i>
-                Models trained or fine-tuned on
-                <small>{{route.params.name}}</small>
-              </p>
-            </div>
-          </div>
-          <el-row class="list_body" v-loading="false">
-            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata" :key="l">
-              <el-card class="box-card" @click="detailFun(list, l)">
-                <template #header>
-                  <div class="card-header">
-                    <div class="name">
-                      <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
-                      <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
-                      <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
-                      <b>{{list.name}}</b>
-                    </div>
-                    <span>27</span>
-                  </div>
-                </template>
-                <div class="text">
-                  <i class="icon icon_image"></i>
-                  <p class="ellipsis">argilla/news-summary</p>
-                </div>
-                <!-- <div class="text">
-                                  <el-row :gutter="6">
-                                      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                          <router-link to="" class="ellipsis">
-                                              {{list.license}}
-                                          </router-link>
-                                      </el-col>
-                                  </el-row>
-                              </div> -->
-                <div class="text item">
-                  <div class="item_body">
-                    <i class="icon icon_time"></i>
-                    <span class="small">5 Sept 2022 - 5 Oct 2022</span>
-                  </div>
-                  <!-- <div class="item_body">
-                    <i class="icon icon_up"></i>
-                    <span class="small">5.15M</span>
-                  </div> -->
-                </div>
-              </el-card>
-            </el-col>
-          </el-row>
-        </el-col>
+  <section id="space">
+    <div id="spaceBody">
+      <el-row class="space_body" v-loading="listLoad">
+        <iframe v-if="listdata.job_result_uri" :src="listdata.job_result_uri" title="Space app" class="space_iframe"></iframe>
       </el-row>
     </div>
   </section>
@@ -201,7 +14,6 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   EditPen, Edit, CircleClose
 } from '@element-plus/icons-vue'
-import { async } from 'q';
 
 export default defineComponent({
   name: 'Spaces',
@@ -216,179 +28,33 @@ export default defineComponent({
   },
   setup (props, context) {
     const store = useStore()
-    const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-    const dataList = reactive({
-      Tasks: [
-        'Text Classification', 'Text Retrieval', 'Text Generation', 'Question Answering',
-        'Token Classification', 'Text2Text Generation', 'Voice Activity Detection'
-      ],
-      SubTasks: [
-        'language-modeling', 'multi-class-classification', 'named-entity-recognition',
-        'extractive-qa', 'natural-language-inference'
-      ],
-      Sizes: [
-        'n<1K', '1K<n<10K', '10K<n<100K', '100K<n<1M', '1M<n<10M', '10M<n<100M', '100M<n<1B', '1B<n<10B',
-        '10B<b<100B', '100B<n<1T', 'n>1T'
-      ],
-      Licenses: [
-        'mit', 'apache-2.0', 'cc-by-4.0', 'other', 'cc-by-sa-4.0'
-      ]
-    })
-    const searchValue = ref('')
-    const value = ref('')
-    const options = ref([
-      {
-        value: 'Option1',
-        label: 'Most Downloads',
-      },
-      {
-        value: 'Option2',
-        label: 'Alphabetical',
-      },
-      {
-        value: 'Option3',
-        label: 'Recently Updated',
-      },
-      {
-        value: 'Option4',
-        label: 'Most Likes',
-      }
-    ])
-    const urlReadme = ref('')
-    const urlReadmeName = ref('')
-    const isPreview = ref(true)
-    const currentPage1 = ref(1)
-    const small = ref(false)
-    const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref([])
-    const total = ref(0)
+    const listdata = reactive({
+      job_result_uri: ''
+    })
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const tableData = ref([
-      {
-        sentence1: '"The cat sat on the mat."',
-        sentence2: '"The cat did not sit on the mat."',
-        idx: '0',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"The cat did not sit on the mat."',
-        sentence2: '"The cat sat on the mat."',
-        idx: '1',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"When you\'ve got no snow,  it\'s really hard to...',
-        sentence2: '"When you\'ve got snow, it\'s really hard to learn a snowy...',
-        idx: '2',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '3',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '4',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya supports Twitch.tv...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '5',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouy supports media apps...',
-        sentence2: '"Out of the box, Ouya supports Twitch.tv and XBMC media player."',
-        idx: '6',
-        label: '1   (not_entailment)'
-      }
-    ])
-    const textEditor = ref('')
-    const textEditorChange = ref('')
-    const preview = ref(null)
-    const titles = ref([])
-    const createLoad = ref(false)
-    const templateData = ref([
-      {
-        title: 'No Template',
-        desc: 'Create your own template',
-        type: 'create'
-      },
-      {
-        title: 'Lagrange Template',
-        desc: 'Create a space card by using our template',
-        type: 'lag'
-      },
-      {
-        title: 'Hugging Face Template',
-        desc: 'Create a space card by using Hugging Face template',
-        type: 'hugging'
-      }
-    ])
 
-    function editFun () {
-      textEditorChange.value = textEditor.value
-      isPreview.value = false
-    }
-    async function editCommitFun (type) {
-      // console.log(urlReadmeName.value)
-      listLoad.value = true
-      let newFile = new File([type === 'create' ? textEditor.value : textEditorChange.value], type === 'create' ? 'README.md' : urlReadmeName.value)
-      let fd = new FormData()
-      fd.append('file', newFile, type === 'create' ? 'README.md' : urlReadmeName.value)
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
-      await system.$commonFun.timeout(500)
-      if (uploadRes && uploadRes.status === "success") {
-        if (uploadRes.data) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
-        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
-      } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
-      init()
-      isPreview.value = true
-    }
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
-    }
-    async function handleSizeChange (val) { }
-    async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
     async function init () {
       if (route.params.tabs !== 'card') return
       listLoad.value = true
-      listdata.value = []
+      listdata.job_result_uri = ''
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        // listdata.value = listRes.data.files || []
-        const fileLi = listRes.data.files || []
-        fileLi.forEach((element, i) => {
-          let el = element.name.split('/')
-          el.shift()
-          el.shift()
-          el.shift()
-          // console.log(el.join('/').toLowerCase())
-          if (el.join('/').toLowerCase() === 'readme.md') {
-            urlReadme.value = element.url
-            urlReadmeName.value = el.join('/')
-            getTitle(urlReadme.value)
-          }
-        })
         const jobData = listRes.data.job || { job_result_uri: '' }
+        if (jobData.job_result_uri) {
+          const response = await fetch(jobData.job_result_uri)
+          const textUri = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          listdata.job_result_uri = JSON.parse(textUri).job_result_uri
+        } else listdata.job_result_uri = jobData.job_result_uri
         const current = Math.floor(Date.now() / 1000)
         let expireTime = current
         if (listRes.data.space.expiration_time) {
@@ -399,100 +65,16 @@ export default defineComponent({
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
-      listdata.value = [
-        {
-          is_public: "1",
-          name: "Frigg"
-        },
-        {
-          is_public: "1",
-          name: "Travis"
-        },
-        {
-          is_public: "1",
-          name: "Tyree"
-        }
-      ]
-    }
-    async function getData () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
-      console.log(listRes)
-    }
-    function detailFun (row, index) {
-      console.log(row, index)
-    }
-    const imgClick = (url, index) => {
-      console.log(url, index);
-    };
-    const getTitle = async (cid) => {
-      if (!urlReadme.value) return
-      var response = await fetch(urlReadme.value)
-      textEditor.value = await new Promise(async resolve => {
-        resolve(response.text())
-      })
-      nextTick(() => {
-        const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-        titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-        if (!titles.value.length) {
-          titles.value = [];
-          return;
-        }
-
-        const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-        titles.value = titles.value.map(el => ({
-          title: el.innerText,
-          lineIndex: el.getAttribute('data-v-md-line'),
-          indent: hTags.indexOf(el.tagName)
-        }));
-      });
-    };
-    function handleAnchorClick (anchor) {
-      const { lineIndex } = anchor
-      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
-
-      if (heading) {
-        preview.value.scrollToTarget({
-          target: heading,
-          scrollContainer: window,
-          top: 0,
-        })
-      }
-    }
-    async function cardAdd (type) {
-      if (type === 'create') createLoad.value = true
-      else if (type === 'lag' || type === 'hugging') {
-        listLoad.value = true
-        var response = await fetch(type === 'lag' ? `/lagrangedao-README.md` : `/huggingface-README.md`)
-        textEditor.value = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        listLoad.value = false
-        createLoad.value = true
-      }
-    }
-    function cancelFun () {
-      createLoad.value = false
-      textEditor.value = ''
     }
     onActivated(() => { })
     onMounted(() => {
-      urlReadme.value = ''
-      createLoad.value = false
       window.scrollTo(0, 0)
       init()
     })
     onDeactivated(() => { })
-    watch(() => props.urlChange, (newValue, oldValue) => {
-      isPreview.value = true
-    })
-    watch(lagLogin, (newValue, oldValue) => {
-      if (!lagLogin.value) init()
-    })
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'card') {
-        urlReadme.value = ''
-        createLoad.value = false
         window.scrollTo(0, 0)
         init()
       }
@@ -502,37 +84,20 @@ export default defineComponent({
     })
     return {
       lagLogin,
-      metaAddress,
-      dataList,
-      searchValue,
-      value,
-      options,
-      currentPage1,
-      small,
-      background,
       listLoad,
       listdata,
-      total,
       bodyWidth,
       system,
       route,
       router,
-      tableData,
-      props,
-      urlReadme,
-      isPreview,
-      templateData,
-      createLoad,
-      textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick,
-      cardAdd, cancelFun
+      init, handleClick
     }
   }
 })
 </script>
 
 <style lang="scss" scoped>
-#dataset {
+#space {
   background: #fff;
   color: #333;
   font-size: 18px;
@@ -547,21 +112,68 @@ export default defineComponent({
       width: 50%;
     }
   }
-  :deep(.dataset_body) {
+  :deep(.space_body) {
     display: flex;
     align-items: stretch;
+    min-height: 80px;
     padding: 0;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0 0.16rem;
-    }
     @media screen and (min-width: 1280px) {
       max-width: 1280px;
     }
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
+    }
+    .space_iframe {
+      width: 100%;
+      overflow: auto;
+      @media screen and (min-height: 500px) and (min-width: 769px) {
+        min-height: 215px;
+      }
+      @media screen and (min-height: 600px) and (min-width: 769px) {
+        min-height: 315px;
+      }
+      @media screen and (min-height: 680px) and (min-width: 769px) {
+        min-height: 395px;
+      }
+      @media screen and (min-height: 700px) and (min-width: 769px) {
+        min-height: 495px;
+      }
+      @media screen and (min-height: 750px) and (min-width: 769px) {
+        min-height: 465px;
+      }
+      @media screen and (min-height: 768px) and (min-width: 769px) {
+        min-height: 495px;
+      }
+      @media screen and (min-height: 900px) and (min-width: 769px) {
+        min-height: 585px;
+      }
+      @media screen and (min-height: 1000px) and (min-width: 769px) {
+        min-height: 655px;
+      }
+      @media screen and (min-height: 1100px) and (min-width: 769px) {
+        min-height: 825px;
+      }
+      @media screen and (min-height: 1200px) and (min-width: 769px) {
+        min-height: 885px;
+      }
+      &.space_text {
+        padding: 11px;
+        background-color: #000;
+        font-size: 14px;
+        color: #fff;
+        box-shadow: inset 0 5px 5px rgba(204, 204, 204, 0.55);
+        cursor: text;
+        word-break: break-all;
+        @media screen and (min-width: 1800px) {
+          font-size: 16px;
+        }
+        @media screen and (max-width: 600px) {
+          font-size: 13px;
+        }
+      }
     }
     .readme_text {
       position: relative;
@@ -574,8 +186,7 @@ export default defineComponent({
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
-        min-height: 230px;
-        padding: 0.5rem 0;
+        min-height: 300px;
         background-color: #fbfbfc;
         border: 1px solid #f1f1f1;
         border-radius: 5px;
@@ -585,125 +196,6 @@ export default defineComponent({
           width: 100%;
           margin: 0.1rem auto;
           text-align: center;
-        }
-        .desc {
-          width: 100%;
-          text-align: center;
-        }
-        .card {
-          width: 90%;
-          max-width: 900px;
-          margin: auto;
-          .el-card {
-            height: 100%;
-            cursor: pointer;
-            border-radius: 5px;
-            * {
-              cursor: inherit;
-            }
-            &.is-disabled {
-              cursor: no-drop;
-            }
-            .el-card__header {
-              padding-bottom: 0;
-              border-bottom: 0;
-              font-weight: 600;
-            }
-            .el-card__body {
-              padding-top: 0.15rem;
-              .text {
-                font-size: 13px;
-                color: #878c93;
-                line-height: 1.3;
-                @media screen and (min-width: 1800px) {
-                  font-size: 14px;
-                }
-              }
-            }
-          }
-          .col-title {
-            margin-top: 0.3rem;
-            b {
-              text-align: left;
-            }
-          }
-        }
-      }
-      .readme_create {
-        font-family: "Helvetica-light";
-        .el-tabs {
-          .el-tabs__header {
-            max-width: none;
-            padding: 0;
-            background: linear-gradient(180deg, #fefefe, #f0f0f0);
-            .el-tabs__item {
-              padding: 0.15rem;
-              font-size: 16px;
-              @media screen and (min-width: 1800px) {
-                font-size: 18px;
-              }
-              &.is-active {
-                &::after {
-                  height: 0;
-                }
-              }
-            }
-          }
-        }
-        .upload-demo {
-          .el-upload {
-            width: 100%;
-            .el-upload-dragger {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              width: 100%;
-              height: auto;
-              min-height: 140px;
-              font-size: 16px;
-              @media screen and (max-width: 1600px) {
-                font-size: 15px;
-              }
-              .el-upload__text {
-                font-size: inherit;
-              }
-            }
-          }
-        }
-        .el-form {
-          margin: 0.3rem 0 0;
-          .el-form-item {
-            font-size: 18px;
-            @media screen and (max-width: 1600px) {
-              font-size: 16px;
-            }
-            .el-form-item__label {
-              font-size: inherit;
-            }
-            .el-form-item__content {
-              font-size: inherit;
-              .el-input {
-                font-size: inherit;
-                .el-input__inner {
-                  height: auto;
-                  padding: 0.05rem 0.1rem;
-                  font-size: inherit;
-                }
-              }
-            }
-          }
-        }
-        .el-button-group {
-          margin: 0.2rem 0 0;
-          .el-button {
-            margin: 0 0.15rem 0 0;
-            background: linear-gradient(180deg, #fefefe, #f0f0f0);
-            font-family: inherit;
-            font-size: 18px;
-            @media screen and (max-width: 1600px) {
-              font-size: 16px;
-            }
-          }
         }
       }
       &::after {
@@ -821,7 +313,7 @@ export default defineComponent({
               left center;
             background-size: 17px;
           }
-          .icon_datasets {
+          .icon_spaces {
             width: 16px;
             height: 16px;
             margin: 0 5px 0 0;

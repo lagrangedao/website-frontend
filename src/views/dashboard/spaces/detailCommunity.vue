@@ -20,38 +20,34 @@ export default defineComponent({
     CaretBottom
   },
   props: {
-    isVisible: { type: Boolean, default: false }
+    isVisible: { type: Boolean, default: false },
+    likesValue: { type: Boolean, default: false }
   },
-  setup (props) {
+  setup (props, context) {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const info = reactive({
       name: ''
     })
     const renameLoad = ref(false)
+    const listdata = reactive({
+      job_result_uri: ''
+    })
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
-    async function renameFun () {
-      renameLoad.value = true
+    async function init () {
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         const jobData = listRes.data.job || { job_result_uri: '' }
-        if (jobData.job_result_uri) {
-          const response = await fetch(jobData.job_result_uri)
-          const textUri = await new Promise(async resolve => {
-            resolve(response.text())
-          })
-          listdata.job_result_uri = JSON.parse(textUri).job_result_uri
-        } else listdata.job_result_uri = jobData.job_result_uri
         const current = Math.floor(Date.now() / 1000)
         let expireTime = current
         if (listRes.data.space.expiration_time) {
           const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
-        context.emit('handleValue', listRes.data.space.status, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+        context.emit('handleValue', listRes.data.space, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       renameLoad.value = false
@@ -62,6 +58,10 @@ export default defineComponent({
     onMounted(() => {
       info.name = ''
       window.scrollTo(0, 0)
+      init()
+    })
+    watch(() => props.likesValue, () => {
+      init()
     })
     return {
       lagLogin,
@@ -71,7 +71,7 @@ export default defineComponent({
       route,
       router,
       props,
-      renameFun, momentFilter
+      momentFilter
     }
   }
 })

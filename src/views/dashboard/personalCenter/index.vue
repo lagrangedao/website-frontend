@@ -109,7 +109,7 @@
                   </el-popover>
                 </div>
                 <div class="card-header">
-                  <span>1</span>
+                  <span>{{list.likes}}</span>
                 </div>
                 <h1>{{list.name}}</h1>
               </template>
@@ -129,7 +129,7 @@
                   </el-popover>
                 </div>
                 <div class="card-header">
-                  <span>1</span>
+                  <span>{{list.likes}}</span>
                 </div>
                 <h1>{{list.name}}</h1>
               </template>
