@@ -318,7 +318,8 @@ export default defineComponent({
     CaretBottom, Warning, DocumentCopy, dataNft
   },
   props: {
-    // listdata: { type: Number, default: 1 }
+    // listdata: { type: Number, default: 1 },
+    likesValue: { type: Boolean, default: false }
   },
   setup (props, context) {
     const store = useStore()
@@ -545,7 +546,7 @@ export default defineComponent({
         }
         let ipfsURL = ''
         const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post')
-        if (generateRes && generateRes.status === 'success') ipfsURL = generateRes.ipfs_url || ''
+        if (generateRes && generateRes.status === 'success') ipfsURL = `${generateRes.data.gateway}/ipfs/${generateRes.data.metadata_cid}` || ''
         else {
           system.$commonFun.messageTip('error', generateRes.message ? generateRes.message : 'Request failed!')
           return
@@ -656,7 +657,7 @@ export default defineComponent({
           const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
-        context.emit('handleValue', listRes.data.space.status, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
+        context.emit('handleValue', listRes.data.space, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
         if (listRes.data.nft) {
           if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
           let contract_address = listRes.data.nft.contract_address
@@ -705,6 +706,9 @@ export default defineComponent({
     onDeactivated(() => {
       ruleForm.name = ''
       ruleForm.delete = ''
+    })
+    watch(() => props.likesValue, () => {
+      requestInitData()
     })
     return {
       lagLogin,

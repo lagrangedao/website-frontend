@@ -222,7 +222,7 @@ export default defineComponent({
           }
           const licenseRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
-            if (licenseRes.data && licenseRes.data.ipfs_url) createLicense(licenseRes.data.ipfs_url)
+            if (licenseRes.data) createLicense(`${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`)
             else generateLoad.value = false
             return
           }

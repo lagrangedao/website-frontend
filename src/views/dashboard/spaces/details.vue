@@ -14,9 +14,9 @@
           <b>{{route.params.name}}</b>
           <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
           <el-button-group class="ml-4">
-            <el-button>
+            <el-button @click="likeMethod">
               <i class="icon icon_like"></i>like</el-button>
-            <el-button>0</el-button>
+            <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
           <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime <=7 && expireTime >= 0">
@@ -56,10 +56,19 @@
           <template #label>
             <span class="custom-tabs-label">
               <i class="icon icon_spaces"></i>
+              <span>Space card</span>
+            </span>
+          </template>
+          <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName"></detail-card>
+        </el-tab-pane>
+        <el-tab-pane name="app">
+          <template #label>
+            <span class="custom-tabs-label">
+              <i class="icon icon_spaces"></i>
               <span>App</span>
             </span>
           </template>
-          <detail-card @handleValue="handleValue" :urlChange="activeName"></detail-card>
+          <detail-app @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'app'"></detail-app>
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
@@ -68,7 +77,7 @@
               <span>Files and versions</span>
             </span>
           </template>
-          <detail-files @handleValue="handleValue" v-if="activeName === 'files'"></detail-files>
+          <detail-files @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'files'"></detail-files>
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
@@ -78,7 +87,7 @@
               <!-- <b>3</b> -->
             </span>
           </template>
-          <detail-community v-if="activeName === 'community'"></detail-community>
+          <detail-community @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
         <el-tab-pane name="settings" v-if="metaAddress === route.params.wallet_address">
           <template #label>
@@ -90,7 +99,7 @@
               <span>Settings</span>
             </span>
           </template>
-          <detail-setting @handleValue="handleValue" v-if="activeName === 'settings'"></detail-setting>
+          <detail-setting @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'settings'"></detail-setting>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -107,6 +116,7 @@
 </template>
 <script>
 import detailCard from './detailCard.vue'
+import detailApp from './detailApp.vue'
 import detailFiles from './detailFiles.vue'
 import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
@@ -123,6 +133,7 @@ export default defineComponent({
   components: {
     detailFiles,
     detailCard,
+    detailApp,
     detailCommunity,
     detailSetting,
     Setting, sharePop, ArrowLeft, WarningFilled
@@ -227,6 +238,8 @@ export default defineComponent({
     const settingOneself = ref(false)
     const forkLoad = ref(false)
     const parentValue = ref('')
+    const likeValue = ref(0)
+    const likesValue = ref(false)
     const drawer = ref(false)
     const direction = ref('btt')
     const logsValue = ref('')
@@ -293,11 +306,13 @@ export default defineComponent({
         logsValue.value = ''
       }
       expireTime.value = time ? time : Math.floor(Date.now() / 1000)
-      parentValue.value = numRe.test(value) ? '' : value
+      parentValue.value = numRe.test(value.status) ? '' : value.status
+      likeValue.value = value.likes || 0
       if (nftCont) {
         nft.contract_address = nftCont.contract_address
         nft.chain_id = nftCont.chain_id
       }
+      forkLoad.value = false
     }
     const forkOperate = async () => {
       forkLoad.value = true
@@ -344,13 +359,25 @@ export default defineComponent({
       let nftParams = new FormData()
       nftParams.append('chain_id', nft.chain_id)
       nftParams.append('wallet_address', route.params.wallet_address)
-      nftParams.append('dataset_name', route.params.name)
+      nftParams.append('space_name', route.params.name)
       nftParams.append('ipfs_url', ipfs_uri)
       const nftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/license/request`, 'post', nftParams)
       if (nftRes && nftRes.status === 'success') system.$commonFun.messageTip('success', nftRes.message ? nftRes.message : 'Submitted license request!')
       else system.$commonFun.messageTip('error', nftRes.message ? nftRes.message : 'Failed!')
       await system.$commonFun.timeout(500)
       forkLoad.value = false
+    }
+    async function likeMethod () {
+      forkLoad.value = true
+      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
+      if (getLikeRes && getLikeRes.data.liked) {
+        const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
+        console.log('unlikeRes', unlikeRes)
+      } else {
+        const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
+        console.log('likeRes', likeRes)
+      }
+      likesValue.value = !likesValue.value
     }
     onActivated(() => init())
     watch(route, (to, from) => {
@@ -383,9 +410,9 @@ export default defineComponent({
       tableData,
       forkLoad,
       nft,
-      parentValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
+      parentValue, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick, copyName,
-      forkOperate, back, renewFun, reqNFT
+      forkOperate, back, renewFun, reqNFT, likeMethod
     }
   }
 })
