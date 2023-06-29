@@ -13,9 +13,11 @@
           Space:
           <b>{{route.params.name}}</b>
           <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
-          <el-button-group class="ml-4">
-            <el-button @click="likeMethod">
-              <i class="icon icon_like"></i>like</el-button>
+          <el-button-group class="ml-4" >
+            <el-button @click="likeMethod" v-if="likeValue">
+              <i class="icon icon_like"></i>Unlike</el-button>
+            <el-button @click="likeMethod" v-else>
+              <i class="icon icon_like"></i>Like</el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
