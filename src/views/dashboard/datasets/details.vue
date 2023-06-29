@@ -267,7 +267,8 @@ export default defineComponent({
       if (!nft.contract_address) return
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       if (getID.toString() !== nft.chain_id) {
-        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + nft.chain_id)
+        const { name } = await system.$commonFun.getUnit(Number(nft.chain_id))
+        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
         return
       }
       ntfLoad.value = true

@@ -38,7 +38,7 @@
             <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
-                  <span>1</span>
+                  <span>{{list.likes}}</span>
                 </div>
                 <h1>{{list.name}}</h1>
                 <!-- <div class="card-owner">

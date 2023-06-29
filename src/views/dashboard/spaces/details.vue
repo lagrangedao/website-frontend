@@ -13,10 +13,12 @@
           Space:
           <b>{{route.params.name}}</b>
           <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
-          <el-button-group class="ml-4">
-            <el-button>
-              <i class="icon icon_like"></i>like</el-button>
-            <el-button>0</el-button>
+          <el-button-group class="ml-4" >
+            <el-button @click="likeMethod" v-if="likeValue">
+              <i class="icon icon_like"></i>Unlike</el-button>
+            <el-button @click="likeMethod" v-else>
+              <i class="icon icon_like"></i>Like</el-button>
+            <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
           <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime <=7 && expireTime >= 0">
@@ -30,6 +32,14 @@
           <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime < 0">
             <el-button type="warning" plain @click="renewFun">Restart</el-button>
           </el-button-group>
+          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+            <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
+              <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
+                p-id="2675" fill="#878c93"></path>
+              <path d="M830 720.068 830 409.978c0-67.974-20.98-122.004-62.36-160.588-44.222-41.236-108.628-60.776-191.64-58.212L576 64l-192 192 192 192 0-128c53 0 85.34 5.284 104.35 23.008 14.366 13.396 21.65 35.928 21.65 66.97l0 312.392c-37.124 22.434-62 63.178-62 109.628 0 70.58 57.42 128 128 128s128-57.42 128-128C896 783.902 869.324 741.938 830 720.068zM768 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S803.346 896 768 896z"
+                p-id="2676" fill="#878c93"></path>
+            </svg> Request License
+          </div>
           <div class="logs_style" v-if="logsValue" @click="drawer = true">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
@@ -48,10 +58,19 @@
           <template #label>
             <span class="custom-tabs-label">
               <i class="icon icon_spaces"></i>
+              <span>Space card</span>
+            </span>
+          </template>
+          <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName"></detail-card>
+        </el-tab-pane>
+        <el-tab-pane name="app">
+          <template #label>
+            <span class="custom-tabs-label">
+              <i class="icon icon_spaces"></i>
               <span>App</span>
             </span>
           </template>
-          <detail-card @handleValue="handleValue" :urlChange="activeName"></detail-card>
+          <detail-app @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'app'"></detail-app>
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
@@ -60,7 +79,7 @@
               <span>Files and versions</span>
             </span>
           </template>
-          <detail-files @handleValue="handleValue" v-if="activeName === 'files'"></detail-files>
+          <detail-files @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'files'"></detail-files>
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
@@ -70,7 +89,7 @@
               <!-- <b>3</b> -->
             </span>
           </template>
-          <detail-community v-if="activeName === 'community'"></detail-community>
+          <detail-community @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
         <el-tab-pane name="settings" v-if="metaAddress === route.params.wallet_address">
           <template #label>
@@ -82,7 +101,7 @@
               <span>Settings</span>
             </span>
           </template>
-          <detail-setting @handleValue="handleValue" v-if="activeName === 'settings'"></detail-setting>
+          <detail-setting @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'settings'"></detail-setting>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -99,6 +118,7 @@
 </template>
 <script>
 import detailCard from './detailCard.vue'
+import detailApp from './detailApp.vue'
 import detailFiles from './detailFiles.vue'
 import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
@@ -109,11 +129,13 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   Setting, ArrowLeft, WarningFilled
 } from '@element-plus/icons-vue'
+const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
   name: 'Spaces',
   components: {
     detailFiles,
     detailCard,
+    detailApp,
     detailCommunity,
     detailSetting,
     Setting, sharePop, ArrowLeft, WarningFilled
@@ -218,12 +240,18 @@ export default defineComponent({
     const settingOneself = ref(false)
     const forkLoad = ref(false)
     const parentValue = ref('')
+    const likeValue = ref(0)
+    const likesValue = ref(false)
     const drawer = ref(false)
     const direction = ref('btt')
     const logsValue = ref('')
     const expireTime = ref(Math.floor(Date.now() / 1000))
     const logsCont = reactive({
       data: {}
+    })
+    const nft = reactive({
+      contract_address: null,
+      chain_id: null
     })
 
     function handleClick (tab, event) {
@@ -266,7 +294,7 @@ export default defineComponent({
       }
       return false
     }
-    const handleValue = async (value, log, time) => {
+    const handleValue = async (value, log, time, nftCont) => {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
       if (log) {
@@ -275,13 +303,18 @@ export default defineComponent({
           resolve(response.text())
         })
         logsValue.value = log
-        expireTime.value = time
         logsCont.data = textUri ? JSON.parse(textUri).data : {}
       } else {
         logsValue.value = ''
-        expireTime.value = Math.floor(Date.now() / 1000)
       }
-      parentValue.value = numRe.test(value) ? '' : value
+      expireTime.value = time ? time : Math.floor(Date.now() / 1000)
+      parentValue.value = numRe.test(value.status) ? '' : value.status
+      likeValue.value = value.likes || 0
+      if (nftCont) {
+        nft.contract_address = nftCont.contract_address
+        nft.chain_id = nftCont.chain_id
+      }
+      forkLoad.value = false
     }
     const forkOperate = async () => {
       forkLoad.value = true
@@ -314,6 +347,40 @@ export default defineComponent({
       } else system.$commonFun.messageTip('error', 'Request failed!')
       forkLoad.value = false
     }
+    async function reqNFT () {
+      if (!nft.contract_address) return
+      const getID = await system.$commonFun.web3Init.eth.net.getId()
+      if (getID.toString() !== nft.chain_id) {
+        const { name } = await system.$commonFun.getUnit(Number(nft.chain_id))
+        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+        return
+      }
+      forkLoad.value = true
+      const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, nft.contract_address)
+      const ipfs_uri = await nft_contract.methods.tokenURI(1).call()
+      let nftParams = new FormData()
+      nftParams.append('chain_id', nft.chain_id)
+      nftParams.append('wallet_address', route.params.wallet_address)
+      nftParams.append('space_name', route.params.name)
+      nftParams.append('ipfs_url', ipfs_uri)
+      const nftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/license/request`, 'post', nftParams)
+      if (nftRes && nftRes.status === 'success') system.$commonFun.messageTip('success', nftRes.message ? nftRes.message : 'Submitted license request!')
+      else system.$commonFun.messageTip('error', nftRes.message ? nftRes.message : 'Failed!')
+      await system.$commonFun.timeout(500)
+      forkLoad.value = false
+    }
+    async function likeMethod () {
+      forkLoad.value = true
+      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
+      if (getLikeRes && getLikeRes.data.liked) {
+        const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
+        console.log('unlikeRes', unlikeRes)
+      } else {
+        const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
+        console.log('likeRes', likeRes)
+      }
+      likesValue.value = !likesValue.value
+    }
     onActivated(() => init())
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
@@ -344,9 +411,10 @@ export default defineComponent({
       settingOneself,
       tableData,
       forkLoad,
-      parentValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
+      nft,
+      parentValue, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick, copyName,
-      forkOperate, back, renewFun
+      forkOperate, back, renewFun, reqNFT, likeMethod
     }
   }
 })
@@ -540,6 +608,10 @@ export default defineComponent({
           }
           &:hover {
             background-color: #f7f7f7;
+          }
+          &.is-disabled {
+            opacity: 0.5;
+            cursor: no-drop;
           }
           svg {
             width: 14px;

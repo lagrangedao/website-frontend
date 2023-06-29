@@ -51,51 +51,51 @@ const routes = [{
                     title: ''
                 }
             },
-            {
-                path: '/dataset',
-                name: 'datasets',
-                component: datasets,
-                meta: {
-                    keepAlive: true,
-                    title: 'Datasets - '
-                }
-            },
-            {
-                path: '/datasets/:wallet_address/:name/:tabs',
-                name: 'datasetDetail',
-                component: datasetDetail,
-                meta: {
-                    keepAlive: true,
-                    title: 'Datasets at '
-                }
-            },
-            {
-                path: '/models',
-                name: 'models',
-                component: models,
-                meta: {
-                    keepAlive: true,
-                    title: 'Models - '
-                }
-            },
-            {
-                path: '/models/:wallet_address/:name/:tabs',
-                name: 'modelsDetail',
-                component: modelsDetail,
-                meta: {
-                    keepAlive: true,
-                    title: 'Models at '
-                }
-            },
-            {
-                path: '/create_dataset',
-                name: 'datasetsCreate',
-                component: datasetsCreate,
-                meta: {
-                    keepAlive: true,
-                    title: ''
-                }
-            },
+            // {
+            //     path: '/dataset',
+            //     name: 'datasets',
+            //     component: datasets,
+            //     meta: {
+            //         keepAlive: true,
+            //         title: 'Datasets - '
+            //     }
+            // },
+            // {
+            //     path: '/datasets/:wallet_address/:name/:tabs',
+            //     name: 'datasetDetail',
+            //     component: datasetDetail,
+            //     meta: {
+            //         keepAlive: true,
+            //         title: 'Datasets at '
+            //     }
+            // },
+            // {
+            //     path: '/models',
+            //     name: 'models',
+            //     component: models,
+            //     meta: {
+            //         keepAlive: true,
+            //         title: 'Models - '
+            //     }
+            // },
+            // {
+            //     path: '/models/:wallet_address/:name/:tabs',
+            //     name: 'modelsDetail',
+            //     component: modelsDetail,
+            //     meta: {
+            //         keepAlive: true,
+            //         title: 'Models at '
+            //     }
+            // },
+            // {
+            //     path: '/create_dataset',
+            //     name: 'datasetsCreate',
+            //     component: datasetsCreate,
+            //     meta: {
+            //         keepAlive: true,
+            //         title: ''
+            //     }
+            // },
             {
                 path: '/spaces',
                 name: 'spaces',
