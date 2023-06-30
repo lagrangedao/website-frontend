@@ -442,7 +442,7 @@ export default defineComponent({
       if (type === 'create') createLoad.value = true
       else if (type === 'lag' || type === 'hugging') {
         listLoad.value = true
-        var response = await fetch(type === 'lag' ? `/lagrangedao-README.md` : `/huggingface-README.md`)
+        var response = await fetch(type === 'lag' ? `/static/template/lagrangedao-README.md` : `/static/template/huggingface-README.md`)
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })

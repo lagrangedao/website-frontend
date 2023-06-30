@@ -24,12 +24,12 @@
                 </a>
             </el-col>
             <el-col :xs="24" :sm="24" :md="11" :lg="11" :xl="11">
-                <router-link to="/dataset">
+                <!-- <router-link to="/dataset">
                     Datasets
                 </router-link>
                 <router-link to="/models">
                     Models
-                </router-link>
+                </router-link> -->
                 <router-link to="/spaces">
                     Spaces
                 </router-link>
