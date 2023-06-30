@@ -23,7 +23,7 @@ export default defineComponent({
     CircleClose
   },
   props: {
-    urlChange: { type: String, default: 'card' },
+    urlChange: { type: String, default: 'app' },
     likesValue: { type: Boolean, default: false }
   },
   setup (props, context) {
@@ -42,7 +42,7 @@ export default defineComponent({
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
     }
     async function init () {
-      if (route.params.tabs !== 'card') return
+      if (route.params.tabs !== 'app') return
       listLoad.value = true
       listdata.job_result_uri = ''
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
@@ -74,7 +74,7 @@ export default defineComponent({
     onDeactivated(() => { })
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
-      if (to.params.tabs === 'card') {
+      if (to.params.tabs === 'app') {
         window.scrollTo(0, 0)
         init()
       }
