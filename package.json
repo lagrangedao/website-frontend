@@ -6,13 +6,16 @@
     "serve": "vue-cli-service serve",
     "build:test": "vue-cli-service build --mode test",
     "build:prod": "vue-cli-service build --mode production",
+    "build:testnet": "vue-cli-service build --mode testnet",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\"",
     "serve_t": "set NODE_OPTIONS=\"--openssl-legacy-provider\" & npm run serve\n",
     "build:test_t": "set NODE_OPTIONS=\"--openssl-legacy-provider\" & npm run build:test\n",
     "build:prod_t": "set NODE_OPTIONS=\"--openssl-legacy-provider\" & npm run build:prod\n",
     "serve_u": "export NODE_OPTIONS=\"--openssl-legacy-provider\" && npm run serve\n",
     "build:test_u": "export NODE_OPTIONS=\"--openssl-legacy-provider\" && npm run build:test\n",
-    "build:prod_u": "export NODE_OPTIONS=\"--openssl-legacy-provider\" && npm run build:prod\n"
+    "build:prod_u": "export NODE_OPTIONS=\"--openssl-legacy-provider\" && npm run build:prod\n",
+    "build:testnet_t": "set NODE_OPTIONS=\"--openssl-legacy-provider\" & npm run build:testnet\n",
+    "build:testnet_u": "export NODE_OPTIONS=\"--openssl-legacy-provider\" && npm run build:testnet\n"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^1.0.0",
