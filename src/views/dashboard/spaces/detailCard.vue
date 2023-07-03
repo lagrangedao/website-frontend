@@ -10,24 +10,10 @@
             </div>
             <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address">
               <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="col-title">
-                <b>Start with Space card</b>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" v-for="card in templateData" :key="card">
-                <el-card class="box-card" shadow="hover" @click="cardAdd(card.type)">
-                  <template #header>
-                    <div class="card-header">
-                      <span>{{card.title}}</span>
-                    </div>
-                  </template>
-                  <div class="text item">{{card.desc}}</div>
-                </el-card>
-              </el-col>
-
-              <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="col-title">
-                <b>Start with hello-world</b>
+                <b>Start with hello-world template</b>
               </el-col>
               <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                <el-card class="box-card is-disabled" shadow="hover">
+                <el-card class="box-card" shadow="hover" @click="cardAdd('docker')">
                   <div class="text item">Create a hello-world docker container</div>
                 </el-card>
               </el-col>
@@ -414,10 +400,6 @@ export default defineComponent({
         }
       ]
     }
-    async function getData () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
-      console.log(listRes)
-    }
     function detailFun (row, index) {
       console.log(row, index)
     }
@@ -462,13 +444,34 @@ export default defineComponent({
       if (type === 'create') createLoad.value = true
       else if (type === 'lag' || type === 'hugging') {
         listLoad.value = true
-        var response = await fetch(type === 'lag' ? `/lagrangedao-README.md` : `/huggingface-README.md`)
+        var response = await fetch(type === 'lag' ? `/static/template/lagrangedao-README.md` : `/static/template/huggingface-README.md`)
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
         listLoad.value = false
         createLoad.value = true
+      } else if (type === 'docker') {
+        listLoad.value = true
+        let fd = await formDataRetrue()
+        const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+        if (uploadRes && uploadRes.status === "success" && uploadRes.data) system.$commonFun.messageTip('success', 'Update  successfully!')
+        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+        init()
       }
+    }
+    async function formDataRetrue () {
+      let formdata = new FormData()
+      const fileList = ['Dockerfile', 'Readme.md', 'requirements.txt', 'app/_init_.py', 'app/main.py']
+      for (let f = 0; f < fileList.length; f++) {
+        let name = fileList[f]
+        let response = await fetch(`/static/template/hello-world/${name}`)
+        let text = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        let newFile = new File([text], name)
+        formdata.append('file', newFile, name)
+      }
+      return formdata
     }
     function cancelFun () {
       createLoad.value = false
@@ -524,7 +527,7 @@ export default defineComponent({
       templateData,
       createLoad,
       textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick,
+      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick,
       cardAdd, cancelFun
     }
   }
@@ -594,6 +597,7 @@ export default defineComponent({
           width: 90%;
           max-width: 900px;
           margin: auto;
+          justify-content: center;
           .el-card {
             height: 100%;
             cursor: pointer;
@@ -623,9 +627,6 @@ export default defineComponent({
           }
           .col-title {
             margin-top: 0.3rem;
-            b {
-              text-align: left;
-            }
           }
         }
       }
