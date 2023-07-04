@@ -170,62 +170,6 @@ async function signOutFun() {
   store.dispatch('setAccessDataset', '')
 }
 
-async function changeNet(rows) {
-  let text = {}
-  switch (rows) {
-    case 97:
-      text = {
-        chainId: web3Init.utils.numberToHex(97),
-        chainName: 'BSC TestNet',
-        nativeCurrency: {
-          name: 'tBNB',
-          symbol: 'tBNB', // 2-6 characters long
-          decimals: 18
-        },
-        rpcUrls: [process.env.VUE_APP_BSCRPC],
-        blockExplorerUrls: [process.env.VUE_APP_BSCBLOCKURL]
-      }
-      break
-    case 137:
-      text = {
-        chainId: web3Init.utils.numberToHex(137),
-        chainName: 'Polygon Mainnet',
-        nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC', // 2-6 characters long
-          decimals: 18
-        },
-        rpcUrls: [process.env.VUE_APP_POLYGONRPC],
-        blockExplorerUrls: [process.env.VUE_APP_POLYGONBLOCKURL]
-      }
-      break
-    case 3141:
-      text = {
-        chainId: web3Init.utils.numberToHex(3141),
-        chainName: 'Filecoin TestNet',
-        rpcUrls: [process.env.VUE_APP_FILECOINRPC],
-        blockExplorerUrls: [process.env.VUE_APP_FILECOINRPC]
-      }
-      break
-    case 11155111:
-      text = {
-        chainId: web3Init.utils.numberToHex(11155111),
-        chainName: 'Sepolia Testnet',
-        rpcUrls: [process.env.VUE_APP_SEPOLIARPC],
-        blockExplorerUrls: [process.env.VUE_APP_SEPOLIABLOCKURL]
-      }
-      break
-  }
-  ethereum.request({
-    method: 'wallet_addEthereumChain',
-    params: [text]
-  }).then((res) => {
-    // signIn()
-  }).catch((err) => {
-    console.log(err)
-  })
-}
-
 function momentFun(dateItem) {
   let dateNew = dateItem * 1000
   let dataUnit = ''
@@ -266,8 +210,15 @@ async function getUnit(id) {
   let name = ''
   let url = ''
   switch (id) {
+    case 56:
+      unit = 'BNB'
+      name = 'Binance Smart Chain Mainnet '
+      url = `${process.env.VUE_APP_BSCBLOCKURL}/address/`
+      break
     case 97:
       unit = 'tBNB'
+      name = 'Binance Smart Chain Testnet '
+      url = `${process.env.VUE_APP_BSCTESTNETBLOCKURL}/address/`
       break
     case 137:
       unit = 'MATIC'
@@ -277,15 +228,16 @@ async function getUnit(id) {
     case 80001:
       unit = 'MATIC'
       name = 'Mumbai Testnet '
-      url = 'https://mumbai.polygonscan.com/address/'
+      url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
       break
     case 3141:
       unit = 'ETH'
+      name = 'Filecoin - Hyperspace testnet '
       break
     case 11155111:
       unit = 'ETH'
       name = 'Sepolia Testnet '
-      url = `${process.env.VUE_APP_SEPOLIABLOCKURL}address/`
+      url = `${process.env.VUE_APP_SEPOLIABLOCKURL}/address/`
       break
   }
   return ({
@@ -299,9 +251,9 @@ async function changeIDLogin() {
   const chainId = await ethereum.request({
     method: 'eth_chainId'
   })
-  const list = [137, 80001, 11155111]
+  const list = [137, 80001, 56, 97]
   const getPast = await list.some(t => t === parseInt(chainId, 16))
-  if (!getPast) messageTip('error', 'Switch to Polygon Mainnet, Mumbai Testnet or Sepolia Testnet!')
+  if (!getPast) messageTip('error', 'Switch to Polygon Mainnet, Mumbai Testnet, Binance Smart Chain Mainnet or Binance Smart Chain Testnet!')
   return getPast
 }
 
@@ -333,7 +285,6 @@ function copyContent(text, tipCont) {
 }
 
 const Web3 = require('web3');
-const web3NFT = new Web3(process.env.VUE_APP_FILECOINRPC)
 let web3Init
 if (typeof window.ethereum === 'undefined') {
   window.open('https://metamask.io/download.html')
@@ -359,11 +310,9 @@ export default {
   timeout,
   Init,
   web3Init,
-  web3NFT,
   login,
   messageTip,
   signOutFun,
-  changeNet,
   momentFun,
   popupwindow,
   copyContent,

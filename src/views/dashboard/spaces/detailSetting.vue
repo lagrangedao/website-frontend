@@ -306,8 +306,6 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   CaretBottom, Warning, DocumentCopy
 } from '@element-plus/icons-vue'
-import tokenABI from '@/utils/abi/LagrangeDAOToken.json'
-import hyperspaceABI from '@/utils/abi/SpacePayment.json'
 import hardwareList from '@/utils/hardware-list.js'
 import dataNft from '@/components/dataNFT.vue'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
@@ -419,7 +417,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_POLYGON_ADDRESS)
+    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
