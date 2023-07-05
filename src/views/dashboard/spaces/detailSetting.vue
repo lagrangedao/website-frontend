@@ -542,22 +542,15 @@ export default defineComponent({
           generateLoad.value = false
           return false
         }
-        let ipfsURL = ''
-        const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post')
-        if (generateRes && generateRes.status === 'success') ipfsURL = `${generateRes.data.gateway}/ipfs/${generateRes.data.metadata_cid}` || ''
-        else {
-          system.$commonFun.messageTip('error', generateRes.message ? generateRes.message : 'Request failed!')
-          return
-        }
 
         let estimatedGas = await factory.methods
-          .requestDataNFT(route.params.name, ipfsURL)
+          .requestDataNFT(route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         let gasLimit = Math.floor(estimatedGas * 1.5)
 
         await factory.methods
-          .requestDataNFT(route.params.name, ipfsURL)
+          .requestDataNFT(route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)

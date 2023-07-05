@@ -48,7 +48,6 @@
                   <img src="@/assets/images/icons/icon_41.png" alt="" />
                 </div>
                 <span class="is_file">{{scope.row.title}}</span>
-                <!-- <a class="is_file" :href="scope.row._originPath.url" target="_blank" :title="scope.row.title">{{scope.row.title}}</a> -->
               </div>
             </template>
           </el-table-column>
@@ -60,7 +59,7 @@
           <el-table-column label="url" min-width="140">
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
-              <a v-else :href="scope.row._originPath.url" target="_blank">{{scope.row._originPath.url}}</a>
+              <a v-else :href="`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`}}</a>
             </template>
           </el-table-column>
           <el-table-column label="Created At" align="right" min-width="110">
@@ -85,7 +84,7 @@
             <div class="worktop" style="justify-content: space-between;">
               <ul>
                 <li v-if="fileTextType !== 'binary'">
-                  <a :href="fileBody._originPath.url" target="_blank" :title="fileBody.title">
+                  <a :href="`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`" target="_blank" :title="fileBody.title">
                     <svg class="mr-raw" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" style="transform: rotate(360deg);">
                       <path d="M31 16l-7 7l-1.41-1.41L28.17 16l-5.58-5.59L24 9l7 7z" fill="currentColor"></path>
                       <path d="M1 16l7-7l1.41 1.41L3.83 16l5.58 5.59L8 23l-7-7z" fill="currentColor"></path>
@@ -565,7 +564,7 @@ export default defineComponent({
       fileTextShow.value = false
       fileBody._originPath = row._originPath
       fileBody.title = row.title
-      await getTitle(fileBody._originPath.url)
+      await getTitle(`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`)
     }
     const getTitle = async (url) => {
       if (!url) return

@@ -4,6 +4,7 @@ import moment from 'moment'
 import {
   ElMessage
 } from 'element-plus'
+import router from '../router';
 let lastTime = 0
 
 async function sendRequest(apilink, type, jsonObject, api_token) {
@@ -168,6 +169,9 @@ async function signOutFun() {
   store.dispatch('setMetaAddress', '')
   store.dispatch('setAccessSpace', '')
   store.dispatch('setAccessDataset', '')
+  router.push({
+    name: 'main'
+  })
 }
 
 function momentFun(dateItem) {
@@ -251,9 +255,9 @@ async function changeIDLogin() {
   const chainId = await ethereum.request({
     method: 'eth_chainId'
   })
-  const list = [137, 80001, 56, 97]
+  const list = [137, 80001, 97]
   const getPast = await list.some(t => t === parseInt(chainId, 16))
-  if (!getPast) messageTip('error', 'Switch to Polygon Mainnet, Mumbai Testnet, Binance Smart Chain Mainnet or Binance Smart Chain Testnet!')
+  if (!getPast) messageTip('error', 'Switch to Polygon Mainnet, Mumbai Testnet or Binance Smart Chain Testnet!')
   return getPast
 }
 
