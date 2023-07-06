@@ -623,12 +623,20 @@ export default defineComponent({
         return []
       }
     }
+    async function ownerAddress (nft_contract, index) {
+      try {
+        const owner = await nft_contract.methods.ownerOf(index).call().then()
+        return owner
+      } catch  {
+        return ''
+      }
+    }
     async function mapTokens (list, nft_contract, contract_address, gateway) {
       const number = list ? list.length : 0
       for (let token = 0; token < number; token++) {
         let { name, url } = await system.$commonFun.getUnit(parseInt(list[token].chain_id), 16)
         list[token].contract_address = contract_address
-        list[token].owner_address = list[token].token_id ? await nft_contract.methods.ownerOf(list[token].token_id).call() : ''
+        list[token].owner_address = list[token].token_id && list[token].token_id !== null ? await ownerAddress(nft_contract, list[token].token_id) : ''
         list[token].chain_name = name
         list[token].chain_url = url
         list[token].ipfs_url = `${gateway}/ipfs/${list[token].licnese_cid}`

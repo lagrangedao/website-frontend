@@ -181,7 +181,8 @@
       </el-col>
     </el-row>
 
-    <data-nft v-if="dataNFTRequest" @handleChange="handleChange" :dataNFTRequest="dataNFTRequest" :createdAt="dataNFTRow.data.created_at" :updatedAt="dataNFTRow.data.updated_at" :getNftID="dataNFTRow.data.chain_id.toString()" :personalCenter="dataNFTRow.data"></data-nft>
+    <data-nft v-if="dataNFTRequest" @handleChange="handleChange" :dataNFTRequest="dataNFTRequest" :createdAt="dataNFTRow.data.created_at" :updatedAt="dataNFTRow.data.updated_at" :contractAddress="dataNFTRow.data.contract_address" :getNftID="dataNFTRow.data.chain_id.toString()"
+      :personalCenter="dataNFTRow.data"></data-nft>
   </section>
 </template>
 <script>
