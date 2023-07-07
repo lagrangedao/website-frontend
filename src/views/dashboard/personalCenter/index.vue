@@ -148,7 +148,7 @@
           <div class="list">
             <div class="title">
               <i class="icon icon_license"></i>
-              My Licenses
+              Received Licenses
               <span>{{licenseIndex}}</span>
             </div>
           </div>
@@ -158,11 +158,15 @@
             <el-card class="box-card" @click="detailFun(list, 'licenses')">
               <div class="text">
                 <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
+                <p class="ellipsis">{{list.space_name}}</p>
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+                <p class="ellipsis">{{hiddAddress(list.space_owner)}}</p>
+              </div>
+              <div class="text">
+                <i class="icon time-select-item"></i>
+                <p class="ellipsis">{{momentFilter(list.created_at)}}</p>
               </div>
             </el-card>
           </el-col>
