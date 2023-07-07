@@ -370,7 +370,7 @@ export default defineComponent({
           el.shift()
           // console.log(el.join('/').toLowerCase())
           if (el.join('/').toLowerCase() === 'readme.md') {
-            urlReadme.value = element.url
+            urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
             getTitle(urlReadme.value)
           }

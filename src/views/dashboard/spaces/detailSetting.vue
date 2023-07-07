@@ -149,7 +149,7 @@
               </el-table-column>
               <el-table-column label="Ipfs URL">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" @click="copyName(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
+                  <el-button size="large" class="generateDOI" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
@@ -227,14 +227,14 @@
           <p>
             <label>Owner:</label>
             {{ eventArgs.owner }}
-            <el-icon v-if="eventArgs.owner" @click="copyName(eventArgs.owner, 'Copied')">
+            <el-icon v-if="eventArgs.owner" @click="system.$commonFun.copyContent(eventArgs.owner, 'Copied')">
               <DocumentCopy />
             </el-icon>
           </p>
           <p>
             <label>IPFS URL:</label>
             {{ eventArgs.ipfs_url }}
-            <el-icon v-if="eventArgs.ipfs_url" @click="copyName(eventArgs.ipfs_url, 'Copied')">
+            <el-icon v-if="eventArgs.ipfs_url" @click="system.$commonFun.copyContent(eventArgs.ipfs_url, 'Copied')">
               <DocumentCopy />
             </el-icon>
           </p>
@@ -306,8 +306,6 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   CaretBottom, Warning, DocumentCopy
 } from '@element-plus/icons-vue'
-import tokenABI from '@/utils/abi/LagrangeDAOToken.json'
-import hyperspaceABI from '@/utils/abi/SpacePayment.json'
 import hardwareList from '@/utils/hardware-list.js'
 import dataNft from '@/components/dataNFT.vue'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
@@ -419,7 +417,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_POLYGON_ADDRESS)
+    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
@@ -474,9 +472,6 @@ export default defineComponent({
           return false
         }
       })
-    }
-    function copyName (text, tipCont) {
-      system.$commonFun.copyContent(text, tipCont)
     }
     async function claimDataNFT () {
       try {
@@ -544,22 +539,15 @@ export default defineComponent({
           generateLoad.value = false
           return false
         }
-        let ipfsURL = ''
-        const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post')
-        if (generateRes && generateRes.status === 'success') ipfsURL = `${generateRes.data.gateway}/ipfs/${generateRes.data.metadata_cid}` || ''
-        else {
-          system.$commonFun.messageTip('error', generateRes.message ? generateRes.message : 'Request failed!')
-          return
-        }
 
         let estimatedGas = await factory.methods
-          .requestDataNFT(route.params.name, ipfsURL)
+          .requestDataNFT(route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         let gasLimit = Math.floor(estimatedGas * 1.5)
 
         await factory.methods
-          .requestDataNFT(route.params.name, ipfsURL)
+          .requestDataNFT(route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -632,15 +620,23 @@ export default defineComponent({
         return []
       }
     }
+    async function ownerAddress (nft_contract, index) {
+      try {
+        const owner = await nft_contract.methods.ownerOf(index).call().then()
+        return owner
+      } catch  {
+        return ''
+      }
+    }
     async function mapTokens (list, nft_contract, contract_address, gateway) {
       const number = list ? list.length : 0
       for (let token = 0; token < number; token++) {
         let { name, url } = await system.$commonFun.getUnit(parseInt(list[token].chain_id), 16)
         list[token].contract_address = contract_address
-        list[token].owner_address = list[token].token_id ? await nft_contract.methods.ownerOf(list[token].token_id).call() : ''
+        list[token].owner_address = list[token].token_id && list[token].token_id !== null ? await ownerAddress(nft_contract, list[token].token_id) : ''
         list[token].chain_name = name
         list[token].chain_url = url
-        list[token].ipfs_url = `${gateway}/ipfs/${list[token].licnese_cid}`
+        list[token].ipfs_url = `${gateway}/ipfs/${list[token].cid}`
       }
       return list
     }
@@ -741,7 +737,7 @@ export default defineComponent({
       manageDOI,
       eventArgs,
       props, submitForm, submitDeleteForm, momentFilter, sleepChange,
-      handleChange, requestInitData, beforeClose, requestNFT, refreshContract, copyName
+      handleChange, requestInitData, beforeClose, requestNFT, refreshContract
     }
   }
 })

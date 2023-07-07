@@ -189,7 +189,6 @@ import {
 import dataNft from '@/components/dataNFT.vue'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
-const linkTokenAbi = require('@/utils/abi/linkToken.json')
 export default defineComponent({
   name: 'Datasets',
   components: {
@@ -252,9 +251,7 @@ export default defineComponent({
     const router = useRouter()
     const refreshExecutable = ref(false)
     const moreLoad = ref(false)
-    // const DATA_NFT_ADDRESS = process.env.VUE_APP_DATANFT_ADDRESS
-    // const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_FACTORY_ADDRESS)
-    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_POLYGON_ADDRESS)
+    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
@@ -384,22 +381,15 @@ export default defineComponent({
           generateLoad.value = false
           return false
         }
-        let ipfsURL = ''
-        const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post')
-        if (generateRes && generateRes.status === 'success') ipfsURL = generateRes.ipfs_url || ''
-        else {
-          system.$commonFun.messageTip('error', generateRes.message ? generateRes.message : 'Request failed!')
-          return
-        }
 
         let estimatedGas = await factory.methods
-          .requestDataNFT(route.params.name, ipfsURL)
+          .requestDataNFT(route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         let gasLimit = Math.floor(estimatedGas * 1.5)
 
         await factory.methods
-          .requestDataNFT(route.params.name, ipfsURL)
+          .requestDataNFT(route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)

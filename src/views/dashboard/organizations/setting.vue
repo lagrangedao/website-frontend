@@ -1,6 +1,5 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <!-- <network-alert v-if="loadingText"></network-alert> -->
     <el-row class="dataset_body">
       <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
@@ -42,7 +41,6 @@ import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
-import networkAlert from '@/components/networkAlert.vue'
 import editProfile from './editProfile.vue'
 import editAccount from './editAccount.vue'
 import editMembers from './editMembers.vue'
@@ -54,7 +52,7 @@ import {
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    Plus, editProfile, editAccount, editMembers, editBilling, editToken, networkAlert
+    Plus, editProfile, editAccount, editMembers, editBilling, editToken
   },
   setup () {
     const store = useStore()

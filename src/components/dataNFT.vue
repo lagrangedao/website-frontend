@@ -15,7 +15,7 @@
           </el-form-item>
           <el-form-item prop="recipient" label="Recipient">
             <div class="flex flex-row">
-              <el-input v-model="dataNFTForm.recipient" placeholder=" " />
+              <el-input v-model="dataNFTForm.recipient" placeholder=" " :disabled="JSON.stringify(props.personalCenter) !== '{}'?true:false" />
             </div>
           </el-form-item>
           <el-form-item prop="tags" label="Tags">
@@ -79,7 +79,8 @@ export default defineComponent({
     createdAt: { type: String, default: "" },
     updatedAt: { type: String, default: "" },
     contractAddress: { type: String, default: "" },
-    getNftID: { type: String, default: "" }
+    getNftID: { type: String, default: "" },
+    personalCenter: { type: Object, default: {} }
   },
   setup (props, context) {
     const store = useStore()
@@ -167,7 +168,7 @@ export default defineComponent({
     }
 
     function typeName () {
-      let type = 'dataset'
+      let type = 'space'
       switch (route.name) {
         case 'spaceDetail':
           type = 'space'
@@ -211,7 +212,8 @@ export default defineComponent({
             "author": dataNFTForm.author,
             "links": dataNFTForm.links,
             "tags": dataNFTForm.tags,
-            "additionalInformation": additionalInformation
+            "additionalInformation": additionalInformation,
+            "recipient": dataNFTForm.recipient
           }
           const getID = await system.$commonFun.web3Init.eth.net.getId()
           if (getID.toString() !== props.getNftID) {
@@ -220,7 +222,7 @@ export default defineComponent({
             generateLoad.value = false
             return
           }
-          const licenseRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
+          const licenseRes = await system.$commonFun.sendRequest(JSON.stringify(props.personalCenter) !== '{}' ? `${process.env.VUE_APP_BASEAPI}spaces/${props.personalCenter.owner_address}/${props.personalCenter.space_name}/license/metadata/generate` : `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
             if (licenseRes.data) createLicense(`${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`)
             else generateLoad.value = false
@@ -274,7 +276,9 @@ export default defineComponent({
       const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/create_license`, 'post', fd)
     }
 
-    onMounted(() => { })
+    onMounted(() => {
+      if (JSON.stringify(props.personalCenter) !== '{}') dataNFTForm.recipient = props.personalCenter.recipient_address
+    })
     watch(() => props.dataNFTRequest, (newValue, oldValue) => {
       dataNFTShow.value = props.dataNFTRequest
     })

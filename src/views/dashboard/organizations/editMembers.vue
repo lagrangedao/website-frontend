@@ -318,9 +318,6 @@ export default defineComponent({
       // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
-    function changeNetChange (rows) {
-      system.$commonFun.changeNet(rows)
-    }
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
@@ -422,7 +419,7 @@ export default defineComponent({
       changeVisible,
       CaretTop,
       radioLink,
-      getdataList, changeNetChange, momentFilter, detailFun, submitForm, editAvatar,
+      getdataList, momentFilter, detailFun, submitForm, editAvatar,
       handleChange, handleRemove, removeAvatar
     }
   }
