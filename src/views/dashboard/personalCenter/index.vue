@@ -12,7 +12,12 @@
             </div>
             <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
             <div class="desc">Balance: {{info.balance||'-'}} {{info.unit}}</div>
-            <el-button type="" text bg @click="editProfile">Settings</el-button>
+            <div class="desc">Wallet Address: {{hiddAddress(metaAddress)}}
+              <el-icon v-if="metaAddress" @click="system.$commonFun.copyContent(metaAddress, 'Copied')">
+                <CopyDocument />
+              </el-icon>
+            </div>
+            <!-- <el-button type="" text bg @click="editProfile">Settings</el-button> -->
           </div>
           <div class="personal">
             <div class="top_text">
@@ -192,13 +197,13 @@ import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
 import {
-  Warning
+  Warning, CopyDocument
 } from '@element-plus/icons-vue'
 import dataNft from '@/components/dataNFT.vue'
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    Warning, dataNft
+    Warning, dataNft, CopyDocument
   },
   setup () {
     const store = useStore()
@@ -577,7 +582,10 @@ export default defineComponent({
             }
           }
           .desc {
-            margin: 0.05rem 0 0.2rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 0.05rem 0 0.1rem;
             font-size: 15px;
             @media screen and (min-width: 1800px) {
               font-size: 17px;
@@ -587,6 +595,19 @@ export default defineComponent({
             }
             @media screen and (max-width: 768px) {
               font-size: 13px;
+            }
+            .el-icon {
+              margin: 0 0 0 0.05rem;
+              font-size: 16px;
+              color: #fff;
+              cursor: pointer;
+              svg,
+              path {
+                cursor: inherit;
+              }
+              &:hover {
+                font-size: 17px;
+              }
             }
           }
           .el-button {
@@ -737,11 +758,13 @@ export default defineComponent({
             background: url(../../../assets/images/icons/icon_17.png) no-repeat
               left 0px;
             background-size: auto 100%;
+            cursor: pointer;
           }
           .icon_info {
             background: url(../../../assets/images/icons/icon_18.png) no-repeat
               left 0px;
             background-size: auto 100%;
+            cursor: pointer;
           }
           .l {
             margin: 0 0.18rem;

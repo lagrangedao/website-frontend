@@ -12,8 +12,8 @@
           <i class="icon icon_spaces"></i>
           Space:
           <b>{{route.params.name}}</b>
-          <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
-          <el-button-group class="ml-4" >
+          <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
+          <el-button-group class="ml-4">
             <el-button @click="likeMethod" v-if="likeValue">
               <i class="icon icon_like"></i>Unlike</el-button>
             <el-button @click="likeMethod" v-else>
@@ -268,32 +268,6 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
-    function copyName (text) {
-      var txtArea = document.createElement('textarea')
-      txtArea.id = 'txt'
-      txtArea.style.position = 'fixed'
-      txtArea.style.top = '0'
-      txtArea.style.left = '0'
-      txtArea.style.opacity = '0'
-      txtArea.value = text
-      document.body.appendChild(txtArea)
-      txtArea.select()
-
-      try {
-        var successful = document.execCommand('copy')
-        var msg = successful ? 'successful' : 'unsuccessful'
-        console.log('Copying text command was ' + msg)
-        if (successful) {
-          system.$commonFun.messageTip('success', 'Copied')
-          return true
-        }
-      } catch (err) {
-        console.log('Oops, unable to copy')
-      } finally {
-        document.body.removeChild(txtArea)
-      }
-      return false
-    }
     const handleValue = async (value, log, time, nftCont) => {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
@@ -413,7 +387,7 @@ export default defineComponent({
       forkLoad,
       nft,
       parentValue, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
-      NumFormat, handleCurrentChange, handleSizeChange, handleClick, copyName,
+      NumFormat, handleCurrentChange, handleSizeChange, handleClick,
       forkOperate, back, renewFun, reqNFT, likeMethod
     }
   }

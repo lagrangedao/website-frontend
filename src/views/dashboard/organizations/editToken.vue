@@ -20,7 +20,7 @@
             <template #append>
               <div class="action">
                 <i class="icon icon_look" @click="tokenShow=!tokenShow"></i>
-                <i class="icon icon_copy" @click="copyName(tokenData.token)"></i>
+                <i class="icon icon_copy" @click="system.$commonFun.copyContent(tokenData.token, 'Copied')"></i>
               </div>
               <!-- <el-icon @click="deleteToken(tokenData.token)">
                 <Delete />
@@ -107,33 +107,6 @@ export default defineComponent({
     function settingDetail (row) {
       router.push({ name: 'personalCenterProfile', params: { menu: row } })
     }
-
-    function copyName (text) {
-      var txtArea = document.createElement('textarea')
-      txtArea.id = 'txt'
-      txtArea.style.position = 'fixed'
-      txtArea.style.top = '0'
-      txtArea.style.left = '0'
-      txtArea.style.opacity = '0'
-      txtArea.value = text
-      document.body.appendChild(txtArea)
-      txtArea.select()
-
-      try {
-        var successful = document.execCommand('copy')
-        var msg = successful ? 'successful' : 'unsuccessful'
-        console.log('Copying text command was ' + msg)
-        if (successful) {
-          system.$commonFun.messageTip('success', 'Copied')
-          return true
-        }
-      } catch (err) {
-        console.log('Oops, unable to copy')
-      } finally {
-        document.body.removeChild(txtArea)
-      }
-      return false
-    }
     onMounted(() => {
       getdataList()
     })
@@ -151,7 +124,7 @@ export default defineComponent({
       tokenShow,
       value,
       options,
-      getdataList, createToken, deleteToken, copyName, settingDetail
+      getdataList, createToken, deleteToken, settingDetail
     }
   }
 })

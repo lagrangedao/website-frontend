@@ -149,7 +149,7 @@
               </el-table-column>
               <el-table-column label="Ipfs URL">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" @click="copyName(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
+                  <el-button size="large" class="generateDOI" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
@@ -227,14 +227,14 @@
           <p>
             <label>Owner:</label>
             {{ eventArgs.owner }}
-            <el-icon v-if="eventArgs.owner" @click="copyName(eventArgs.owner, 'Copied')">
+            <el-icon v-if="eventArgs.owner" @click="system.$commonFun.copyContent(eventArgs.owner, 'Copied')">
               <DocumentCopy />
             </el-icon>
           </p>
           <p>
             <label>IPFS URL:</label>
             {{ eventArgs.ipfs_url }}
-            <el-icon v-if="eventArgs.ipfs_url" @click="copyName(eventArgs.ipfs_url, 'Copied')">
+            <el-icon v-if="eventArgs.ipfs_url" @click="system.$commonFun.copyContent(eventArgs.ipfs_url, 'Copied')">
               <DocumentCopy />
             </el-icon>
           </p>
@@ -473,9 +473,6 @@ export default defineComponent({
         }
       })
     }
-    function copyName (text, tipCont) {
-      system.$commonFun.copyContent(text, tipCont)
-    }
     async function claimDataNFT () {
       try {
         const loginJudg = await system.$commonFun.changeIDLogin()
@@ -639,7 +636,7 @@ export default defineComponent({
         list[token].owner_address = list[token].token_id && list[token].token_id !== null ? await ownerAddress(nft_contract, list[token].token_id) : ''
         list[token].chain_name = name
         list[token].chain_url = url
-        list[token].ipfs_url = `${gateway}/ipfs/${list[token].licnese_cid}`
+        list[token].ipfs_url = `${gateway}/ipfs/${list[token].cid}`
       }
       return list
     }
@@ -740,7 +737,7 @@ export default defineComponent({
       manageDOI,
       eventArgs,
       props, submitForm, submitDeleteForm, momentFilter, sleepChange,
-      handleChange, requestInitData, beforeClose, requestNFT, refreshContract, copyName
+      handleChange, requestInitData, beforeClose, requestNFT, refreshContract
     }
   }
 })
