@@ -1609,6 +1609,8 @@ export default defineComponent({
 <style lang="scss">
 .message_style {
   width: 300px;
+  max-height: 300px;
+  overflow-y: scroll;
   .drop_title {
     padding: 5px 16px;
   }
