@@ -272,6 +272,7 @@ export default defineComponent({
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
       fd.append('contract_address', props.contractAddress)
+      fd.append('recipient', dataNFTForm.recipient)
       const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${route.params.name}/license/mint_hash`, 'post', fd)
       const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/create_license`, 'post', fd)
     }
