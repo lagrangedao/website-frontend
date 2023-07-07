@@ -273,7 +273,10 @@ export default defineComponent({
       fd.append('chain_id', getID)
       fd.append('contract_address', props.contractAddress)
       fd.append('recipient', dataNFTForm.recipient)
-      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${route.params.name}/license/mint_hash`, 'post', fd)
+      const spaceName = route.params.name ? route.params.name : props.personalCenter.space_name;
+      console.log('spaceName', spaceName)
+      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)
+      // const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${route.params.name}/license/mint_hash`, 'post', fd)
       const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/create_license`, 'post', fd)
     }
 
