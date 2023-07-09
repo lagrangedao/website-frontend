@@ -118,7 +118,7 @@
         <div class="title">
           {{ 'Space NFT (SNFT)' }}
 
-          <el-button class="request_btn" v-if="nftdata.status === 'success'" @click="dataNFTRequest = true">Create new License</el-button>
+          <el-button class="request_btn" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
           <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
@@ -408,6 +408,7 @@ export default defineComponent({
     const listLoad = ref(false)
     const dialogDOIVisible = ref(false)
     const dataNFTRequest = ref(false)
+    const chainIdRes = ref(true)
     const eventArgs = reactive({
       owner: '',
       ipfs_url: ''
@@ -475,8 +476,8 @@ export default defineComponent({
     }
     async function claimDataNFT () {
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
           generateLoad.value = false
           return false
         }
@@ -534,8 +535,8 @@ export default defineComponent({
     async function requestNFT () {
       generateLoad.value = true
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
           generateLoad.value = false
           return false
         }
@@ -698,6 +699,7 @@ export default defineComponent({
       requestInitData()
       hardwareOptions.value = hardwareList
       settingIndex.value = await spaceIndex()
+      chainIdRes.value = await system.$commonFun.changeIDLogin(1)
     })
     onDeactivated(() => {
       ruleForm.name = ''
@@ -736,6 +738,7 @@ export default defineComponent({
       generateLoad,
       manageDOI,
       eventArgs,
+      chainIdRes,
       props, submitForm, submitDeleteForm, momentFilter, sleepChange,
       handleChange, requestInitData, beforeClose, requestNFT, refreshContract
     }

@@ -28,7 +28,7 @@
               <el-button @click="clearMethod('clear')">Clear</el-button>
             </div>
           </div>
-          <div class="title">
+          <div class="title" style="cursor: pointer;" @click="sortChange('likes')">
             Spaces of the week
             <i class="icon icon_week"></i>
           </div>
