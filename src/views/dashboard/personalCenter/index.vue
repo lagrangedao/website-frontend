@@ -164,9 +164,11 @@
                 <i class="icon icon_wallet"></i>
                 <p class="ellipsis">{{hiddAddress(list.space_owner)}}</p>
               </div>
-              <div class="text">
-                <i class="icon time-select-item"></i>
-                <p class="ellipsis">{{momentFilter(list.created_at)}}</p>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
               </div>
             </el-card>
           </el-col>
