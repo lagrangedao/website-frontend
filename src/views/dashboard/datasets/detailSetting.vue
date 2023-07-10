@@ -63,7 +63,7 @@
               </el-table-column>
               <el-table-column label="Ipfs URL">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" @click="copyName(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
+                  <el-button size="large" class="generateDOI" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
@@ -143,14 +143,14 @@
           <p>
             <label>Owner:</label>
             {{ eventArgs.owner }}
-            <el-icon v-if="eventArgs.owner" @click="copyName(eventArgs.owner, 'Copied')">
+            <el-icon v-if="eventArgs.owner" @click="system.$commonFun.copyContent(eventArgs.owner, 'Copied')">
               <DocumentCopy />
             </el-icon>
           </p>
           <p>
             <label>IPFS URL:</label>
             {{ eventArgs.ipfs_url }}
-            <el-icon v-if="eventArgs.ipfs_url" @click="copyName(eventArgs.ipfs_url, 'Copied')">
+            <el-icon v-if="eventArgs.ipfs_url" @click="system.$commonFun.copyContent(eventArgs.ipfs_url, 'Copied')">
               <DocumentCopy />
             </el-icon>
           </p>
@@ -309,10 +309,6 @@ export default defineComponent({
           return false
         }
       })
-    }
-
-    function copyName (text, tipCont) {
-      system.$commonFun.copyContent(text, tipCont)
     }
 
     async function claimDataNFT () {
@@ -553,7 +549,7 @@ export default defineComponent({
       router,
       moreLoad,
       props, submitForm, submitDeleteForm, momentFilter, beforeClose,
-      handleChange, requestInitData, requestNFT, copyName, refreshContract
+      handleChange, requestInitData, requestNFT, refreshContract
     }
   }
 })

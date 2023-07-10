@@ -12,7 +12,7 @@
           <i class="icon icon_datasets"></i>
           Datasets:
           <b>{{route.params.name}}</b>
-          <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
+          <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
           <el-button-group class="ml-4">
             <el-button>
               <i class="icon icon_like"></i>like</el-button>
@@ -230,32 +230,6 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
-    function copyName (text) {
-      var txtArea = document.createElement('textarea')
-      txtArea.id = 'txt'
-      txtArea.style.position = 'fixed'
-      txtArea.style.top = '0'
-      txtArea.style.left = '0'
-      txtArea.style.opacity = '0'
-      txtArea.value = text
-      document.body.appendChild(txtArea)
-      txtArea.select()
-
-      try {
-        var successful = document.execCommand('copy')
-        var msg = successful ? 'successful' : 'unsuccessful'
-        console.log('Copying text command was ' + msg)
-        if (successful) {
-          system.$commonFun.messageTip('success', 'Copied')
-          return true
-        }
-      } catch (err) {
-        console.log('Oops, unable to copy')
-      } finally {
-        document.body.removeChild(txtArea)
-      }
-      return false
-    }
     function back () {
       router.push({ path: '/dataset' })
     }
@@ -312,7 +286,7 @@ export default defineComponent({
       tableData,
       nft,
       ntfLoad,
-      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName, back,
+      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, back,
       handleValue, reqNFT
     }
   }

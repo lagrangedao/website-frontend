@@ -144,6 +144,80 @@
           <img v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
+
+        <div class="top">
+          <div class="list">
+            <div class="title">
+              <i class="icon icon_datasets"></i>
+              Datasets
+              <span>{{dataSetIndex}}</span>
+            </div>
+          </div>
+          <!-- <el-select v-model="value" class="m-2" placeholder="Sort: most Downloads">
+            <template #prefix>
+              <i class="el-icon-select"></i>
+            </template>
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select> -->
+        </div>
+        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
+          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
+            <el-card class="box-card">
+              <template #header>
+                <!-- <div class="card-header">
+                                    <span>27</span>
+                                </div> -->
+              </template>
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+                <!-- <div class="item_body">
+                  <i class="icon icon_up"></i>
+                  <span class="small">5.15M</span>
+                </div> -->
+              </div>
+            </el-card>
+          </el-col>
+          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
+            <el-card class="box-card">
+              <template #header>
+              </template>
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+                <!-- <div class="item_body">
+                  <i class="icon icon_up"></i>
+                  <span class="small">5.15M</span>
+                </div> -->
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+        <div class="more_style" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">
+          <img v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        </div>
+
         <div class="top">
           <div class="list">
             <div class="title">
@@ -252,13 +326,16 @@ export default defineComponent({
     const prevType = ref(true)
     const licenseIndex = ref(0)
     const spacesIndex = ref(0)
+    const dataSetIndex = ref(0)
     const listdata = reactive({
       spaces: [],
+      datasets: [],
       owned_licenses: [],
       license_requests_notifications: [],
       outgoing_pending_license_requests: [],
       user: {},
       spacesIsShow: false,
+      datasetsIsShow: false,
       licenseIsShow: false
     })
     const listLoad = ref(false)
@@ -303,15 +380,18 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.spaces = listRes.data.space || []
+        listdata.datasets = listRes.data.dataset || []
         listdata.owned_licenses = listRes.data.owned_licenses || []
         listdata.license_requests_notifications = listRes.data.license_requests_notifications || []
         listdata.outgoing_pending_license_requests = listRes.data.outgoing_pending_license_requests || []
         listdata.user = listRes.data.user || {}
         licenseIndex.value = listRes.data.owned_licenses.length
+        dataSetIndex.value = listRes.data.dataset.length
         spacesIndex.value = listRes.data.space.length
         store.dispatch('setAccessAvatar', listRes.data.user.avatar)
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
+        let datasetList = []
         listdata.spaces.forEach(space => {
           const current = Math.floor(Date.now() / 1000)
           if (space.expiration_time) {
@@ -320,15 +400,19 @@ export default defineComponent({
           } else space.expireTime = current
           spaceList.push(space.name)
         })
+        listdata.datasets.forEach(space => datasetList.push(space.name))
         store.dispatch('setAccessSpace', JSON.stringify(spaceList))
+        store.dispatch('setAccessDataset', JSON.stringify(datasetList))
       } else {
         listdata.spaces = []
+        listdata.datasets = []
         listdata.owned_licenses = []
         listdata.license_requests_notifications = []
         listdata.outgoing_pending_license_requests = []
         listdata.user = {}
         licenseIndex.value = 0
         spacesIndex.value = 0
+        dataSetIndex.value = 0
         system.$commonFun.messageTip('error', listRes.error ? listRes.error : 'Failed!')
       }
       // await system.$commonFun.timeout(500)
@@ -411,14 +495,17 @@ export default defineComponent({
     })
     onDeactivated(() => {
       listdata.spacesIsShow = false
+      listdata.datasetsIsShow = false
       listdata.licenseIsShow = false
       listdata.spaces = []
+      listdata.datasets = []
       listdata.owned_licenses = []
       listdata.license_requests_notifications = []
       listdata.outgoing_pending_license_requests = []
       listdata.user = {}
       licenseIndex.value = 0
       spacesIndex.value = 0
+      dataSetIndex.value = 0
     })
     watch(navLogin, (newValue, oldValue) => {
       if (navLogin.value) isLogin()
@@ -442,6 +529,7 @@ export default defineComponent({
       prevType,
       licenseIndex,
       spacesIndex,
+      dataSetIndex,
       listdata,
       listLoad,
       accessAvatar,
