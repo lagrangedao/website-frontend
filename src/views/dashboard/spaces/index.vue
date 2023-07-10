@@ -19,7 +19,7 @@
               <el-input v-model="searchValue" clearable @input="searchChange()" class="search_name w-50 m-2" placeholder="search Space" />
             </div>
             <div class="top_input_search">
-              <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: most Downloads">
+              <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: Alphabetical">
                 <template #prefix>
                   <i class="el-icon-select"></i>
                 </template>
@@ -84,10 +84,10 @@ export default defineComponent({
     const spaceData = ref([])
     const spaceDataAll = ref([])
     const options = ref([
-      {
-        value: 'downloads',
-        label: 'Most Downloads',
-      },
+      // {
+      //   value: 'downloads',
+      //   label: 'Most Downloads',
+      // },
       {
         value: 'alphabetical',
         label: 'Alphabetical',
