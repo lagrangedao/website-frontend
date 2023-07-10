@@ -12,11 +12,13 @@
           <i class="icon icon_datasets"></i>
           Datasets:
           <b>{{route.params.name}}</b>
-          <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
+          <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
           <el-button-group class="ml-4">
-            <el-button>
-              <i class="icon icon_like"></i>like</el-button>
-            <el-button>4</el-button>
+            <el-button @click="likeMethod" v-if="likeOwner">
+              <i class="icon icon_like"></i>Unlike</el-button>
+            <el-button @click="likeMethod" v-else>
+              <i class="icon icon_like"></i>Like</el-button>
+            <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
@@ -50,7 +52,7 @@
               <span>Dataset card</span>
             </span>
           </template>
-          <detail-card @handleValue="handleValue" :urlChange="activeName"></detail-card>
+          <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName"></detail-card>
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
@@ -59,7 +61,7 @@
               <span>Files and versions</span>
             </span>
           </template>
-          <detail-files @handleValue="handleValue" v-if="activeName === 'files'"></detail-files>
+          <detail-files @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'files'"></detail-files>
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
@@ -69,7 +71,7 @@
               <!-- <b>3</b> -->
             </span>
           </template>
-          <detail-community @handleValue="handleValue" v-if="activeName === 'community'"></detail-community>
+          <detail-community @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
         <el-tab-pane name="settings" v-if="settingOneself">
           <template #label>
@@ -81,7 +83,7 @@
               <span>Settings</span>
             </span>
           </template>
-          <detail-setting @handleValue="handleValue" v-if="activeName === 'settings'"></detail-setting>
+          <detail-setting @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'settings'"></detail-setting>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -212,6 +214,9 @@ export default defineComponent({
       chain_id: null
     })
     const ntfLoad = ref(false)
+    const likeValue = ref(0)
+    const likeOwner = ref(false)
+    const likesValue = ref(false)
 
     function handleClick (tab, event) {
       router.push({ name: 'datasetDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -230,38 +235,14 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
-    function copyName (text) {
-      var txtArea = document.createElement('textarea')
-      txtArea.id = 'txt'
-      txtArea.style.position = 'fixed'
-      txtArea.style.top = '0'
-      txtArea.style.left = '0'
-      txtArea.style.opacity = '0'
-      txtArea.value = text
-      document.body.appendChild(txtArea)
-      txtArea.select()
-
-      try {
-        var successful = document.execCommand('copy')
-        var msg = successful ? 'successful' : 'unsuccessful'
-        console.log('Copying text command was ' + msg)
-        if (successful) {
-          system.$commonFun.messageTip('success', 'Copied')
-          return true
-        }
-      } catch (err) {
-        console.log('Oops, unable to copy')
-      } finally {
-        document.body.removeChild(txtArea)
-      }
-      return false
-    }
     function back () {
       router.push({ path: '/dataset' })
     }
-    const handleValue = async (value, chainID) => {
-      nft.contract_address = value
-      nft.chain_id = chainID
+    const handleValue = async (value, nft) => {
+      nft.contract_address = nft.contract_address
+      nft.chain_id = nft.chain_id
+      likeValue.value = value.likes || 0
+      ntfLoad.value = false
     }
     async function reqNFT () {
       if (!nft.contract_address) return
@@ -285,10 +266,26 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       ntfLoad.value = false
     }
+    async function likeMethod () {
+      ntfLoad.value = true
+      if (likeOwner.value) {
+        const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
+      } else {
+        const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
+      }
+      likesValue.value = !likesValue.value
+      likesData()
+    }
+    const likesData = async () => {
+      ntfLoad.value = true
+      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/like`, 'get')
+      if (getLikeRes) likeOwner.value = getLikeRes.data.liked
+    }
     onActivated(() => {
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
       settingOneself.value = accessDataset.value.some(ele => ele === route.params.name)
+      likesData()
     })
     return {
       settingOneself,
@@ -312,8 +309,9 @@ export default defineComponent({
       tableData,
       nft,
       ntfLoad,
-      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, copyName, back,
-      handleValue, reqNFT
+      likeValue, likesValue, likeOwner,
+      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, back,
+      handleValue, reqNFT, likeMethod
     }
   }
 })

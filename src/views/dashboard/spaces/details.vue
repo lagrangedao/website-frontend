@@ -14,7 +14,7 @@
           <b>{{route.params.name}}</b>
           <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
           <el-button-group class="ml-4">
-            <el-button @click="likeMethod" v-if="likeValue">
+            <el-button @click="likeMethod" v-if="likeOwner">
               <i class="icon icon_like"></i>Unlike</el-button>
             <el-button @click="likeMethod" v-else>
               <i class="icon icon_like"></i>Like</el-button>
@@ -241,6 +241,7 @@ export default defineComponent({
     const forkLoad = ref(false)
     const parentValue = ref('')
     const likeValue = ref(0)
+    const likeOwner = ref(false)
     const likesValue = ref(false)
     const drawer = ref(false)
     const direction = ref('btt')
@@ -308,6 +309,7 @@ export default defineComponent({
       logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
+      likesData()
     }
     function back () {
       router.push({ path: '/spaces' })
@@ -345,15 +347,18 @@ export default defineComponent({
     }
     async function likeMethod () {
       forkLoad.value = true
-      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
-      if (getLikeRes && getLikeRes.data.liked) {
+      if (likeOwner.value) {
         const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
-        console.log('unlikeRes', unlikeRes)
       } else {
         const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
-        console.log('likeRes', likeRes)
       }
       likesValue.value = !likesValue.value
+      likesData()
+    }
+    const likesData = async () => {
+      forkLoad.value = true
+      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
+      if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
     onActivated(() => init())
     watch(route, (to, from) => {
@@ -386,7 +391,7 @@ export default defineComponent({
       tableData,
       forkLoad,
       nft,
-      parentValue, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
+      parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick,
       forkOperate, back, renewFun, reqNFT, likeMethod
     }

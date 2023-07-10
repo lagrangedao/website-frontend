@@ -118,7 +118,7 @@
         <div class="title">
           {{ 'Space NFT (SNFT)' }}
 
-          <el-button class="request_btn" v-if="nftdata.status === 'success'" @click="dataNFTRequest = true">Create new License</el-button>
+          <el-button class="request_btn" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
           <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
@@ -128,8 +128,12 @@
           </div>
           <div v-if="nftdata.status === 'success' || (nftdata.tokens && nftdata.tokens.length>0)">
             <div class="contract tip">
-              Contract Address:
-              <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
+              <div class="flex-left">Contract Address:
+                <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
+              </div>
+              <div class="flex-right">
+                <i class="icon icon_star"></i>: Licenses owned by yourself
+              </div>
             </div>
             <el-table :data="nftdata.tokens" stripe style="width: 100%" class="nft_table">
               <el-table-column prop="chain_id" label="Chain ID">
@@ -142,8 +146,9 @@
                   <a :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
                 </template>
               </el-table-column>
-              <el-table-column prop="owner_address" label="Owner Address">
+              <el-table-column prop="owner_address" label="Owner Address" min-width="140">
                 <template #default="scope">
+                  <i class="icon" :class="{'icon_star':scope.row.owner_address === route.params.wallet_address}"></i>
                   <span>{{scope.row.owner_address}}</span>
                 </template>
               </el-table-column>
@@ -408,6 +413,7 @@ export default defineComponent({
     const listLoad = ref(false)
     const dialogDOIVisible = ref(false)
     const dataNFTRequest = ref(false)
+    const chainIdRes = ref(true)
     const eventArgs = reactive({
       owner: '',
       ipfs_url: ''
@@ -475,8 +481,8 @@ export default defineComponent({
     }
     async function claimDataNFT () {
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
           generateLoad.value = false
           return false
         }
@@ -534,8 +540,8 @@ export default defineComponent({
     async function requestNFT () {
       generateLoad.value = true
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
           generateLoad.value = false
           return false
         }
@@ -698,6 +704,7 @@ export default defineComponent({
       requestInitData()
       hardwareOptions.value = hardwareList
       settingIndex.value = await spaceIndex()
+      chainIdRes.value = await system.$commonFun.changeIDLogin(1)
     })
     onDeactivated(() => {
       ruleForm.name = ''
@@ -736,6 +743,7 @@ export default defineComponent({
       generateLoad,
       manageDOI,
       eventArgs,
+      chainIdRes,
       props, submitForm, submitDeleteForm, momentFilter, sleepChange,
       handleChange, requestInitData, beforeClose, requestNFT, refreshContract
     }
@@ -811,6 +819,15 @@ export default defineComponent({
         font-weight: normal;
         color: #666;
         line-height: 1.5;
+        &.contract {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .flex-right {
+            display: flex;
+            align-items: center;
+          }
+        }
       }
       .tip_new {
         padding-top: 0.2rem;
@@ -970,6 +987,17 @@ export default defineComponent({
           }
         }
       }
+      .icon {
+        display: block;
+        width: 16px;
+        height: 16px;
+        margin: 0 0.07rem 0 0;
+      }
+      .icon_star {
+        background: url(../../../assets/images/icons/owner_star.png) no-repeat
+          left center;
+        background-size: 100%;
+      }
       .el-table {
         text-align: left;
         // border-top: 1px solid #e4e4e4;
@@ -992,6 +1020,8 @@ export default defineComponent({
           td {
             padding: 0;
             .cell {
+              display: flex;
+              align-items: center;
               padding: 0.2rem;
               font-family: "FIRACODE-REGULAR";
               font-size: 15px;
@@ -1018,6 +1048,9 @@ export default defineComponent({
                 @media screen and (min-width: 1800px) {
                   font-size: 16px;
                 }
+              }
+              .el-button {
+                margin: 0;
               }
             }
           }

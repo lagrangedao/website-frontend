@@ -51,24 +51,24 @@ const routes = [{
                     title: ''
                 }
             },
-            // {
-            //     path: '/dataset',
-            //     name: 'datasets',
-            //     component: datasets,
-            //     meta: {
-            //         keepAlive: true,
-            //         title: 'Datasets - '
-            //     }
-            // },
-            // {
-            //     path: '/datasets/:wallet_address/:name/:tabs',
-            //     name: 'datasetDetail',
-            //     component: datasetDetail,
-            //     meta: {
-            //         keepAlive: true,
-            //         title: 'Datasets at '
-            //     }
-            // },
+            {
+                path: '/dataset',
+                name: 'datasets',
+                component: datasets,
+                meta: {
+                    keepAlive: true,
+                    title: 'Datasets - '
+                }
+            },
+            {
+                path: '/datasets/:wallet_address/:name/:tabs',
+                name: 'datasetDetail',
+                component: datasetDetail,
+                meta: {
+                    keepAlive: true,
+                    title: 'Datasets at '
+                }
+            },
             // {
             //     path: '/models',
             //     name: 'models',
@@ -87,15 +87,15 @@ const routes = [{
             //         title: 'Models at '
             //     }
             // },
-            // {
-            //     path: '/create_dataset',
-            //     name: 'datasetsCreate',
-            //     component: datasetsCreate,
-            //     meta: {
-            //         keepAlive: true,
-            //         title: ''
-            //     }
-            // },
+            {
+                path: '/create_dataset',
+                name: 'datasetsCreate',
+                component: datasetsCreate,
+                meta: {
+                    keepAlive: true,
+                    title: ''
+                }
+            },
             {
                 path: '/spaces',
                 name: 'spaces',
