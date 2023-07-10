@@ -32,7 +32,7 @@
         <div class="title">
           {{ 'Data NFT (DNFT)' }}
 
-          <el-button class="request_btn" v-if="nftdata.status === 'success'" @click="dataNFTRequest = true">Create new License</el-button>
+          <el-button class="request_btn" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
           <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
@@ -42,8 +42,12 @@
           </div>
           <div v-if="nftdata.status === 'success' || (nftdata.tokens && nftdata.tokens.length>0)">
             <div class="contract tip">
-              Contract Address:
-              <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
+              <div class="flex-left">Contract Address:
+                <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
+              </div>
+              <div class="flex-right">
+                <i class="icon icon_star"></i>: Licenses owned by yourself
+              </div>
             </div>
             <el-table :data="nftdata.tokens" stripe style="width: 100%" class="nft_table">
               <el-table-column prop="chain_id" label="Chain ID">
@@ -56,8 +60,9 @@
                   <a :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
                 </template>
               </el-table-column>
-              <el-table-column prop="owner_address" label="Owner Address">
+              <el-table-column prop="owner_address" label="Owner Address" min-width="140">
                 <template #default="scope">
+                  <i class="icon" :class="{'icon_star':scope.row.owner_address === route.params.wallet_address}"></i>
                   <span>{{scope.row.owner_address}}</span>
                 </template>
               </el-table-column>
@@ -195,7 +200,8 @@ export default defineComponent({
     CaretBottom, Warning, DocumentCopy, dataNft
   },
   props: {
-    // listdata: { type: Number, default: 1 }
+    // listdata: { type: Number, default: 1 },
+    likesValue: { type: Boolean, default: false }
   },
   setup (props, context) {
     const store = useStore()
@@ -246,6 +252,7 @@ export default defineComponent({
     const dialogDOIVisible = ref(false)
     const settingIndex = ref(0)
     const dataNFTRequest = ref(false)
+    const chainIdRes = ref(true)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -313,8 +320,8 @@ export default defineComponent({
 
     async function claimDataNFT () {
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
           generateLoad.value = false
           return false
         }
@@ -372,8 +379,8 @@ export default defineComponent({
     async function requestNFT () {
       generateLoad.value = true
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
           generateLoad.value = false
           return false
         }
@@ -460,15 +467,23 @@ export default defineComponent({
       }
     }
 
+    async function ownerAddress (nft_contract, index) {
+      try {
+        const owner = await nft_contract.methods.ownerOf(index).call().then()
+        return owner
+      } catch  {
+        return ''
+      }
+    }
     async function mapTokens (list, nft_contract, contract_address, gateway) {
       const number = list ? list.length : 0
       for (let token = 0; token < number; token++) {
         let { name, url } = await system.$commonFun.getUnit(parseInt(list[token].chain_id), 16)
         list[token].contract_address = contract_address
-        list[token].owner_address = list[token].token_id ? await nft_contract.methods.ownerOf(list[token].token_id).call() : ''
+        list[token].owner_address = list[token].token_id && list[token].token_id !== null ? await ownerAddress(nft_contract, list[token].token_id) : ''
         list[token].chain_name = name
         list[token].chain_url = url
-        list[token].ipfs_url = `${gateway}/ipfs/${list[token].licnese_cid}`
+        list[token].ipfs_url = `${gateway}/ipfs/${list[token].cid}`
       }
       return list
     }
@@ -497,7 +512,7 @@ export default defineComponent({
           }
         }
         nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
-        context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
+        context.emit('handleValue', listRes.data.dataset, listRes.data.nft)
       }
       listLoad.value = false
     }
@@ -518,10 +533,14 @@ export default defineComponent({
       window.scrollTo(0, 0)
       requestInitData()
       settingIndex.value = await datasetIndex()
+      chainIdRes.value = await system.$commonFun.changeIDLogin(1)
     })
     onDeactivated(() => {
       ruleForm.name = ''
       ruleForm.delete = ''
+    })
+    watch(() => props.likesValue, () => {
+      requestInitData()
     })
     return {
       lagLogin,
@@ -548,6 +567,7 @@ export default defineComponent({
       route,
       router,
       moreLoad,
+      chainIdRes,
       props, submitForm, submitDeleteForm, momentFilter, beforeClose,
       handleChange, requestInitData, requestNFT, refreshContract
     }
@@ -623,6 +643,15 @@ export default defineComponent({
         font-weight: normal;
         color: #666;
         line-height: 1.5;
+        &.contract {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .flex-right {
+            display: flex;
+            align-items: center;
+          }
+        }
       }
 
       .tip_new {
@@ -798,7 +827,17 @@ export default defineComponent({
           }
         }
       }
-
+      .icon {
+        display: block;
+        width: 16px;
+        height: 16px;
+        margin: 0 0.07rem 0 0;
+      }
+      .icon_star {
+        background: url(../../../assets/images/icons/owner_star.png) no-repeat
+          left center;
+        background-size: 100%;
+      }
       .el-table {
         text-align: left;
         // border-top: 1px solid #e4e4e4;
@@ -824,6 +863,8 @@ export default defineComponent({
             padding: 0;
 
             .cell {
+              display: flex;
+              align-items: center;
               padding: 0.2rem;
               font-family: "FIRACODE-REGULAR";
               font-size: 14px;
@@ -835,6 +876,9 @@ export default defineComponent({
               }
               @media screen and (min-width: 1800px) {
                 font-size: 17px;
+              }
+              .icon {
+                margin-top: -3px;
               }
 
               .el-button {

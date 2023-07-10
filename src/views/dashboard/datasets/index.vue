@@ -100,7 +100,7 @@
                     <!-- <div class="img"></div> -->
                     <b>{{list.name}}</b>
                   </div>
-                  <span>27</span>
+                  <span>{{list.likes}}</span>
                 </div>
               </template>
               <div class="text">

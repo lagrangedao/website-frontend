@@ -222,6 +222,9 @@ export default defineComponent({
     UploadFilled,
     EditPen
   },
+  props: {
+    likesValue: { type: Boolean, default: false }
+  },
   setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
@@ -319,7 +322,7 @@ export default defineComponent({
         // console.log(fileRow.fileAlldata)
         fileRow.filedata = await sortList(fileRow.fileAlldata)
         // console.log(fileRow.filedata)
-        context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
+        context.emit('handleValue', listRes.data.dataset, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -755,6 +758,9 @@ export default defineComponent({
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
+    })
+    watch(() => props.likesValue, () => {
+      init()
     })
     return {
       accessAvatar,

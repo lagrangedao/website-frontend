@@ -199,7 +199,8 @@ export default defineComponent({
     CircleClose
   },
   props: {
-    urlChange: { type: String, default: 'card' }
+    urlChange: { type: String, default: 'card' },
+    likesValue: { type: Boolean, default: false }
   },
   setup (props, context) {
     const store = useStore()
@@ -375,7 +376,7 @@ export default defineComponent({
             getTitle(urlReadme.value)
           }
         })
-        context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
+        context.emit('handleValue', listRes.data.dataset, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -476,6 +477,9 @@ export default defineComponent({
         window.scrollTo(0, 0)
         init()
       }
+    })
+    watch(() => props.likesValue, () => {
+      init()
     })
     return {
       lagLogin,

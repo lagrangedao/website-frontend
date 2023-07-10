@@ -20,7 +20,8 @@ export default defineComponent({
     CaretBottom
   },
   props: {
-    isVisible: { type: Boolean, default: false }
+    isVisible: { type: Boolean, default: false },
+    likesValue: { type: Boolean, default: false }
   },
   setup (props, context) {
     const store = useStore()
@@ -37,7 +38,7 @@ export default defineComponent({
       renameLoad.value = true
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        context.emit('handleValue', listRes.data.nft.contract_address, listRes.data.nft.chain_id)
+        context.emit('handleValue', listRes.data.dataset, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       renameLoad.value = false
@@ -45,9 +46,19 @@ export default defineComponent({
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
+    async function init () {
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        context.emit('handleValue', listRes.data.dataset, listRes.data.nft)
+      }
+    }
     onMounted(() => {
       info.name = ''
       window.scrollTo(0, 0)
+      init()
+    })
+    watch(() => props.likesValue, () => {
+      init()
     })
     return {
       lagLogin,

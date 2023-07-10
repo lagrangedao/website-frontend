@@ -164,13 +164,17 @@
           <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
             <el-card class="box-card">
               <template #header>
-                <!-- <div class="card-header">
-                                    <span>27</span>
-                                </div> -->
+                <div class="card-header card-datasets">
+                  <div class="name">
+                    <!-- <div class="img"></div> -->
+                    <b>{{list.name}}</b>
+                  </div>
+                  <span>{{list.likes}}</span>
+                </div>
               </template>
               <div class="text">
                 <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
+                <p class="ellipsis">{{list.license}}</p>
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
@@ -1081,6 +1085,48 @@ export default defineComponent({
                     font-size: 15px;
                   }
                 }
+                &.card-datasets {
+                  display: flex;
+                  justify-content: space-between;
+                  .name {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    width: 80%;
+                    color: #606060;
+                    @media screen and (min-width: 441px) {
+                    }
+                    b {
+                      width: calc(100% - 0.6rem);
+                      font-weight: normal;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      word-spacing: normal;
+                      text-align: left;
+                    }
+                  }
+                  .img {
+                    width: 14px;
+                    height: 14px;
+                    margin: 0 5px 0 0;
+                    background: url(../../../assets/images/icons/icon_1_1.png)
+                      no-repeat left center;
+                    background-size: 100%;
+                  }
+                  span {
+                    height: 0.25rem;
+                    padding-left: 0.23rem;
+                    background: url(../../../assets/images/icons/icon_9.png)
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
+                    font-size: 13px;
+                    color: #000;
+                    line-height: 0.25rem;
+                    @media screen and (min-width: 1800px) {
+                      font-size: 15px;
+                    }
+                  }
+                }
               }
             }
             .el-card__body {
@@ -1184,6 +1230,9 @@ export default defineComponent({
               background-color: #7405ff;
               .el-card__header {
                 .card-header {
+                  .name {
+                    color: #fff;
+                  }
                   span {
                     background: url(../../../assets/images/icons/icon_9_1.png)
                       no-repeat left 0px;
