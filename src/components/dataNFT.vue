@@ -223,7 +223,7 @@ export default defineComponent({
             generateLoad.value = false
             return
           }
-          licenseRes = await system.$commonFun.sendRequest(JSON.stringify(props.personalCenter) !== '{}' ? `${process.env.VUE_APP_BASEAPI}spaces/${props.personalCenter.owner_address}/${props.personalCenter.space_name}/license/metadata/generate` : route.name === 'datasetDetail' ? `${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate` : `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
+          licenseRes = await system.$commonFun.sendRequest(JSON.stringify(props.personalCenter) !== '{}' ? `${process.env.VUE_APP_BASEAPI}spaces/${props.personalCenter.owner_address}/${props.personalCenter.name}/license/metadata/generate` : route.name === 'datasetDetail' ? `${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate` : `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
             if (licenseRes.data) createLicense(`${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`)
             else generateLoad.value = false
@@ -275,7 +275,7 @@ export default defineComponent({
       fd.append('contract_address', props.contractAddress)
       fd.append('recipient', dataNFTForm.recipient)
       fd.append('ipfs_uri', `${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`)
-      const spaceName = route.params.name ? route.params.name : props.personalCenter.space_name;
+      const spaceName = route.params.name ? route.params.name : props.personalCenter.name;
       if (route.name === 'datasetDetail') {
         const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)
         const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/create_license`, 'post', fd)
