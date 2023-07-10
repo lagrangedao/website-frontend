@@ -89,6 +89,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    let licenseRes = {}
     const dataNFTShow = props.dataNFTRequest
     const dataNFTRef = ref(null)
     const generateLoad = ref(false)
@@ -222,7 +223,7 @@ export default defineComponent({
             generateLoad.value = false
             return
           }
-          const licenseRes = await system.$commonFun.sendRequest(JSON.stringify(props.personalCenter) !== '{}' ? `${process.env.VUE_APP_BASEAPI}spaces/${props.personalCenter.owner_address}/${props.personalCenter.space_name}/license/metadata/generate` : route.name === 'datasetDetail' ? `${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate` : `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
+          licenseRes = await system.$commonFun.sendRequest(JSON.stringify(props.personalCenter) !== '{}' ? `${process.env.VUE_APP_BASEAPI}spaces/${props.personalCenter.owner_address}/${props.personalCenter.space_name}/license/metadata/generate` : route.name === 'datasetDetail' ? `${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate` : `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
             if (licenseRes.data) createLicense(`${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`)
             else generateLoad.value = false
@@ -273,6 +274,7 @@ export default defineComponent({
       fd.append('chain_id', getID)
       fd.append('contract_address', props.contractAddress)
       fd.append('recipient', dataNFTForm.recipient)
+      fd.append('ipfs_uri', `${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`)
       const spaceName = route.params.name ? route.params.name : props.personalCenter.space_name;
       if (route.name === 'datasetDetail') {
         const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)

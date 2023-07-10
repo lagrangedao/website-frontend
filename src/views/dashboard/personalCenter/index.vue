@@ -303,20 +303,20 @@ export default defineComponent({
       unit: ''
     })
     const options = ref([
+      // {
+      //   value: 'Option1',
+      //   label: 'Most Downloads',
+      // },
       {
         value: 'Option1',
-        label: 'Most Downloads',
-      },
-      {
-        value: 'Option2',
         label: 'Alphabetical',
       },
       {
-        value: 'Option3',
+        value: 'Option2',
         label: 'Recently Updated',
       },
       {
-        value: 'Option4',
+        value: 'Option3',
         label: 'Most Likes',
       }
     ])
