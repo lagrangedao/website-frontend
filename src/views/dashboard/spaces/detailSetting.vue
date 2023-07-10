@@ -132,7 +132,7 @@
                 <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
               </div>
               <div class="flex-right">
-                <i class="icon icon_star"></i>: Licenses you have approved for others
+                <i class="icon icon_star"></i>: Licenses owned by yourself
               </div>
             </div>
             <el-table :data="nftdata.tokens" stripe style="width: 100%" class="nft_table">
