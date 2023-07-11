@@ -160,7 +160,7 @@ export default defineComponent({
       ]
     })
     const searchValue = ref('')
-    const optionsValue = ref('')
+    const optionsValue = ref('alphabetical')
     const options = ref([
       // {
       //   value: 'downloads',
@@ -183,7 +183,7 @@ export default defineComponent({
       pageSize: 12,
       pageNo: 1,
       total: 0,
-      sort: ''
+      sort: 'alphabetical'
     })
     const small = ref(false)
     const background = ref(false)
@@ -206,8 +206,8 @@ export default defineComponent({
     async function searchChange (val) {
       // listdata.value = await filterData(listdataAll.value, val)
       pagin.pageNo = 1
-      pagin.sort = ''
-      optionsValue.value = ''
+      // pagin.sort = ''
+      // optionsValue.value = ''
       init()
     }
     function filterData (listData, val) {
@@ -271,8 +271,8 @@ export default defineComponent({
       searchValue.value = ''
       pagin.pageNo = 1
       pagin.total = 0
-      pagin.sort = ''
-      optionsValue.value = ''
+      pagin.sort = 'alphabetical'
+      optionsValue.value = 'alphabetical'
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()

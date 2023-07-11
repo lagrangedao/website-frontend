@@ -99,28 +99,8 @@
           </div>
         </div>
         <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
-          <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
-            <el-card class="box-card">
-              <template #header>
-                <div class="card-warn" v-if="list.expiration_time !== null && list.expireTime <= 7">
-                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
-                    popper-style="word-break: break-word; text-align: left;">
-                    <template #reference>
-                      <el-icon>
-                        <Warning />
-                      </el-icon>
-                    </template>
-                  </el-popover>
-                </div>
-                <div class="card-header">
-                  <span>{{list.likes}}</span>
-                </div>
-                <h1>{{list.name}}</h1>
-              </template>
-            </el-card>
-          </el-col>
-          <el-col v-if="listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces" :key="list" @click="detailFun(list, 'space')">
-            <el-card class="box-card">
+          <el-col :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
+            <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<2: true">
               <template #header>
                 <div class="card-warn" v-if="list.expiration_time !== null && list.expireTime <= 7">
                   <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
@@ -161,8 +141,8 @@
           </el-select> -->
         </div>
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets.slice(0,3)" :key="l" @click="detailFun(list, 'dataset')">
-            <el-card class="box-card">
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
+            <el-card class="box-card is-hover" v-show="!listdata.datasetsIsShow ? l<3: true">
               <template #header>
                 <div class="card-header card-datasets">
                   <div class="name">
@@ -175,30 +155,6 @@
               <div class="text">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.license}}</p>
-              </div>
-              <div class="text">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-                <!-- <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div> -->
-              </div>
-            </el-card>
-          </el-col>
-          <el-col v-show="listdata.datasetsIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
-            <el-card class="box-card">
-              <template #header>
-              </template>
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
@@ -232,26 +188,8 @@
           </div>
         </div>
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.licenseIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.licenseIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.owned_licenses.slice(0,3)" :key="l">
-            <el-card class="box-card" @click="detailFun(list, 'licenses')">
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.space_name}}</p>
-              </div>
-              <div class="text">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.space_owner)}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col v-show="listdata.licenseIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.owned_licenses" :key="l">
-            <el-card class="box-card" @click="detailFun(list, 'licenses')">
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.owned_licenses" :key="l">
+            <el-card :class="{'box-card':true,'is-hover': list.cid&&list.cid !== 'undefined','is-disabled': !(list.cid&&list.cid !== 'undefined')}" v-show="!listdata.licenseIsShow ? l<3: true" @click="detailFun(list, 'licenses')">
               <div class="text">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.space_name}}</p>
@@ -467,7 +405,7 @@ export default defineComponent({
       if (type === 'dataset') router.push({ name: 'datasetDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'space') router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'model') router.push({ name: 'modelsDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
-      else if (type === 'licenses') window.open(`${row.gateway}/ipfs/${row.cid}`)
+      else if (type === 'licenses') if (row.cid && row.cid !== 'undefined') window.open(`${row.gateway}/ipfs/${row.cid}`)
     }
     function editProfile (row, index) {
       // console.log(row, index)
@@ -1072,6 +1010,14 @@ export default defineComponent({
             * {
               cursor: pointer;
             }
+            &.is-disabled {
+              opacity: 0.7;
+              background-color: #eee !important;
+              cursor: no-drop;
+              * {
+                cursor: inherit;
+              }
+            }
             .el-card__header {
               padding: 0;
               border: 0;
@@ -1232,7 +1178,7 @@ export default defineComponent({
             }
           }
           &:hover {
-            .box-card {
+            .is-hover {
               background-color: #7405ff;
               .el-card__header {
                 .card-header {
@@ -1241,8 +1187,8 @@ export default defineComponent({
                   }
                   span {
                     background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 0px;
-                    background-size: 0.2rem;
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
                     color: #fff;
                   }
                 }

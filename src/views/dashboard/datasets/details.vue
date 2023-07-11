@@ -16,7 +16,7 @@
           <el-button-group class="ml-4">
             <el-button @click="likeMethod" v-if="likeOwner">
               <i class="icon icon_like"></i>Unlike</el-button>
-            <el-button @click="likeMethod" v-else>
+            <el-button @click="likeMethod" v-else :disabled="metaAddress?false:true">
               <i class="icon icon_like"></i>Like</el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
@@ -285,7 +285,8 @@ export default defineComponent({
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
       settingOneself.value = accessDataset.value.some(ele => ele === route.params.name)
-      likesData()
+      if (metaAddress.value) likesData()
+      else if (activeName.value === 'settings') router.push({ name: 'datasetDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
     })
     return {
       settingOneself,
@@ -406,7 +407,7 @@ export default defineComponent({
           background: url(../../../assets/images/icons/icon_37.png) no-repeat
             left center;
           background-size: auto 100%;
-          cursor: pointer;
+          cursor: inherit;
         }
         .el-button {
           height: 28px;
