@@ -104,7 +104,7 @@
             <b>Models</b> {{NumFormat(pagin.total)}}
             <el-input v-model="searchValue" clearable @input="searchChange" class="w-50 m-2" placeholder="Filter by name" />
           </div>
-          <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: most Downloads">
+          <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: Alphabetical">
             <template #prefix>
               <i class="el-icon-select"></i>
             </template>
@@ -186,10 +186,10 @@ export default defineComponent({
     const searchValue = ref('')
     const optionsValue = ref('')
     const options = ref([
-      {
-        value: 'downloads',
-        label: 'Most Downloads',
-      },
+      // {
+      //   value: 'downloads',
+      //   label: 'Most Downloads',
+      // },
       {
         value: 'alphabetical',
         label: 'Alphabetical',

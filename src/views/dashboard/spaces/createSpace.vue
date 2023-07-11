@@ -61,9 +61,9 @@
                                         </svg>
                                         Docker
                                     </el-radio>
-                                    <el-radio label="Gradio" size="large" border>
+                                    <!-- <el-radio label="Gradio" size="large" border>
                                         <img src="@/assets/images/dashboard/spaces/Bacalhau.jpg" class="icon_Bacalhau" alt=""> Bacalhau
-                                    </el-radio>
+                                    </el-radio> -->
                                     <el-radio label="Streamlit" size="large" border>
                                         <svg class="h-6 w-6 w-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="32" height="18" preserveAspectRatio="xMidYMid meet" viewBox="0 0 301 165">
                                             <path d="M150.731 101.547l-52.592-27.8-91.292-48.25c-.084-.083-.25-.083-.334-.083-3.333-1.584-6.75 1.75-5.5 5.083L47.53 149.139l.008.025c.05.117.092.233.142.35 1.909 4.425 6.075 7.158 10.609 8.233.383.084.657.159 1.117.251.459.102 1.1.241 1.65.283.09.008.174.008.266.016h.067c.066.009.133.009.2.017h.091c.059.008.125.008.184.008h.108c.067.009.133.009.2.009a817.728 817.728 0 00177.259 0c.708 0 1.4-.034 2.066-.1l.634-.075c.025-.009.058-.009.083-.017.142-.017.283-.042.425-.067.208-.025.417-.066.625-.108.417-.092.606-.158 1.172-.353.565-.194 1.504-.534 2.091-.817.588-.283.995-.555 1.487-.863a26.566 26.566 0 001.774-1.216c.253-.194.426-.318.609-.493l-.1-.058-99.566-52.617z"
