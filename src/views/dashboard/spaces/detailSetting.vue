@@ -488,7 +488,7 @@ export default defineComponent({
         }
         // estimate gas
         let estimatedGas = await factory.methods
-          .claimDataNFT(route.params.name)
+          .claimDataNFT(1, route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         // we will use estimated gas * 1.5
@@ -500,7 +500,7 @@ export default defineComponent({
         // call contract
         console.log('Deploying Data NFT...')
         const tx = await factory.methods
-          .claimDataNFT(route.params.name)
+          .claimDataNFT(1, route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -547,13 +547,13 @@ export default defineComponent({
         }
 
         let estimatedGas = await factory.methods
-          .requestDataNFT(route.params.name)
+          .requestDataNFT(1, route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         let gasLimit = Math.floor(estimatedGas * 1.5)
 
         await factory.methods
-          .requestDataNFT(route.params.name)
+          .requestDataNFT(1, route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -587,7 +587,7 @@ export default defineComponent({
         return
       }
       try {
-        const request = await factory.methods.requestData(route.params.wallet_address, route.params.name).call().then()
+        const request = await factory.methods.requestData(1, route.params.wallet_address, route.params.name).call().then()
         console.log('request:', request)
         if (request.fulfilled && request.claimable) {
           claimDataNFT()

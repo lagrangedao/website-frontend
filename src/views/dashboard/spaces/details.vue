@@ -16,7 +16,7 @@
           <el-button-group class="ml-4">
             <el-button @click="likeMethod" v-if="likeOwner">
               <i class="icon icon_like"></i>Unlike</el-button>
-            <el-button @click="likeMethod" v-else>
+            <el-button @click="likeMethod" v-else :disabled="metaAddress?false:true">
               <i class="icon icon_like"></i>Like</el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
@@ -32,7 +32,7 @@
           <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime < 0">
             <el-button type="warning" plain @click="renewFun">Restart</el-button>
           </el-button-group>
-          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
               <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
                 p-id="2675" fill="#878c93"></path>
@@ -254,6 +254,7 @@ export default defineComponent({
       contract_address: null,
       chain_id: null
     })
+    const nftTokens = ref([])
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -288,6 +289,7 @@ export default defineComponent({
       if (nftCont) {
         nft.contract_address = nftCont.contract_address
         nft.chain_id = nftCont.chain_id
+        nftTokens.value = nftCont.tokens || []
       }
       forkLoad.value = false
     }
@@ -309,7 +311,8 @@ export default defineComponent({
       logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
-      likesData()
+      if (metaAddress.value) likesData()
+      else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
     }
     function back () {
       router.push({ path: '/spaces' })
@@ -324,7 +327,7 @@ export default defineComponent({
       forkLoad.value = false
     }
     async function reqNFT () {
-      if (!nft.contract_address) return
+      if (!nft.contract_address || nftTokens.value.length === 0) return
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       if (getID.toString() !== nft.chain_id) {
         const { name } = await system.$commonFun.getUnit(Number(nft.chain_id))
@@ -391,6 +394,7 @@ export default defineComponent({
       tableData,
       forkLoad,
       nft,
+      nftTokens,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick,
       forkOperate, back, renewFun, reqNFT, likeMethod
@@ -489,7 +493,7 @@ export default defineComponent({
           background: url(../../../assets/images/icons/icon_37.png) no-repeat
             left center;
           background-size: auto 100%;
-          cursor: pointer;
+          cursor: inherit;
         }
         .el-button {
           height: 28px;

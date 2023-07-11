@@ -60,7 +60,7 @@ export default defineComponent({
       ethereum.on('accountsChanged', function (account) {
         // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
         if (!prevType.value) return false
-        store.dispatch('setMetaAddress', account[0])
+        store.dispatch('setMetaAddress', '')
         store.dispatch('setNavLogin', false)
         store.dispatch('setLogin', false)
         store.dispatch('setAccessToken', '')
