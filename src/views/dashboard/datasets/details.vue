@@ -16,17 +16,17 @@
           <el-button-group class="ml-4">
             <el-button @click="likeMethod" v-if="likeOwner">
               <i class="icon icon_like"></i>Unlike</el-button>
-            <el-button @click="likeMethod" v-else>
+            <el-button @click="likeMethod" v-else :disabled="metaAddress?false:true">
               <i class="icon icon_like"></i>Like</el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
-          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 || !nft.ipfs_uri}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
               <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
                 p-id="2675" fill="#878c93"></path>
               <path d="M830 720.068 830 409.978c0-67.974-20.98-122.004-62.36-160.588-44.222-41.236-108.628-60.776-191.64-58.212L576 64l-192 192 192 192 0-128c53 0 85.34 5.284 104.35 23.008 14.366 13.396 21.65 35.928 21.65 66.97l0 312.392c-37.124 22.434-62 63.178-62 109.628 0 70.58 57.42 128 128 128s128-57.42 128-128C896 783.902 869.324 741.938 830 720.068zM768 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S803.346 896 768 896z"
                 p-id="2676" fill="#878c93"></path>
-            </svg> Request NFT
+            </svg> Request License
           </div>
           <share-pop></share-pop>
         </div>
@@ -211,8 +211,10 @@ export default defineComponent({
     const settingOneself = ref(false)
     const nft = reactive({
       contract_address: null,
-      chain_id: null
+      chain_id: null,
+      ipfs_uri: ''
     })
+    const nftTokens = ref([])
     const ntfLoad = ref(false)
     const likeValue = ref(0)
     const likeOwner = ref(false)
@@ -238,14 +240,16 @@ export default defineComponent({
     function back () {
       router.push({ path: '/dataset' })
     }
-    const handleValue = async (value, nft) => {
-      nft.contract_address = nft.contract_address
-      nft.chain_id = nft.chain_id
+    const handleValue = async (value, nftData) => {
+      nft.contract_address = nftData.contract_address
+      nft.chain_id = nftData.chain_id
       likeValue.value = value.likes || 0
       ntfLoad.value = false
+      nftTokens.value = nftData.tokens || []
+      if (nftData.tokens && nftData.tokens.length > 0) nft.ipfs_uri = nftData.tokens[0].cid && nftData.tokens[0].cid !== 'undefined' ? `${value.gateway}/ipfs/${nftData.tokens[0].cid}` : ''
     }
     async function reqNFT () {
-      if (!nft.contract_address) return
+      if (!nft.contract_address || nftTokens.value.length === 0 || !nft.ipfs_uri) return
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       if (getID.toString() !== nft.chain_id) {
         const { name } = await system.$commonFun.getUnit(Number(nft.chain_id))
@@ -254,12 +258,12 @@ export default defineComponent({
       }
       ntfLoad.value = true
       const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, nft.contract_address)
-      const ipfs_uri = await nft_contract.methods.tokenURI(1).call()
+      // const ipfs_uri = await nft_contract.methods.tokenURI(1).call()
       let nftParams = new FormData()
       nftParams.append('chain_id', nft.chain_id)
       nftParams.append('wallet_address', route.params.wallet_address)
       nftParams.append('dataset_name', route.params.name)
-      nftParams.append('ipfs_url', ipfs_uri)
+      nftParams.append('ipfs_url', nft.ipfs_uri)
       const nftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/license/request`, 'post', nftParams)
       if (nftRes && nftRes.status === 'success') system.$commonFun.messageTip('success', nftRes.message ? nftRes.message : 'Submitted license request!')
       else system.$commonFun.messageTip('error', nftRes.message ? nftRes.message : 'Failed!')
@@ -285,7 +289,8 @@ export default defineComponent({
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
       settingOneself.value = accessDataset.value.some(ele => ele === route.params.name)
-      likesData()
+      if (metaAddress.value) likesData()
+      else if (activeName.value === 'settings') router.push({ name: 'datasetDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
     })
     return {
       settingOneself,
@@ -309,7 +314,7 @@ export default defineComponent({
       tableData,
       nft,
       ntfLoad,
-      likeValue, likesValue, likeOwner,
+      likeValue, likesValue, likeOwner, nftTokens,
       NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, back,
       handleValue, reqNFT, likeMethod
     }
@@ -406,7 +411,7 @@ export default defineComponent({
           background: url(../../../assets/images/icons/icon_37.png) no-repeat
             left center;
           background-size: auto 100%;
-          cursor: pointer;
+          cursor: inherit;
         }
         .el-button {
           height: 28px;

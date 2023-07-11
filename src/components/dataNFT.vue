@@ -1,29 +1,34 @@
 <template>
   <div class="dataNFT_pop">
-    <el-dialog v-model="dataNFTShow" title="Generate Metadata License" :close-on-click-modal="false" :show-close="false" custom-class="doi_body" @close="beforeClose">
+    <el-dialog v-model="dataNFTShow" title="Generate Metadata License" :close-on-click-modal="false" :show-close="false"
+               custom-class="doi_body" @close="beforeClose">
       <div>
         <el-form ref="dataNFTRef" :model="dataNFTForm" label-width="120px" :rules="rulesDataNFT" status-icon>
           <el-form-item prop="type" label="Type">
             <div class="flex flex-row">
-              <el-input v-model="dataNFTForm.type" placeholder=" " disabled readonly />
+              <el-input v-model="dataNFTForm.type" placeholder=" " disabled readonly/>
             </div>
           </el-form-item>
           <el-form-item prop="author" label="Author">
             <div class="flex flex-row">
-              <el-input v-model="dataNFTForm.author" placeholder=" " disabled readonly />
+              <el-input v-model="dataNFTForm.author" placeholder=" " disabled readonly/>
             </div>
           </el-form-item>
           <el-form-item prop="recipient" label="Recipient">
             <div class="flex flex-row">
-              <el-input v-model="dataNFTForm.recipient" placeholder=" " :disabled="JSON.stringify(props.personalCenter) !== '{}'?true:false" />
+              <el-input v-model="dataNFTForm.recipient" placeholder=" "
+                        :disabled="JSON.stringify(props.personalCenter) !== '{}'?true:false"/>
             </div>
           </el-form-item>
           <el-form-item prop="tags" label="Tags">
             <div class="flex flex-row">
-              <el-tag v-for="tag in dataNFTForm.tags" :key="tag" class="mx-1" closable :disable-transitions="false" @close="handleClose(tag, 'tags')">
+              <el-tag v-for="tag in dataNFTForm.tags" :key="tag" class="mx-1" closable :disable-transitions="false"
+                      @close="handleClose(tag, 'tags')">
                 {{ tag }}
               </el-tag>
-              <el-input v-if="dataNFTForm.inputVisible" ref="InputRef" v-model="dataNFTForm.inputValue" class="ml-1 w-20" size="small" @keyup.enter="handleInputConfirm('tags')" @blur="handleInputConfirm('tags')" />
+              <el-input v-if="dataNFTForm.inputVisible" ref="InputRef" v-model="dataNFTForm.inputValue"
+                        class="ml-1 w-20" size="small" @keyup.enter="handleInputConfirm('tags')"
+                        @blur="handleInputConfirm('tags')"/>
               <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput('tags')">
                 +
               </el-button>
@@ -31,24 +36,29 @@
           </el-form-item>
           <el-form-item prop="description" label="Description">
             <div class="flex flex-row">
-              <el-input v-model="dataNFTForm.description" placeholder=" " />
+              <el-input v-model="dataNFTForm.description" placeholder=" "/>
             </div>
           </el-form-item>
           <el-form-item prop="links" label="Links">
             <div class="flex flex-row">
-              <el-tag v-for="link in dataNFTForm.links" :key="link" class="mx-1" closable :disable-transitions="false" @close="handleClose(link, 'links')">
+              <el-tag v-for="link in dataNFTForm.links" :key="link" class="mx-1" closable :disable-transitions="false"
+                      @close="handleClose(link, 'links')">
                 {{ link }}
               </el-tag>
-              <el-input v-if="dataNFTForm.linksVisible" ref="LinksRef" v-model="dataNFTForm.linksValue" class="ml-1 w-20" size="small" @keyup.enter="handleInputConfirm('links')" @blur="handleInputConfirm('links')" />
+              <el-input v-if="dataNFTForm.linksVisible" ref="LinksRef" v-model="dataNFTForm.linksValue"
+                        class="ml-1 w-20" size="small" @keyup.enter="handleInputConfirm('links')"
+                        @blur="handleInputConfirm('links')"/>
               <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput('links')">
                 +
               </el-button>
             </div>
           </el-form-item>
-          <el-form-item v-for="(info, index) in dataNFTForm.additionalInformation" :key="index" :label="index===0?'Additional Info':''" :prop="'additionalInformation.' + index + '.value'" class="form-flex">
-            <el-input v-model="info.key" />
+          <el-form-item v-for="(info, index) in dataNFTForm.additionalInformation" :key="index"
+                        :label="index===0?'Additional Info':''" :prop="'additionalInformation.' + index + '.value'"
+                        class="form-flex">
+            <el-input v-model="info.key"/>
             <span class="m">:</span>
-            <el-input v-model="info.value" />
+            <el-input v-model="info.value"/>
             <span class="m"></span>
             <el-button @click="addInfo">+</el-button>
             <el-button class="mt-2" :disabled="index===0" @click.prevent="removeInfo(info)">-</el-button>
@@ -67,29 +77,30 @@
   </div>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, nextTick, getCurrentInstance } from 'vue'
-import { useStore } from "vuex"
-import { useRouter, useRoute } from 'vue-router'
+import {defineComponent, computed, onMounted, watch, ref, reactive, nextTick, getCurrentInstance} from 'vue'
+import {useStore} from "vuex"
+import {useRouter, useRoute} from 'vue-router'
+
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
   name: 'Data NFT',
   components: {},
   props: {
-    dataNFTRequest: { type: Boolean, default: false },
-    createdAt: { type: String, default: "" },
-    updatedAt: { type: String, default: "" },
-    contractAddress: { type: String, default: "" },
-    getNftID: { type: String, default: "" },
-    personalCenter: { type: Object, default: {} }
+    dataNFTRequest: {type: Boolean, default: false},
+    createdAt: {type: String, default: ""},
+    updatedAt: {type: String, default: ""},
+    contractAddress: {type: String, default: ""},
+    getNftID: {type: String, default: ""},
+    personalCenter: {type: Object, default: {}}
   },
-  setup (props, context) {
+  setup(props, context) {
     const store = useStore()
     const metaAddress = computed(() => store.state.metaAddress)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    let licenseRes = {}
+    const licenseIPFS = ref('')
     const dataNFTShow = props.dataNFTRequest
     const dataNFTRef = ref(null)
     const generateLoad = ref(false)
@@ -120,8 +131,8 @@ export default defineComponent({
     }
     const rulesDataNFT = reactive({
       recipient: [
-        { required: true, message: ' ', trigger: 'blur' },
-        { validator: validateRec, trigger: "blur" }
+        {required: true, message: ' ', trigger: 'blur'},
+        {validator: validateRec, trigger: "blur"}
       ]
     })
     const InputRef = ref()
@@ -168,7 +179,7 @@ export default defineComponent({
       })
     }
 
-    function typeName () {
+    function typeName() {
       let type = 'space'
       switch (route.name) {
         case 'spaceDetail':
@@ -184,17 +195,19 @@ export default defineComponent({
       return type
     }
 
-    function beforeClose () {
+    function beforeClose() {
       context.emit('handleChange', false)
     }
-    async function infoList () {
+
+    async function infoList() {
       let list = {}
       dataNFTForm.additionalInformation.forEach(info => {
         list[info.key] = info.value
       })
       return list
     }
-    async function generateLicense (formEl) {
+
+    async function generateLicense(formEl) {
       if (!formEl) return
       await dataNFTRef.value.validate(async (valid, fields) => {
         if (valid) {
@@ -218,15 +231,22 @@ export default defineComponent({
           }
           const getID = await system.$commonFun.web3Init.eth.net.getId()
           if (getID.toString() !== props.getNftID) {
-            const { name } = await system.$commonFun.getUnit(Number(props.getNftID))
+            const {name} = await system.$commonFun.getUnit(Number(props.getNftID))
             await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
             generateLoad.value = false
             return
           }
-          licenseRes = await system.$commonFun.sendRequest(JSON.stringify(props.personalCenter) !== '{}' ? `${process.env.VUE_APP_BASEAPI}spaces/${props.personalCenter.owner_address}/${props.personalCenter.name}/license/metadata/generate` : route.name === 'datasetDetail' ? `${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate` : `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
+          const licenseRes = await system.$commonFun.sendRequest(
+              JSON.stringify(props.personalCenter) !== '{}'
+                  ? `${process.env.VUE_APP_BASEAPI}${props.personalCenter.source_type === 'Dataset' ? 'datasets' : 'spaces'}/${props.personalCenter.owner_address}/${props.personalCenter.name}/license/metadata/generate`
+                  : route.name === 'datasetDetail'
+                      ? `${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`
+                      : `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/license/metadata/generate`, 'post', params)
           if (licenseRes && licenseRes.status === "success") {
-            if (licenseRes.data) createLicense(`${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`)
-            else generateLoad.value = false
+            if (licenseRes.data) {
+              licenseIPFS.value = `${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`
+              createLicense(licenseIPFS.value)
+            } else generateLoad.value = false
             return
           }
           system.$commonFun.messageTip('error', licenseRes.message ? licenseRes.message : 'Failed!')
@@ -237,24 +257,25 @@ export default defineComponent({
         }
       })
     }
-    async function createLicense (ipfsURL) {
+
+    async function createLicense(ipfsURL) {
       try {
         const factory = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, props.contractAddress)
         let estimatedGas = await factory.methods
-          .createLicense(dataNFTForm.recipient, ipfsURL)
-          .estimateGas({ from: store.state.metaAddress })
+            .createLicense(dataNFTForm.recipient, ipfsURL)
+            .estimateGas({from: store.state.metaAddress})
 
         let gasLimit = Math.floor(estimatedGas * 1.5)
         const tx = await factory.methods
-          .createLicense(dataNFTForm.recipient, ipfsURL)
-          .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-          .on('transactionHash', async (transactionHash) => {
-            console.log('transactionHash:', transactionHash)
-            await generateMintHash(transactionHash)
-            generateLoad.value = false
-            context.emit('handleChange', false, true)
-          })
-          .on('error', () => generateLoad.value = false)
+            .createLicense(dataNFTForm.recipient, ipfsURL)
+            .send({from: store.state.metaAddress, gasLimit: gasLimit})
+            .on('transactionHash', async (transactionHash) => {
+              console.log('transactionHash:', transactionHash)
+              await generateMintHash(transactionHash)
+              generateLoad.value = false
+              context.emit('handleChange', false, true)
+            })
+            .on('error', () => generateLoad.value = false)
       } catch (err) {
         console.log('err', err)
         if (err && err.message) system.$commonFun.messageTip('error', err.message)
@@ -262,11 +283,11 @@ export default defineComponent({
       }
     }
 
-    async function generateMintHash (tx_hash) {
+    async function generateMintHash(tx_hash) {
       let fd = new FormData()
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       if (getID.toString() !== props.getNftID) {
-        const { name } = await system.$commonFun.getUnit(Number(props.getNftID))
+        const {name} = await system.$commonFun.getUnit(Number(props.getNftID))
         await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
         return
       }
@@ -274,14 +295,17 @@ export default defineComponent({
       fd.append('chain_id', getID)
       fd.append('contract_address', props.contractAddress)
       fd.append('recipient', dataNFTForm.recipient)
-      fd.append('ipfs_uri', `${licenseRes.data.gateway}/ipfs/${licenseRes.data.metadata_cid}`)
+      fd.append('ipfs_uri', licenseIPFS.value)
       const spaceName = route.params.name ? route.params.name : props.personalCenter.name;
       if (route.name === 'datasetDetail') {
         const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)
         const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/create_license`, 'post', fd)
-      } else {
+      } else if (route.name === 'spaceDetail') {
         const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)
         const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/create_license`, 'post', fd)
+      } else if (route.name === 'personalCenter'){
+        const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${props.personalCenter.source_type === 'Dataset' ? 'datasets' : 'spaces'}/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)
+        const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${props.personalCenter.source_type === 'Dataset' ? 'datasets' : 'spaces'}/create_license`, 'post', fd)
       }
     }
 
@@ -312,21 +336,26 @@ export default defineComponent({
 .dataNFT_pop {
   @media screen and (max-width: 1024px) {
   }
+
   :deep(.doi_body) {
     .el-dialog__body {
       .el-form {
         padding: 0.05rem 0.25rem 0.15rem !important;
+
         .el-form-item {
           margin: 12px 0;
+
           .el-tag {
             margin-right: 5px;
             background-color: #f3f1ff;
             color: #562683;
             border-color: #f1f1f2;
+
             .el-tag__close {
               color: inherit;
             }
           }
+
           .button-new-tag {
             &:hover,
             &:focus {
@@ -335,12 +364,15 @@ export default defineComponent({
               border-color: #f1f1f2;
             }
           }
+
           &.form-flex {
             .el-form-item__content {
               flex-wrap: inherit;
+
               .m {
                 padding: 0 5px;
               }
+
               .el-button {
                 &:hover,
                 &:focus {

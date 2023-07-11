@@ -119,7 +119,7 @@
           {{ 'Space NFT (SNFT)' }}
 
           <el-button class="request_btn" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
-          <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" @click="requestInitData()">Refresh</el-button>
+          <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
           <div class="tip">
@@ -154,7 +154,7 @@
               </el-table-column>
               <el-table-column label="Ipfs URL">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
+                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined'?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
@@ -488,7 +488,7 @@ export default defineComponent({
         }
         // estimate gas
         let estimatedGas = await factory.methods
-          .claimDataNFT(route.params.name)
+          .claimDataNFT(1, route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         // we will use estimated gas * 1.5
@@ -500,7 +500,7 @@ export default defineComponent({
         // call contract
         console.log('Deploying Data NFT...')
         const tx = await factory.methods
-          .claimDataNFT(route.params.name)
+          .claimDataNFT(1, route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -547,13 +547,13 @@ export default defineComponent({
         }
 
         let estimatedGas = await factory.methods
-          .requestDataNFT(route.params.name)
+          .requestDataNFT(1, route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         let gasLimit = Math.floor(estimatedGas * 1.5)
 
         await factory.methods
-          .requestDataNFT(route.params.name)
+          .requestDataNFT(1, route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -587,7 +587,7 @@ export default defineComponent({
         return
       }
       try {
-        const request = await factory.methods.requestData(route.params.wallet_address, route.params.name).call().then()
+        const request = await factory.methods.requestData(1, route.params.wallet_address, route.params.name).call().then()
         console.log('request:', request)
         if (request.fulfilled && request.claimable) {
           claimDataNFT()
