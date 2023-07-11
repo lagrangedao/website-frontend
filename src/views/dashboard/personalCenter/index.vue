@@ -258,7 +258,7 @@
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+                <p class="ellipsis">{{hiddAddress(list.space_owner)}}</p>
               </div>
               <div class="text item">
                 <div class="item_body">
