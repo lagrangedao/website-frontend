@@ -192,7 +192,7 @@
             <el-card :class="{'box-card':true,'is-hover': list.cid&&list.cid !== 'undefined','is-disabled': !(list.cid&&list.cid !== 'undefined')}" v-show="!listdata.licenseIsShow ? l<3: true" @click="detailFun(list, 'licenses')">
               <div class="text">
                 <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.space_name}}</p>
+                <p class="ellipsis">{{list.name}}</p>
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
