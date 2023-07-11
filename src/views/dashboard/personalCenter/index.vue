@@ -79,7 +79,8 @@
                 <el-dropdown-menu>
                   <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests_notifications" :key="c">
                     <div class="drop_body">
-                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your space license:
+                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your
+                        {{child.source_type ? (child.source_type):''}} license:
                         <b>{{child.name}}</b>
                       </p>
                       <el-button @click="licenseMetaData(child)" type="primary" size="small">Approve</el-button>
@@ -196,7 +197,14 @@
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.space_owner)}}</p>
+                <p class="ellipsis" v-if="list.type === 'Space License'">{{hiddAddress(list.space_owner)}}</p>
+                <p class="ellipsis" v-else>{{hiddAddress(list.dataset_owner)}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{list.type}}</span>
+                </div>
               </div>
               <div class="text item">
                 <div class="item_body">
@@ -424,7 +432,9 @@ export default defineComponent({
     }
     async function licenseFun (row, type) {
       listLoad.value = true
-      const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
+      console.log(row.source_type)
+      const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${row.source_type === "Space" ? 'spaces' : 'datasets'}/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
+      // const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
       if (approveRes && approveRes.status === 'success') system.$commonFun.messageTip('success', approveRes.message ? approveRes.message : 'Request successful.')
       else system.$commonFun.messageTip('error', approveRes.message ? approveRes.message : 'Request failed!')
       getdataList()
