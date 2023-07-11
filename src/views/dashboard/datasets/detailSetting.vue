@@ -489,6 +489,7 @@ export default defineComponent({
     }
 
     async function requestInitData (type) {
+      if (route.name !== 'datasetDetail') return
       listLoad.value = true
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
