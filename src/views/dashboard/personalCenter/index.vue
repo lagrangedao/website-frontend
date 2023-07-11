@@ -188,7 +188,7 @@
           </div>
         </div>
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.licenseIsShow}" v-loading="listLoad">
-          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.owned_licenses" :key="l">
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.received_licenses" :key="l">
             <el-card :class="{'box-card':true,'is-hover': list.cid&&list.cid !== 'undefined','is-disabled': !(list.cid&&list.cid !== 'undefined')}" v-show="!listdata.licenseIsShow ? l<3: true" @click="detailFun(list, 'licenses')">
               <div class="text">
                 <i class="icon icon_text"></i>
@@ -207,7 +207,7 @@
             </el-card>
           </el-col>
         </el-row>
-        <div class="more_style" v-if="listdata.owned_licenses.length>3">
+        <div class="more_style" v-if="listdata.received_licenses.length>3">
           <img v-if="!listdata.licenseIsShow" @click="listdata.licenseIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img v-else @click="listdata.licenseIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
@@ -278,7 +278,7 @@ export default defineComponent({
     const listdata = reactive({
       spaces: [],
       datasets: [],
-      owned_licenses: [],
+      received_licenses: [],
       license_requests_notifications: [],
       outgoing_pending_license_requests: [],
       user: {},
@@ -329,11 +329,11 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         listdata.spaces = listRes.data.space || []
         listdata.datasets = listRes.data.dataset || []
-        listdata.owned_licenses = listRes.data.owned_licenses || []
+        listdata.received_licenses = listRes.data.received_licenses || []
         listdata.license_requests_notifications = listRes.data.license_requests_notifications || []
         listdata.outgoing_pending_license_requests = listRes.data.outgoing_pending_license_requests || []
         listdata.user = listRes.data.user || {}
-        licenseIndex.value = listRes.data.owned_licenses.length
+        licenseIndex.value = listRes.data.received_licenses.length
         dataSetIndex.value = listRes.data.dataset.length
         spacesIndex.value = listRes.data.space.length
         store.dispatch('setAccessAvatar', listRes.data.user.avatar)
@@ -354,7 +354,7 @@ export default defineComponent({
       } else {
         listdata.spaces = []
         listdata.datasets = []
-        listdata.owned_licenses = []
+        listdata.received_licenses = []
         listdata.license_requests_notifications = []
         listdata.outgoing_pending_license_requests = []
         listdata.user = {}
@@ -447,7 +447,7 @@ export default defineComponent({
       listdata.licenseIsShow = false
       listdata.spaces = []
       listdata.datasets = []
-      listdata.owned_licenses = []
+      listdata.received_licenses = []
       listdata.license_requests_notifications = []
       listdata.outgoing_pending_license_requests = []
       listdata.user = {}
