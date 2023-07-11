@@ -61,7 +61,7 @@
                     <div class="drop_body margin">
                       <p>
                         {{c+1}}.
-                        <b>{{child.space_name}}</b>
+                        <b>{{child.name}}</b>
                       </p>
                     </div>
                   </el-dropdown-item>
@@ -80,7 +80,7 @@
                   <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests_notifications" :key="c">
                     <div class="drop_body">
                       <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your space license:
-                        <b>{{child.space_name}}</b>
+                        <b>{{child.name}}</b>
                       </p>
                       <el-button @click="licenseMetaData(child)" type="primary" size="small">Approve</el-button>
                       <el-button @click="licenseFun(child, 'reject')" type="danger" size="small">Reject</el-button>
@@ -254,11 +254,17 @@
             <el-card class="box-card" @click="detailFun(list, 'licenses')">
               <div class="text">
                 <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
+                <p class="ellipsis">{{list.space_name}}</p>
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
                 <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
               </div>
             </el-card>
           </el-col>
