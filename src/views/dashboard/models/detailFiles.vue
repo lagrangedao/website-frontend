@@ -1025,6 +1025,7 @@ export default defineComponent({
               display: flex;
               align-items: center;
               cursor: pointer;
+              line-height: 1;
               i,
               svg {
                 width: 17px;
