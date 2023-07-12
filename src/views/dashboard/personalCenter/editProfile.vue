@@ -15,14 +15,13 @@
           <el-input v-model="ruleForm.name" placeholder="Full name" />
         </div>
       </el-form-item>
-      <el-form-item prop="avatar">
+      <!-- <el-form-item prop="avatar">
         <label class="label">
           Avatar
           <span class="span">(optional)</span>
         </label>
         <div class="flex flex-row">
           <el-upload class="avatar-uploader" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" action="#" :auto-upload="false">
-            <!-- <img v-if="ruleForm.avatar" :src="ruleForm.avatar" class="avatar" /> -->
             <el-button class="avatar-uploader-icon" type="" text bg>Upload file</el-button>
           </el-upload>
         </div>
@@ -30,7 +29,7 @@
           <img class="img" :src="ruleForm.avatar" />
           <div class="remove" @click="removeAvatar">Remove</div>
         </div>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item prop="homepage">
         <label class="label">
           Homepage
@@ -165,9 +164,6 @@ export default defineComponent({
       // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
-    function changeNetChange (rows) {
-      system.$commonFun.changeNet(rows)
-    }
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
@@ -262,7 +258,7 @@ export default defineComponent({
       prevType,
       listLoad,
       fileList,
-      getdataList, changeNetChange, momentFilter, detailFun, submitForm, editAvatar,
+      getdataList, momentFilter, detailFun, submitForm, editAvatar,
       handleChange, handleRemove, removeAvatar
     }
   }

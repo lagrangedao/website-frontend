@@ -98,43 +98,8 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-    const dataList = reactive({
-      Tasks: [
-        'Text Classification', 'Text Retrieval', 'Text Generation', 'Question Answering',
-        'Token Classification', 'Text2Text Generation', 'Voice Activity Detection'
-      ],
-      SubTasks: [
-        'language-modeling', 'multi-class-classification', 'named-entity-recognition',
-        'extractive-qa', 'natural-language-inference'
-      ],
-      Sizes: [
-        'n<1K', '1K<n<10K', '10K<n<100K', '100K<n<1M', '1M<n<10M', '10M<n<100M', '100M<n<1B', '1B<n<10B',
-        '10B<b<100B', '100B<n<1T', 'n>1T'
-      ],
-      Licenses: [
-        'mit', 'apache-2.0', 'cc-by-4.0', 'other', 'cc-by-sa-4.0'
-      ]
-    })
     const searchValue = ref('')
     const value = ref('')
-    const options = ref([
-      {
-        value: 'Option1',
-        label: 'Most Downloads',
-      },
-      {
-        value: 'Option2',
-        label: 'Alphabetical',
-      },
-      {
-        value: 'Option3',
-        label: 'Recently Updated',
-      },
-      {
-        value: 'Option4',
-        label: 'Most Likes',
-      }
-    ])
     const currentPage1 = ref(1)
     const small = ref(false)
     const background = ref(false)
@@ -274,10 +239,8 @@ export default defineComponent({
     })
     return {
       lagLogin,
-      dataList,
       searchValue,
       value,
-      options,
       currentPage1,
       small,
       background,

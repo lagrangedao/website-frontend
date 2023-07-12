@@ -31,11 +31,6 @@
                 <el-button type="primary" @click="signFun">
                   <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> {{$t('fs3Login.Connect_cont_Wallet')}}
                 </el-button>
-                <!-- <p v-if="loadingText">please switch to
-                  <span style="text-decoration: underline;" @click="changeNetChange(3141)">Filecoin TestNet</span> or
-                  <span style="text-decoration: underline;" @click="changeNetChange(137)">Polygon Mainnet</span> or
-                  <span style="text-decoration: underline;" @click="changeNetChange(97)">BSC TestNet</span> or
-                  <span style="text-decoration: underline;" @click="changeNetChange(11155111)">Sepolia Testnet</span>.</p> -->
               </div>
             </div>
           </el-col>
@@ -165,10 +160,6 @@ export default defineComponent({
         return '-'
       }
     }
-    async function changeNetChange (rows) {
-      await system.$commonFun.changeNet(rows)
-      signIn()
-    }
     function fn () {
       document.addEventListener('visibilitychange', function () {
         prevType.value = !document.hidden
@@ -249,7 +240,7 @@ export default defineComponent({
       system,
       route,
       router,
-      signFun, signIn, hiddAddress, changeNetChange, getStart, submitEmail
+      signFun, signIn, hiddAddress, getStart, submitEmail
     }
   }
 })
@@ -266,7 +257,8 @@ export default defineComponent({
   color: #fff;
   background: #180e1a url(../../../assets/images/dashboard/main/bg.jpg)
     no-repeat center;
-  background-size: auto 100%;
+  // background-size: auto 100%;
+  background-size: cover;
   font-size: 18px;
   text-align: left;
   @media screen and (max-width: 1200px) {

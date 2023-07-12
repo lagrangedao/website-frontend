@@ -88,7 +88,7 @@
           </el-col>
         </el-row>
       </div>
-      <div class="fileList" v-loading="renameLoad">
+      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -118,8 +118,8 @@
         <div class="title">
           {{ 'Space NFT (SNFT)' }}
 
-          <el-button class="request_btn" v-if="nftdata.status === 'success'" @click="dataNFTRequest = true">Create new License</el-button>
-          <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" @click="requestInitData()">Refresh</el-button>
+          <el-button class="request_btn" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
+          <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
           <div class="tip">
@@ -128,8 +128,12 @@
           </div>
           <div v-if="nftdata.status === 'success' || (nftdata.tokens && nftdata.tokens.length>0)">
             <div class="contract tip">
-              Contract Address:
-              <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
+              <div class="flex-left">Contract Address:
+                <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
+              </div>
+              <div class="flex-right">
+                <i class="icon icon_star"></i>: Licenses owned by yourself
+              </div>
             </div>
             <el-table :data="nftdata.tokens" stripe style="width: 100%" class="nft_table">
               <el-table-column prop="chain_id" label="Chain ID">
@@ -142,18 +146,19 @@
                   <a :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
                 </template>
               </el-table-column>
-              <el-table-column prop="owner_address" label="Owner Address">
+              <el-table-column prop="owner_address" label="Owner Address" min-width="140">
                 <template #default="scope">
+                  <i class="icon" :class="{'icon_star':scope.row.owner_address === route.params.wallet_address}"></i>
                   <span>{{scope.row.owner_address}}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Ipfs URL">
+              <el-table-column prop="status" label="Status" />
+              <el-table-column label="Share License Info" min-width="110">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" @click="copyName(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
+                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined'?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Get shared link</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
-              <el-table-column prop="status" label="Status" />
             </el-table>
           </div>
           <div v-else-if="nftdata.status === 'processing'" class="process_style">
@@ -203,7 +208,9 @@
     <el-dialog v-model="dialogDOIVisible" title="SNFT Agreement" :show-close="false" :close-on-click-modal="false" custom-class="doi_body" @close="beforeClose">
       <div v-if="manageDOI">
         <div class="tip">
-          Generating a SNFT restricts certain features of the space: it will no longer be possible to rename, transfer, delete or change the visibility to private.
+          Generating a SNFT restricts certain features of the space: It will NOT be possible to
+          <b>rename</b> or
+          <b>transfer</b>.
         </div>
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your space and your name to
@@ -227,14 +234,14 @@
           <p>
             <label>Owner:</label>
             {{ eventArgs.owner }}
-            <el-icon v-if="eventArgs.owner" @click="copyName(eventArgs.owner, 'Copied')">
+            <el-icon v-if="eventArgs.owner" @click="system.$commonFun.copyContent(eventArgs.owner, 'Copied')">
               <DocumentCopy />
             </el-icon>
           </p>
           <p>
             <label>IPFS URL:</label>
             {{ eventArgs.ipfs_url }}
-            <el-icon v-if="eventArgs.ipfs_url" @click="copyName(eventArgs.ipfs_url, 'Copied')">
+            <el-icon v-if="eventArgs.ipfs_url" @click="system.$commonFun.copyContent(eventArgs.ipfs_url, 'Copied')">
               <DocumentCopy />
             </el-icon>
           </p>
@@ -306,8 +313,6 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   CaretBottom, Warning, DocumentCopy
 } from '@element-plus/icons-vue'
-import tokenABI from '@/utils/abi/LagrangeDAOToken.json'
-import hyperspaceABI from '@/utils/abi/SpacePayment.json'
 import hardwareList from '@/utils/hardware-list.js'
 import dataNft from '@/components/dataNFT.vue'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
@@ -410,6 +415,7 @@ export default defineComponent({
     const listLoad = ref(false)
     const dialogDOIVisible = ref(false)
     const dataNFTRequest = ref(false)
+    const chainIdRes = ref(true)
     const eventArgs = reactive({
       owner: '',
       ipfs_url: ''
@@ -419,7 +425,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_POLYGON_ADDRESS)
+    const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
@@ -475,19 +481,16 @@ export default defineComponent({
         }
       })
     }
-    function copyName (text, tipCont) {
-      system.$commonFun.copyContent(text, tipCont)
-    }
     async function claimDataNFT () {
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
           generateLoad.value = false
           return false
         }
         // estimate gas
         let estimatedGas = await factory.methods
-          .claimDataNFT(route.params.name)
+          .claimDataNFT(1, route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         // we will use estimated gas * 1.5
@@ -499,7 +502,7 @@ export default defineComponent({
         // call contract
         console.log('Deploying Data NFT...')
         const tx = await factory.methods
-          .claimDataNFT(route.params.name)
+          .claimDataNFT(1, route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -539,27 +542,20 @@ export default defineComponent({
     async function requestNFT () {
       generateLoad.value = true
       try {
-        const loginJudg = await system.$commonFun.changeIDLogin()
-        if (!loginJudg) {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
           generateLoad.value = false
           return false
         }
-        let ipfsURL = ''
-        const generateRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${route.params.name}/generate_metadata`, 'post')
-        if (generateRes && generateRes.status === 'success') ipfsURL = `${generateRes.data.gateway}/ipfs/${generateRes.data.metadata_cid}` || ''
-        else {
-          system.$commonFun.messageTip('error', generateRes.message ? generateRes.message : 'Request failed!')
-          return
-        }
 
         let estimatedGas = await factory.methods
-          .requestDataNFT(route.params.name, ipfsURL)
+          .requestDataNFT(1, route.params.name)
           .estimateGas({ from: store.state.metaAddress })
 
         let gasLimit = Math.floor(estimatedGas * 1.5)
 
         await factory.methods
-          .requestDataNFT(route.params.name, ipfsURL)
+          .requestDataNFT(1, route.params.name)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -593,7 +589,7 @@ export default defineComponent({
         return
       }
       try {
-        const request = await factory.methods.requestData(route.params.wallet_address, route.params.name).call().then()
+        const request = await factory.methods.requestData(1, route.params.wallet_address, route.params.name).call().then()
         console.log('request:', request)
         if (request.fulfilled && request.claimable) {
           claimDataNFT()
@@ -632,15 +628,23 @@ export default defineComponent({
         return []
       }
     }
+    async function ownerAddress (nft_contract, index) {
+      try {
+        const owner = await nft_contract.methods.ownerOf(index).call().then()
+        return owner
+      } catch  {
+        return ''
+      }
+    }
     async function mapTokens (list, nft_contract, contract_address, gateway) {
       const number = list ? list.length : 0
       for (let token = 0; token < number; token++) {
         let { name, url } = await system.$commonFun.getUnit(parseInt(list[token].chain_id), 16)
         list[token].contract_address = contract_address
-        list[token].owner_address = list[token].token_id ? await nft_contract.methods.ownerOf(list[token].token_id).call() : ''
+        list[token].owner_address = list[token].token_id && list[token].token_id !== null ? await ownerAddress(nft_contract, list[token].token_id) : ''
         list[token].chain_name = name
         list[token].chain_url = url
-        list[token].ipfs_url = `${gateway}/ipfs/${list[token].licnese_cid}`
+        list[token].ipfs_url = `${gateway}/ipfs/${list[token].cid}`
       }
       return list
     }
@@ -702,6 +706,7 @@ export default defineComponent({
       requestInitData()
       hardwareOptions.value = hardwareList
       settingIndex.value = await spaceIndex()
+      chainIdRes.value = await system.$commonFun.changeIDLogin(1)
     })
     onDeactivated(() => {
       ruleForm.name = ''
@@ -740,8 +745,9 @@ export default defineComponent({
       generateLoad,
       manageDOI,
       eventArgs,
+      chainIdRes,
       props, submitForm, submitDeleteForm, momentFilter, sleepChange,
-      handleChange, requestInitData, beforeClose, requestNFT, refreshContract, copyName
+      handleChange, requestInitData, beforeClose, requestNFT, refreshContract
     }
   }
 })
@@ -815,6 +821,15 @@ export default defineComponent({
         font-weight: normal;
         color: #666;
         line-height: 1.5;
+        &.contract {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .flex-right {
+            display: flex;
+            align-items: center;
+          }
+        }
       }
       .tip_new {
         padding-top: 0.2rem;
@@ -974,6 +989,17 @@ export default defineComponent({
           }
         }
       }
+      .icon {
+        display: block;
+        width: 16px;
+        height: 16px;
+        margin: 0 0.07rem 0 0;
+      }
+      .icon_star {
+        background: url(../../../assets/images/icons/owner_star.png) no-repeat
+          left center;
+        background-size: 100%;
+      }
       .el-table {
         text-align: left;
         // border-top: 1px solid #e4e4e4;
@@ -996,6 +1022,8 @@ export default defineComponent({
           td {
             padding: 0;
             .cell {
+              display: flex;
+              align-items: center;
               padding: 0.2rem;
               font-family: "FIRACODE-REGULAR";
               font-size: 15px;
@@ -1022,6 +1050,9 @@ export default defineComponent({
                 @media screen and (min-width: 1800px) {
                   font-size: 16px;
                 }
+              }
+              .el-button {
+                margin: 0;
               }
             }
           }
@@ -1355,7 +1386,7 @@ export default defineComponent({
       .tip,
       .tip_black,
       .tip_text {
-        padding: 0.1rem 0.25rem 0.2rem;
+        padding: 0.1rem 0.25rem;
         background-color: #f3f1ff;
         color: #562683;
         font-size: 14px;
@@ -1389,6 +1420,13 @@ export default defineComponent({
           svg {
             cursor: pointer;
           }
+        }
+      }
+
+      .tip {
+        color: red;
+        b {
+          text-transform: uppercase;
         }
       }
 

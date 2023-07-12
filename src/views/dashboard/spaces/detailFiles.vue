@@ -48,7 +48,6 @@
                   <img src="@/assets/images/icons/icon_41.png" alt="" />
                 </div>
                 <span class="is_file">{{scope.row.title}}</span>
-                <!-- <a class="is_file" :href="scope.row._originPath.url" target="_blank" :title="scope.row.title">{{scope.row.title}}</a> -->
               </div>
             </template>
           </el-table-column>
@@ -60,7 +59,7 @@
           <el-table-column label="url" min-width="140">
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
-              <a v-else :href="scope.row._originPath.url" target="_blank">{{scope.row._originPath.url}}</a>
+              <a v-else :href="`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`}}</a>
             </template>
           </el-table-column>
           <el-table-column label="Created At" align="right" min-width="110">
@@ -75,7 +74,7 @@
         <div v-else-if="labelTab === 'edit'" class="uploadBody">
           <div class="top_title">
             <div class="left">
-              <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt=""> {{metaAddress === route.params.wallet_address?accessName:'-'}}
+              <img :src="peopleImg" class="people" width="30" height="30" alt=""> {{peopleName|| hiddAddress(route.params.wallet_address)}}
             </div>
             <div class="right" :title="momentFilter(fileBody._originPath.created_at)">
               {{calculateDiffTime(fileBody._originPath.created_at)}}
@@ -85,7 +84,7 @@
             <div class="worktop" style="justify-content: space-between;">
               <ul>
                 <li v-if="fileTextType !== 'binary'">
-                  <a :href="fileBody._originPath.url" target="_blank" :title="fileBody.title">
+                  <a :href="`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`" target="_blank" :title="fileBody.title">
                     <svg class="mr-raw" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" style="transform: rotate(360deg);">
                       <path d="M31 16l-7 7l-1.41-1.41L28.17 16l-5.58-5.59L24 9l7 7z" fill="currentColor"></path>
                       <path d="M1 16l7-7l1.41 1.41L3.83 16l5.58 5.59L8 23l-7-7z" fill="currentColor"></path>
@@ -228,10 +227,9 @@ export default defineComponent({
   setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
-    const accessAvatar = computed(() => (store.state.accessAvatar))
-    const accessName = computed(() => (store.state.accessName))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-    const people_img = require("@/assets/images/dashboard/people_default.png")
+    const peopleImg = require("@/assets/images/dashboard/people_default.png")
+    const peopleName = ref('')
     const tableLayout = ref('fixed')
     const labelTab = ref('list')
     const listdata = reactive({})
@@ -309,6 +307,10 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         fileRow.fileResdata = listRes.data.files || []
         listdata.value = listRes.data.space || { name: route.params.name }
+        if (listRes.data.owner) {
+          // if (listRes.data.owner.avatar) peopleImg.value = listRes.data.owner.avatar
+          peopleName.value = listRes.data.owner.full_name || ''
+        }
         const current = Math.floor(Date.now() / 1000)
         let expireTime = current
         if (listRes.data.space.expiration_time) {
@@ -572,7 +574,7 @@ export default defineComponent({
       fileTextShow.value = false
       fileBody._originPath = row._originPath
       fileBody.title = row.title
-      await getTitle(fileBody._originPath.url)
+      await getTitle(`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`)
     }
     const getTitle = async (url) => {
       if (!url) return
@@ -657,6 +659,10 @@ export default defineComponent({
 
       if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    }
+    function hiddAddress (val) {
+      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
+      else return '-'
     }
 
     const treeify = (nodeList) => {
@@ -769,11 +775,10 @@ export default defineComponent({
       init()
     })
     return {
-      accessAvatar,
-      accessName,
+      peopleName,
       metaAddress,
       lagLogin,
-      people_img,
+      peopleImg,
       tableLayout,
       labelTab,
       listdata,
@@ -800,7 +805,7 @@ export default defineComponent({
       blobSize,
       init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile
+      calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile, hiddAddress
     }
   }
 })
@@ -1038,6 +1043,7 @@ export default defineComponent({
               display: flex;
               align-items: center;
               cursor: pointer;
+              line-height: 1;
               i,
               svg {
                 width: 17px;

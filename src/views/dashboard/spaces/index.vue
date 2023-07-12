@@ -19,7 +19,7 @@
               <el-input v-model="searchValue" clearable @input="searchChange()" class="search_name w-50 m-2" placeholder="search Space" />
             </div>
             <div class="top_input_search">
-              <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: most Downloads">
+              <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: Alphabetical">
                 <template #prefix>
                   <i class="el-icon-select"></i>
                 </template>
@@ -28,7 +28,7 @@
               <el-button @click="clearMethod('clear')">Clear</el-button>
             </div>
           </div>
-          <div class="title">
+          <div class="title" style="cursor: pointer;" @click="sortChange('likes')">
             Spaces of the week
             <i class="icon icon_week"></i>
           </div>
@@ -76,7 +76,7 @@ export default defineComponent({
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const accessName = computed(() => (store.state.accessName))
     const searchValue = ref('')
-    const optionsValue = ref('')
+    const optionsValue = ref('updated')
     const small = ref(false)
     const background = ref(false)
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -84,10 +84,10 @@ export default defineComponent({
     const spaceData = ref([])
     const spaceDataAll = ref([])
     const options = ref([
-      {
-        value: 'downloads',
-        label: 'Most Downloads',
-      },
+      // {
+      //   value: 'downloads',
+      //   label: 'Most Downloads',
+      // },
       {
         value: 'alphabetical',
         label: 'Alphabetical',
@@ -105,7 +105,7 @@ export default defineComponent({
       pageSize: 12,
       pageNo: 1,
       total: 0,
-      sort: ''
+      sort: 'updated'
     })
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -120,8 +120,6 @@ export default defineComponent({
     async function searchChange (val) {
       // spaceData.value = await filterData(spaceDataAll.value, val)
       pagin.pageNo = 1
-      pagin.sort = ''
-      optionsValue.value = ''
       const name = val ? val.wallet_address : ''
       init(name)
     }
@@ -129,8 +127,8 @@ export default defineComponent({
       searchValue.value = ''
       pagin.pageNo = 1
       pagin.total = 0
-      pagin.sort = ''
-      optionsValue.value = ''
+      pagin.sort = 'updated'
+      optionsValue.value = 'updated'
       if (type) init()
     }
     function filterData (spaceData, val) {

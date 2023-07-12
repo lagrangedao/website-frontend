@@ -238,7 +238,7 @@
           <b>Your new Access Token is：</b>
         </p>
         <p style="text-indent:0.1rem">{{apiCont.access}}
-          <span class="el-icon-document-copy" @click="accessCopy"></span>
+          <span class="el-icon-document-copy" @click="system.$commonFun.copyContent(apiCont.access, 'Copied')"></span>
         </p>
       </div>
       <div class="apiTipCont" v-else>
@@ -386,33 +386,6 @@ export default defineComponent({
       getdataList()
     }
 
-    function copyName (text) {
-      var txtArea = document.createElement('textarea')
-      txtArea.id = 'txt'
-      txtArea.style.position = 'fixed'
-      txtArea.style.top = '0'
-      txtArea.style.left = '0'
-      txtArea.style.opacity = '0'
-      txtArea.value = text
-      document.body.appendChild(txtArea)
-      txtArea.select()
-
-      try {
-        var successful = document.execCommand('copy')
-        var msg = successful ? 'successful' : 'unsuccessful'
-        console.log('Copying text command was ' + msg)
-        if (successful) {
-          system.$commonFun.messageTip('success', 'Copied')
-          return true
-        }
-      } catch (err) {
-        console.log('Oops, unable to copy')
-      } finally {
-        document.body.removeChild(txtArea)
-      }
-      return false
-    }
-
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
@@ -509,7 +482,7 @@ export default defineComponent({
       expiration_month_options,
       expiration_year,
       expiration_year_options,
-      getdataList, createCom, deleteCom, copyName, detailSetting, calculateDiffTime, momentFilter, handleChange, handleRemove, handleSelectionChange
+      getdataList, createCom, deleteCom, detailSetting, calculateDiffTime, momentFilter, handleChange, handleRemove, handleSelectionChange
     }
   }
 })

@@ -12,11 +12,11 @@
           <i class="icon icon_spaces"></i>
           Space:
           <b>{{route.params.name}}</b>
-          <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
-          <el-button-group class="ml-4" >
-            <el-button @click="likeMethod" v-if="likeValue">
+          <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
+          <el-button-group class="ml-4">
+            <el-button @click="likeMethod" v-if="likeOwner">
               <i class="icon icon_like"></i>Unlike</el-button>
-            <el-button @click="likeMethod" v-else>
+            <el-button @click="likeMethod" v-else :disabled="metaAddress?false:true">
               <i class="icon icon_like"></i>Like</el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
@@ -32,7 +32,7 @@
           <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime < 0">
             <el-button type="warning" plain @click="renewFun">Restart</el-button>
           </el-button-group>
-          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
               <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
                 p-id="2675" fill="#878c93"></path>
@@ -145,43 +145,8 @@ export default defineComponent({
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-    const dataList = reactive({
-      Tasks: [
-        'Text Classification', 'Text Retrieval', 'Text Generation', 'Question Answering',
-        'Token Classification', 'Text2Text Generation', 'Voice Activity Detection'
-      ],
-      SubTasks: [
-        'language-modeling', 'multi-class-classification', 'named-entity-recognition',
-        'extractive-qa', 'natural-language-inference'
-      ],
-      Sizes: [
-        'n<1K', '1K<n<10K', '10K<n<100K', '100K<n<1M', '1M<n<10M', '10M<n<100M', '100M<n<1B', '1B<n<10B',
-        '10B<b<100B', '100B<n<1T', 'n>1T'
-      ],
-      Licenses: [
-        'mit', 'apache-2.0', 'cc-by-4.0', 'other', 'cc-by-sa-4.0'
-      ]
-    })
     const searchValue = ref('')
     const value = ref('')
-    const options = ref([
-      {
-        value: 'Option1',
-        label: 'Most Downloads',
-      },
-      {
-        value: 'Option2',
-        label: 'Alphabetical',
-      },
-      {
-        value: 'Option3',
-        label: 'Recently Updated',
-      },
-      {
-        value: 'Option4',
-        label: 'Most Likes',
-      }
-    ])
     const currentPage1 = ref(1)
     const small = ref(false)
     const background = ref(false)
@@ -241,6 +206,7 @@ export default defineComponent({
     const forkLoad = ref(false)
     const parentValue = ref('')
     const likeValue = ref(0)
+    const likeOwner = ref(false)
     const likesValue = ref(false)
     const drawer = ref(false)
     const direction = ref('btt')
@@ -253,6 +219,7 @@ export default defineComponent({
       contract_address: null,
       chain_id: null
     })
+    const nftTokens = ref([])
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -267,32 +234,6 @@ export default defineComponent({
         .toString()
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
-    function copyName (text) {
-      var txtArea = document.createElement('textarea')
-      txtArea.id = 'txt'
-      txtArea.style.position = 'fixed'
-      txtArea.style.top = '0'
-      txtArea.style.left = '0'
-      txtArea.style.opacity = '0'
-      txtArea.value = text
-      document.body.appendChild(txtArea)
-      txtArea.select()
-
-      try {
-        var successful = document.execCommand('copy')
-        var msg = successful ? 'successful' : 'unsuccessful'
-        console.log('Copying text command was ' + msg)
-        if (successful) {
-          system.$commonFun.messageTip('success', 'Copied')
-          return true
-        }
-      } catch (err) {
-        console.log('Oops, unable to copy')
-      } finally {
-        document.body.removeChild(txtArea)
-      }
-      return false
     }
     const handleValue = async (value, log, time, nftCont) => {
       var numReg = /^[0-9]*$/
@@ -313,6 +254,7 @@ export default defineComponent({
       if (nftCont) {
         nft.contract_address = nftCont.contract_address
         nft.chain_id = nftCont.chain_id
+        nftTokens.value = nftCont.tokens || []
       }
       forkLoad.value = false
     }
@@ -334,6 +276,8 @@ export default defineComponent({
       logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
+      if (metaAddress.value) likesData()
+      else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
     }
     function back () {
       router.push({ path: '/spaces' })
@@ -348,7 +292,7 @@ export default defineComponent({
       forkLoad.value = false
     }
     async function reqNFT () {
-      if (!nft.contract_address) return
+      if (!nft.contract_address || nftTokens.value.length === 0) return
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       if (getID.toString() !== nft.chain_id) {
         const { name } = await system.$commonFun.getUnit(Number(nft.chain_id))
@@ -371,15 +315,18 @@ export default defineComponent({
     }
     async function likeMethod () {
       forkLoad.value = true
-      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
-      if (getLikeRes && getLikeRes.data.liked) {
+      if (likeOwner.value) {
         const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
-        console.log('unlikeRes', unlikeRes)
       } else {
         const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
-        console.log('likeRes', likeRes)
       }
       likesValue.value = !likesValue.value
+      likesData()
+    }
+    const likesData = async () => {
+      forkLoad.value = true
+      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
+      if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
     onActivated(() => init())
     watch(route, (to, from) => {
@@ -393,10 +340,8 @@ export default defineComponent({
       accessSpace,
       metaAddress,
       lagLogin,
-      dataList,
       searchValue,
       value,
-      options,
       currentPage1,
       small,
       background,
@@ -412,8 +357,9 @@ export default defineComponent({
       tableData,
       forkLoad,
       nft,
-      parentValue, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
-      NumFormat, handleCurrentChange, handleSizeChange, handleClick, copyName,
+      nftTokens,
+      parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
+      NumFormat, handleCurrentChange, handleSizeChange, handleClick,
       forkOperate, back, renewFun, reqNFT, likeMethod
     }
   }
@@ -510,7 +456,7 @@ export default defineComponent({
           background: url(../../../assets/images/icons/icon_37.png) no-repeat
             left center;
           background-size: auto 100%;
-          cursor: pointer;
+          cursor: inherit;
         }
         .el-button {
           height: 28px;

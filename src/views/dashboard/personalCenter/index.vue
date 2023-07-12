@@ -1,6 +1,5 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <!-- <network-alert v-if="loadingText"></network-alert> -->
     <el-row class="dataset_body">
       <el-col :xs="24" :sm="8" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
@@ -13,7 +12,12 @@
             </div>
             <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
             <div class="desc">Balance: {{info.balance||'-'}} {{info.unit}}</div>
-            <el-button type="" text bg @click="editProfile">Settings</el-button>
+            <div class="desc">Wallet Address: {{hiddAddress(metaAddress)}}
+              <el-icon v-if="metaAddress" @click="system.$commonFun.copyContent(metaAddress, 'Copied')">
+                <CopyDocument />
+              </el-icon>
+            </div>
+            <!-- <el-button type="" text bg @click="editProfile">Settings</el-button> -->
           </div>
           <div class="personal">
             <div class="top_text">
@@ -57,7 +61,7 @@
                     <div class="drop_body margin">
                       <p>
                         {{c+1}}.
-                        <b>{{child.space_name}}</b>
+                        <b>{{child.name}}</b>
                       </p>
                     </div>
                   </el-dropdown-item>
@@ -75,10 +79,10 @@
                 <el-dropdown-menu>
                   <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests_notifications" :key="c">
                     <div class="drop_body">
-                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your space license:
-                        <b>{{child.space_name}}</b>
+                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your {{child.source_type ? (child.source_type):''}} license:
+                        <b>{{child.name}}</b>
                       </p>
-                      <el-button @click="licenseFun(child, 'approve')" type="primary" size="small">Approve</el-button>
+                      <el-button @click="licenseMetaData(child)" type="primary" size="small">Approve</el-button>
                       <el-button @click="licenseFun(child, 'reject')" type="danger" size="small">Reject</el-button>
                     </div>
                   </el-dropdown-item>
@@ -95,28 +99,8 @@
           </div>
         </div>
         <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
-          <el-col v-if="!listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces.slice(0,2)" :key="list" @click="detailFun(list, 'space')">
-            <el-card class="box-card">
-              <template #header>
-                <div class="card-warn" v-if="list.expiration_time !== null && list.expireTime <= 7">
-                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
-                    popper-style="word-break: break-word; text-align: left;">
-                    <template #reference>
-                      <el-icon>
-                        <Warning />
-                      </el-icon>
-                    </template>
-                  </el-popover>
-                </div>
-                <div class="card-header">
-                  <span>{{list.likes}}</span>
-                </div>
-                <h1>{{list.name}}</h1>
-              </template>
-            </el-card>
-          </el-col>
-          <el-col v-if="listdata.spacesIsShow" :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="list in listdata.spaces" :key="list" @click="detailFun(list, 'space')">
-            <el-card class="box-card">
+          <el-col :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
+            <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<2: true">
               <template #header>
                 <div class="card-warn" v-if="list.expiration_time !== null && list.expireTime <= 7">
                   <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
@@ -140,43 +124,37 @@
           <img v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
+
         <div class="top">
           <div class="list">
             <div class="title">
-              <i class="icon icon_license"></i>
-              Requested License & License given by others
-              <span>{{licenseIndex}}</span>
+              <i class="icon icon_datasets"></i>
+              Datasets
+              <span>{{dataSetIndex}}</span>
             </div>
           </div>
+          <!-- <el-select v-model="value" class="m-2" placeholder="Sort: most Downloads">
+            <template #prefix>
+              <i class="el-icon-select"></i>
+            </template>
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select> -->
         </div>
-        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.licenseIsShow}" v-loading="listLoad">
-          <el-col v-show="!listdata.licenseIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.license.slice(0,3)" :key="l">
-            <el-card class="box-card">
-              <div class="text">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
-              </div>
-              <div class="text">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
-              </div>
-              <div class="text item">
-                <div class="item_body">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
+        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
+            <el-card class="box-card is-hover" v-show="!listdata.datasetsIsShow ? l<3: true">
+              <template #header>
+                <div class="card-header card-datasets">
+                  <div class="name">
+                    <!-- <div class="img"></div> -->
+                    <b>{{list.name}}</b>
+                  </div>
+                  <span>{{list.likes}}</span>
                 </div>
-                <!-- <div class="item_body">
-                  <i class="icon icon_up"></i>
-                  <span class="small">5.15M</span>
-                </div> -->
-              </div>
-            </el-card>
-          </el-col>
-          <el-col v-show="listdata.licenseIsShow" :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.license" :key="l">
-            <el-card class="box-card">
+              </template>
               <div class="text">
                 <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.name}}</p>
+                <p class="ellipsis">{{list.license}}</p>
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
@@ -195,12 +173,56 @@
             </el-card>
           </el-col>
         </el-row>
-        <div class="more_style" v-if="listdata.license.length>3">
+        <div class="more_style" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">
+          <img v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        </div>
+
+        <div class="top">
+          <div class="list">
+            <div class="title">
+              <i class="icon icon_license"></i>
+              Received Licenses
+              <span>{{licenseIndex}}</span>
+            </div>
+          </div>
+        </div>
+        <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.licenseIsShow}" v-loading="listLoad">
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.received_licenses" :key="l">
+            <el-card :class="{'box-card':true,'is-hover': list.cid&&list.cid !== 'undefined','is-disabled': !(list.cid&&list.cid !== 'undefined')}" v-show="!listdata.licenseIsShow ? l<3: true" @click="detailFun(list, 'licenses')">
+              <div class="text">
+                <i class="icon icon_text"></i>
+                <p class="ellipsis">{{list.name}}</p>
+              </div>
+              <div class="text">
+                <i class="icon icon_wallet"></i>
+                <p class="ellipsis" v-if="list.type === 'Space License'">{{hiddAddress(list.space_owner)}}</p>
+                <p class="ellipsis" v-else>{{hiddAddress(list.dataset_owner)}}</p>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_type"></i>
+                  <span class="small">{{list.type}}</span>
+                </div>
+              </div>
+              <div class="text item">
+                <div class="item_body">
+                  <i class="icon icon_time"></i>
+                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+        <div class="more_style" v-if="listdata.received_licenses.length>3">
           <img v-if="!listdata.licenseIsShow" @click="listdata.licenseIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img v-else @click="listdata.licenseIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
       </el-col>
     </el-row>
+
+    <data-nft v-if="dataNFTRequest" @handleChange="handleChange" :dataNFTRequest="dataNFTRequest" :createdAt="dataNFTRow.data.created_at" :updatedAt="dataNFTRow.data.updated_at" :contractAddress="dataNFTRow.data.contract_address" :getNftID="dataNFTRow.data.chain_id.toString()"
+      :personalCenter="dataNFTRow.data"></data-nft>
   </section>
 </template>
 <script>
@@ -209,14 +231,14 @@ import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import moment from 'moment'
-import networkAlert from '@/components/networkAlert.vue'
 import {
-  Warning
+  Warning, CopyDocument
 } from '@element-plus/icons-vue'
+import dataNft from '@/components/dataNFT.vue'
 export default defineComponent({
   name: 'Personal Center',
   components: {
-    networkAlert, Warning
+    Warning, dataNft, CopyDocument
   },
   setup () {
     const store = useStore()
@@ -225,27 +247,27 @@ export default defineComponent({
     const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const searchValue = ref('')
-    const value = ref('')
+    const value = ref('updated')
     const info = reactive({
       address: '',
       balance: '',
       unit: ''
     })
     const options = ref([
+      // {
+      //   value: 'Option1',
+      //   label: 'Most Downloads',
+      // },
       {
-        value: 'Option1',
-        label: 'Most Downloads',
-      },
-      {
-        value: 'Option2',
+        value: 'alphabetical',
         label: 'Alphabetical',
       },
       {
-        value: 'Option3',
+        value: 'updated',
         label: 'Recently Updated',
       },
       {
-        value: 'Option4',
+        value: 'likes',
         label: 'Most Likes',
       }
     ])
@@ -259,13 +281,16 @@ export default defineComponent({
     const prevType = ref(true)
     const licenseIndex = ref(0)
     const spacesIndex = ref(0)
+    const dataSetIndex = ref(0)
     const listdata = reactive({
       spaces: [],
-      license: [],
+      datasets: [],
+      received_licenses: [],
       license_requests_notifications: [],
       outgoing_pending_license_requests: [],
       user: {},
       spacesIsShow: false,
+      datasetsIsShow: false,
       licenseIsShow: false
     })
     const listLoad = ref(false)
@@ -273,6 +298,10 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const dataNFTRequest = ref(false)
+    const dataNFTRow = reactive({
+      data: {}
+    })
 
     async function isLogin () {
       loadingText.value = ''
@@ -306,15 +335,18 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.spaces = listRes.data.space || []
-        listdata.license = listRes.data.license || []
+        listdata.datasets = listRes.data.dataset || []
+        listdata.received_licenses = listRes.data.received_licenses || []
         listdata.license_requests_notifications = listRes.data.license_requests_notifications || []
         listdata.outgoing_pending_license_requests = listRes.data.outgoing_pending_license_requests || []
         listdata.user = listRes.data.user || {}
-        // licenseIndex.value = listRes.data.model.length
+        licenseIndex.value = listRes.data.received_licenses.length
+        dataSetIndex.value = listRes.data.dataset.length
         spacesIndex.value = listRes.data.space.length
         store.dispatch('setAccessAvatar', listRes.data.user.avatar)
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
+        let datasetList = []
         listdata.spaces.forEach(space => {
           const current = Math.floor(Date.now() / 1000)
           if (space.expiration_time) {
@@ -323,16 +355,20 @@ export default defineComponent({
           } else space.expireTime = current
           spaceList.push(space.name)
         })
+        listdata.datasets.forEach(space => datasetList.push(space.name))
         store.dispatch('setAccessSpace', JSON.stringify(spaceList))
+        store.dispatch('setAccessDataset', JSON.stringify(datasetList))
       } else {
         listdata.spaces = []
-        listdata.license = []
+        listdata.datasets = []
+        listdata.received_licenses = []
         listdata.license_requests_notifications = []
         listdata.outgoing_pending_license_requests = []
         listdata.user = {}
         licenseIndex.value = 0
         spacesIndex.value = 0
-        system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
+        dataSetIndex.value = 0
+        system.$commonFun.messageTip('error', listRes.error ? listRes.error : 'Failed!')
       }
       // await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -376,6 +412,7 @@ export default defineComponent({
       if (type === 'dataset') router.push({ name: 'datasetDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'space') router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'model') router.push({ name: 'modelsDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
+      else if (type === 'licenses') if (row.cid && row.cid !== 'undefined') window.open(`${row.gateway}/ipfs/${row.cid}`)
     }
     function editProfile (row, index) {
       // console.log(row, index)
@@ -384,9 +421,19 @@ export default defineComponent({
     const handleCommand = (command) => {
       // console.log(`click on item ${command}`)
     }
+    function handleChange (val, refresh) {
+      dataNFTRequest.value = val
+      if (refresh) licenseFun(dataNFTRow.data, 'approve')
+    }
+    async function licenseMetaData (row) {
+      dataNFTRow.data = row
+      dataNFTRequest.value = true
+    }
     async function licenseFun (row, type) {
       listLoad.value = true
-      const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
+      console.log(row.source_type)
+      const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${row.source_type === "Space" ? 'spaces' : 'datasets'}/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
+      // const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
       if (approveRes && approveRes.status === 'success') system.$commonFun.messageTip('success', approveRes.message ? approveRes.message : 'Request successful.')
       else system.$commonFun.messageTip('error', approveRes.message ? approveRes.message : 'Request failed!')
       getdataList()
@@ -405,14 +452,17 @@ export default defineComponent({
     })
     onDeactivated(() => {
       listdata.spacesIsShow = false
+      listdata.datasetsIsShow = false
       listdata.licenseIsShow = false
       listdata.spaces = []
-      listdata.license = []
+      listdata.datasets = []
+      listdata.received_licenses = []
       listdata.license_requests_notifications = []
       listdata.outgoing_pending_license_requests = []
       listdata.user = {}
       licenseIndex.value = 0
       spacesIndex.value = 0
+      dataSetIndex.value = 0
     })
     watch(navLogin, (newValue, oldValue) => {
       if (navLogin.value) isLogin()
@@ -436,12 +486,15 @@ export default defineComponent({
       prevType,
       licenseIndex,
       spacesIndex,
+      dataSetIndex,
       listdata,
       listLoad,
       accessAvatar,
       bodyWidth,
+      dataNFTRequest,
+      dataNFTRow,
       isLogin, signIn, getdataList, fn, momentFilter, detailFun, editProfile, hiddAddress,
-      handleCommand, licenseFun
+      handleCommand, licenseFun, licenseMetaData, handleChange
     }
   }
 })
@@ -580,7 +633,10 @@ export default defineComponent({
             }
           }
           .desc {
-            margin: 0.05rem 0 0.2rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 0.05rem 0 0.1rem;
             font-size: 15px;
             @media screen and (min-width: 1800px) {
               font-size: 17px;
@@ -590,6 +646,19 @@ export default defineComponent({
             }
             @media screen and (max-width: 768px) {
               font-size: 13px;
+            }
+            .el-icon {
+              margin: 0 0 0 0.05rem;
+              font-size: 16px;
+              color: #fff;
+              cursor: pointer;
+              svg,
+              path {
+                cursor: inherit;
+              }
+              &:hover {
+                font-size: 17px;
+              }
             }
           }
           .el-button {
@@ -740,11 +809,13 @@ export default defineComponent({
             background: url(../../../assets/images/icons/icon_17.png) no-repeat
               left 0px;
             background-size: auto 100%;
+            cursor: pointer;
           }
           .icon_info {
             background: url(../../../assets/images/icons/icon_18.png) no-repeat
               left 0px;
             background-size: auto 100%;
+            cursor: pointer;
           }
           .l {
             margin: 0 0.18rem;
@@ -940,13 +1011,21 @@ export default defineComponent({
         .el-col {
           margin: 0.16rem 0;
           .box-card {
-            padding: 0.15rem 0.2rem;
+            padding: 0.1rem 0.2rem;
             background-color: #fff;
             border-color: #e4e4e4;
             border-radius: 0.1rem;
             box-shadow: 5px 7px 9px rgba(0, 0, 0, 0.15);
             * {
               cursor: pointer;
+            }
+            &.is-disabled {
+              opacity: 0.7;
+              background-color: #eee !important;
+              cursor: no-drop;
+              * {
+                cursor: inherit;
+              }
             }
             .el-card__header {
               padding: 0;
@@ -967,6 +1046,48 @@ export default defineComponent({
                     font-size: 15px;
                   }
                 }
+                &.card-datasets {
+                  display: flex;
+                  justify-content: space-between;
+                  .name {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    width: 80%;
+                    color: #606060;
+                    @media screen and (min-width: 441px) {
+                    }
+                    b {
+                      width: calc(100% - 0.6rem);
+                      font-weight: normal;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      word-spacing: normal;
+                      text-align: left;
+                    }
+                  }
+                  .img {
+                    width: 14px;
+                    height: 14px;
+                    margin: 0 5px 0 0;
+                    background: url(../../../assets/images/icons/icon_1_1.png)
+                      no-repeat left center;
+                    background-size: 100%;
+                  }
+                  span {
+                    height: 0.25rem;
+                    padding-left: 0.23rem;
+                    background: url(../../../assets/images/icons/icon_9.png)
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
+                    font-size: 13px;
+                    color: #000;
+                    line-height: 0.25rem;
+                    @media screen and (min-width: 1800px) {
+                      font-size: 15px;
+                    }
+                  }
+                }
               }
             }
             .el-card__body {
@@ -975,7 +1096,7 @@ export default defineComponent({
                 display: flex;
                 justify-content: flex-start;
                 align-items: center;
-                margin-bottom: 0.1rem;
+                margin: 0.1rem 0;
                 color: #000;
                 line-height: 1;
                 @media screen and (min-width: 1800px) {
@@ -999,6 +1120,12 @@ export default defineComponent({
                 .icon_time {
                   width: 15px;
                   background: url(../../../assets/images/icons/icon_11.png)
+                    no-repeat left center;
+                  background-size: 100%;
+                }
+                .icon_type {
+                  width: 15px;
+                  background: url(../../../assets/images/icons/icon_50.png)
                     no-repeat left center;
                   background-size: 100%;
                 }
@@ -1066,14 +1193,17 @@ export default defineComponent({
             }
           }
           &:hover {
-            .box-card {
+            .is-hover {
               background-color: #7405ff;
               .el-card__header {
                 .card-header {
+                  .name {
+                    color: #fff;
+                  }
                   span {
                     background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 0px;
-                    background-size: 0.2rem;
+                      no-repeat left 2px;
+                    background-size: 0.17rem;
                     color: #fff;
                   }
                 }
@@ -1093,6 +1223,11 @@ export default defineComponent({
                   }
                   .icon_time {
                     background: url(../../../assets/images/icons/icon_11_1.png)
+                      no-repeat left center;
+                    background-size: 100%;
+                  }
+                  .icon_type {
+                    background: url(../../../assets/images/icons/icon_50_1.png)
                       no-repeat left center;
                     background-size: 100%;
                   }
@@ -1478,11 +1613,142 @@ export default defineComponent({
       top: 30%;
     }
   }
+  :deep(.doi_body) {
+    width: 40%;
+    max-width: 770px;
+    min-width: 300px;
+    border-radius: 0.13rem;
+    text-align: left;
+    .el-dialog__header {
+      padding: 0.17rem 0.25rem 0.1rem;
+      font-size: 17px;
+      color: #000;
+      @media screen and (max-width: 768px) {
+        font-size: 15px;
+      }
+      @media screen and (min-width: 1800px) {
+        font-size: 18px;
+      }
+    }
+
+    .el-dialog__body {
+      padding: 0;
+
+      .tip,
+      .tip_black,
+      .tip_text {
+        padding: 0.1rem 0.25rem 0.2rem;
+        background-color: #f3f1ff;
+        color: #562683;
+        font-size: 14px;
+        word-break: break-word;
+        line-height: 1.3;
+        @media screen and (max-width: 768px) {
+          font-size: 14px;
+        }
+        @media screen and (min-width: 1800px) {
+          font-size: 17px;
+        }
+      }
+
+      .tip_black,
+      .tip_text {
+        background-color: transparent;
+        color: #000;
+
+        a {
+          text-decoration: underline;
+        }
+
+        p {
+          padding: 0.05rem 0;
+
+          label {
+            display: inline-block;
+            width: 85px;
+          }
+          i,
+          svg {
+            cursor: pointer;
+          }
+        }
+      }
+
+      .el-form {
+        padding: 0 0.25rem;
+
+        .el-form-item {
+          .el-form-item__content {
+            .label {
+              color: #000;
+              font-size: 15px;
+              @media screen and (max-width: 768px) {
+                font-size: 14px;
+              }
+              @media screen and (min-width: 1800px) {
+                font-size: 17px;
+              }
+            }
+
+            .flex-row {
+              width: 100%;
+            }
+
+            .el-input {
+              .el-input__inner {
+                background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .el-dialog__footer {
+      padding: 0 0.25rem 0.25rem;
+      text-align: left;
+
+      .dialog-footer {
+        display: flex;
+      }
+
+      .el-button {
+        width: auto;
+        height: auto;
+        padding: 0.07rem 0.15rem;
+        margin: 0 0.15rem 0 0;
+        background: linear-gradient(180deg, #fefefe, #f0f0f0);
+        font-family: inherit;
+        font-size: 16px;
+        line-height: 1;
+        color: #000;
+        border-radius: 0.07rem;
+        @media screen and (max-width: 1600px) {
+          font-size: 14px;
+        }
+
+        &:hover {
+          opacity: 0.9;
+
+          span {
+            cursor: inherit;
+          }
+        }
+
+        &.is-disabled {
+          opacity: 0.5;
+          border-color: #e3e6eb;
+        }
+      }
+    }
+  }
 }
 </style>
 <style lang="scss">
 .message_style {
   width: 300px;
+  max-height: 300px;
+  overflow-y: scroll;
   .drop_title {
     padding: 5px 16px;
   }

@@ -7,11 +7,11 @@
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
         <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <!-- <el-menu-item index="/dataset">
+          <el-menu-item index="/dataset">
             <i class="icon icon_datasets"></i>
             Datasets
           </el-menu-item>
-          <el-menu-item index="/models">
+          <!-- <el-menu-item index="/models">
             <i class="icon icon_models"></i>
             Models
           </el-menu-item> -->
@@ -54,7 +54,7 @@
                 <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt="">
               </router-link>
             </template>
-            <!-- <el-menu-item index="/create_dataset">+ New Dataset</el-menu-item> -->
+            <el-menu-item index="/create_dataset">+ New Dataset</el-menu-item>
             <el-menu-item index="/create_space">+ New Space</el-menu-item>
             <!-- <el-menu-item index="/create_organizations">Create Organizations</el-menu-item> -->
             <el-menu-item index="settings">Settings</el-menu-item>

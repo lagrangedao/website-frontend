@@ -37,7 +37,7 @@ VueMarkdownEditor.lang.use('en-US', enUS);
 VueMarkdownEditor.use(githubTheme, {
     Hljs: hljs,
 });
-
+console.log('update time: 2023-07-12')
 const app = createApp(App)
 app.config.globalProperties.$commonFun = commonFun
 app.config.globalProperties.$Web3 = Web3

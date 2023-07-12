@@ -84,7 +84,7 @@
             <b>Datasets</b> {{NumFormat(pagin.total)}}
             <el-input v-model="searchValue" clearable @input="searchChange" class="w-50 m-2" placeholder="Filter by name" />
           </div>
-          <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: most Downloads">
+          <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: Alphabetical">
             <template #prefix>
               <i class="el-icon-select"></i>
             </template>
@@ -100,7 +100,7 @@
                     <!-- <div class="img"></div> -->
                     <b>{{list.name}}</b>
                   </div>
-                  <span>27</span>
+                  <span>{{list.likes}}</span>
                 </div>
               </template>
               <div class="text">
@@ -160,12 +160,12 @@ export default defineComponent({
       ]
     })
     const searchValue = ref('')
-    const optionsValue = ref('')
+    const optionsValue = ref('updated')
     const options = ref([
-      {
-        value: 'downloads',
-        label: 'Most Downloads',
-      },
+      // {
+      //   value: 'downloads',
+      //   label: 'Most Downloads',
+      // },
       {
         value: 'alphabetical',
         label: 'Alphabetical',
@@ -183,7 +183,7 @@ export default defineComponent({
       pageSize: 12,
       pageNo: 1,
       total: 0,
-      sort: ''
+      sort: 'updated'
     })
     const small = ref(false)
     const background = ref(false)
@@ -206,8 +206,8 @@ export default defineComponent({
     async function searchChange (val) {
       // listdata.value = await filterData(listdataAll.value, val)
       pagin.pageNo = 1
-      pagin.sort = ''
-      optionsValue.value = ''
+      // pagin.sort = ''
+      // optionsValue.value = ''
       init()
     }
     function filterData (listData, val) {
@@ -271,8 +271,8 @@ export default defineComponent({
       searchValue.value = ''
       pagin.pageNo = 1
       pagin.total = 0
-      pagin.sort = ''
-      optionsValue.value = ''
+      pagin.sort = 'updated'
+      optionsValue.value = 'updated'
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
