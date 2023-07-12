@@ -257,7 +257,8 @@ export default defineComponent({
   color: #fff;
   background: #180e1a url(../../../assets/images/dashboard/main/bg.jpg)
     no-repeat center;
-  background-size: auto 100%;
+  // background-size: auto 100%;
+  background-size: cover;
   font-size: 18px;
   text-align: left;
   @media screen and (max-width: 1200px) {
