@@ -88,7 +88,7 @@
           </el-col>
         </el-row>
       </div>
-      <div class="fileList" v-loading="renameLoad">
+      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -152,13 +152,13 @@
                   <span>{{scope.row.owner_address}}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Ipfs URL">
+              <el-table-column prop="status" label="Status" />
+              <el-table-column label="Share License Info" min-width="110">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined'?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Copy IPFS URL</el-button>
+                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined'?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Get shared link</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
-              <el-table-column prop="status" label="Status" />
             </el-table>
           </div>
           <div v-else-if="nftdata.status === 'processing'" class="process_style">
@@ -208,7 +208,9 @@
     <el-dialog v-model="dialogDOIVisible" title="SNFT Agreement" :show-close="false" :close-on-click-modal="false" custom-class="doi_body" @close="beforeClose">
       <div v-if="manageDOI">
         <div class="tip">
-          Generating a SNFT restricts certain features of the space: it will no longer be possible to rename, transfer, delete or change the visibility to private.
+          Generating a SNFT restricts certain features of the space: It will NOT be possible to
+          <b>rename</b> or
+          <b>transfer</b>.
         </div>
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your space and your name to
@@ -1384,7 +1386,7 @@ export default defineComponent({
       .tip,
       .tip_black,
       .tip_text {
-        padding: 0.1rem 0.25rem 0.2rem;
+        padding: 0.1rem 0.25rem;
         background-color: #f3f1ff;
         color: #562683;
         font-size: 14px;
@@ -1418,6 +1420,13 @@ export default defineComponent({
           svg {
             cursor: pointer;
           }
+        }
+      }
+
+      .tip {
+        color: red;
+        b {
+          text-transform: uppercase;
         }
       }
 
