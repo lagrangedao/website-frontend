@@ -247,7 +247,7 @@ export default defineComponent({
     const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const searchValue = ref('')
-    const value = ref('')
+    const value = ref('updated')
     const info = reactive({
       address: '',
       balance: '',
@@ -259,15 +259,15 @@ export default defineComponent({
       //   label: 'Most Downloads',
       // },
       {
-        value: 'Option1',
+        value: 'alphabetical',
         label: 'Alphabetical',
       },
       {
-        value: 'Option2',
+        value: 'updated',
         label: 'Recently Updated',
       },
       {
-        value: 'Option3',
+        value: 'likes',
         label: 'Most Likes',
       }
     ])
