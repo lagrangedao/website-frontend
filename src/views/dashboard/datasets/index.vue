@@ -160,7 +160,7 @@ export default defineComponent({
       ]
     })
     const searchValue = ref('')
-    const optionsValue = ref('alphabetical')
+    const optionsValue = ref('updated')
     const options = ref([
       // {
       //   value: 'downloads',
@@ -183,7 +183,7 @@ export default defineComponent({
       pageSize: 12,
       pageNo: 1,
       total: 0,
-      sort: 'alphabetical'
+      sort: 'updated'
     })
     const small = ref(false)
     const background = ref(false)
@@ -271,8 +271,8 @@ export default defineComponent({
       searchValue.value = ''
       pagin.pageNo = 1
       pagin.total = 0
-      pagin.sort = 'alphabetical'
-      optionsValue.value = 'alphabetical'
+      pagin.sort = 'updated'
+      optionsValue.value = 'updated'
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()

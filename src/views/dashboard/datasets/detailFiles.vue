@@ -74,7 +74,7 @@
         <div v-else-if="labelTab === 'edit'" class="uploadBody">
           <div class="top_title">
             <div class="left">
-              <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt=""> {{metaAddress === route.params.wallet_address?accessName:'-'}}
+              <img :src="people_img" class="people" width="30" height="30" alt=""> {{metaAddress === route.params.wallet_address?accessName:'-'}}
             </div>
             <div class="right" :title="momentFilter(fileBody._originPath.created_at)">
               {{calculateDiffTime(fileBody._originPath.created_at)}}
@@ -1032,6 +1032,7 @@ export default defineComponent({
               display: flex;
               align-items: center;
               cursor: pointer;
+              line-height: 1;
               i,
               svg {
                 width: 17px;

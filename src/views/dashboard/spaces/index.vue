@@ -76,7 +76,7 @@ export default defineComponent({
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const accessName = computed(() => (store.state.accessName))
     const searchValue = ref('')
-    const optionsValue = ref('alphabetical')
+    const optionsValue = ref('updated')
     const small = ref(false)
     const background = ref(false)
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -105,7 +105,7 @@ export default defineComponent({
       pageSize: 12,
       pageNo: 1,
       total: 0,
-      sort: 'alphabetical'
+      sort: 'updated'
     })
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -120,8 +120,6 @@ export default defineComponent({
     async function searchChange (val) {
       // spaceData.value = await filterData(spaceDataAll.value, val)
       pagin.pageNo = 1
-      // pagin.sort = 'alphabetical'
-      // optionsValue.value = 'alphabetical'
       const name = val ? val.wallet_address : ''
       init(name)
     }
@@ -129,8 +127,8 @@ export default defineComponent({
       searchValue.value = ''
       pagin.pageNo = 1
       pagin.total = 0
-      pagin.sort = 'alphabetical'
-      optionsValue.value = 'alphabetical'
+      pagin.sort = 'updated'
+      optionsValue.value = 'updated'
       if (type) init()
     }
     function filterData (spaceData, val) {
