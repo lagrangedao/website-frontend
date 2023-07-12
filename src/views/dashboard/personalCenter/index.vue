@@ -79,8 +79,7 @@
                 <el-dropdown-menu>
                   <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests_notifications" :key="c">
                     <div class="drop_body">
-                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your
-                        {{child.source_type ? (child.source_type):''}} license:
+                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your {{child.source_type ? (child.source_type):''}} license:
                         <b>{{child.name}}</b>
                       </p>
                       <el-button @click="licenseMetaData(child)" type="primary" size="small">Approve</el-button>
@@ -202,7 +201,7 @@
               </div>
               <div class="text item">
                 <div class="item_body">
-                  <i class="icon icon_time"></i>
+                  <i class="icon icon_type"></i>
                   <span class="small">{{list.type}}</span>
                 </div>
               </div>
@@ -1124,6 +1123,12 @@ export default defineComponent({
                     no-repeat left center;
                   background-size: 100%;
                 }
+                .icon_type {
+                  width: 15px;
+                  background: url(../../../assets/images/icons/icon_50.png)
+                    no-repeat left center;
+                  background-size: 100%;
+                }
                 .icon_up {
                   width: 15px;
                   margin: -1px 3px 0 0;
@@ -1218,6 +1223,11 @@ export default defineComponent({
                   }
                   .icon_time {
                     background: url(../../../assets/images/icons/icon_11_1.png)
+                      no-repeat left center;
+                    background-size: 100%;
+                  }
+                  .icon_type {
+                    background: url(../../../assets/images/icons/icon_50_1.png)
                       no-repeat left center;
                     background-size: 100%;
                   }
