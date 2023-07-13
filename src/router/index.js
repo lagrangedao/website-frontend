@@ -34,6 +34,8 @@ const personalCenter = () =>
     import ("@/views/dashboard/personalCenter/index");
 const personalCenterProfile = () =>
     import ("@/views/dashboard/personalCenter/setting");
+const termsOfService = () =>
+    import ("@/views/dashboard/company/index");
 
 const routes = [{
         path: '/',
@@ -164,6 +166,42 @@ const routes = [{
                 path: '/personal_center/organizations/:submenu',
                 name: 'organizationsSettings',
                 component: organizationsSettings,
+                meta: {
+                    keepAlive: true,
+                    title: ''
+                }
+            },
+            {
+                path: '/terms_of_service',
+                name: 'termsOfService',
+                component: termsOfService,
+                meta: {
+                    keepAlive: true,
+                    title: ''
+                }
+            },
+            {
+                path: '/privacy',
+                name: 'privacy',
+                component: termsOfService,
+                meta: {
+                    keepAlive: true,
+                    title: ''
+                }
+            },
+            {
+                path: '/content_guidelines',
+                name: 'contentGuidelines',
+                component: termsOfService,
+                meta: {
+                    keepAlive: true,
+                    title: ''
+                }
+            },
+            {
+                path: '/code_of_conduct',
+                name: 'codeOfConduct',
+                component: termsOfService,
                 meta: {
                     keepAlive: true,
                     title: ''

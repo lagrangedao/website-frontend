@@ -5,9 +5,9 @@
                 <a href="" target="_blank">
                     @Lagrange
                 </a>
-                <a href="" target="_blank">
+                <router-link to="/terms_of_service">
                     TOS
-                </a>
+                </router-link>
                 <a href="" target="_blank">
                     Privacy
                 </a>
