@@ -74,7 +74,7 @@
         <div v-else-if="labelTab === 'edit'" class="uploadBody">
           <div class="top_title">
             <div class="left">
-              <img :src="peopleImg" class="people" width="30" height="30" alt=""> {{peopleName|| hiddAddress(route.params.wallet_address)}}
+              <img :src="peopleAvatarImg || peopleImg" class="people" width="30" height="30" alt=""> {{peopleName|| hiddAddress(route.params.wallet_address)}}
             </div>
             <div class="right" :title="momentFilter(fileBody._originPath.created_at)">
               {{calculateDiffTime(fileBody._originPath.created_at)}}
@@ -229,6 +229,7 @@ export default defineComponent({
     const metaAddress = computed(() => (store.state.metaAddress))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const peopleImg = require("@/assets/images/dashboard/people_default.png")
+    const peopleAvatarImg = ref('')
     const peopleName = ref('')
     const tableLayout = ref('fixed')
     const labelTab = ref('list')
@@ -308,7 +309,7 @@ export default defineComponent({
         fileRow.fileResdata = listRes.data.files || []
         listdata.value = listRes.data.space || { name: route.params.name }
         if (listRes.data.owner) {
-          // if (listRes.data.owner.avatar) peopleImg.value = listRes.data.owner.avatar
+          // if (listRes.data.owner.avatar) peopleAvatarImg.value = listRes.data.owner.avatar
           peopleName.value = listRes.data.owner.full_name || ''
         }
         const current = Math.floor(Date.now() / 1000)
@@ -779,6 +780,7 @@ export default defineComponent({
       metaAddress,
       lagLogin,
       peopleImg,
+      peopleAvatarImg,
       tableLayout,
       labelTab,
       listdata,
