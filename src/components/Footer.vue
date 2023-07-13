@@ -2,19 +2,19 @@
     <div class="footer landing">
         <el-row class="footer_menu">
             <el-col :xs="24" :sm="24" :md="11" :lg="11" :xl="11">
-                <a href="" target="_blank">
+                <router-link to="/main">
                     @Lagrange
-                </a>
+                </router-link>
                 <router-link to="/terms_of_service">
                     TOS
                 </router-link>
-                <a href="" target="_blank">
+                <router-link to="/privacy">
                     Privacy
-                </a>
-                <a href="" target="_blank">
+                </router-link>
+                <a href="/" target="_blank">
                     Team
                 </a>
-                <a href="" target="_blank">
+                <a href="/" target="_blank">
                     Jobs
                 </a>
             </el-col>
