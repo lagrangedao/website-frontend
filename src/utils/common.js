@@ -32,7 +32,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
   } catch (err) {
     console.error(err, err.response)
     messageTip('error', err.response ? err.response.statusText : 'Request failed. Please try again later!')
-    if (err.response.status === 401) {
+    if (err.response && err.response.status === 401) {
       signOutFun()
     } else if (err.response) {
       // The request has been sent, but the status code of the server response is not within the range of 2xx
@@ -288,6 +288,24 @@ function copyContent(text, tipCont) {
   return false
 }
 
+function hiddAddress(val) {
+  if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
+  else return '-'
+}
+
+const cmOptions = {
+  mode: 'text/x-markdown', // Language mode
+  // theme: 'dracula', // Theme
+  lineNumbers: true, // Show line number
+  smartIndent: true, // Smart indent
+  indentUnit: 4, // The smart indent unit is 2 spaces in length
+  foldGutter: true, // Code folding
+  matchBrackets: true,
+  autoCloseBrackets: true,
+  styleActiveLine: true, // Display the style of the selected row
+  readOnly: false,
+}
+
 const Web3 = require('web3');
 let web3Init
 if (typeof window.ethereum === 'undefined') {
@@ -321,5 +339,7 @@ export default {
   popupwindow,
   copyContent,
   getUnit,
-  changeIDLogin
+  changeIDLogin,
+  hiddAddress,
+  cmOptions
 }

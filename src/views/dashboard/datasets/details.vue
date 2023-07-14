@@ -335,7 +335,7 @@ export default defineComponent({
         font-size: 0.21rem;
         color: #878c93;
         line-height: 1;
-        @media screen and (max-width: 600px) {
+        @media screen and (max-width: 992px) {
           flex-wrap: wrap;
         }
         b {
@@ -379,6 +379,7 @@ export default defineComponent({
         .el-button {
           height: 28px;
           padding: 0.05rem 0.1rem;
+          margin: 0.1rem 0;
           font-family: inherit;
           font-size: 14px;
           color: #878c93;
