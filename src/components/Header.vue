@@ -30,24 +30,18 @@
           <el-menu-item index="6">
             Pricing
           </el-menu-item>
-          <!-- <el-menu-item index="7">
-            &nbsp;
-            <svg class="mr-1.5 text-gray-500 w-5 group-hover:text-gray-400 dark:text-gray-300 dark:group-hover:text-gray-400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="21px"
-              height="21px" viewBox="0 0 32 18" preserveAspectRatio="xMidYMid meet">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 3.30221C14.4504 2.836 14.8284 2.45807 15.2946 2.45807H28.4933C28.9595 2.45807 29.3374 2.836 29.3374 3.30221C29.3374 3.76842 28.9595 4.14635 28.4933 4.14635H15.2946C14.8284 4.14635 14.4504 3.76842 14.4504 3.30221Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 9.00002C14.4504 8.53382 14.8284 8.15588 15.2946 8.15588H28.4933C28.9595 8.15588 29.3374 8.53382 29.3374 9.00002C29.3374 9.46623 28.9595 9.84417 28.4933 9.84417H15.2946C14.8284 9.84417 14.4504 9.46623 14.4504 9.00002Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 14.6978C14.4504 14.2316 14.8284 13.8537 15.2946 13.8537H28.4933C28.9595 13.8537 29.3374 14.2316 29.3374 14.6978C29.3374 15.164 28.9595 15.542 28.4933 15.542H15.2946C14.8284 15.542 14.4504 15.164 14.4504 14.6978Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M1.94549 6.87377C2.27514 6.54411 2.80962 6.54411 3.13928 6.87377L6.23458 9.96907L9.32988 6.87377C9.65954 6.54411 10.194 6.54411 10.5237 6.87377C10.8533 7.20343 10.8533 7.73791 10.5237 8.06756L6.23458 12.3567L1.94549 8.06756C1.61583 7.73791 1.61583 7.20343 1.94549 6.87377Z"
-                fill="currentColor"></path>
-            </svg>
+          <!-- <el-menu-item index="web3Model">
+            <w3m-core-button></w3m-core-button>
+            <button id="my-button" @click="web3modal.openModal()">Connect Wallet</button>
           </el-menu-item> -->
-          <el-menu-item index="/personal_center" v-if="!lagLogin">
+          <el-menu-item index="signature" v-if="!lagLogin">
             &nbsp;
             <span class="loginBtn">Login</span>
           </el-menu-item>
+          <!-- <el-menu-item index="/personal_center" v-if="!lagLogin">
+            &nbsp;
+            <span class="loginBtn">Login</span>
+          </el-menu-item> -->
           <el-sub-menu index="8" v-else>
             <template #title>
               <router-link to="/personal_center" class="loginImg">
@@ -66,6 +60,11 @@
   </div>
 </template>
 <script>
+import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum'
+import { Web3Modal } from '@web3modal/html'
+import { configureChains, createConfig, signMessage, connect, InjectedConnector, disconnect } from '@wagmi/core'
+import { arbitrum, mainnet, polygon } from '@wagmi/core/chains'
+
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -97,8 +96,10 @@ export default defineComponent({
       else if (key === 'sign_out') {
         system.$commonFun.signOutFun()
         // await system.$commonFun.timeout(200)
-        window.location.reload()
+        // window.location.reload()
+        await disconnect()
       }
+      else if (key === 'signature') signature()
       else store.dispatch('setNavLogin', false)
     }
     function activeMenu (row) {
@@ -107,6 +108,102 @@ export default defineComponent({
       else if (name.indexOf('model') > -1) activeIndex.value = '/models'
       else if (name.indexOf('space') > -1) activeIndex.value = '/spaces'
       else activeIndex.value = name
+    }
+
+
+
+    const chains = [arbitrum, mainnet, polygon]
+    const projectId = 'a7dcc1b6f7e8fba0ae488b807e86969f'
+
+    const { publicClient } = configureChains(chains, [w3mProvider({ projectId })])
+    const wagmiConfig = createConfig({
+      autoConnect: true,
+      connectors: w3mConnectors({ projectId, chains }),
+      publicClient
+    })
+    const ethereumClient = new EthereumClient(wagmiConfig, chains)
+    const web3modal = new Web3Modal({ projectId }, ethereumClient)
+    let provider
+
+    async function onConnect () {
+      console.log("Opening a dialog", web3modal);
+      try {
+        // provider = await connect({
+        //   connector: new InjectedConnector(),
+        // })
+        provider = web3modal.openModal()
+        console.log(provider)
+      } catch (e) {
+        console.log("Could not get a wallet connection", e);
+        return;
+      }
+
+      // Subscribe to accounts change
+      provider.on("accountsChanged", (accounts) => {
+        fetchAccountData();
+      });
+
+      // Subscribe to chainId change
+      provider.on("chainChanged", (chainId) => {
+        fetchAccountData();
+      });
+
+      // Subscribe to networkId change
+      provider.on("networkChanged", (networkId) => {
+        fetchAccountData();
+      });
+
+      return provider ?.account
+    }
+
+    /**
+     * Disconnect wallet button pressed.
+     */
+    async function onDisconnect () {
+
+      console.log("Killing the wallet connection", provider);
+
+      // TODO: Which providers have close method?
+      if (provider.close) {
+        await provider.close();
+
+        // If the cached provider is not cleared,
+        // WalletConnect will default to the existing session
+        // and does not allow to re-scan the QR code with a new wallet.
+        // Depending on your use case you may want or want not his behavir.
+        await web3modal.clearCachedProvider();
+        provider = null;
+      }
+
+      selectedAccount = null;
+
+      // Set the UI back to the initial state
+      document.querySelector("#prepare").style.display = "block";
+      document.querySelector("#connected").style.display = "none";
+    }
+    async function fetchAccountData () {
+
+      // Get a Web3 instance for the wallet
+      const web3 = new Web3(provider);
+
+      console.log("Web3 instance is", system.$commonFun.web3Init);
+
+      // Get connected chain id from Ethereum node
+      const chainId = await web3.eth.getChainId();
+      // Load chain information over an HTTP API
+      const chainData = await EvmChains.getChain(chainId);
+      document.querySelector("#network-name").textContent = chainData.name;
+
+      // Get list of accounts of the connected wallet
+      const accounts = await web3.eth.getAccounts();
+
+      // MetaMask does not give you all accounts, only the selected account
+      console.log("Got accounts", accounts);
+      selectedAccount = accounts[0];
+    }
+    async function signature () {
+      const lStatus = await system.$commonFun.login()
+      if (lStatus) router.push({ path: '/personal_center' })
     }
     onMounted(() => activeMenu())
     watch(route, (to, from) => {
@@ -123,6 +220,7 @@ export default defineComponent({
       activeIndex,
       bodyWidth,
       system,
+      signature, web3modal,
       header_logo, handleSelect
     }
   }

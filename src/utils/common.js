@@ -5,6 +5,14 @@ import {
   ElMessage
 } from 'element-plus'
 import router from '../router';
+import {
+  configureChains,
+  createConfig,
+  signMessage,
+  connect,
+  InjectedConnector,
+  disconnect
+} from '@wagmi/core'
 let lastTime = 0
 
 async function sendRequest(apilink, type, jsonObject, api_token) {
@@ -93,19 +101,44 @@ async function Init(callback) {
 }
 
 async function login() {
-  if (!store.state.metaAddress || store.state.metaAddress === undefined) {
-    const accounts = await ethereum.request({
-      method: 'eth_requestAccounts'
-    })
-    store.dispatch('setMetaAddress', accounts[0])
-  }
+  // if (!store.state.metaAddress || store.state.metaAddress === undefined) {
+  //   const accounts = await ethereum.request({
+  //     method: 'eth_requestAccounts'
+  //   })
+  //   store.dispatch('setMetaAddress', accounts[0])
+  // }
+  disconnect()
+  const result = await connect({
+    connector: new InjectedConnector()
+  })
+  const accountW = result.account
+  store.dispatch('setMetaAddress', accountW)
 
   const time = await throttle()
   if (!time) return false
-  const signature = await sign()
+  // const signature = await sign()
+  const signature = await signModel(accountW)
   if (!signature) return false
   const token = await performSignin(signature)
   return !!token
+}
+
+async function signModel(accountAddress) {
+  const rightnow = (Date.now() / 1000).toFixed(0)
+  const sortanow = rightnow - (rightnow % 600)
+  const local = process.env.VUE_APP_DOMAINNAME
+  const buff = "Signing in to " + local + " at " + sortanow
+  let sig = null
+  try {
+    sig = await signMessage({
+      account: accountAddress,
+      message: buff
+    })
+  } catch (err) {
+    disconnect()
+  }
+
+  return sig
 }
 
 async function throttle() {
@@ -172,6 +205,7 @@ async function signOutFun() {
   router.push({
     name: 'main'
   })
+  disconnect()
 }
 
 function momentFun(dateItem) {
@@ -341,5 +375,6 @@ export default {
   getUnit,
   changeIDLogin,
   hiddAddress,
-  cmOptions
+  cmOptions,
+  performSignin
 }

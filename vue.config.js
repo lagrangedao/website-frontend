@@ -30,6 +30,12 @@ module.exports = {
       }
     }
   },
+  transpileDependencies: [
+    /[/\\]node_modules[/\\](.+?)?@walletconnect(.*)/,
+    /[/\\]node_modules[/\\](.+?)?@wagmi(.*)/,
+    /[/\\]node_modules[/\\](.+?)?viem(.*)/,
+    /[/\\]node_modules[/\\](.+?)?@web3modal(.*)/,
+  ],
 
   configureWebpack: (config) => {
     config.name = globalConfig.baseTitle
@@ -92,6 +98,22 @@ module.exports = {
         options.compilerOptions = addOptions;
         return options;
       });
+
+    // config.module.rule('compile')
+    //   .test(/\.js$/)
+    //   .include
+    //   .add(resolve('src'))
+    //   .add('/node_modules/')
+    //   .end()
+    //   .use('babel')
+    //   .loader('babel-loader')
+    //   .options({
+    //     presets: [
+    //       ['@babel/preset-env', {
+    //         modules: false
+    //       }]
+    //     ]
+    //   });
   },
 
   devServer: {
