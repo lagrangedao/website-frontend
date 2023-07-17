@@ -38,10 +38,6 @@
             &nbsp;
             <span class="loginBtn">Login</span>
           </el-menu-item>
-          <!-- <el-menu-item index="/personal_center" v-if="!lagLogin">
-            &nbsp;
-            <span class="loginBtn">Login</span>
-          </el-menu-item> -->
           <el-sub-menu index="8" v-else>
             <template #title>
               <router-link to="/personal_center" class="loginImg">
@@ -131,7 +127,8 @@ export default defineComponent({
         // provider = await connect({
         //   connector: new InjectedConnector(),
         // })
-        provider = web3modal.openModal()
+        web3modal.openModal(row => { console.log(row) })
+        provider = web3modal
         console.log(provider)
       } catch (e) {
         console.log("Could not get a wallet connection", e);
