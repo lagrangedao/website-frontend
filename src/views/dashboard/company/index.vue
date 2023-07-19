@@ -100,6 +100,7 @@ export default defineComponent({
       }
     }
     h1,
+    h2,
     h3 {
       display: flex;
       margin: 0.55rem 0 0.4rem;
@@ -166,6 +167,43 @@ export default defineComponent({
         &.is-active {
           background-color: #c37af9;
           color: #fff;
+        }
+      }
+    }
+    table {
+      margin-bottom: 2em;
+      margin-top: 2em;
+      table-layout: auto;
+      text-align: left;
+      width: 100%;
+      tr {
+        font-size: 15px;
+        line-height: 1.5;
+        color: rgb(17, 24, 39);
+        @media screen and (max-width: 1200px) {
+          font-size: 13px;
+        }
+        th {
+          padding-bottom: 0.75em;
+          padding-left: 0.75em;
+          padding-right: 0.75em;
+          border-bottom: 1px solid #e5e7eb;
+          &:first-child {
+            padding-left: 0;
+          }
+          &:last-child {
+            padding-right: 0;
+          }
+        }
+        td {
+          padding: 0.75em;
+          vertical-align: text-top;
+          &:first-child {
+            padding-left: 0;
+          }
+          &:last-child {
+            padding-right: 0;
+          }
         }
       }
     }

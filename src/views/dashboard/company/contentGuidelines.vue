@@ -38,62 +38,62 @@
         <router-link to="/privacy">
           Privacy Policy
         </router-link> and all other policies available on our Website.</p>
-      <p>"
-        <strong>Content</strong>" refers to any material posted, displayed, or accessed on our Website or Hub, including but not limited to code, data, text, graphics, images, applications, or software you, we, or any third party provide or make available.</p>
+      <p>
+        <strong>"Content"</strong> refers to any material posted, displayed, or accessed on our Website or Hub, including but not limited to code, data, text, graphics, images, applications, or software you, we, or any third party provide or make available.</p>
       <p>Content types may include:</p>
       <ul>
         <li>
-          <p>"
-            <strong>ML Artifacts"</strong>: Code and assets hosted as Lagrange Repositories, including Models, Datasets, Spaces;</p>
+          <p>
+            <strong>"ML Artifacts"</strong>: Code and assets hosted as Lagrange Repositories, including Models, Datasets, Spaces;</p>
         </li>
         <li>
-          <p>"
-            <strong>Community Content"</strong>: Content that can be found in the Community section of the Lagrange Platform, including discussions, comments, and usernames, as well as related documentation such as READMEs, model cards, data cards,
+          <p>
+            <strong>"Community Content"</strong>: Content that can be found in the Community section of the Lagrange Platform, including discussions, comments, and usernames, as well as related documentation such as READMEs, model cards, data cards,
             pull requests, and merges.</p>
         </li>
       </ul>
-      <p>"
-        <strong>Community</strong>" refers to all Users of the Lagrange Platform, including Lagrange personnel.</p>
-      <p>"
-        <strong>Community Tab"</strong> refers to a collaborative feature where the Community can discuss specific Repositories, including providing feedback, brainstorming ideas and opening pull requests for improvements.</p>
-      <p>"
-        <strong>Lagrange</strong>" refers to Lagrange Inc., which may perform its obligations through its affiliates, directors, subsidiaries, contractors, licensors, officers, agents and/or employees.</p>
-      <p>"
-        <strong>Platform</strong>" or "
-        <strong>Lagrange Hub</strong>", or "
-        <strong>Hub</strong>" refers to the hosting platform where Users can build, benchmark, share, version and deploy Repositories, which may include Models, Datasets and Machine Learning Applications.</p>
-      <p>"
-        <strong>Repository"</strong> refers to a data structure which contains all of the project files and the entire revision history.</p>
+      <p>
+        <strong>"Community"</strong> refers to all Users of the Lagrange Platform, including Lagrange personnel.</p>
+      <p>
+        <strong>"Community Tab"</strong> refers to a collaborative feature where the Community can discuss specific Repositories, including providing feedback, brainstorming ideas and opening pull requests for improvements.</p>
+      <p>
+        <strong>"Lagrange"</strong> refers to Lagrange Inc., which may perform its obligations through its affiliates, directors, subsidiaries, contractors, licensors, officers, agents and/or employees.</p>
+      <p>
+        <strong>"Platform"</strong> or
+        <strong>"Lagrange Hub"</strong>, or
+        <strong>"Hub"</strong> refers to the hosting platform where Users can build, benchmark, share, version and deploy Repositories, which may include Models, Datasets and Machine Learning Applications.</p>
+      <p>
+        <strong>"Repository"</strong> refers to a data structure which contains all of the project files and the entire revision history.</p>
       <p>A Repository may be:</p>
       <ul>
         <li>
-          <p>"
-            <strong>Public"</strong>: anyone on the internet can see it, but only you or members of your organization can make changes;</p>
+          <p>
+            <strong>"Public"</strong>: anyone on the internet can see it, but only you or members of your organization can make changes;</p>
         </li>
         <li>
-          <p>"
-            <strong>Private"</strong>: only you or members of your organization can see and make changes to the Repository; New Users need to join the maintaining organization in order to both see the Repository and access its Content.</p>
+          <p>
+            <strong>"Private"</strong>: only you or members of your organization can see and make changes to the Repository; New Users need to join the maintaining organization in order to both see the Repository and access its Content.</p>
         </li>
         <li>
-          <p>"
-            <strong>Gated"</strong>: Gated Repositories and their Community Content are visible to everyone, but access to their ML artifacts (data, model weights) requires either accepting conditions in a click-through form or approval by the Repository
+          <p>
+            <strong>"Gated"</strong>: Gated Repositories and their Community Content are visible to everyone, but access to their ML artifacts (data, model weights) requires either accepting conditions in a click-through form or approval by the Repository
             maintainers.
           </p>
         </li>
         <li>
-          <p>"
-            <strong>Disabled"</strong>: a Repository that has its access blocked to all Community members except its owner.</p>
+          <p>
+            <strong>"Disabled"</strong>: a Repository that has its access blocked to all Community members except its owner.</p>
         </li>
       </ul>
-      <p>"
-        <strong>Repository Label"</strong> refers to a label assigned to a Repository. For example:</p>
+      <p>
+        <strong>"Repository Label"</strong> refers to a label assigned to a Repository. For example:</p>
       <ul>
-        <li>"
-          <strong>Not For All Audiences" (NFAA)</strong>: Content that Lagrange or the Repository's authors have determined may not be suitable for all Community members, e.g., sexual Content.</li>
+        <li>
+          <strong>"Not For All Audiences" (NFAA)</strong>: Content that Lagrange or the Repository's authors have determined may not be suitable for all Community members, e.g., sexual Content.</li>
       </ul>
-      <p>"
-        <strong>Team</strong>" or "
-        <strong>Lagrange Team</strong>" refers to Lagrange personnel.</p>
+      <p>
+        <strong>"Team"</strong> or
+        <strong>"Lagrange Team"</strong> refers to Lagrange personnel.</p>
       <h2 id="🕵️-how-do-we-assess-whether-content-follows-our-guidelines">🕵️ How do we assess whether Content follows our Guidelines?</h2>
       <p>These Guidelines address two categories of content.</p>
       <p>Some Content is deemed broadly inappropriate for the Platform, and will be removed and may lead to further consequences for the Users depending on severity. Such Content is covered in the 🙅&zwj;♂️
@@ -201,8 +201,8 @@
           </tr>
         </tbody>
       </table>
-      <p>B. "
-        <strong>Not-for-all-Audiences" tag</strong>: out of consideration for other Users of the Hub, we request you flag applicable Content via the "Not For All Audiences" tag and in the Repository's card metadata, as it will allow Users of the Hub
+      <p>B.
+        <strong>"Not-for-all-Audiences" tag</strong>: out of consideration for other Users of the Hub, we request you flag applicable Content via the "Not For All Audiences" tag and in the Repository's card metadata, as it will allow Users of the Hub
         to choose whether they see it or not by default. The Lagrange Team may also tag the at-issue Repositories of Content if they meet any of the following criteria.</p>
       <p> Flagged content should include, but should not be limited to:</p>
       <ul>

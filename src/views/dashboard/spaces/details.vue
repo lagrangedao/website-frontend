@@ -106,12 +106,37 @@
       </el-tabs>
     </div>
 
-    <el-drawer title="Logs" v-model="drawer" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style">
+    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style">
       <template #default>
-        <div>
-          {{logsCont.data.job}}
-          <br /> {{logsCont.data.task}}
+        <div class="close" @click="drawer=false">
+          <el-icon>
+            <CloseBold />
+          </el-icon>
         </div>
+        <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick">
+          <el-tab-pane label="Logs" name="Logs">
+            <div class="logBody">
+              {{logsCont.data.job}}
+              <br /> {{logsCont.data.task}}
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="Build" name="Build" v-if="false">
+            <div class="uploadBody">
+              <div class="top_title">
+                <div class="left">
+                  <i class="icon"></i>
+                  Computing provider
+                </div>
+              </div>
+              <ul>
+                <li v-for="n in 20" :key="n">
+                  <div class="type">name</div>
+                  <div>= db.Column(db.String)</div>
+                </li>
+              </ul>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
       </template>
     </el-drawer>
   </section>
@@ -127,7 +152,7 @@ import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, 
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  Setting, ArrowLeft, WarningFilled
+  Setting, ArrowLeft, WarningFilled, CloseBold
 } from '@element-plus/icons-vue'
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
@@ -138,7 +163,7 @@ export default defineComponent({
     detailApp,
     detailCommunity,
     detailSetting,
-    Setting, sharePop, ArrowLeft, WarningFilled
+    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold
   },
   setup () {
     const store = useStore()
@@ -209,6 +234,7 @@ export default defineComponent({
     const likeOwner = ref(false)
     const likesValue = ref(false)
     const drawer = ref(false)
+    const drawerName = ref('Logs')
     const direction = ref('btt')
     const logsValue = ref('')
     const expireTime = ref(Math.floor(Date.now() / 1000))
@@ -328,6 +354,9 @@ export default defineComponent({
       const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
+    const drawerClick = (tab, event) => {
+      // console.log(tab, event)
+    }
     onActivated(() => init())
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
@@ -358,9 +387,10 @@ export default defineComponent({
       forkLoad,
       nft,
       nftTokens,
+      drawerName,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick,
-      forkOperate, back, renewFun, reqNFT, likeMethod
+      forkOperate, back, renewFun, reqNFT, likeMethod, drawerClick
     }
   }
 })
@@ -417,7 +447,7 @@ export default defineComponent({
         font-size: 0.21rem;
         color: #878c93;
         line-height: 1;
-        @media screen and (max-width: 600px) {
+        @media screen and (max-width: 992px) {
           flex-wrap: wrap;
         }
         b {
@@ -461,6 +491,7 @@ export default defineComponent({
         .el-button {
           height: 28px;
           padding: 0.05rem 0.1rem;
+          margin: 0.1rem 0;
           font-family: inherit;
           font-size: 14px;
           color: #878c93;
@@ -729,16 +760,175 @@ export default defineComponent({
 </style>
 <style lang="scss">
 .drawer_style {
-  padding-bottom: 15px;
+  background-color: #fafafa;
   text-align: left;
   font-size: 14px;
   line-height: 1.5;
+  .close {
+    display: flex;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 0.18rem;
+    top: 0.16rem;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 9;
+    i,
+    svg,
+    path {
+      cursor: pointer;
+    }
+  }
   .el-drawer__header {
     padding-top: 15px;
     font-size: 16px;
     margin-bottom: 0;
     line-height: 1;
     color: #000;
+  }
+  .el-drawer__body {
+    padding: 0;
+    .el-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      height: 100%;
+      .el-tabs__nav-wrap::after {
+        height: 1px;
+        background-color: #e0e0e0;
+      }
+      .el-tabs__active-bar {
+        background-color: #000;
+      }
+      .el-tabs__header {
+        width: 100%;
+        margin: 0;
+        background-color: #fff;
+        .el-tabs__nav-wrap {
+          padding: 0 4%;
+          @media screen and (max-width: 768px) {
+            padding: 0 2%;
+          }
+        }
+      }
+      .el-tabs__content {
+        width: 92%;
+        height: calc(100% - 1rem - 18px);
+        padding: 0.3rem 4%;
+        @media screen and (max-width: 768px) {
+          width: 96%;
+          padding: 0.3rem 2%;
+        }
+        .el-tab-pane {
+          height: 100%;
+        }
+        .logBody {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          overflow-y: scroll;
+        }
+        .uploadBody {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          border: 1px solid #dfdee5;
+          border-radius: 0.1rem;
+          color: #606060;
+          overflow: hidden;
+          .top_title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.12rem 0.25rem;
+            font-size: 18px;
+            font-weight: normal;
+            background: linear-gradient(180deg, #fefefe, #f0f0f0);
+            text-transform: lowercase;
+            color: #606060;
+            @media screen and (max-width: 1600px) {
+              font-size: 16px;
+            }
+            @media screen and (max-width: 768px) {
+              font-size: 15px;
+            }
+            .left {
+              display: flex;
+              align-items: center;
+              font-size: 16px;
+              text-transform: capitalize;
+              @media screen and (max-width: 1600px) {
+                font-size: 14px;
+              }
+              @media screen and (max-width: 768px) {
+                font-size: 13px;
+              }
+              .icon {
+                width: 20px;
+                height: 20px;
+                margin: 0 7px 0 0;
+                background: url(../../../assets/images/icons/icon_51.png) center;
+                background-size: 100%;
+              }
+            }
+            .right {
+            }
+          }
+          ul {
+            width: 100%;
+            height: calc(100% - 0.24rem - 18px);
+            border-top: 1px solid #dfdee5;
+            overflow: scroll;
+            li {
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              background-color: #fafafa;
+              font-size: 14px;
+              line-height: 1;
+              @media screen and (max-width: 1600px) {
+                font-size: 13px;
+              }
+              @media screen and (max-width: 768px) {
+                font-size: 12px;
+              }
+              div {
+                padding: 0.1rem 0.25rem;
+                color: #878c93;
+              }
+              .type {
+                color: #562683;
+                border-right: 1px solid #dddddd;
+              }
+              &:nth-child(2n + 1) {
+                background-color: #f3f1ff;
+              }
+            }
+          }
+        }
+      }
+      .el-tabs__item {
+        height: auto;
+        padding: 0.18rem 0;
+        margin: 0 0.45rem 0 0;
+        font-size: 20px;
+        line-height: 1;
+        text-transform: capitalize;
+        @media screen and (max-width: 1600px) {
+          font-size: 18px;
+        }
+        @media screen and (max-width: 1440px) {
+          font-size: 16px;
+        }
+        @media screen and (max-width: 441px) {
+          font-size: 14px;
+        }
+        &.is-active {
+          color: #000;
+        }
+      }
+    }
   }
 }
 </style>

@@ -15,7 +15,7 @@
           <el-input v-model="ruleForm.name" placeholder="Full name" />
         </div>
       </el-form-item>
-      <!-- <el-form-item prop="avatar">
+      <el-form-item prop="avatar">
         <label class="label">
           Avatar
           <span class="span">(optional)</span>
@@ -29,7 +29,7 @@
           <img class="img" :src="ruleForm.avatar" />
           <div class="remove" @click="removeAvatar">Remove</div>
         </div>
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item prop="homepage">
         <label class="label">
           Homepage
@@ -189,6 +189,7 @@ export default defineComponent({
           }
           await system.$commonFun.timeout(500)
           system.$commonFun.messageTip('success', 'Update successfully!')
+          fileList.value = []
           listLoad.value = false
         } else {
           console.log('error submit!', fields)
@@ -214,14 +215,13 @@ export default defineComponent({
       let fd = new FormData()
       fileList.value.forEach(file => {
         let fileNew = new File([file.raw], `${new Date().getTime() + file.name}`)
-        fd.append('file', fileNew, `${new Date().getTime() + file.name}`)
-        console.log('file', fileNew)
+        fd.append('avatar', fileNew, `${new Date().getTime() + file.name}`)
+        // console.log('file', fileNew)
       })
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/profile/files`, 'post', fd)
-      await system.$commonFun.timeout(500)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/profile/avatar`, 'post', fd)
       if (uploadRes && uploadRes.status === "success") {
-        if (uploadRes.data.files) return uploadRes.data.files[0].url
-      }
+        if (uploadRes.data) return `${uploadRes.data.gateway}/ipfs/${uploadRes.data.cid}`
+      } else system.$commonFun.messageTip('error', 'Failed to upload avatar!')
       return ruleForm.avatar
     }
     function reset () {

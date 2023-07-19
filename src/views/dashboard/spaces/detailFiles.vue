@@ -74,13 +74,13 @@
         <div v-else-if="labelTab === 'edit'" class="uploadBody">
           <div class="top_title">
             <div class="left">
-              <img :src="peopleAvatarImg || peopleImg" class="people" width="30" height="30" alt=""> {{peopleName|| hiddAddress(route.params.wallet_address)}}
+              <img :src="peopleAvatarImg || peopleImg" class="people" width="30" height="30" alt=""> {{peopleName|| system.$commonFun.hiddAddress(route.params.wallet_address)}}
             </div>
             <div class="right" :title="momentFilter(fileBody._originPath.created_at)">
               {{calculateDiffTime(fileBody._originPath.created_at)}}
             </div>
           </div>
-          <div v-if="!fileTextShow" v-loading="uploadLoad">
+          <div v-loading="uploadLoad">
             <div class="worktop" style="justify-content: space-between;">
               <ul>
                 <li v-if="fileTextType !== 'binary'">
@@ -91,15 +91,6 @@
                       <path d="M12.419 25.484L17.639 6l1.932.518L14.35 26z" fill="currentColor"></path>
                     </svg>
                     raw
-                  </a>
-                </li>
-                <li v-if="fileTextType === 'text'">
-                  <a @click="editChange" :class="{'disable': metaAddress !== route.params.wallet_address}">
-                    <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                      <path d="M2 26h28v2H2z" fill="currentColor"></path>
-                      <path d="M25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10l3.6 3.6l-10 10H6z" fill="currentColor"></path>
-                    </svg>
-                    edit
                   </a>
                 </li>
                 <li v-else>
@@ -125,19 +116,21 @@
               <small>{{sizeChange(blobSize)}}</small>
             </div>
             <img v-if="fileTextType === 'image'" :src="fileTextEditor" :alt="fileBody.title" class="img_file">
-            <v-md-preview v-else-if="fileTextType === 'text'" :text="fileTextEditor" ref="preview" id="preview"></v-md-preview>
+            <div v-else-if="fileTextType === 'text'" v-loading="uploadLoad">
+              <div class="mirror">
+                <Codemirror v-model:value="fileTextEditor" :options="system.$commonFun.cmOptions" border placeholder="" @blur="onBlur" />
+              </div>
+              <!-- <v-md-editor v-model="fileTextEditor" height="450px"></v-md-editor> -->
+              <el-button-group class="ml-4 worktop">
+                <el-button @click="commitEditFun('edit')" :disabled="!fileBody.title">Commit changes</el-button>
+                <el-button @click="cancelFun">Cancel</el-button>
+              </el-button-group>
+            </div>
             <div class="tip_down" v-else>
               This file contains binary data. It cannot be displayed, but you can still
               <a @click="downFile">download</a>
               it.
             </div>
-          </div>
-          <div v-else v-loading="uploadLoad">
-            <v-md-editor v-model="fileTextEditor" height="450px"></v-md-editor>
-            <el-button-group class="ml-4 worktop">
-              <el-button @click="commitEditFun('edit')" :disabled="!fileBody.title">Commit changes</el-button>
-              <el-button @click="cancelFun">Cancel</el-button>
-            </el-button-group>
           </div>
         </div>
         <div v-else-if="labelTab === 'upload'" class="uploadBody">
@@ -153,7 +146,7 @@
                   </div>
                 </template> -->
               </el-upload>
-              <el-form :label-position="'top'" ref="ruleFormRef" :model="info" :rules="rules">
+              <el-form :label-position="'top'" ref="ruleFormRef" :model="info" :rules="rules" @submit.native.prevent>
                 <el-form-item label="Commit changes" prop="name">
                   <el-input v-model="info.name" :placeholder="'Upload '+fileList.length+' files'" />
                 </el-form-item>
@@ -167,7 +160,7 @@
               <el-upload class="upload-demo" ref="uploadFolderRef" :file-list="stateUpload.files" :on-change="handleFolderChange" :on-remove="handleFolderRemove" action="#" multiple :auto-upload="false" webkitdirectory>
                 <div class="el-upload__text el-upload-dragger uploadDigFolder">Browse Folders</div>
               </el-upload>
-              <el-form :label-position="'top'" ref="ruleFormFolderRef" :model="info" :rules="rules">
+              <el-form :label-position="'top'" ref="ruleFormFolderRef" :model="info" :rules="rules" @submit.native.prevent>
                 <el-form-item label="Commit changes" prop="name">
                   <el-input v-model="info.name" :placeholder="'Upload '+stateUpload.files.length+' files'" />
                 </el-form-item>
@@ -182,8 +175,11 @@
         <div v-else-if="labelTab === 'create'" class="uploadBody">
           <el-tabs type="border-card" v-loading="uploadLoad">
             <el-tab-pane label="Create new file">
-              <v-md-editor v-model="textEditor"></v-md-editor>
-              <el-form :label-position="'top'" ref="ruleEditName" :model="textInfo" :rules="rulesEdit">
+              <div class="mirror">
+                <Codemirror v-model:value="textEditor" :options="system.$commonFun.cmOptions" border placeholder="" />
+              </div>
+              <!-- <v-md-editor v-model="textEditor"></v-md-editor> -->
+              <el-form :label-position="'top'" ref="ruleEditName" :model="textInfo" :rules="rulesEdit" @submit.native.prevent>
                 <el-form-item label="File name" prop="name">
                   <el-input v-model="textInfo.name" :placeholder="'Name your file'" />
                 </el-form-item>
@@ -211,6 +207,7 @@ import {
   UploadFilled,
   EditPen
 } from '@element-plus/icons-vue'
+import Codemirror from "codemirror-editor-vue3"
 export default defineComponent({
   name: 'Spaces',
   components: {
@@ -219,7 +216,8 @@ export default defineComponent({
     Folder,
     Plus,
     UploadFilled,
-    EditPen
+    EditPen,
+    Codemirror
   },
   props: {
     likesValue: { type: Boolean, default: false }
@@ -309,7 +307,7 @@ export default defineComponent({
         fileRow.fileResdata = listRes.data.files || []
         listdata.value = listRes.data.space || { name: route.params.name }
         if (listRes.data.owner) {
-          // if (listRes.data.owner.avatar) peopleAvatarImg.value = listRes.data.owner.avatar
+          if (listRes.data.owner.avatar) peopleAvatarImg.value = listRes.data.owner.avatar
           peopleName.value = listRes.data.owner.full_name || ''
         }
         const current = Math.floor(Date.now() / 1000)
@@ -374,6 +372,7 @@ export default defineComponent({
       listLoad.value = false
     }
     async function handleCommand (command) {
+      uploadLoad.value = command === 'create'
       labelTab.value = command
       pathList.value = []
       fileRow.fileTitle.forEach((element, i) => {
@@ -381,6 +380,14 @@ export default defineComponent({
       })
       await system.$commonFun.timeout(1000)
       if (command === 'upload') addEvent()
+      else if (command === 'create') createText()
+    }
+    async function createText () {
+      var response = await fetch(`/static/template/create.md`)
+      textEditor.value = await new Promise(async resolve => {
+        resolve(response.text())
+      })
+      uploadLoad.value = false
     }
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
@@ -661,10 +668,6 @@ export default defineComponent({
       if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     }
-    function hiddAddress (val) {
-      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
-      else return '-'
-    }
 
     const treeify = (nodeList) => {
       const root = {
@@ -764,6 +767,9 @@ export default defineComponent({
       }
       return newNodeList;
     }
+    const onBlur = (option) => {
+      // console.log("update:value", option.getValue())
+    }
     onMounted(() => {
       reset()
       window.scrollTo(0, 0)
@@ -807,7 +813,7 @@ export default defineComponent({
       blobSize,
       init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile, hiddAddress
+      calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile, onBlur
     }
   }
 })
@@ -818,6 +824,7 @@ export default defineComponent({
   background: #fff;
   color: #333;
   font-size: 18px;
+  text-align: left;
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
