@@ -28,9 +28,43 @@
               <el-button @click="clearMethod('clear')">Clear</el-button>
             </div>
           </div>
-          <div class="title" style="cursor: pointer;" @click="sortChange('likes')">
-            Spaces of the week
-            <i class="icon icon_week"></i>
+        </div>
+        <div class="week" v-if="pagin.pageNo<=1 && optionsValue === 'updated' && !searchValue">
+          <div class="top">
+            <div class="title">
+              Spaces of the week
+              <i class="icon icon_week"></i>
+            </div>
+          </div>
+
+          <el-row :gutter="32" class="list_body" v-loading="listLoad">
+            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="ls in spaceLikesData" :key="ls">
+              <el-card class="box-card" @click="detailFun(ls, l)">
+                <template #header>
+                  <div class="card-header">
+                    <span>{{ls.likes}}</span>
+                  </div>
+                  <h1>{{ls.name}}</h1>
+                  <!-- <div class="card-owner">
+                    <span>Owner: {{ls.wallet_address}}</span>
+                  </div> -->
+                </template>
+                <div class="text">
+                  <div class="text_left">
+                    <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
+                    <i class="icon"></i>
+                    <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || hiddAddress(ls.wallet_address)}}</span>
+                  </div>
+                  <span>{{momentFilter(ls.created_at)}}</span>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+
+          <div class="top">
+            <div class="title title_all">
+              # All running apps, trending first
+            </div>
           </div>
         </div>
         <el-row :gutter="32" class="list_body" v-loading="listLoad">
@@ -83,6 +117,7 @@ export default defineComponent({
     const listLoad = ref(true)
     const spaceData = ref([])
     const spaceDataAll = ref([])
+    const spaceLikesData = ref([])
     const options = ref([
       // {
       //   value: 'downloads',
@@ -129,7 +164,7 @@ export default defineComponent({
       pagin.total = 0
       pagin.sort = 'updated'
       optionsValue.value = 'updated'
-      if (type) init()
+      if (type) init('', 1)
     }
     function filterData (spaceData, val) {
       if (val === '') return spaceDataAll.value
@@ -153,7 +188,7 @@ export default defineComponent({
       pagin.pageNo = 1
       init()
     }
-    async function init (name) {
+    async function init (name, typeLikes) {
       listLoad.value = true
       spaceData.value = []
       const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
@@ -163,6 +198,11 @@ export default defineComponent({
         sort: pagin.sort, // alphabetical， updated
         name: searchValue.value,
         public_address: name || ''
+      }
+
+      if (typeLikes) {
+        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify({ sort: 'likes', limit: 3 })}`, 'get')
+        if (likesRes) spaceLikesData.value = likesRes.spaces || []
       }
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
       if (listRes) {
@@ -187,13 +227,13 @@ export default defineComponent({
     }
     onActivated(() => {
       window.scrollTo(0, 0)
-      init()
+      init('', 1)
     })
     onDeactivated(() => {
       clearMethod()
     })
     watch(lagLogin, (newValue, oldValue) => {
-      if (!lagLogin.value) init()
+      if (!lagLogin.value) init('', 1)
     })
     return {
       accessAvatar,
@@ -206,6 +246,7 @@ export default defineComponent({
       listLoad,
       spaceData,
       spaceDataAll,
+      spaceLikesData,
       pagin,
       system,
       route,
@@ -419,6 +460,12 @@ export default defineComponent({
             background: url(../../../assets/images/icons/icon_14.png) no-repeat
               center;
             background-size: 100%;
+          }
+          &.title_all {
+            padding: 0.07rem 0.35rem;
+            background-color: #f3f4f6;
+            // background-image: linear-gradient(to bottom right, #f3f4f6, #fff);
+            color: rgb(55, 65, 81);
           }
         }
       }
