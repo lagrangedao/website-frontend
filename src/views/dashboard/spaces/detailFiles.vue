@@ -311,12 +311,12 @@ export default defineComponent({
           peopleName.value = listRes.data.owner.full_name || ''
         }
         const current = Math.floor(Date.now() / 1000)
-        let expireTime = current
+        let expireTime = NaN
         if (listRes.data.space.expiration_time) {
           const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
-        context.emit('handleValue', listRes.data.space, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
+        context.emit('handleValue', listRes.data, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
 
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)

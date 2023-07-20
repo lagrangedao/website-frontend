@@ -2,9 +2,9 @@
     <div class="footer landing">
         <el-row class="footer_menu">
             <el-col :xs="24" :sm="24" :md="11" :lg="11" :xl="11">
-                <router-link to="/main">
+                <a class="text">
                     @Lagrange
-                </router-link>
+                </a>
                 <router-link to="/terms_of_service">
                     TOS
                 </router-link>
@@ -115,6 +115,12 @@ export default defineComponent({
         }
         &:hover {
           text-decoration: underline;
+        }
+        &.text {
+          cursor: text;
+          &:hover {
+            text-decoration: none;
+          }
         }
       }
     }

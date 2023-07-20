@@ -21,7 +21,7 @@
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime <=7 && expireTime >= 0">
+          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime <=5 && expireTime >= 0">
             <el-button type="warning" plain disabled>
               <el-icon>
                 <WarningFilled />
@@ -51,6 +51,11 @@
             </svg> Fork
           </div>
           <share-pop></share-pop>
+        </div>
+        <div class="remain" v-if="expireTime>=0">
+          <el-icon>
+            <Timer />
+          </el-icon>Remaining Time： {{expireTime === 0 ? '&lt; 1' : expireTime}} Day
         </div>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
@@ -106,7 +111,7 @@
       </el-tabs>
     </div>
 
-    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style">
+    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70% '" :destroy-on-close="true" custom-class="drawer_style">
       <template #default>
         <div class="close" @click="drawer=false">
           <el-icon>
@@ -139,6 +144,27 @@
         </el-tabs>
       </template>
     </el-drawer>
+
+    <div class="note" v-if="noteShow && !forkLoad">
+      <div class="close" @click="noteShow=false">
+        <el-icon>
+          <Close />
+        </el-icon>
+      </div>
+      <div class="box">
+        <div class="title">Space 101</div>
+        <ul>
+          <li :class="{'strikeout': allData.files.length>0}">Upload Docker file</li>
+          <li>Choose the hardware you want</li>
+          <li>Done!</li>
+        </ul>
+      </div>
+    </div>
+
+    <el-dialog v-model="spaceHardDia" title="" :width="'90%'" :show-close="true" :close-on-click-modal="false">
+      <space-hardware @handleHard="handleHard" :listdata="allData.space"></space-hardware>
+    </el-dialog>
+
   </section>
 </template>
 <script>
@@ -148,11 +174,12 @@ import detailFiles from './detailFiles.vue'
 import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
 import sharePop from '@/components/share.vue'
+import spaceHardware from '@/components/spaceHardware.vue'
 import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  Setting, ArrowLeft, WarningFilled, CloseBold
+  Setting, ArrowLeft, WarningFilled, CloseBold, Close, Timer
 } from '@element-plus/icons-vue'
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
@@ -163,7 +190,8 @@ export default defineComponent({
     detailApp,
     detailCommunity,
     detailSetting,
-    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold
+    spaceHardware,
+    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer
   },
   setup () {
     const store = useStore()
@@ -237,7 +265,7 @@ export default defineComponent({
     const drawerName = ref('Logs')
     const direction = ref('btt')
     const logsValue = ref('')
-    const expireTime = ref(Math.floor(Date.now() / 1000))
+    const expireTime = ref(NaN)
     const logsCont = reactive({
       data: {}
     })
@@ -246,6 +274,12 @@ export default defineComponent({
       chain_id: null
     })
     const nftTokens = ref([])
+    const noteShow = ref(true)
+    const allData = reactive({
+      space: {},
+      files: []
+    })
+    const spaceHardDia = ref(false)
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -261,9 +295,11 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
-    const handleValue = async (value, log, time, nftCont) => {
+    const handleValue = async (dataRes, log, time, nftCont) => {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
+      allData.space = dataRes.space || {}
+      allData.files = dataRes.files || []
       if (log) {
         const response = await fetch(log)
         const textUri = await new Promise(async resolve => {
@@ -274,9 +310,9 @@ export default defineComponent({
       } else {
         logsValue.value = ''
       }
-      expireTime.value = time ? time : Math.floor(Date.now() / 1000)
-      parentValue.value = numRe.test(value.status) ? '' : value.status
-      likeValue.value = value.likes || 0
+      expireTime.value = time === 0 ? 0 : time ? time : NaN
+      parentValue.value = numRe.test(dataRes.space.status) ? '' : dataRes.space.status
+      likeValue.value = dataRes.space.likes || 0
       if (nftCont) {
         nft.contract_address = nftCont.contract_address
         nft.chain_id = nftCont.chain_id
@@ -298,7 +334,7 @@ export default defineComponent({
       forkLoad.value = false
       parentValue.value = ''
       logsValue.value = ''
-      expireTime.value = Math.floor(Date.now() / 1000)
+      expireTime.value = NaN
       logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
@@ -309,13 +345,14 @@ export default defineComponent({
       router.push({ path: '/spaces' })
     }
     async function renewFun () {
-      forkLoad.value = true
-      const renewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/extend`, 'post')
-      if (renewRes && renewRes.status === 'success') {
-        await system.$commonFun.timeout(500)
-        window.location.reload()
-      } else system.$commonFun.messageTip('error', 'Request failed!')
-      forkLoad.value = false
+      spaceHardDia.value = true
+      // forkLoad.value = true
+      // const renewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/extend`, 'post')
+      // if (renewRes && renewRes.status === 'success') {
+      //   await system.$commonFun.timeout(500)
+      //   window.location.reload()
+      // } else system.$commonFun.messageTip('error', 'Request failed!')
+      // forkLoad.value = false
     }
     async function reqNFT () {
       if (!nft.contract_address || nftTokens.value.length === 0) return
@@ -357,6 +394,9 @@ export default defineComponent({
     const drawerClick = (tab, event) => {
       // console.log(tab, event)
     }
+    function handleHard (val, refresh) {
+      spaceHardDia.value = val
+    }
     onActivated(() => init())
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
@@ -387,16 +427,20 @@ export default defineComponent({
       forkLoad,
       nft,
       nftTokens,
+      noteShow,
+      allData,
       drawerName,
+      spaceHardDia,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick,
-      forkOperate, back, renewFun, reqNFT, likeMethod, drawerClick
+      forkOperate, back, renewFun, reqNFT, likeMethod, drawerClick, handleHard
     }
   }
 })
 </script>
 
 <style lang="scss" scoped>
+@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,600;1,700&display=swap");
 #space {
   background: #fff;
   color: #333;
@@ -666,6 +710,14 @@ export default defineComponent({
         background-color: #f3f1ff;
       }
     }
+    .remain {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      i {
+        margin-right: 3px;
+      }
+    }
     :deep(.demo-tabs) {
       display: block;
       flex-wrap: wrap;
@@ -753,6 +805,88 @@ export default defineComponent({
       }
       .el-tabs__nav-wrap::after {
         display: none;
+      }
+    }
+  }
+  .note {
+    position: fixed;
+    right: -10px;
+    top: 30%;
+    width: auto;
+    height: auto;
+    font-family: "Raleway", sans-serif;
+    text-align: left;
+    border-radius: 3px;
+    overflow: hidden;
+    z-index: 99999;
+    .close {
+      position: absolute;
+      top: 30px;
+      right: 20px;
+      color: #000;
+      font-size: 23px;
+      cursor: pointer;
+      z-index: 99;
+      svg,
+      path {
+        cursor: pointer;
+      }
+    }
+    .box {
+      position: relative;
+      background-color: #fee16c;
+      width: 300px;
+      height: auto;
+      padding: 0 0 0.15rem;
+      margin: 20px 10px;
+      border: 2px solid #fee16c;
+      .title {
+        padding: 0.15rem;
+        font-size: 0.2rem;
+        font-weight: 700;
+        font-style: italic;
+        font-stretch: normal;
+        text-align: center;
+      }
+      ul {
+        padding: 0 15px 0 30px;
+        list-style-type: disc;
+        li {
+          margin: 0 0 0.1rem;
+          font-size: 0.18rem;
+          font-weight: 600;
+          font-style: normal;
+          font-stretch: normal;
+          line-height: 1.3;
+          list-style: disc;
+          &.strikeout {
+            text-decoration: line-through;
+          }
+        }
+      }
+      &:before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        width: 80%;
+        height: 80%;
+        left: 13%;
+        bottom: 7px;
+        background: red;
+        transform: skew(14deg) rotate(3deg);
+        box-shadow: 0 0 16px rgba(0, 0, 0, 0.8);
+      }
+      &:after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        width: 80%;
+        height: 80%;
+        right: 13%;
+        bottom: 7px;
+        background: red;
+        transform: skew(-14deg) rotate(-3deg);
+        box-shadow: 0 0 16px rgba(0, 0, 0, 0.8);
       }
     }
   }
