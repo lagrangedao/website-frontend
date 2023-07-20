@@ -63,7 +63,7 @@
 
           <div class="top">
             <div class="title title_all">
-              # All running apps, trending first
+              All running spaces, recently uploaded first
             </div>
           </div>
         </div>
@@ -463,9 +463,6 @@ export default defineComponent({
           }
           &.title_all {
             padding: 0.07rem 0.35rem;
-            background-color: #f3f4f6;
-            // background-image: linear-gradient(to bottom right, #f3f4f6, #fff);
-            color: rgb(55, 65, 81);
           }
         }
       }
