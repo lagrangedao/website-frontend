@@ -145,7 +145,7 @@
       </template>
     </el-drawer>
 
-    <div class="note" v-if="noteShow && !forkLoad">
+    <div class="note" v-if="noteShow && !forkLoad && !spaceHardDia">
       <div class="close" @click="noteShow=false">
         <el-icon>
           <Close />
@@ -161,7 +161,7 @@
       </div>
     </div>
 
-    <el-dialog v-model="spaceHardDia" title="" :width="'90%'" :show-close="true" :close-on-click-modal="false">
+    <el-dialog v-model="spaceHardDia" title="" :width="bodyWidth" :show-close="true" :close-on-click-modal="false">
       <space-hardware @handleHard="handleHard" :listdata="allData.space"></space-hardware>
     </el-dialog>
 
@@ -206,7 +206,7 @@ export default defineComponent({
     const listLoad = ref(true)
     const filedata = ref([])
     const total = ref(0)
-    const bodyWidth = ref(document.body.clientWidth < 992)
+    const bodyWidth = ref(document.body.clientWidth > 1536 ? '1536px' : '90%')
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
