@@ -56,12 +56,12 @@ export default defineComponent({
           listdata.job_result_uri = JSON.parse(textUri).job_result_uri
         } else listdata.job_result_uri = jobData.job_result_uri
         const current = Math.floor(Date.now() / 1000)
-        let expireTime = current
+        let expireTime = NaN
         if (listRes.data.space.expiration_time) {
           const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
-        context.emit('handleValue', listRes.data.space, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+        context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -130,34 +130,34 @@ export default defineComponent({
       width: 100%;
       overflow: auto;
       @media screen and (min-height: 500px) and (min-width: 769px) {
-        min-height: 215px;
-      }
-      @media screen and (min-height: 600px) and (min-width: 769px) {
         min-height: 315px;
       }
+      @media screen and (min-height: 600px) and (min-width: 769px) {
+        min-height: 415px;
+      }
       @media screen and (min-height: 680px) and (min-width: 769px) {
-        min-height: 395px;
+        min-height: 495px;
       }
       @media screen and (min-height: 700px) and (min-width: 769px) {
-        min-height: 495px;
+        min-height: 595px;
       }
       @media screen and (min-height: 750px) and (min-width: 769px) {
-        min-height: 465px;
+        min-height: 565px;
       }
       @media screen and (min-height: 768px) and (min-width: 769px) {
-        min-height: 495px;
+        min-height: 595px;
       }
       @media screen and (min-height: 900px) and (min-width: 769px) {
-        min-height: 585px;
+        min-height: 685px;
       }
       @media screen and (min-height: 1000px) and (min-width: 769px) {
-        min-height: 655px;
+        min-height: 755px;
       }
       @media screen and (min-height: 1100px) and (min-width: 769px) {
-        min-height: 825px;
+        min-height: 925px;
       }
       @media screen and (min-height: 1200px) and (min-width: 769px) {
-        min-height: 885px;
+        min-height: 985px;
       }
       &.space_text {
         padding: 11px;

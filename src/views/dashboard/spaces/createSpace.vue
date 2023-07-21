@@ -83,22 +83,6 @@
                             </div>
                         </label>
                     </el-form-item>
-                    <el-form-item prop="hardware">
-                        <label class="label" for="hardware">
-                            Select the Space Hardware
-                            <small>
-                                You can switch to a different hardware at any time in your Space settings.
-                                <br /> You will be billed for every minute of uptime on a paid hardware.
-                            </small>
-                            <div class="flex flex-row">
-                                <el-select v-model="ruleForm.hardware" placeholder="Select a hardware" @change="radioChange">
-                                    <el-option-group v-for="group in hardwareOptions" :key="group.label" :label="group.label">
-                                        <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value" />
-                                    </el-option-group>
-                                </el-select>
-                            </div>
-                        </label>
-                    </el-form-item>
                     <el-form-item prop="resource" class="flex_pad">
                         <el-radio-group v-model="ruleForm.resource" disabled>
                             <el-radio label="1">
@@ -146,10 +130,7 @@ import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import { FormInstance, FormRules } from 'element-plus'
 import { Unlock } from '@element-plus/icons-vue'
-import tokenABI from '@/utils/abi/LagrangeDAOToken.json'
-import hyperspaceABI from '@/utils/abi/SpacePayment.json'
 import licenseList from '@/utils/License-list.js'
-import hardwareList from '@/utils/hardware-list.js'
 export default defineComponent({
     name: "Create Space",
     components: {
@@ -176,7 +157,6 @@ export default defineComponent({
             licenseOptions: [],
             oldOptions: []
         })
-        const hardwareOptions = ref([])
         const validateInput = (rule, value, callback) => {
             if ((/[^a-zA-Z0-9-]/g).test(value)) {
                 callback(new Error("Only regular alphanumeric characters and '-' support"));
@@ -223,8 +203,6 @@ export default defineComponent({
             await ruleFormRef.value.validate(async (valid, fields) => {
                 if (valid) {
                     loading.createLoad = true
-                    ruleForm.payment_hash = await init()
-                    if (!ruleForm.payment_hash && ruleForm.hardware !== '0') return false
                     loading.createText = 'Please wait for the space creation to complete.'
                     let formData = new FormData()
                     formData.append('name', ruleForm.name)
@@ -233,9 +211,7 @@ export default defineComponent({
                     formData.append('hardware', ruleForm.hardware)
                     formData.append('sdk', ruleForm.sdk)
                     formData.append('hours', ruleForm.hours)
-                    formData.append('payment_hash', !ruleForm.payment_hash ? '' : ruleForm.payment_hash)
                     const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces`, 'post', formData)
-                    await system.$commonFun.timeout(500)
                     if (listRes && listRes.data) system.$commonFun.messageTip('success', 'Created Space successfully!')
                     else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Created Failed!')
                     ruleForm.name = ''
@@ -273,77 +249,7 @@ export default defineComponent({
         }
         let nonce = 0
         let hash = ''
-        const space_contract_address = process.env.VUE_APP_SPACE_ADDRESS
-        const token_contract_address = process.env.VUE_APP_TOKEN_ADDRESS
-        const token_contract = new system.$commonFun.web3Init.eth.Contract(tokenABI, token_contract_address)
-        const space_contract = new system.$commonFun.web3Init.eth.Contract(hyperspaceABI, space_contract_address)
 
-        const init = async () => {
-            try {
-                if (ruleForm.hardware === '0') return false
-                const chainId = await ethereum.request({ method: 'eth_chainId' })
-                if (parseInt(chainId, 16) !== 3141) {
-                    await errFun('please switch to Filecoin TestNet.')
-                    return false
-                }
-                loading.createText = 'Please wait until the process completed.'
-                const token_name = await token_contract.methods.name().call().then()
-                const token_symbol = await token_contract.methods.symbol().call().then()
-                const token_decimals = await token_contract.methods.decimals().call().then()
-                const token_balance = await token_contract.methods.balanceOf(metaAddress.value).call().then()
-                const fil_balance = await system.$commonFun.web3Init.eth.getBalance(metaAddress.value).then()
-                const user_balance = await space_contract.methods.balanceOf(metaAddress.value).call().then()
-                const lad_allowance = await token_contract.methods.allowance(metaAddress.value, space_contract_address).call().then()
-                // console.log(`Your payment wallet address: ${metaAddress.value}`)
-                // console.log(`Your Account balance: ${fil_balance / (10 ** token_decimals)} tFIL`)
-                // console.log(`Your Account balance: ${token_balance / (10 ** token_decimals)} ${token_symbol}`)
-
-                const blocks = 120
-                const prices = [0, 1, 20, 30, 35, 105]
-                const price = prices[ruleForm.hardware] * parseInt(blocks)
-                const price_in_wei = toFixed(parseInt(price) * (10 ** token_decimals))
-                // console.log(`Confirm purchasing hardware type ${ruleForm.hardware} for ${blocks} blocks (${price} ${token_symbol})?`)
-                console.log('LAD approved:', lad_allowance / (10 ** token_decimals), ',user_balance:', user_balance / (10 ** token_decimals), ',token_balance:', token_balance, ',price_in_wei:', price_in_wei)
-                if (token_balance < price_in_wei) {
-                    await errFun('Not enough LAD tokens!')
-                    return false
-                }
-
-                if (user_balance < price_in_wei && parseInt(ruleForm.hardware) !== 0) {
-                    console.log('Deposit LAD into contract')
-                    loading.createText = 'Deposit LAD into contract'
-                    if (lad_allowance < price_in_wei) {
-                        console.log('user needs to approve spending LAD')
-                        nonce = await system.$commonFun.web3Init.eth.getTransactionCount(metaAddress.value).then()
-                        tx_config["nonce"] = nonce
-                        const approve_tx = await token_contract.methods.approve(space_contract_address, String(price_in_wei)).send(tx_config)
-                        console.log('approve_tx: ', approve_tx)
-                    }
-
-                    console.log(`Depositing ${price} ${token_symbol} into contract...`)
-                    nonce = await new system.$commonFun.web3Init.eth.getTransactionCount(metaAddress.value).then()
-                    tx_config["nonce"] = nonce
-                    const deposit_tx = await space_contract.methods.deposit(String(price_in_wei)).send(tx_config)
-                    console.log('deposit_tx:', deposit_tx)
-                    hash = deposit_tx.transactionHash
-                    console.log(`Deposit is completed. Tx Hash: https://hyperspace.filfox.info/en/message/${hash}`)
-                }
-
-                console.log(`purchasing space...`)
-                loading.createText = 'Purchasing space...'
-                nonce = await system.$commonFun.web3Init.eth.getTransactionCount(metaAddress.value).then()
-                tx_config["nonce"] = nonce
-                const tx = await space_contract.methods.buySpace(parseInt(ruleForm.hardware), parseInt(blocks)).send(tx_config)
-                hash = tx.transactionHash
-                console.log(`Purchasing Success. Tx Hash: https://hyperspace.filfox.info/en/message/${hash}`)
-                return hash
-            } catch (err) {
-                console.error(err)
-                loading.createLoad = false
-                loading.createText = ''
-                return false
-            }
-        }
         async function errFun (text) {
             system.$commonFun.messageTip('error', text)
             loading.createLoad = false
@@ -378,7 +284,6 @@ export default defineComponent({
         }
         onMounted(async () => {
             ruleFormRef.value.resetFields()
-            hardwareOptions.value = hardwareList
             ruleForm.licenseOptions = await licenseSelect()
             ruleForm.oldOptions = await licenseSelect()
         })
@@ -396,7 +301,6 @@ export default defineComponent({
             formLabelWidth,
             depostForm,
             dialogWidth,
-            hardwareOptions,
             submitForm, radioChange, handleChange, licenseChange, licenseQuery, ModelChangeSelect
         }
     },

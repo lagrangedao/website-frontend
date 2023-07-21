@@ -341,12 +341,12 @@ export default defineComponent({
         })
         const jobData = listRes.data.job || { job_result_uri: '' }
         const current = Math.floor(Date.now() / 1000)
-        let expireTime = current
+        let expireTime = NaN
         if (listRes.data.space.expiration_time) {
           const currentTime = (listRes.data.space.expiration_time - current) / 86400
           expireTime = Math.floor(currentTime)
         }
-        context.emit('handleValue', listRes.data.space, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+        context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
