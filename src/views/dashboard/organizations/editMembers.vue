@@ -298,57 +298,12 @@ export default defineComponent({
       var re = new RegExp('^(?!mailto:)(?:(?:http|https|ftp)://|//)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$', 'i');
       return re.test(str_url);
     }
-    async function getdataList () {
-      loading.value = false
-      listLoad.value = true
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
-      if (listRes && listRes.status === 'success') {
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar)
-        store.dispatch('setAccessName', listRes.data.user.full_name)
-        profileName.value = listRes.data.user.full_name
-        ruleForm.name = listRes.data.user.full_name
-        ruleForm.avatar = listRes.data.user.avatar
-        ruleForm.homepage = listRes.data.user.homepage
-        ruleForm.github = listRes.data.user.github_username
-        ruleForm.twitter = listRes.data.user.twitter_username
-      } else {
-        reset()
-        system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
-      }
-      // await system.$commonFun.timeout(500)
-      listLoad.value = false
-    }
     function momentFilter (dateItem) {
       return system.$commonFun.momentFun(dateItem)
     }
     function detailFun (row, index) {
       // console.log(row, index)
       router.push({ name: 'datasetDetail', params: { name: row.name, tabs: 'card' } })
-    }
-    const submitForm = async (formEl) => {
-      if (!formEl) return
-      await ruleFormRef.value.validate(async (valid, fields) => {
-        if (valid) {
-          listLoad.value = true
-          if (fileList.value.length > 0) ruleForm.avatar = await editAvatar()
-          let formData = new FormData()
-          formData.append('full_name', ruleForm.name)
-          formData.append('avatar', ruleForm.avatar || '')
-          formData.append('homepage', ruleForm.homepage || '')
-          formData.append('github_username', ruleForm.github || '')
-          formData.append('twitter_username', ruleForm.twitter || '')
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'post', formData)
-          if (listRes && listRes.status === 'success') {
-            getdataList()
-          }
-          await system.$commonFun.timeout(500)
-          system.$commonFun.messageTip('success', 'Update successfully!')
-          listLoad.value = false
-        } else {
-          console.log('error submit!', fields)
-          return false
-        }
-      })
     }
     function removeAvatar () {
       fileList.value = []
@@ -388,7 +343,6 @@ export default defineComponent({
       fileList.value = []
     }
     onMounted(() => {
-      // getdataList()
       loading.value = false
     })
     onActivated(() => {
@@ -419,7 +373,7 @@ export default defineComponent({
       changeVisible,
       CaretTop,
       radioLink,
-      getdataList, momentFilter, detailFun, submitForm, editAvatar,
+      momentFilter, detailFun, editAvatar,
       handleChange, handleRemove, removeAvatar
     }
   }

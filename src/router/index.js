@@ -36,6 +36,8 @@ const personalCenterProfile = () =>
     import ("@/views/dashboard/personalCenter/setting");
 const termsOfService = () =>
     import ("@/views/dashboard/company/index");
+const paymentHistory = () =>
+    import ("@/components/paymentHistory");
 
 const routes = [{
         path: '/',
@@ -202,6 +204,15 @@ const routes = [{
                 path: '/code_of_conduct',
                 name: 'codeOfConduct',
                 component: termsOfService,
+                meta: {
+                    keepAlive: true,
+                    title: ''
+                }
+            },
+            {
+                path: '/payment_history',
+                name: 'paymentHistory',
+                component: paymentHistory,
                 meta: {
                     keepAlive: true,
                     title: ''
