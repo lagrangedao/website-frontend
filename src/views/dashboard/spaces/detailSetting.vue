@@ -262,7 +262,7 @@ export default defineComponent({
     const ruleFormRef = ref(null)
     const listdata = ref({})
     const nftdata = ref({})
-    const taskdata = ref({})
+    const taskdata = ref(null)
     const ruleFormRefDelete = ref(null)
     const renameLoad = ref(false)
     const deleteLoad = ref(false)
