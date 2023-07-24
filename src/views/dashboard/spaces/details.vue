@@ -826,7 +826,7 @@ export default defineComponent({
     text-align: left;
     border-radius: 3px;
     overflow: hidden;
-    z-index: 99999;
+    z-index: 2000;
     .close {
       position: absolute;
       top: 30px;

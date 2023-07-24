@@ -193,11 +193,11 @@ export default defineComponent({
       listLoad.value = true
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
       if (listRes && listRes.status === 'success') {
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar)
+        store.dispatch('setAccessAvatar', listRes.data.user.avatar ? `${listRes.data.gateway}/ipfs/${listRes.data.user.avatar}` : '')
         store.dispatch('setAccessName', listRes.data.user.full_name)
         profileName.value = listRes.data.user.full_name
         ruleForm.name = listRes.data.user.full_name
-        ruleForm.avatar = listRes.data.user.avatar
+        ruleForm.avatar = listRes.data.user.avatar ? `${listRes.data.gateway}/ipfs/${listRes.data.user.avatar}` : ''
         ruleForm.homepage = listRes.data.user.homepage
         ruleForm.github = listRes.data.user.github_username
         ruleForm.twitter = listRes.data.user.twitter_username
