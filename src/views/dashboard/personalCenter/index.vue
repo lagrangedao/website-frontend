@@ -33,6 +33,11 @@
             </div>
             <div class="desc">None yet</div>
           </div>
+          <div class="personal">
+            <el-button type="" text bg>
+              <router-link :to="{name:'paymentHistory'}">Payment History</router-link>
+            </el-button>
+          </div>
           <div class="media">
             <a v-if="listdata.user.homepage" :href="listdata.user.homepage" target="_blank" class="homepage"></a>
             <a v-if="listdata.user.twitter_username" :href="'https://twitter.com/'+listdata.user.twitter_username" target="_blank" class="twitter"></a>
@@ -343,7 +348,7 @@ export default defineComponent({
         licenseIndex.value = listRes.data.received_licenses.length
         dataSetIndex.value = listRes.data.dataset.length
         spacesIndex.value = listRes.data.space.length
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar)
+        store.dispatch('setAccessAvatar', listRes.data.user.avatar ? `${listRes.data.gateway}/ipfs/${listRes.data.user.avatar}` : '')
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
         let datasetList = []

@@ -45,6 +45,12 @@
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
           </div>
+          <div class="logs_style">
+            <svg t="1690181902015" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2037" width="200" height="200">
+              <path d="M992.627337 593.536l-42.304 0 0-529.536-661.376 0c-16.64 0-26.112 18.944-15.872 32 42.496 54.464 124.288 159.36 124.672 160l360.576 0 0 337.536-42.24 0c-26.176 0-40.832 30.08-24.704 50.688l138.24 177.28c12.544 16.128 36.928 16.128 49.536 0l138.304-177.28c15.936-20.608 1.216-50.688-24.832-50.688zM626.355337 768l-360.576 0 0-337.536 42.24 0c26.176 0 40.832-30.08 24.704-50.688l-138.24-177.28c-12.544-16.128-36.928-16.128-49.536 0l-138.304 177.28c-16 20.608-1.28 50.688 24.768 50.688l42.304 0 0 529.536 661.44 0c16.64 0 26.112-18.944 15.872-32-42.496-54.464-124.288-159.36-124.672-160z"
+                fill="#878c93" p-id="2038"></path>
+            </svg> Reboot
+          </div>
           <div class="logs_style" @click="forkOperate" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
               <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
@@ -145,7 +151,7 @@
       </template>
     </el-drawer>
 
-    <div class="note" v-if="noteShow && !forkLoad && !spaceHardDia">
+    <div class="note" v-if="noteShow && !forkLoad && !spaceHardDia && !(allData.files.length>0 && allData.task !== null)">
       <div class="close" @click="noteShow=false">
         <el-icon>
           <Close />
@@ -155,14 +161,14 @@
         <div class="title">Space 101</div>
         <ul>
           <li :class="{'strikeout': allData.files.length>0}">Upload Docker file</li>
-          <li>Choose the hardware you want</li>
+          <li :class="{'strikeout': allData.task !== null}">Choose the hardware you want</li>
           <li>Done!</li>
         </ul>
       </div>
     </div>
 
     <el-dialog v-model="spaceHardDia" title="" :width="bodyWidth" :show-close="true" :close-on-click-modal="false">
-      <space-hardware @handleHard="handleHard" :listdata="allData.space"></space-hardware>
+      <space-hardware @handleHard="handleHard" :listdata="allData.space" :taskdata="allData.task"></space-hardware>
     </el-dialog>
 
   </section>
@@ -277,6 +283,7 @@ export default defineComponent({
     const noteShow = ref(true)
     const allData = reactive({
       space: {},
+      task: null,
       files: []
     })
     const spaceHardDia = ref(false)
@@ -300,6 +307,7 @@ export default defineComponent({
       var numRe = new RegExp(numReg)
       allData.space = dataRes.space || {}
       allData.files = dataRes.files || []
+      allData.task = dataRes.task
       if (log) {
         const response = await fetch(log)
         const textUri = await new Promise(async resolve => {
@@ -811,7 +819,7 @@ export default defineComponent({
   .note {
     position: fixed;
     right: -10px;
-    top: 30%;
+    top: 1rem;
     width: auto;
     height: auto;
     font-family: "Raleway", sans-serif;
@@ -824,7 +832,7 @@ export default defineComponent({
       top: 30px;
       right: 20px;
       color: #000;
-      font-size: 23px;
+      font-size: 20px;
       cursor: pointer;
       z-index: 99;
       svg,
@@ -835,14 +843,14 @@ export default defineComponent({
     .box {
       position: relative;
       background-color: #fee16c;
-      width: 300px;
+      width: 200px;
       height: auto;
       padding: 0 0 0.15rem;
       margin: 20px 10px;
       border: 2px solid #fee16c;
       .title {
         padding: 0.15rem;
-        font-size: 0.2rem;
+        font-size: 0.18rem;
         font-weight: 700;
         font-style: italic;
         font-stretch: normal;
@@ -853,7 +861,7 @@ export default defineComponent({
         list-style-type: disc;
         li {
           margin: 0 0 0.1rem;
-          font-size: 0.18rem;
+          font-size: 0.16rem;
           font-weight: 600;
           font-style: normal;
           font-stretch: normal;
@@ -870,7 +878,7 @@ export default defineComponent({
         z-index: -1;
         width: 80%;
         height: 80%;
-        left: 13%;
+        left: 11%;
         bottom: 7px;
         background: red;
         transform: skew(14deg) rotate(3deg);
@@ -882,7 +890,7 @@ export default defineComponent({
         z-index: -1;
         width: 80%;
         height: 80%;
-        right: 13%;
+        right: 11%;
         bottom: 7px;
         background: red;
         transform: skew(-14deg) rotate(-3deg);
