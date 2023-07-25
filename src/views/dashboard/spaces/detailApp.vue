@@ -2,7 +2,7 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body" v-loading="listLoad">
-        <iframe v-if="listdata.job_result_uri" :src="listdata.job_result_uri" title="Space app" class="space_iframe"></iframe>
+        <iframe v-if="listdata.job_result_uri" :src="`${listdata.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
       </el-row>
     </div>
   </section>
@@ -31,7 +31,8 @@ export default defineComponent({
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const listLoad = ref(true)
     const listdata = reactive({
-      job_result_uri: ''
+      job_result_uri: '',
+      space: {}
     })
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
@@ -48,6 +49,7 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         const jobData = listRes.data.job || { job_result_uri: '' }
+        listdata.space = listRes.data.space
         if (jobData.job_result_uri) {
           const response = await fetch(jobData.job_result_uri)
           const textUri = await new Promise(async resolve => {
