@@ -79,7 +79,7 @@
             <el-divider content-position="left">{{item.label}}</el-divider>
             <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.options.concat(item.options_setting)" :key="o">
               <!-- 'active': props.listdata.hardware === ol.value,  -->
-              <el-card class="box-card" :class="{'is-disabled':!availableData.some(t => t === ol.label)}" @click="sleepChange(ol)">
+              <el-card class="box-card" :class="{'is-disabled':!availableData.hasOwnProperty(ol.label)}" @click="sleepChange(ol)">
                 <div class="abo" v-if="props.listdata.hardware === ol.value && false">
                   <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
                     <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
@@ -91,7 +91,7 @@
                 <h5>{{ol.type}}</h5>
                 <div class="desc-text">{{ol.label_short}}</div>
                 <div class="price">
-                  <b v-if="availableData.some(t => t === ol.label)">{{ol.price}}</b>
+                  <b v-if="availableData.hasOwnProperty(ol.label)">{{ol.price}}</b>
                   <b v-else>No available CP</b>
                 </div>
               </el-card>
@@ -115,22 +115,11 @@
             <div class="title_tip flex">
               <div class="flex">
                 Usage time
-                <el-popover placement="top-start" :width="200" trigger="hover" content="About 2 sec / block">
-                  <template #reference>
-                    <div>
-                      <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                        <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
-                        <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
-                        <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
-                      </svg>
-                    </div>
-                  </template>
-                </el-popover>
               </div>
               <el-divider />
             </div>
             <div class="time flex">
-              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="168" :precision="0" :step="1" controls-position="right" /> &nbsp; hours (About {{ruleForm.usageTime*60*30}} blocks)
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="168" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
             <el-divider />
             <p class="p-1">Make sure to follow
@@ -250,7 +239,7 @@ export default defineComponent({
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
-            await hardwareHash(transactionHash)
+            await hardwareHash(transactionHash, approveAmount)
             hardwareLoad.value = false
             context.emit('handleHard', false, true)
           })
@@ -262,7 +251,7 @@ export default defineComponent({
       }
     }
 
-    async function hardwareHash (tx_hash) {
+    async function hardwareHash (tx_hash, approveAmount) {
       let fd = new FormData()
       let chainID = '80001'
       const getID = await system.$commonFun.web3Init.eth.net.getId()
@@ -271,27 +260,27 @@ export default defineComponent({
         await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
         return
       }
-      fd.append('paid', sleepSelect.value.paid)
+      fd.append('paid', approveAmount) // 授权代币的金额
       fd.append('space_name', route.params.name)
       fd.append('type', sleepSelect.value.typeLabel)
       fd.append('hardware', sleepSelect.value.label)
       fd.append('hardware_id', sleepSelect.value.hardwareId)
       fd.append('vcpu', sleepSelect.value.vCPU)
       fd.append('memory', sleepSelect.value.memory)
-      fd.append('duration', ruleForm.usageTime)
+      fd.append('duration', ruleForm.usageTime * 3600)
       fd.append('price_per_hour', sleepSelect.value.pricePerHour)
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
       const hardhashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}space/deployment`, 'post', fd)
     }
     function sleepChange (row) {
-      if (!availableData.value.some(t => t === row.label)) return false
+      if (!availableData.value.hasOwnProperty(row.label)) return false
       sleepSelect.value = row
       sleepVisible.value = true
     }
     async function init (params) {
       machinesLoad.value = true
-      const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines/`, 'get')
+      const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
       if (machinesRes && machinesRes.status === 'success') availableData.value = machinesRes.data.available_hardware || []
       else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
       machinesLoad.value = false

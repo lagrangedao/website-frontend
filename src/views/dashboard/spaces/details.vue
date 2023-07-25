@@ -21,16 +21,18 @@
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime <=5 && expireTime >= 0">
-            <el-button type="warning" plain disabled>
+          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime <=5">
+            <el-button type="warning" plain disabled v-if="expireTime >= 0">
               <el-icon>
                 <WarningFilled />
               </el-icon>
               &nbsp;Expires in {{expireTime}} days</el-button>
-            <el-button type="warning" plain @click="renewFun">Renew</el-button>
-          </el-button-group>
-          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime < 0">
-            <el-button type="warning" plain @click="renewFun">Restart</el-button>
+            <el-button type="warning" plain disabled v-else>
+              <el-icon>
+                <WarningFilled />
+              </el-icon>
+              &nbsp;Expired</el-button>
+            <el-button type="warning" plain @click="spaceHardDia = true">Renew</el-button>
           </el-button-group>
           <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
@@ -45,7 +47,7 @@
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
           </div>
-          <div class="logs_style">
+          <div class="logs_style" @click="rebootFun" v-if="metaAddress === route.params.wallet_address">
             <svg t="1690181902015" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2037" width="200" height="200">
               <path d="M992.627337 593.536l-42.304 0 0-529.536-661.376 0c-16.64 0-26.112 18.944-15.872 32 42.496 54.464 124.288 159.36 124.672 160l360.576 0 0 337.536-42.24 0c-26.176 0-40.832 30.08-24.704 50.688l138.24 177.28c12.544 16.128 36.928 16.128 49.536 0l138.304-177.28c15.936-20.608 1.216-50.688-24.832-50.688zM626.355337 768l-360.576 0 0-337.536 42.24 0c26.176 0 40.832-30.08 24.704-50.688l-138.24-177.28c-12.544-16.128-36.928-16.128-49.536 0l-138.304 177.28c-16 20.608-1.28 50.688 24.768 50.688l42.304 0 0 529.536 661.44 0c16.64 0 26.112-18.944 15.872-32-42.496-54.464-124.288-159.36-124.672-160z"
                 fill="#878c93" p-id="2038"></path>
@@ -352,15 +354,14 @@ export default defineComponent({
     function back () {
       router.push({ path: '/spaces' })
     }
-    async function renewFun () {
-      spaceHardDia.value = true
-      // forkLoad.value = true
-      // const renewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/extend`, 'post')
-      // if (renewRes && renewRes.status === 'success') {
-      //   await system.$commonFun.timeout(500)
-      //   window.location.reload()
-      // } else system.$commonFun.messageTip('error', 'Request failed!')
-      // forkLoad.value = false
+    async function rebootFun () {
+      forkLoad.value = true
+      const rebootRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/redeploy`, 'post')
+      if (rebootRes && rebootRes.status === 'success') {
+        await system.$commonFun.timeout(500)
+        window.location.reload()
+      } else if (rebootRes.message) system.$commonFun.messageTip('error', rebootRes.message)
+      forkLoad.value = false
     }
     async function reqNFT () {
       if (!nft.contract_address || nftTokens.value.length === 0) return
@@ -441,7 +442,7 @@ export default defineComponent({
       spaceHardDia,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick,
-      forkOperate, back, renewFun, reqNFT, likeMethod, drawerClick, handleHard
+      forkOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard
     }
   }
 })
