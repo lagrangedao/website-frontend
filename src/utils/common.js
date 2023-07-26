@@ -213,26 +213,31 @@ async function getUnit(id) {
   let unit = 'ETH'
   let name = ''
   let url = ''
+  let url_tx = ''
   switch (id) {
     case 56:
       unit = 'BNB'
       name = 'Binance Smart Chain Mainnet '
       url = `${process.env.VUE_APP_BSCBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_BSCBLOCKURL}/tx/`
       break
     case 97:
       unit = 'tBNB'
       name = 'Binance Smart Chain Testnet '
       url = `${process.env.VUE_APP_BSCTESTNETBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_BSCTESTNETBLOCKURL}/tx/`
       break
     case 137:
       unit = 'MATIC'
       name = 'Polygon Mainnet '
       url = `${process.env.VUE_APP_POLYGONBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_POLYGONBLOCKURL}/tx/`
       break
     case 80001:
       unit = 'MATIC'
       name = 'Mumbai Testnet '
       url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_MUMBAIBLOCKURL}/tx/`
       break
     case 3141:
       unit = 'ETH'
@@ -242,12 +247,14 @@ async function getUnit(id) {
       unit = 'ETH'
       name = 'Sepolia Testnet '
       url = `${process.env.VUE_APP_SEPOLIABLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_SEPOLIABLOCKURL}/tx/`
       break
   }
   return ({
     unit,
     name,
-    url
+    url,
+    url_tx
   })
 }
 

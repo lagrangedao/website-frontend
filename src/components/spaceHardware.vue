@@ -119,7 +119,7 @@
               <el-divider />
             </div>
             <div class="time flex">
-              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="168" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.typeLabel === 'GPU' ? 168:336" :precision="0" :step="1" :disabled="sleepSelect.hardwareId === '0' ?true: false" controls-position="right" /> &nbsp; hours
             </div>
             <el-divider />
             <p class="p-1">Make sure to follow
@@ -132,8 +132,8 @@
         <template #footer>
           <span class="dialog-footer">
             <el-button-group class="flex">
-              <el-button @click="hardwareFun">Confirm new hardware</el-button>
-              <el-button @click="sleepVisible = false">Cancel</el-button>
+              <el-button @click="hardwareFun" :disabled="hardwareLoad">Confirm new hardware</el-button>
+              <el-button @click="sleepVisible = false" :disabled="hardwareLoad">Cancel</el-button>
             </el-button-group>
           </span>
         </template>
@@ -157,7 +157,8 @@ export default defineComponent({
   components: {},
   props: {
     listdata: { type: Object, default: {} },
-    taskdata: { type: Object, default: null }
+    taskdata: { type: Object, default: null },
+    statusPayment: { type: String, default: 'Stopped' }
   },
   setup (props, context) {
     const store = useStore()
@@ -168,7 +169,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const ruleForm = reactive({
-      usageTime: 0,
+      usageTime: 1,
       sleepTime: '259200',
       sleepTimeOption: [
         {
@@ -241,6 +242,7 @@ export default defineComponent({
             console.log('transactionHash:', transactionHash)
             await hardwareHash(transactionHash, approveAmount)
             hardwareLoad.value = false
+            sleepVisible.value = false
             context.emit('handleHard', false, true)
           })
           .on('error', () => hardwareLoad.value = false)
@@ -268,13 +270,14 @@ export default defineComponent({
       fd.append('vcpu', sleepSelect.value.vCPU)
       fd.append('memory', sleepSelect.value.memory)
       fd.append('duration', ruleForm.usageTime * 3600)
-      fd.append('price_per_hour', sleepSelect.value.pricePerHour)
+      fd.append('price_per_hour', sleepSelect.value.paid)
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
       const hardhashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}space/deployment`, 'post', fd)
     }
     function sleepChange (row) {
       if (!availableData.value.hasOwnProperty(row.label)) return false
+      ruleForm.usageTime = 1
       sleepSelect.value = row
       sleepVisible.value = true
     }

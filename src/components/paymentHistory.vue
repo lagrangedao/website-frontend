@@ -1,62 +1,75 @@
 <template>
-    <div class="payment-history">
-        <div class="title">Payment history</div>
-        <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%">
-            <el-table-column prop="transaction_hash" label="transaction hash" />
-            <el-table-column prop="chain_id" label="chain id" width="100" />
-            <el-table-column prop="token" label="token" />
-            <el-table-column prop="space_name" label="space name" />
-            <el-table-column prop="amount" label="amount" />
-            <el-table-column prop="status" label="status" width="120">
-                <template #default="scope">
-                    <el-button type="primary" v-if="scope.row.status === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
-                    <span v-else>{{scope.row.status}}</span>
-                </template>
-            </el-table-column>
-        </el-table>
-    </div>
+  <div class="payment-history">
+    <div class="title">Payment history</div>
+    <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%">
+      <el-table-column prop="transaction_hash" label="transaction hash">
+        <template #default="scope">
+          <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
+        </template>
+      </el-table-column>
+      <el-table-column prop="chain_id" label="chain id" width="100" />
+      <el-table-column prop="token" label="token">
+        <template #default="scope">
+          <span>LAG</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="space_name" label="space name" />
+      <el-table-column prop="amount" label="amount" />
+      <el-table-column prop="status" label="status" width="120">
+        <template #default="scope">
+          <el-button type="primary" v-if="scope.row.status === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
+          <span v-else>{{scope.row.status}}</span>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 <script>
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 export default defineComponent({
-    name: 'footer_page',
-    setup () {
-        const store = useStore()
-        const logo_small = require("@/assets/images/icons/logo_small.png")
-        const system = getCurrentInstance().appContext.config.globalProperties
-        const route = useRoute()
-        const router = useRouter()
-        const paymentData = ref([])
-        const paymentLoad = ref(false)
+  name: 'footer_page',
+  setup () {
+    const store = useStore()
+    const logo_small = require("@/assets/images/icons/logo_small.png")
+    const system = getCurrentInstance().appContext.config.globalProperties
+    const route = useRoute()
+    const router = useRouter()
+    const paymentData = ref([])
+    const paymentLoad = ref(false)
 
-        async function refundFun (row) {
-            paymentLoad.value = true
-            let formData = new FormData()
-            formData.append('tx_hash', row.transaction_hash)
-            formData.append('chain_id', row.chain_id)
-            const refundRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/refund`, 'post', formData)
-            if (!refundRes || refundRes.status !== 'success') if (refundRes.message) system.$commonFun.messageTip('error', refundRes.message)
-            init()
+    async function refundFun (row) {
+      paymentLoad.value = true
+      let formData = new FormData()
+      formData.append('tx_hash', row.transaction_hash)
+      formData.append('chain_id', row.chain_id)
+      const refundRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/refund`, 'post', formData)
+      if (!refundRes || refundRes.status !== 'success') if (refundRes.message) system.$commonFun.messageTip('error', refundRes.message)
+      init()
+    }
+    async function init (params) {
+      paymentLoad.value = true
+      const paymentsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/payments`, 'get')
+      if (paymentsRes && paymentsRes.status === 'success') {
+        for (let p = 0; p < paymentsRes.data.payments.length; p++) {
+          let { url_tx } = await system.$commonFun.getUnit(parseInt(paymentsRes.data.payments[p].chain_id), 16)
+          paymentsRes.data.payments[p].url_tx = url_tx
         }
-        async function init (params) {
-            paymentLoad.value = true
-            const paymentsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/payments`, 'get')
-            if (paymentsRes && paymentsRes.status === 'success') paymentData.value = paymentsRes.data.payments || []
-            else if (paymentsRes.message) system.$commonFun.messageTip('error', paymentsRes.message)
-            paymentLoad.value = false
-        }
-        onMounted(() => { init() })
-        return {
-            paymentData,
-            paymentLoad,
-            system,
-            route,
-            router,
-            refundFun
-        }
-    },
+        paymentData.value = paymentsRes.data.payments || []
+      } else if (paymentsRes.message) system.$commonFun.messageTip('error', paymentsRes.message)
+      paymentLoad.value = false
+    }
+    onMounted(() => { init() })
+    return {
+      paymentData,
+      paymentLoad,
+      system,
+      route,
+      router,
+      refundFun
+    }
+  },
 })
 </script>
 <style  lang="scss" scoped>

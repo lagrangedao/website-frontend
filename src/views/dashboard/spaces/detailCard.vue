@@ -300,7 +300,7 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
-        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+        else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
       } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
       init()
       isPreview.value = true
@@ -420,7 +420,7 @@ export default defineComponent({
         let fd = await formDataRetrue()
         const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
         if (uploadRes && uploadRes.status === "success" && uploadRes.data) system.$commonFun.messageTip('success', 'Update  successfully!')
-        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+        else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
         init()
       }
     }

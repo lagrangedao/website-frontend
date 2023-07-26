@@ -255,7 +255,7 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
-        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+        else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
       } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
       init()
       isPreview.value = true
