@@ -79,8 +79,32 @@ const h = [{
                 hardwareId: '6',
                 label: 'Nvidia 3060 Ti - 8 vCPU - 32 GiB',
                 label_short: '8 vCPU · 32 GiB · Nvidia 3060 Ti',
-                price: '10 LAG per hour',
+                price: '8 LAG per hour',
                 type: 'M2ae.medium',
+                vCPU: '8',
+                typeLabel: 'GPU',
+                paid: '8',
+                memory: 32,
+                pricePerHour: 7002000000000000000
+            },
+            {
+                hardwareId: '7',
+                label: 'Nvidia 3070 - 4 vCPU - 16 GiB',
+                label_short: '8 vCPU · 32 GiB · Nvidia 3070',
+                price: '9 LAG per hour',
+                type: 'M2ae.large',
+                vCPU: '4',
+                typeLabel: 'GPU',
+                paid: '9',
+                memory: 16,
+                pricePerHour: 7002000000000000000
+            },
+            {
+                hardwareId: '8',
+                label: 'Nvidia 3070 Ti - 8 vCPU - 32 GiB',
+                label_short: '8 vCPU · 32 GiB · Nvidia 3070 Ti',
+                price: '10 LAG per hour',
+                type: 'M2ae.xlarge',
                 vCPU: '8',
                 typeLabel: 'GPU',
                 paid: '10',
@@ -88,7 +112,7 @@ const h = [{
                 pricePerHour: 7002000000000000000
             },
             {
-                hardwareId: '7',
+                hardwareId: '9',
                 label: 'Nvidia 3080 - 4 vCPU - 16 GiB',
                 label_short: '4 vCPU · 16 GiB · Nvidia 3080',
                 price: '11 LAG per hour',
@@ -100,7 +124,7 @@ const h = [{
                 pricePerHour: 4500000000000000000
             },
             {
-                hardwareId: '8',
+                hardwareId: '10',
                 label: 'Nvidia 3080 - 8 vCPU - 32 GiB',
                 label_short: '8 vCPU · 32 GiB · Nvidia 3080',
                 price: '13 LAG per hour',
@@ -112,7 +136,7 @@ const h = [{
                 pricePerHour: 7488000000000000000
             },
             {
-                hardwareId: '9',
+                hardwareId: '11',
                 label: 'Nvidia 3080 Ti - 4 vCPU - 16 GiB',
                 label_short: '4 vCPU · 16 GiB · Nvidia 3080 Ti',
                 price: '15 LAG per hour',
@@ -124,7 +148,7 @@ const h = [{
                 pricePerHour: 5490000000000000000
             },
             {
-                hardwareId: '10',
+                hardwareId: '12',
                 label: 'Nvidia 3080 Ti - 8 vCPU - 32 GiB',
                 label_short: '8 vCPU · 32 GiB · Nvidia 3080 Ti',
                 price: '18 LAG per hour',
@@ -136,7 +160,7 @@ const h = [{
                 pricePerHour: 7992000000000000000
             },
             {
-                hardwareId: '11',
+                hardwareId: '13',
                 label: 'Nvidia T4 - 4 vCPU - 16 GiB',
                 label_short: '4 vCPU · 16 GiB · Nvidia T4',
                 price: '20 LAG per hour',
@@ -148,7 +172,7 @@ const h = [{
                 pricePerHour: 5994000000000000000
             },
             {
-                hardwareId: '12',
+                hardwareId: '14',
                 label: 'Nvidia T4 - 8 vCPU - 32 GiB',
                 label_short: '8 vCPU · 32 GiB · Nvidia T4',
                 price: '23 LAG per hour',
@@ -160,7 +184,7 @@ const h = [{
                 pricePerHour: 9000000000000000000
             },
             {
-                hardwareId: '13',
+                hardwareId: '15',
                 label: 'Nvidia A10G - 4 vCPU - 16 GiB',
                 label_short: '4 vCPU · 16 GiB · Nvidia A10G',
                 price: '26 LAG per hour',
@@ -172,7 +196,7 @@ const h = [{
                 pricePerHour: 10494000000000000000
             },
             {
-                hardwareId: '14',
+                hardwareId: '16',
                 label: 'Nvidia A10G - 12 vCPU - 48 GiB',
                 label_short: '12 vCPU · 48 GiB · Nvidia A10G',
                 price: '28 LAG per hour',
@@ -184,7 +208,7 @@ const h = [{
                 pricePerHour: 31500000000000000000
             },
             {
-                hardwareId: '15',
+                hardwareId: '17',
                 label: 'Nvidia 3090 - 4 vCPU - 16 GiB',
                 label_short: '4 vCPU · 16 GiB · Nvidia 3090',
                 price: '30 LAG per hour',
@@ -196,7 +220,7 @@ const h = [{
                 pricePerHour: 12492000000000000000
             },
             {
-                hardwareId: '16',
+                hardwareId: '18',
                 label: 'Nvidia 3090 - 8 vCPU - 32 GiB',
                 label_short: '8 vCPU · 32 GiB · Nvidia 3090',
                 price: '32 LAG per hour',
@@ -208,7 +232,7 @@ const h = [{
                 pricePerHour: 24984000000000000000
             },
             {
-                hardwareId: '17',
+                hardwareId: '19',
                 label: 'Nvidia 3090 Ti - 4 vCPU - 16 GiB',
                 label_short: '4 vCPU · 16 GiB · Nvidia 3090 Ti',
                 price: '34 LAG per hour',
@@ -220,7 +244,7 @@ const h = [{
                 pricePerHour: 13500000000000000000
             },
             {
-                hardwareId: '18',
+                hardwareId: '20',
                 label: 'Nvidia 3090 Ti - 8 vCPU - 32 GiB',
                 label_short: '8 vCPU · 32 GiB · Nvidia 3090 Ti',
                 price: '36 LAG per hour',
@@ -232,7 +256,7 @@ const h = [{
                 pricePerHour: 25992000000000000000
             },
             {
-                hardwareId: '19',
+                hardwareId: '21',
                 label: 'Nvidia 4090 - 4 vCPU - 16 GiB',
                 label_short: '4 vCPU · 16 GiB · Nvidia 4090',
                 price: '38 LAG per hour',
@@ -244,7 +268,7 @@ const h = [{
                 pricePerHour: 14994000000000000000
             },
             {
-                hardwareId: '20',
+                hardwareId: '22',
                 label: 'Nvidia 4090 - 8 vCPU - 32 GiB',
                 label_short: '8 vCPU · 32 GiB · Nvidia 4090',
                 price: '40 LAG per hour',
@@ -256,7 +280,7 @@ const h = [{
                 pricePerHour: 25380000000000000000
             },
             {
-                hardwareId: '21',
+                hardwareId: '23',
                 label: 'Nvidia 4090 Ti - 4 vCPU - 16 GiB',
                 label_short: '4 vCPU · 16 GiB · Nvidia 4090 Ti',
                 price: '42 LAG per block',
@@ -268,7 +292,7 @@ const h = [{
                 pricePerHour: 16992000000000000000
             },
             {
-                hardwareId: '22',
+                hardwareId: '24',
                 label: 'Nvidia 4090 Ti - 8 vCPU - 32 GiB',
                 label_short: '8 vCPU · 32 GiB · Nvidia 4090 Ti',
                 price: '44 LAG per hour',
@@ -280,7 +304,7 @@ const h = [{
                 pricePerHour: 28998000000000000000
             },
             {
-                hardwareId: '23',
+                hardwareId: '25',
                 label: 'Nvidia A100 - 12 vCPU - 128 GiB',
                 label_short: '12 vCPU · 128 GiB · Nvidia A100',
                 price: '46 LAG per hour',
@@ -292,11 +316,11 @@ const h = [{
                 pricePerHour: 41292000000000000000
             },
             {
-                hardwareId: '24',
+                hardwareId: '26',
                 label: 'Nvidia A100 - 24 vCPU - 256 GiB',
                 label_short: '24 vCPU · 256 GiB · Nvidia A100',
                 price: '52 LAG per hour',
-                type: 'Nvidia A100',
+                type: 'P1ae.medium',
                 vCPU: '24',
                 typeLabel: 'GPU',
                 paid: '52',
@@ -304,7 +328,7 @@ const h = [{
                 pricePerHour: 99990000000000000000
             },
             {
-                hardwareId: '25',
+                hardwareId: '27',
                 label: 'Nvidia H100 - 12 vCPU - 128 GiB',
                 label_short: '12 vCPU · 128 GiB · Nvidia H100',
                 price: '57 LAG per hour',
@@ -316,7 +340,7 @@ const h = [{
                 pricePerHour: 52992000000000000000
             },
             {
-                hardwareId: '26',
+                hardwareId: '28',
                 label: 'Nvidia H100 - 24 vCPU - 256 GiB',
                 label_short: '24 vCPU · 256 GiB · Nvidia H100',
                 price: '65 LAG per hour',

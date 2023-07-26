@@ -274,6 +274,7 @@ export default defineComponent({
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
       const hardhashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}space/deployment`, 'post', fd)
+      if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
     }
     function sleepChange (row) {
       if (!availableData.value.hasOwnProperty(row.label)) return false
