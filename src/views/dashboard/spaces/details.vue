@@ -47,7 +47,7 @@
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
           </div>
-          <div class="logs_style" @click="rebootFun" v-if="metaAddress === route.params.wallet_address">
+          <div class="logs_style" @click="rebootFun" v-if="metaAddress === route.params.wallet_address && allData.statusPayment === 'Running'">
             <svg t="1690181902015" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2037" width="200" height="200">
               <path d="M992.627337 593.536l-42.304 0 0-529.536-661.376 0c-16.64 0-26.112 18.944-15.872 32 42.496 54.464 124.288 159.36 124.672 160l360.576 0 0 337.536-42.24 0c-26.176 0-40.832 30.08-24.704 50.688l138.24 177.28c12.544 16.128 36.928 16.128 49.536 0l138.304-177.28c15.936-20.608 1.216-50.688-24.832-50.688zM626.355337 768l-360.576 0 0-337.536 42.24 0c26.176 0 40.832-30.08 24.704-50.688l-138.24-177.28c-12.544-16.128-36.928-16.128-49.536 0l-138.304 177.28c-16 20.608-1.28 50.688 24.768 50.688l42.304 0 0 529.536 661.44 0c16.64 0 26.112-18.944 15.872-32-42.496-54.464-124.288-159.36-124.672-160z"
                 fill="#878c93" p-id="2038"></path>
@@ -128,6 +128,69 @@
         </div>
         <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick">
           <el-tab-pane label="Logs" name="Logs">
+            <div class="el-steps el-steps--simple">
+              <div class="el-step is-simple">
+                <div class="el-step__head" :class="{'is-success': allData.files.length>0, 'is-wait':!allData.files.length>0}">
+                  <div class="el-step__icon is-text">
+                    <i v-if="allData.files.length>0" class="el-icon el-step__icon-inner is-status">
+                      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="currentColor" d="M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944z"></path>
+                      </svg>
+                    </i>
+                  </div>
+                </div>
+                <div class="el-step__main">
+                  <div class="el-step__title" :class="{'is-success': allData.files.length>0, 'is-wait':!allData.files.length>0}">Update Files</div>
+                  <div class="el-step__arrow"></div>
+                </div>
+              </div>
+              <div class="el-step is-simple is-flex">
+                <div class="el-step__head" :class="{'is-success': allData.statusPayment !== 'Stopped', 'is-wait':!allData.statusPayment !== 'Stopped'}">
+                  <div class="el-step__icon is-text">
+                    <i v-if="allData.statusPayment !== 'Stopped'" class="el-icon el-step__icon-inner is-status">
+                      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="currentColor" d="M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944z"></path>
+                      </svg>
+                    </i>
+                  </div>
+                </div>
+                <div class="el-step__main">
+                  <div class="el-step__title" :class="{'is-success': allData.statusPayment !== 'Stopped', 'is-wait':!allData.statusPayment !== 'Stopped'}">Waiting for transaction complete</div>
+                  <div class="el-step__arrow"></div>
+                </div>
+              </div>
+              <div class="el-step is-simple is-flex">
+                <div class="el-step__head" :class="{'is-success': allData.statusPayment !== 'Stopped' && allData.statusPayment !== 'Waiting for transaction', 'is-wait':!(allData.statusPayment !== 'Stopped' && allData.statusPayment !== 'Waiting for transaction')}">
+                  <div class="el-step__icon is-text">
+                    <i v-if="allData.statusPayment !== 'Stopped' && allData.statusPayment !== 'Waiting for transaction'" class="el-icon el-step__icon-inner is-status">
+                      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="currentColor" d="M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944z"></path>
+                      </svg>
+                    </i>
+                  </div>
+                </div>
+                <div class="el-step__main">
+                  <div class="el-step__title" :class="{'is-success': allData.statusPayment !== 'Stopped' && allData.statusPayment !== 'Waiting for transaction', 'is-wait':!(allData.statusPayment !== 'Stopped' && allData.statusPayment !== 'Waiting for transaction')}">running space</div>
+                  <div class="el-step__arrow"></div>
+                </div>
+              </div>
+              <div class="el-step is-simple is-flex">
+                <div class="el-step__head" :class="{'is-success': allData.task.cp_node_id, 'is-wait':!allData.task.cp_node_id}">
+                  <div class="el-step__icon is-text">
+                    <i v-if="allData.task.cp_node_id" class="el-icon el-step__icon-inner is-status">
+                      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="currentColor" d="M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944z"></path>
+                      </svg>
+                    </i>
+                  </div>
+                </div>
+                <div class="el-step__main">
+                  <div class="el-step__title" :class="{'is-success': allData.task.cp_node_id, 'is-wait':!allData.task.cp_node_id}">cp node id ({{allData.task.cp_node_id}})</div>
+                  <div class="el-step__arrow"></div>
+                </div>
+              </div>
+            </div>
+
             <div class="logBody">
               {{logsCont.data.job}}
               <br /> {{logsCont.data.task}}
@@ -153,7 +216,7 @@
       </template>
     </el-drawer>
 
-    <div class="note" v-if="noteShow && !forkLoad && !spaceHardDia && !(allData.files.length>0 && allData.task !== null)">
+    <div class="note" v-if="noteShow && !forkLoad && !spaceHardDia && !(allData.files.length>0 && allData.statusPayment !== 'Stopped')">
       <div class="close" @click="noteShow=false">
         <el-icon>
           <Close />
@@ -163,14 +226,14 @@
         <div class="title">Space 101</div>
         <ul>
           <li :class="{'strikeout': allData.files.length>0}">Upload Docker file</li>
-          <li :class="{'strikeout': allData.task !== null}">Choose the hardware you want</li>
+          <li :class="{'strikeout': allData.statusPayment !== 'Stopped'}">Choose the hardware you want</li>
           <li>Done!</li>
         </ul>
       </div>
     </div>
 
     <el-dialog v-model="spaceHardDia" title="" :width="bodyWidth" :show-close="true" :close-on-click-modal="false">
-      <space-hardware @handleHard="handleHard" :listdata="allData.space" :taskdata="allData.task"></space-hardware>
+      <space-hardware @handleHard="handleHard" :listdata="allData.space" :taskdata="allData.task" :statusPayment="allData.statusPayment"></space-hardware>
     </el-dialog>
 
   </section>
@@ -286,7 +349,8 @@ export default defineComponent({
     const allData = reactive({
       space: {},
       task: null,
-      files: []
+      files: [],
+      statusPayment: 'Stopped'
     })
     const spaceHardDia = ref(false)
 
@@ -310,6 +374,7 @@ export default defineComponent({
       allData.space = dataRes.space || {}
       allData.files = dataRes.files || []
       allData.task = dataRes.task
+      allData.statusPayment = dataRes.status
       if (log) {
         const response = await fetch(log)
         const textUri = await new Promise(async resolve => {
@@ -967,10 +1032,25 @@ export default defineComponent({
           height: 100%;
         }
         .logBody {
-          width: 100%;
-          height: 100%;
+          width: calc(100% - 30px);
+          max-height: 400px;
+          padding: 15px;
           margin: 0;
+          background-color: #fff;
+          border-radius: 5px;
           overflow-y: scroll;
+          box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
+        }
+        .el-steps {
+          margin: 0.1rem 0 0.4rem;
+          box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
+          .el-step {
+            flex-basis: 50%;
+            text-transform: capitalize;
+            * {
+              word-break: break-word;
+            }
+          }
         }
         .uploadBody {
           width: 100%;

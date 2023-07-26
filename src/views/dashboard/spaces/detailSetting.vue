@@ -1,8 +1,8 @@
 <template>
   <section id="space">
     <el-row class="space_body" v-loading="listLoad">
-      <space-hardware @handleHard="handleHard" :listdata="listdata" :taskdata="taskdata"></space-hardware>
-      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && taskdata === null">
+      <space-hardware @handleHard="handleHard" :listdata="listdata" :taskdata="taskdata" :statusPayment="statusPayment"></space-hardware>
+      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && statusPayment === 'Stopped'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -263,6 +263,7 @@ export default defineComponent({
     const listdata = ref({})
     const nftdata = ref({})
     const taskdata = ref(null)
+    const statusPayment = ref('Stopped')
     const ruleFormRefDelete = ref(null)
     const renameLoad = ref(false)
     const deleteLoad = ref(false)
@@ -519,7 +520,8 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "" }
-        taskdata.value = listRes.data.task
+        statusPayment.value = listRes.data.status
+        taskdata.value = listRes.data.task || null
         const current = Math.floor(Date.now() / 1000)
         let expireTime = NaN
         if (listRes.data.space.expiration_time) {
@@ -562,7 +564,7 @@ export default defineComponent({
       if (refresh) requestInitData()
     }
     function handleHard (val, refresh) {
-
+      if (refresh) requestInitData()
     }
     onMounted(async () => {
       window.scrollTo(0, 0)
@@ -594,6 +596,7 @@ export default defineComponent({
       listLoad,
       nftdata,
       taskdata,
+      statusPayment,
       dataNFTRequest,
       dialogDOIVisible,
       system,

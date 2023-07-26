@@ -307,7 +307,7 @@ export default defineComponent({
         fileRow.fileResdata = listRes.data.files || []
         listdata.value = listRes.data.space || { name: route.params.name }
         if (listRes.data.owner) {
-          if (listRes.data.owner.avatar) peopleAvatarImg.value = listRes.data.owner.avatar
+          if (listRes.data.owner.avatar) peopleAvatarImg.value = listRes.data.owner.avatar && listRes.data.owner.gateway ? `${listRes.data.owner.gateway}/ipfs/${listRes.data.owner.avatar}` : ''
           peopleName.value = listRes.data.owner.full_name || ''
         }
         const current = Math.floor(Date.now() / 1000)

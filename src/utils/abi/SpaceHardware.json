@@ -117,12 +117,62 @@
     "name": "RefundSet",
     "type": "event"
 }, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": false,
+        "internalType": "string",
+        "name": "taskId",
+        "type": "string"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+    }],
+    "name": "RewardClaimed",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": false,
+        "internalType": "string",
+        "name": "taskId",
+        "type": "string"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+    }],
+    "name": "RewardSet",
+    "type": "event"
+}, {
     "inputs": [{
         "internalType": "string",
         "name": "spaceName",
         "type": "string"
     }],
     "name": "claimRefund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "string",
+        "name": "taskId",
+        "type": "string"
+    }],
+    "name": "claimReward",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -203,6 +253,24 @@
 }, {
     "inputs": [{
         "internalType": "address",
+        "name": "",
+        "type": "address"
+    }, {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+    }],
+    "name": "rewards",
+    "outputs": [{
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "address",
         "name": "admin",
         "type": "address"
     }, {
@@ -251,6 +319,24 @@
         "type": "uint256"
     }],
     "name": "setRefund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "string",
+        "name": "taskId",
+        "type": "string"
+    }, {
+        "internalType": "address",
+        "name": "cpWallet",
+        "type": "address"
+    }, {
+        "internalType": "uint256",
+        "name": "rewardAmount",
+        "type": "uint256"
+    }],
+    "name": "setReward",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
