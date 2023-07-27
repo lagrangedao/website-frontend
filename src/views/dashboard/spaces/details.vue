@@ -187,7 +187,11 @@
                 <div class="el-step__main">
                   <div class="el-step__title" :class="{'is-success': allData.job.bidder_id, 'is-wait':!allData.job.bidder_id}">
                     <p v-if="allData.job.bidder_id">cp node id
-                      <span class="copy" @click="system.$commonFun.copyContent(allData.job.bidder_id, 'Copied')">({{system.$commonFun.hiddAddress(allData.job.bidder_id)}})</span>
+                      <el-popover placement="top" :width="300" popper-style="word-break: break-word; text-align: left;" trigger="hover" :content="allData.job.bidder_id">
+                        <template #reference>
+                          <span class="copy" @click="system.$commonFun.copyContent(allData.job.bidder_id, 'Copied')">({{system.$commonFun.hiddAddress(allData.job.bidder_id)}})</span>
+                        </template>
+                      </el-popover>
                     </p>
                     <p v-else>Waiting for CP finish deployment</p>
                   </div>
