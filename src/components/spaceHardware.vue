@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="space-hard" v-if="props.taskdata !== null && props.taskdata.config">
+    <div class="space-hard" v-if="false && props.listdata.activeOrder && props.listdata.activeOrder.config">
       <el-row class="space_hardware" :gutter="30">
         <el-col :span="24">
           <h2 class="flex">You're using:</h2>
-          <p class="p-2">CPU: {{props.taskdata.config.cpu}}</p>
-          <p class="p-2">Memory: {{props.taskdata.config.memory}}</p>
-          <p class="p-2">GPU: {{props.taskdata.config.gpu}}</p>
-          <p class="p-2">VCPU: {{props.taskdata.config.vcpu}}</p>
+          <p class="p-2">CPU: {{props.listdata.activeOrder.config.cpu}}</p>
+          <p class="p-2">Memory: {{props.listdata.activeOrder.config.memory}}</p>
+          <p class="p-2">GPU: {{props.listdata.activeOrder.config.gpu}}</p>
+          <p class="p-2">VCPU: {{props.listdata.activeOrder.config.vcpu}}</p>
         </el-col>
       </el-row>
     </div>
@@ -70,7 +70,7 @@
                 fill="currentColor" fill-opacity="0.3"></path>
               <path fill-rule="evenodd" clip-rule="evenodd" d="M5 4C4.44771 4 4 4.44771 4 5V7C4 7.55227 4.44771 8 5 8H7C7.55227 8 8 7.55227 8 7V5C8 4.44771 7.55227 4 7 4H5Z" fill-opacity="0.5"></path>
             </svg>
-            <span v-if="props.taskdata === null">Space Hardware</span>
+            <span v-if="props.listdata.activeOrder === null">Space Hardware</span>
             <span v-else>Update Hardware</span>
           </h2>
           <p class="p-2">Choose a hardware for your Space.</p>
@@ -78,9 +78,8 @@
           <el-row :gutter="25" class="space_hardware_list" v-for="(item,index) in hardwareOptions" :key="index">
             <el-divider content-position="left">{{item.label}}</el-divider>
             <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.options.concat(item.options_setting)" :key="o">
-              <!-- 'active': props.listdata.hardware === ol.value,  -->
-              <el-card class="box-card" :class="{'is-disabled':!availableData.hasOwnProperty(ol.type)}" @click="sleepChange(ol)">
-                <div class="abo" v-if="props.listdata.hardware === ol.value && false">
+              <el-card class="box-card" :class="{'active': props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.type,'is-disabled':!availableData.hasOwnProperty(ol.type)}" @click="sleepChange(ol)">
+                <div class="abo" v-if="props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.type">
                   <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
                     <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
                       fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
@@ -119,7 +118,7 @@
               <el-divider />
             </div>
             <div class="time flex">
-              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.typeLabel === 'GPU' ? 168:336" :precision="0" :step="1" :disabled="sleepSelect.hardwareId === '0' ?true: false" controls-position="right" /> &nbsp; hours
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.typeLabel === 'GPU' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
             <el-divider />
             <p class="p-1">Make sure to follow
@@ -156,9 +155,7 @@ export default defineComponent({
   name: 'Space Hardware',
   components: {},
   props: {
-    listdata: { type: Object, default: {} },
-    taskdata: { type: Object, default: null },
-    statusPayment: { type: String, default: 'Stopped' }
+    listdata: { type: Object, default: {} }
   },
   setup (props, context) {
     const store = useStore()
@@ -272,7 +269,7 @@ export default defineComponent({
       if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
     }
     function sleepChange (row) {
-      if (!availableData.value.hasOwnProperty(row.type)) return false
+      if (!availableData.value.hasOwnProperty(row.type) || (props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === row.type)) return false
       ruleForm.usageTime = 1
       sleepSelect.value = row
       sleepVisible.value = true
@@ -538,6 +535,10 @@ export default defineComponent({
         }
         &.active {
           background: linear-gradient(to bottom right, #eff6ff, #fff);
+          cursor: no-drop;
+          &:hover {
+            box-shadow: none;
+          }
         }
         &:hover {
           box-shadow: inset 0 0 0.2rem rgba(0, 0, 0, 0.05);

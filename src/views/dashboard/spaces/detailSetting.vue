@@ -1,8 +1,8 @@
 <template>
   <section id="space">
     <el-row class="space_body" v-loading="listLoad">
-      <space-hardware @handleHard="handleHard" :listdata="listdata" :taskdata="taskdata" :statusPayment="statusPayment"></space-hardware>
-      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && statusPayment === 'Stopped'">
+      <space-hardware @handleHard="handleHard" :listdata="listdata"></space-hardware>
+      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && listdata.status === 'Create'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -262,8 +262,6 @@ export default defineComponent({
     const ruleFormRef = ref(null)
     const listdata = ref({})
     const nftdata = ref({})
-    const taskdata = ref(null)
-    const statusPayment = ref('Stopped')
     const ruleFormRefDelete = ref(null)
     const renameLoad = ref(false)
     const deleteLoad = ref(false)
@@ -519,9 +517,7 @@ export default defineComponent({
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "" }
-        statusPayment.value = listRes.data.status
-        taskdata.value = listRes.data.task || null
+        listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Create' }
         const current = Math.floor(Date.now() / 1000)
         let expireTime = NaN
         if (listRes.data.space.expiration_time) {
@@ -595,8 +591,6 @@ export default defineComponent({
       ruleFormRefDelete,
       listLoad,
       nftdata,
-      taskdata,
-      statusPayment,
       dataNFTRequest,
       dialogDOIVisible,
       system,
