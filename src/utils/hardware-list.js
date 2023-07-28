@@ -200,7 +200,7 @@ const h = [{
                 label: 'Nvidia A10G - 12 vCPU - 48 GiB',
                 label_short: '12 vCPU · 48 GiB · Nvidia A10G',
                 price: '28 LAG per hour',
-                type: 'G2ae.lxarge',
+                type: 'G2ae.xlarge',
                 vCPU: '12',
                 typeLabel: 'GPU',
                 paid: '28',
