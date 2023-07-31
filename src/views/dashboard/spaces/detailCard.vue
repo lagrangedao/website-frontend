@@ -323,7 +323,7 @@ export default defineComponent({
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.value = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
         // listdata.value = listRes.data.files || []
         const fileLi = listRes.data.files || []
