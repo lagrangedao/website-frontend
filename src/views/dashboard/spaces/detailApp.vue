@@ -46,7 +46,7 @@ export default defineComponent({
       if (route.params.tabs !== 'app') return
       listLoad.value = true
       listdata.job_result_uri = ''
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
         const jobData = listRes.data.job || { job_result_uri: '' }
         listdata.space = listRes.data.space

@@ -219,7 +219,7 @@ export default defineComponent({
       try {
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardwareId).call()
         const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'ether')
-
+        console.log('hardwareInfo:', hardwareInfo)
         const approveAmount = pricePerHour * ruleForm.usageTime
         // const token_decimals = await tokenContract.methods.decimals().call().then()
 

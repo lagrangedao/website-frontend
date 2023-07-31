@@ -80,14 +80,14 @@
     "anonymous": false,
     "inputs": [{
         "indexed": false,
+        "internalType": "string",
+        "name": "refundId",
+        "type": "string"
+    }, {
+        "indexed": false,
         "internalType": "address",
         "name": "wallet",
         "type": "address"
-    }, {
-        "indexed": false,
-        "internalType": "string",
-        "name": "spaceName",
-        "type": "string"
     }, {
         "indexed": false,
         "internalType": "uint256",
@@ -100,14 +100,14 @@
     "anonymous": false,
     "inputs": [{
         "indexed": false,
+        "internalType": "string",
+        "name": "refundId",
+        "type": "string"
+    }, {
+        "indexed": false,
         "internalType": "address",
         "name": "wallet",
         "type": "address"
-    }, {
-        "indexed": false,
-        "internalType": "string",
-        "name": "spaceName",
-        "type": "string"
     }, {
         "indexed": false,
         "internalType": "uint256",
@@ -159,7 +159,7 @@
 }, {
     "inputs": [{
         "internalType": "string",
-        "name": "spaceName",
+        "name": "refundId",
         "type": "string"
     }],
     "name": "claimRefund",
@@ -175,6 +175,24 @@
     "name": "claimReward",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }, {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+    }],
+    "name": "claimable",
+    "outputs": [{
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+    }],
+    "stateMutability": "view",
     "type": "function"
 }, {
     "inputs": [{
@@ -253,24 +271,6 @@
 }, {
     "inputs": [{
         "internalType": "address",
-        "name": "",
-        "type": "address"
-    }, {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-    }],
-    "name": "rewards",
-    "outputs": [{
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-}, {
-    "inputs": [{
-        "internalType": "address",
         "name": "admin",
         "type": "address"
     }, {
@@ -306,13 +306,13 @@
     "type": "function"
 }, {
     "inputs": [{
+        "internalType": "string",
+        "name": "refundId",
+        "type": "string"
+    }, {
         "internalType": "address",
         "name": "wallet",
         "type": "address"
-    }, {
-        "internalType": "string",
-        "name": "spaceName",
-        "type": "string"
     }, {
         "internalType": "uint256",
         "name": "refundAmount",
@@ -368,10 +368,6 @@
     }, {
         "internalType": "uint256",
         "name": "expiryDate",
-        "type": "uint256"
-    }, {
-        "internalType": "uint256",
-        "name": "refundableAmount",
         "type": "uint256"
     }],
     "stateMutability": "view",
