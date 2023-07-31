@@ -50,7 +50,7 @@ export default defineComponent({
     }
     async function init (params) {
       paymentLoad.value = true
-      const paymentsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/payments`, 'get')
+      const paymentsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/space/payments`, 'get')
       if (paymentsRes && paymentsRes.status === 'success') {
         for (let p = 0; p < paymentsRes.data.payments.length; p++) {
           let { url_tx } = await system.$commonFun.getUnit(parseInt(paymentsRes.data.payments[p].chain_id), 16)
