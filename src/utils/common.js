@@ -237,7 +237,7 @@ async function getUnit(id) {
       unit = 'MATIC'
       name = 'Mumbai Testnet '
       url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
-      url_tx = `${process.env.VUE_APP_MUMBAIBLOCKURL}/tx/`
+      url_tx = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/tx/`
       break
     case 3141:
       unit = 'ETH'

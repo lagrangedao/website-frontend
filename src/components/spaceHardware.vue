@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="hardware">
     <div class="space-hard" v-if="false && props.listdata.activeOrder && props.listdata.activeOrder.config">
       <el-row class="space_hardware" :gutter="30">
         <el-col :span="24">
@@ -75,12 +75,12 @@
           </h2>
           <p class="p-2">Choose a hardware for your Space.</p>
 
-          <el-row :gutter="25" class="space_hardware_list" v-for="(item,index) in hardwareOptions" :key="index">
+          <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
             <el-divider content-position="left">{{item.label}}</el-divider>
-            <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.options.concat(item.options_setting)" :key="o">
-              <el-card class="box-card" :class="{'active': props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.type && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))),'is-disabled':!availableData.hasOwnProperty(ol.type)}"
+            <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o">
+              <el-card class="box-card" :class="{'active': props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))),'is-disabled':ol.hardware_status !== 'available'}"
                 @click="sleepChange(ol)">
-                <div class="abo" v-if="props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.type && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))">
+                <div class="abo" v-if="props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))">
                   <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
                     <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
                       fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
@@ -88,10 +88,10 @@
                       p-id="2342"></path>
                   </svg>
                 </div>
-                <h5>{{ol.type}}</h5>
-                <div class="desc-text">{{ol.label_short}}</div>
+                <h5>{{ol.hardware_name}}</h5>
+                <div class="desc-text">{{ol.hardware_description}}</div>
                 <div class="price">
-                  <b v-if="availableData.hasOwnProperty(ol.type)">{{ol.price}}</b>
+                  <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ol.hardware_price}} LAG per hour</b>
                   <b v-else>No available CP</b>
                 </div>
               </el-card>
@@ -105,21 +105,21 @@
           <div class="title-hard">The hardware of
             <span>{{accessName || metaAddress}}/{{route.params.name}}</span> will be switched to:</div>
           <el-card class="box-card">
-            <h5>{{sleepSelect.type}}</h5>
-            <div class="desc-text">{{sleepSelect.label_short}}</div>
+            <h5>{{sleepSelect.hardware_name}}</h5>
+            <div class="desc-text">{{sleepSelect.hardware_description}}</div>
             <div class="price">
-              <b>{{sleepSelect.price}}</b>
+              <b>{{sleepSelect.hardware_price}} LAG per hour</b>
             </div>
           </el-card>
           <div class="sleep_style">
             <div class="title_tip flex">
               <div class="flex">
-                Usage time
+                Usage Time
               </div>
               <el-divider />
             </div>
             <div class="time flex">
-              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.typeLabel === 'GPU' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
             <el-divider />
             <p class="p-1">Make sure to follow
@@ -148,7 +148,6 @@ import { useRouter, useRoute } from 'vue-router'
 
 import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
-import hardwareList from '@/utils/hardware-list.js'
 import {
   InfoFilled
 } from '@element-plus/icons-vue'
@@ -203,7 +202,6 @@ export default defineComponent({
       displayPrice: false
     })
     const hardwareOptions = ref([])
-    const availableData = ref([])
     const hardwareLoad = ref(false)
     const machinesLoad = ref(false)
     const sleepVisible = ref(false)
@@ -217,24 +215,22 @@ export default defineComponent({
     async function hardwareFun () {
       hardwareLoad.value = true
       try {
-        const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardwareId).call()
+        const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
         const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'ether')
-        console.log('hardwareInfo:', hardwareInfo)
         const approveAmount = pricePerHour * ruleForm.usageTime
         // const token_decimals = await tokenContract.methods.decimals().call().then()
 
         const approve_tx = await tokenContract.methods.approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether')).send({
           from: store.state.metaAddress
         })
-        console.log('approve_tx: ', approve_tx)
 
 
         let gasLimit = await paymentContract.methods
-          .makePayment(route.params.wallet_address, route.params.name, sleepSelect.value.hardwareId, ruleForm.usageTime)
+          .makePayment(route.params.wallet_address, route.params.name, sleepSelect.value.hardware_id, ruleForm.usageTime)
           .estimateGas({ from: store.state.metaAddress })
 
         const tx = await paymentContract.methods
-          .makePayment(route.params.wallet_address, route.params.name, sleepSelect.value.hardwareId, ruleForm.usageTime)
+          .makePayment(route.params.wallet_address, route.params.name, sleepSelect.value.hardware_id, ruleForm.usageTime)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -262,7 +258,7 @@ export default defineComponent({
       }
       fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
       fd.append('space_name', route.params.name)
-      fd.append('cfg_name', sleepSelect.value.type)
+      fd.append('cfg_name', sleepSelect.value.hardware_name)
       fd.append('duration', ruleForm.usageTime * 3600)
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
@@ -270,21 +266,37 @@ export default defineComponent({
       if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
     }
     function sleepChange (row) {
-      if (!availableData.value.hasOwnProperty(row.type) || (props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === row.type && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))))) return false
+      if (row.hardware_status.toLowerCase() !== 'available' || (props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === row.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))))) return false
       ruleForm.usageTime = 1
       sleepSelect.value = row
       sleepVisible.value = true
     }
+    async function listArray (arrayList) {
+      let listArr = [
+        {
+          label: 'CPU',
+          list: []
+        },
+        {
+          label: 'GPU',
+          list: []
+        }
+      ]
+      arrayList.forEach(hard => {
+        if (hard.hardware_type.toLowerCase() === 'cpu') listArr[0].list.push(hard)
+        else listArr[1].list.push(hard)
+      })
+      return listArr
+    }
     async function init (params) {
       machinesLoad.value = true
       const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
-      if (machinesRes && machinesRes.status === 'success') availableData.value = machinesRes.data.available_hardware || []
+      if (machinesRes && machinesRes.status === 'success') hardwareOptions.value = await listArray(machinesRes.data.hardware)
       else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
       machinesLoad.value = false
     }
     onMounted(() => {
       init()
-      hardwareOptions.value = hardwareList
     })
     return {
       route,
@@ -299,151 +311,54 @@ export default defineComponent({
       hardwareOptions,
       hardwareLoad,
       machinesLoad,
-      availableData,
       sleepChange, hardwareFun
     }
   }
 })
 </script>
 <style lang="scss" scoped>
-.space-hard {
+#hardware {
   width: 100%;
-  margin: 0.15rem 0;
-  font-family: "Helvetica-light";
-  border: 1px solid #e4e4e4;
-  border-radius: 0.1rem;
-  color: #606060;
-  text-align: left;
-  overflow: hidden;
-  .flex {
-    display: flex;
-    align-items: center;
-  }
-  :deep(.space_hardware) {
-    position: relative;
-    padding: 0.3rem 0.2rem;
-    color: #000;
-    line-height: 1.5;
-    h2 {
-      margin: 0 0 0.12rem;
-      font-size: 20px;
-      font-weight: 600;
+  .space-hard {
+    width: 100%;
+    margin: 0.15rem 0;
+    font-family: "Helvetica-light";
+    border: 1px solid #e4e4e4;
+    border-radius: 0.1rem;
+    color: #606060;
+    text-align: left;
+    overflow: hidden;
+    .flex {
+      display: flex;
+      align-items: center;
+    }
+    :deep(.space_hardware) {
+      position: relative;
+      padding: 0.3rem 0.2rem;
       color: #000;
-      @media screen and (max-width: 1600px) {
-        font-size: 18px;
-      }
-      @media screen and (max-width: 1440px) {
-        font-size: 17px;
-      }
-      @media screen and (max-width: 768px) {
-        font-size: 15px;
-      }
-      svg {
-        width: 20px;
-        height: 20px;
-        margin-right: 0.05rem;
-      }
-    }
-    .p-2 {
-      margin: 0 0 0.08rem;
-      font-size: 17px;
-      @media screen and (max-width: 1600px) {
-        font-size: 15px;
-      }
-      @media screen and (max-width: 1440px) {
-        font-size: 14px;
-      }
-      @media screen and (max-width: 768px) {
-        font-size: 13px;
-      }
-    }
-    .p-4 {
-      margin: 0 0 0.08rem;
-      font-size: 15px;
-      color: rgba(107, 114, 128, 1);
-      @media screen and (max-width: 1600px) {
-        font-size: 13px;
-      }
-      @media screen and (max-width: 768px) {
-        font-size: 12px;
-      }
-      a {
-        color: inherit;
-        text-decoration: underline;
-      }
-      span {
-        padding: 0.02rem 0.05rem;
-        margin: 0 0 0 0.05rem;
-        background: linear-gradient(
-          45.4deg,
-          rgba(247, 0, 89, 0.1),
-          rgba(82, 255, 0, 0.1) 22.65%,
-          rgba(20, 0, 255, 0.075) 46.82%,
-          rgba(255, 0, 0, 0.1) 67.96%,
-          rgba(255, 230, 0, 0.1) 96.66%
-        );
-        border-radius: 0.05rem;
-        white-space: nowrap;
-        cursor: pointer;
-      }
-    }
-    .hardware-right {
-      max-height: 430px;
-      border-left: 1px solid #dcdfe6;
-      overflow-y: scroll;
-    }
-    .sleep_style {
-      margin: 0 0 0.28rem;
-      .title_tip {
-        white-space: nowrap;
-        font-size: 18px;
+      line-height: 1.5;
+      h2 {
+        margin: 0 0 0.12rem;
+        font-size: 20px;
         font-weight: 600;
+        color: #000;
         @media screen and (max-width: 1600px) {
-          font-size: 16px;
+          font-size: 18px;
         }
         @media screen and (max-width: 1440px) {
-          font-size: 15px;
+          font-size: 17px;
         }
         @media screen and (max-width: 768px) {
-          font-size: 14px;
-        }
-        p {
-          display: flex;
-          align-items: center;
+          font-size: 15px;
         }
         svg {
-          width: 12px;
-          height: 12px;
-          margin: 0 0.08rem;
-        }
-        .el-divider {
-          margin: auto;
-        }
-        .el-switch {
-          margin: 0 0 0 0.08rem;
-          .el-switch__core {
-            width: 30px !important;
-            height: 16.05px;
-            .el-switch__action {
-              width: 12px;
-              height: 12px;
-            }
-          }
-          &.is-checked {
-            .el-switch__core {
-              .el-switch__action {
-                margin-left: -13px;
-              }
-            }
-          }
+          width: 20px;
+          height: 20px;
+          margin-right: 0.05rem;
         }
       }
-      .pause_margin {
-        margin: 0.2rem 0 0.3rem;
-      }
-      .time {
-        margin: 0.15rem 0;
-        white-space: nowrap;
+      .p-2 {
+        margin: 0 0 0.08rem;
         font-size: 17px;
         @media screen and (max-width: 1600px) {
           font-size: 15px;
@@ -454,304 +369,44 @@ export default defineComponent({
         @media screen and (max-width: 768px) {
           font-size: 13px;
         }
-        .el-select {
-          margin: 0 0.08rem;
-          .el-input {
-            .el-input__inner {
-              max-width: 120px;
-            }
-            &.is-disabled {
-              .el-input__inner {
-                background-color: transparent;
-                opacity: 0.8;
-              }
-            }
-          }
-        }
       }
-    }
-    .price_switch {
-      position: absolute;
-      top: 0.2rem;
-      right: 0.6rem;
-      font-size: 14px;
-      color: #333;
-      z-index: 9;
-      @media screen and (max-width: 1600px) {
-        font-size: 13px;
-      }
-      @media screen and (max-width: 768px) {
-        font-size: 12px;
-      }
-      @media screen and (max-width: 1200px) {
-        position: relative;
-        right: 0;
-        left: 0;
-      }
-      .el-switch {
-        margin: 0 0 0 0.08rem;
-        .el-switch__core {
-          width: 25px !important;
-          height: 14.05px;
-          .el-switch__action {
-            width: 10px;
-            height: 10px;
-          }
-        }
-        * {
-          font-size: 14px;
-          color: #333;
-          @media screen and (max-width: 1600px) {
-            font-size: 13px;
-          }
-          @media screen and (max-width: 768px) {
-            font-size: 12px;
-          }
-        }
-        .el-switch__label.is-active {
-          color: inherit;
-        }
-        &.is-checked {
-          .el-switch__core {
-            .el-switch__action {
-              margin-left: -11px;
-            }
-          }
-        }
-      }
-    }
-    .space_hardware_list {
-      @media screen and (max-width: 1200px) {
-        padding: 0;
-      }
-      .el-card {
-        position: relative;
-        padding: 0.1rem;
-        margin: 0.12rem 0;
-        border-radius: 0.1rem;
-        transition: all 0.3s;
-        cursor: pointer;
-        * {
-          cursor: inherit;
-        }
-        &.active {
-          background: linear-gradient(to bottom right, #eff6ff, #fff);
-          cursor: no-drop;
-          &:hover {
-            box-shadow: none;
-          }
-        }
-        &:hover {
-          box-shadow: inset 0 0 0.2rem rgba(0, 0, 0, 0.05);
-        }
-        &.is-disabled {
-          background: linear-gradient(to bottom right, #eeeeee, #f2f2f2);
-          cursor: no-drop;
-          &:hover {
-            box-shadow: none;
-          }
-        }
-        .el-card__body {
-          padding: 0;
-          .abo {
-            position: absolute;
-            top: 0.1rem;
-            right: 0.1rem;
-            width: 15px;
-            height: 15px;
-            z-index: 9;
-            svg {
-              width: 100%;
-              height: 100%;
-              animation: spin 1.5s linear infinite;
-              @keyframes spin {
-                from {
-                  transform: rotate(0deg);
-                }
-                to {
-                  transform: rotate(360deg);
-                }
-              }
-              @-webkit-keyframes spin /* Safari 与 Chrome */ {
-                from {
-                  transform: rotate(0deg);
-                }
-                to {
-                  transform: rotate(360deg);
-                }
-              }
-            }
-          }
-          h5 {
-            padding: 0.05rem 0;
-            font-size: 16px;
-            @media screen and (max-width: 1600px) {
-              font-size: 14px;
-            }
-            @media screen and (max-width: 768px) {
-              font-size: 13px;
-            }
-          }
-          .desc-text {
-            height: 30px;
-            padding: 0;
-            font-size: 14px;
-            color: #6b7280;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: normal;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            line-height: 15px;
-            @media screen and (max-width: 1600px) {
-              font-size: 12px;
-            }
-            @media screen and (max-width: 768px) {
-              font-size: 11px;
-            }
-          }
-          .price {
-            margin-top: 0.05rem;
-            b {
-              padding: 0.03rem 0.08rem;
-              background: rgba(243, 244, 246, 1);
-              border-radius: 0.05rem;
-              font-size: 14px;
-              font-weight: normal;
-              color: #333;
-              @media screen and (max-width: 1600px) {
-                font-size: 12px;
-              }
-              @media screen and (max-width: 768px) {
-                font-size: 11px;
-              }
-            }
-          }
-        }
-      }
-      // &:nth-child(2) {
-      //   margin-top: -0.25rem;
-      //   @media screen and (max-width: 1200px) {
-      //     margin-top: 0.2rem;
-      //   }
-      // }
-    }
-  }
-  :deep(.sleep_body) {
-    border-radius: 0.1rem;
-    font-family: "Helvetica-light";
-    .el-dialog__body {
-      padding: 0.25rem 0.25rem 0.15rem;
-      color: #000;
-      .title-hard {
-        font-size: 18px;
+      .p-4 {
+        margin: 0 0 0.08rem;
+        font-size: 15px;
+        color: rgba(107, 114, 128, 1);
         @media screen and (max-width: 1600px) {
-          font-size: 16px;
+          font-size: 13px;
         }
         @media screen and (max-width: 768px) {
-          font-size: 14px;
+          font-size: 12px;
+        }
+        a {
+          color: inherit;
+          text-decoration: underline;
         }
         span {
-          color: rgba(107, 114, 128, 1);
-        }
-      }
-      .el-card {
-        position: relative;
-        padding: 0.15rem;
-        margin-top: 0.25rem;
-        border-radius: 0.1rem;
-        transition: all 0.3s;
-        * {
+          padding: 0.02rem 0.05rem;
+          margin: 0 0 0 0.05rem;
+          background: linear-gradient(
+            45.4deg,
+            rgba(247, 0, 89, 0.1),
+            rgba(82, 255, 0, 0.1) 22.65%,
+            rgba(20, 0, 255, 0.075) 46.82%,
+            rgba(255, 0, 0, 0.1) 67.96%,
+            rgba(255, 230, 0, 0.1) 96.66%
+          );
+          border-radius: 0.05rem;
+          white-space: nowrap;
           cursor: pointer;
         }
-        &.active {
-          background: linear-gradient(to bottom right, #eff6ff, #fff);
-        }
-        // &:hover {
-        //   box-shadow: inset 0 0 0.2rem rgba(0, 0, 0, 0.05);
-        // }
-        .el-card__body {
-          padding: 0;
-          .abo {
-            position: absolute;
-            top: 0.1rem;
-            right: 0.1rem;
-            width: 15px;
-            height: 15px;
-            z-index: 9;
-            svg {
-              width: 100%;
-              height: 100%;
-              animation: spin 1.5s linear infinite;
-              @keyframes spin {
-                from {
-                  transform: rotate(0deg);
-                }
-                to {
-                  transform: rotate(360deg);
-                }
-              }
-              @-webkit-keyframes spin /* Safari 与 Chrome */ {
-                from {
-                  transform: rotate(0deg);
-                }
-                to {
-                  transform: rotate(360deg);
-                }
-              }
-            }
-          }
-          h5 {
-            padding: 0.05rem 0;
-            font-size: 16px;
-            @media screen and (max-width: 1600px) {
-              font-size: 14px;
-            }
-            @media screen and (max-width: 768px) {
-              font-size: 13px;
-            }
-          }
-          .desc-text {
-            height: 30px;
-            padding: 0;
-            font-size: 14px;
-            color: #6b7280;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: normal;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            line-height: 15px;
-            @media screen and (max-width: 1600px) {
-              font-size: 12px;
-            }
-            @media screen and (max-width: 768px) {
-              font-size: 11px;
-            }
-          }
-          .price {
-            margin-top: 0.05rem;
-            b {
-              padding: 0.03rem 0.08rem;
-              background: rgba(243, 244, 246, 1);
-              border-radius: 0.05rem;
-              font-size: 14px;
-              font-weight: normal;
-              color: #333;
-              @media screen and (max-width: 1600px) {
-                font-size: 12px;
-              }
-              @media screen and (max-width: 768px) {
-                font-size: 11px;
-              }
-            }
-          }
-        }
+      }
+      .hardware-right {
+        max-height: 430px;
+        border-left: 1px solid #dcdfe6;
+        overflow-y: scroll;
       }
       .sleep_style {
-        margin: 0.28rem 0 0;
+        margin: 0 0 0.28rem;
         .title_tip {
           white-space: nowrap;
           font-size: 18px;
@@ -773,6 +428,9 @@ export default defineComponent({
             width: 12px;
             height: 12px;
             margin: 0 0.08rem;
+          }
+          .el-divider {
+            margin: auto;
           }
           .el-switch {
             margin: 0 0 0 0.08rem;
@@ -825,41 +483,397 @@ export default defineComponent({
           }
         }
       }
-      .el-divider {
-        margin: 0;
-      }
-      .p-1 {
-        margin: 0.15rem 0;
-        color: rgba(107, 114, 128, 1);
-        font-size: 17px;
-        word-break: break-word;
+      .price_switch {
+        position: absolute;
+        top: 0.2rem;
+        right: 0.6rem;
+        font-size: 14px;
+        color: #333;
+        z-index: 9;
         @media screen and (max-width: 1600px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 1440px) {
-          font-size: 14px;
-        }
-        @media screen and (max-width: 768px) {
           font-size: 13px;
         }
-        a {
-          text-decoration: underline;
-          color: inherit;
+        @media screen and (max-width: 768px) {
+          font-size: 12px;
+        }
+        @media screen and (max-width: 1200px) {
+          position: relative;
+          right: 0;
+          left: 0;
+        }
+        .el-switch {
+          margin: 0 0 0 0.08rem;
+          .el-switch__core {
+            width: 25px !important;
+            height: 14.05px;
+            .el-switch__action {
+              width: 10px;
+              height: 10px;
+            }
+          }
+          * {
+            font-size: 14px;
+            color: #333;
+            @media screen and (max-width: 1600px) {
+              font-size: 13px;
+            }
+            @media screen and (max-width: 768px) {
+              font-size: 12px;
+            }
+          }
+          .el-switch__label.is-active {
+            color: inherit;
+          }
+          &.is-checked {
+            .el-switch__core {
+              .el-switch__action {
+                margin-left: -11px;
+              }
+            }
+          }
         }
       }
+      .space_hardware_list {
+        @media screen and (max-width: 1200px) {
+          padding: 0;
+        }
+        .el-card {
+          position: relative;
+          padding: 0.1rem;
+          margin: 0.12rem 0;
+          border-radius: 0.1rem;
+          transition: all 0.3s;
+          cursor: pointer;
+          * {
+            cursor: inherit;
+          }
+          &.active {
+            background: linear-gradient(to bottom right, #eff6ff, #fff);
+            cursor: no-drop;
+            &:hover {
+              box-shadow: none;
+            }
+          }
+          &:hover {
+            box-shadow: inset 0 0 0.2rem rgba(0, 0, 0, 0.05);
+          }
+          &.is-disabled {
+            background: linear-gradient(to bottom right, #eeeeee, #f2f2f2);
+            cursor: no-drop;
+            &:hover {
+              box-shadow: none;
+            }
+          }
+          .el-card__body {
+            padding: 0;
+            .abo {
+              position: absolute;
+              top: 0.1rem;
+              right: 0.1rem;
+              width: 15px;
+              height: 15px;
+              z-index: 9;
+              svg {
+                width: 100%;
+                height: 100%;
+                animation: spin 1.5s linear infinite;
+                @keyframes spin {
+                  from {
+                    transform: rotate(0deg);
+                  }
+                  to {
+                    transform: rotate(360deg);
+                  }
+                }
+                @-webkit-keyframes spin /* Safari 与 Chrome */ {
+                  from {
+                    transform: rotate(0deg);
+                  }
+                  to {
+                    transform: rotate(360deg);
+                  }
+                }
+              }
+            }
+            h5 {
+              padding: 0.05rem 0;
+              font-size: 16px;
+              @media screen and (max-width: 1600px) {
+                font-size: 14px;
+              }
+              @media screen and (max-width: 768px) {
+                font-size: 13px;
+              }
+            }
+            .desc-text {
+              height: 30px;
+              padding: 0;
+              font-size: 14px;
+              color: #6b7280;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: normal;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              line-height: 15px;
+              @media screen and (max-width: 1600px) {
+                font-size: 12px;
+              }
+              @media screen and (max-width: 768px) {
+                font-size: 11px;
+              }
+            }
+            .price {
+              margin-top: 0.05rem;
+              b {
+                padding: 0.03rem 0.08rem;
+                background: rgba(243, 244, 246, 1);
+                border-radius: 0.05rem;
+                font-size: 14px;
+                font-weight: normal;
+                color: #333;
+                @media screen and (max-width: 1600px) {
+                  font-size: 12px;
+                }
+                @media screen and (max-width: 768px) {
+                  font-size: 11px;
+                }
+              }
+            }
+          }
+        }
+        // &:nth-child(2) {
+        //   margin-top: -0.25rem;
+        //   @media screen and (max-width: 1200px) {
+        //     margin-top: 0.2rem;
+        //   }
+        // }
+      }
     }
-    .el-dialog__footer {
-      padding: 0 0.25rem 0.25rem;
-      .dialog-footer {
-        .el-button-group {
-          margin: 0;
-          .el-button {
-            margin: 0 0.15rem 0 0;
-            background: linear-gradient(180deg, #fefefe, #f0f0f0);
-            font-family: inherit;
+    :deep(.sleep_body) {
+      border-radius: 0.1rem;
+      font-family: "Helvetica-light";
+      .el-dialog__body {
+        padding: 0.25rem 0.25rem 0.15rem;
+        color: #000;
+        .title-hard {
+          font-size: 18px;
+          @media screen and (max-width: 1600px) {
+            font-size: 16px;
+          }
+          @media screen and (max-width: 768px) {
+            font-size: 14px;
+          }
+          span {
+            color: rgba(107, 114, 128, 1);
+          }
+        }
+        .el-card {
+          position: relative;
+          padding: 0.15rem;
+          margin-top: 0.25rem;
+          border-radius: 0.1rem;
+          transition: all 0.3s;
+          * {
+            cursor: pointer;
+          }
+          &.active {
+            background: linear-gradient(to bottom right, #eff6ff, #fff);
+          }
+          // &:hover {
+          //   box-shadow: inset 0 0 0.2rem rgba(0, 0, 0, 0.05);
+          // }
+          .el-card__body {
+            padding: 0;
+            .abo {
+              position: absolute;
+              top: 0.1rem;
+              right: 0.1rem;
+              width: 15px;
+              height: 15px;
+              z-index: 9;
+              svg {
+                width: 100%;
+                height: 100%;
+                animation: spin 1.5s linear infinite;
+                @keyframes spin {
+                  from {
+                    transform: rotate(0deg);
+                  }
+                  to {
+                    transform: rotate(360deg);
+                  }
+                }
+                @-webkit-keyframes spin /* Safari 与 Chrome */ {
+                  from {
+                    transform: rotate(0deg);
+                  }
+                  to {
+                    transform: rotate(360deg);
+                  }
+                }
+              }
+            }
+            h5 {
+              padding: 0.05rem 0;
+              font-size: 16px;
+              @media screen and (max-width: 1600px) {
+                font-size: 14px;
+              }
+              @media screen and (max-width: 768px) {
+                font-size: 13px;
+              }
+            }
+            .desc-text {
+              height: 30px;
+              padding: 0;
+              font-size: 14px;
+              color: #6b7280;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: normal;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              line-height: 15px;
+              @media screen and (max-width: 1600px) {
+                font-size: 12px;
+              }
+              @media screen and (max-width: 768px) {
+                font-size: 11px;
+              }
+            }
+            .price {
+              margin-top: 0.05rem;
+              b {
+                padding: 0.03rem 0.08rem;
+                background: rgba(243, 244, 246, 1);
+                border-radius: 0.05rem;
+                font-size: 14px;
+                font-weight: normal;
+                color: #333;
+                @media screen and (max-width: 1600px) {
+                  font-size: 12px;
+                }
+                @media screen and (max-width: 768px) {
+                  font-size: 11px;
+                }
+              }
+            }
+          }
+        }
+        .sleep_style {
+          margin: 0.28rem 0 0;
+          .title_tip {
+            white-space: nowrap;
             font-size: 18px;
+            font-weight: 600;
             @media screen and (max-width: 1600px) {
               font-size: 16px;
+            }
+            @media screen and (max-width: 1440px) {
+              font-size: 15px;
+            }
+            @media screen and (max-width: 768px) {
+              font-size: 14px;
+            }
+            p {
+              display: flex;
+              align-items: center;
+            }
+            svg {
+              width: 12px;
+              height: 12px;
+              margin: 0 0.08rem;
+            }
+            .el-switch {
+              margin: 0 0 0 0.08rem;
+              .el-switch__core {
+                width: 30px !important;
+                height: 16.05px;
+                .el-switch__action {
+                  width: 12px;
+                  height: 12px;
+                }
+              }
+              &.is-checked {
+                .el-switch__core {
+                  .el-switch__action {
+                    margin-left: -13px;
+                  }
+                }
+              }
+            }
+          }
+          .pause_margin {
+            margin: 0.2rem 0 0.3rem;
+          }
+          .time {
+            margin: 0.15rem 0;
+            white-space: nowrap;
+            font-size: 17px;
+            @media screen and (max-width: 1600px) {
+              font-size: 15px;
+            }
+            @media screen and (max-width: 1440px) {
+              font-size: 14px;
+            }
+            @media screen and (max-width: 768px) {
+              font-size: 13px;
+            }
+            .el-select {
+              margin: 0 0.08rem;
+              .el-input {
+                .el-input__inner {
+                  max-width: 120px;
+                }
+                &.is-disabled {
+                  .el-input__inner {
+                    background-color: transparent;
+                    opacity: 0.8;
+                  }
+                }
+              }
+            }
+          }
+        }
+        .el-divider {
+          margin: 0;
+        }
+        .p-1 {
+          margin: 0.15rem 0;
+          color: rgba(107, 114, 128, 1);
+          font-size: 17px;
+          word-break: break-word;
+          @media screen and (max-width: 1600px) {
+            font-size: 15px;
+          }
+          @media screen and (max-width: 1440px) {
+            font-size: 14px;
+          }
+          @media screen and (max-width: 768px) {
+            font-size: 13px;
+          }
+          a {
+            text-decoration: underline;
+            color: inherit;
+          }
+        }
+      }
+      .el-dialog__footer {
+        padding: 0 0.25rem 0.25rem;
+        .dialog-footer {
+          .el-button-group {
+            margin: 0;
+            .el-button {
+              margin: 0 0.15rem 0 0;
+              background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              font-family: inherit;
+              font-size: 18px;
+              @media screen and (max-width: 1600px) {
+                font-size: 16px;
+              }
             }
           }
         }

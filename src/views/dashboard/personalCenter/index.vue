@@ -35,7 +35,11 @@
           </div>
           <div class="personal">
             <el-button type="" text bg>
-              <router-link :to="{name:'paymentHistory'}">Payment History</router-link>
+              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
+            </el-button>
+            <br /><br />
+            <el-button type="" text bg>
+              <router-link :to="{name:'paymentHistory', query: {type: 'provider'}}">Provider Payment History</router-link>
             </el-button>
           </div>
           <div class="media">
