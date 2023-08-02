@@ -112,7 +112,7 @@
             <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<2: true">
               <template #header>
                 <div class="card-warn" v-if="list.expiration_time !== null && list.expireTime <= 5">
-                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
+                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} ${list.expireTimeUnit}, please click to the details page to renew`"
                     popper-style="word-break: break-word; text-align: left;">
                     <template #reference>
                       <el-icon>
@@ -356,12 +356,11 @@ export default defineComponent({
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
         let datasetList = []
-        listdata.spaces.forEach(space => {
+        listdata.spaces.forEach(async space => {
           const current = Math.floor(Date.now() / 1000)
-          if (space.expiration_time) {
-            const currentTime = (space.expiration_time - current) / 86400
-            space.expireTime = Math.floor(currentTime)
-          } else space.expireTime = current
+          const expireTime = await system.$commonFun.expireTimeFun(space.expiration_time)
+          space.expireTime = expireTime.time || current
+          space.expireTimeUnit = expireTime.unit
           spaceList.push(space.name)
         })
         listdata.datasets.forEach(space => datasetList.push(space.name))

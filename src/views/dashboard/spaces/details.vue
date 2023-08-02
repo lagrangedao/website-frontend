@@ -21,12 +21,12 @@
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime <=5">
-            <el-button type="warning" plain disabled v-if="expireTime >= 0">
+          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && expireTime.time <=5">
+            <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
               <el-icon>
                 <WarningFilled />
               </el-icon>
-              &nbsp;Expires in {{expireTime}} days</el-button>
+              &nbsp;Expires in {{`${expireTime.time} ${expireTime.unit}`}} </el-button>
             <el-button type="warning" plain disabled v-else>
               <el-icon>
                 <WarningFilled />
@@ -60,11 +60,11 @@
           </div>
           <share-pop></share-pop>
         </div>
-        <div class="remain" v-if="expireTime>=0">
+        <div class="remain" v-if="expireTime.time>=0">
           <el-icon>
             <Timer />
-          </el-icon>Remaining Time： {{expireTime === 0 ? '&lt; 1' : expireTime}} Day
-        </div>
+          </el-icon>
+          Remaining Time： {{`${expireTime.time} ${expireTime.unit}`}} </div>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
         <el-tab-pane name="card">
@@ -241,10 +241,7 @@
       </div>
     </div>
 
-    <el-dialog v-model="spaceHardDia" title="" :width="bodyWidth" :show-close="true" :close-on-click-modal="false">
-      <space-hardware @handleHard="handleHard" :listdata="allData.space"></space-hardware>
-    </el-dialog>
-
+    <space-hardware v-if="spaceHardDia" @handleHard="handleHard" :listdata="allData.space" :renewButton="true"></space-hardware>
   </section>
 </template>
 <script>
@@ -345,7 +342,9 @@ export default defineComponent({
     const drawerName = ref('Logs')
     const direction = ref('btt')
     const logsValue = ref('')
-    const expireTime = ref(NaN)
+    const expireTime = reactive({
+      time: NaN,
+      unit: 'day'    })
     const logsCont = reactive({
       data: {}
     })
@@ -359,7 +358,7 @@ export default defineComponent({
       space: {},
       job: null,
       files: [],
-      paymentStatus: 'Create'
+      paymentStatus: 'Created'
     })
     const spaceHardDia = ref(false)
 
@@ -377,7 +376,7 @@ export default defineComponent({
         .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
-    const handleValue = async (dataRes, log, time, nftCont) => {
+    const handleValue = async (dataRes, log, exTime, nftCont) => {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
       allData.space = dataRes.space || {}
@@ -393,7 +392,8 @@ export default defineComponent({
       } else {
         logsValue.value = ''
       }
-      expireTime.value = time === 0 ? 0 : time ? time : NaN
+      expireTime.time = exTime.time
+      expireTime.unit = exTime.unit
       parentValue.value = numRe.test(dataRes.space.status) ? '' : dataRes.space.status
       likeValue.value = dataRes.space.likes || 0
       if (nftCont) {
@@ -417,7 +417,7 @@ export default defineComponent({
       forkLoad.value = false
       parentValue.value = ''
       logsValue.value = ''
-      expireTime.value = NaN
+      expireTime.time = NaN
       logsCont.data = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)

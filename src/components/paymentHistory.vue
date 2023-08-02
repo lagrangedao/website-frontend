@@ -51,27 +51,33 @@ export default defineComponent({
 
     async function refundFun (row) {
       paymentLoad.value = true
+      try {
+        console.log('refund_id:', row.refund_id)
+        let gasLimit = await paymentContract.methods
+          .claimRefund(String(row.refund_id))
+          .estimateGas({ from: store.state.metaAddress })
+
+        const tx = await paymentContract.methods
+          .claimRefund(String(row.refund_id))
+          .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+          .on('transactionHash', async (transactionHash) => {
+            console.log('refund transactionHash:', transactionHash)
+            refundStatus(row)
+          })
+          .on('error', () => paymentLoad.value = false)
+      } catch (err) {
+        console.log('err', err)
+        paymentLoad.value = false
+        if (err && err.message) system.$commonFun.messageTip('error', err.message)
+      }
+    }
+    async function refundStatus (row) {
+      paymentLoad.value = true
       let formData = new FormData()
       formData.append('tx_hash', row.transaction_hash)
       formData.append('chain_id', row.chain_id)
       const refundRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/refund`, 'post', formData)
       if (!refundRes || refundRes.status !== 'success') if (refundRes.message) system.$commonFun.messageTip('error', refundRes.message)
-      // try {
-      //   let gasLimit = await paymentContract.methods
-      //     .claimRefund(row.refundable_amount)
-      //     .estimateGas({ from: store.state.metaAddress })
-
-      //   const tx = await paymentContract.methods
-      //     .claimRefund(row.refundable_amount)
-      //     .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-      //     .on('transactionHash', async (transactionHash) => {
-      //       console.log('refund transactionHash:', transactionHash)
-      //     })
-      //     .on('error', () => {})
-      // } catch (err) {
-      //   console.log('err', err)
-      //   if (err && err.message) system.$commonFun.messageTip('error', err.message)
-      // }
       init()
     }
     async function init (params) {

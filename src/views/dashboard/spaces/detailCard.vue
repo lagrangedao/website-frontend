@@ -296,7 +296,7 @@ export default defineComponent({
       let newFile = new File([type === 'create' ? textEditor.value : textEditorChange.value], type === 'create' ? 'README.md' : urlReadmeName.value)
       let fd = new FormData()
       fd.append('file', newFile, type === 'create' ? 'README.md' : urlReadmeName.value)
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces_task/${route.params.name}/files/upload`, 'post', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
@@ -340,12 +340,7 @@ export default defineComponent({
           }
         })
         const jobData = listRes.data.job || { job_result_uri: '' }
-        const current = Math.floor(Date.now() / 1000)
-        let expireTime = NaN
-        if (listRes.data.space.expiration_time) {
-          const currentTime = (listRes.data.space.expiration_time - current) / 86400
-          expireTime = Math.floor(currentTime)
-        }
+        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
@@ -418,7 +413,7 @@ export default defineComponent({
       } else if (type === 'docker') {
         listLoad.value = true
         let fd = await formDataRetrue()
-        const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+        const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces_task/${route.params.name}/files/upload`, 'post', fd)
         if (uploadRes && uploadRes.status === "success" && uploadRes.data) system.$commonFun.messageTip('success', 'Update  successfully!')
         else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
         init()

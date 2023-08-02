@@ -310,12 +310,7 @@ export default defineComponent({
           if (listRes.data.owner.avatar) peopleAvatarImg.value = listRes.data.owner.avatar && listRes.data.owner.gateway ? `${listRes.data.owner.gateway}/ipfs/${listRes.data.owner.avatar}` : ''
           peopleName.value = listRes.data.owner.full_name || ''
         }
-        const current = Math.floor(Date.now() / 1000)
-        let expireTime = NaN
-        if (listRes.data.space.expiration_time) {
-          const currentTime = (listRes.data.space.expiration_time - current) / 86400
-          expireTime = Math.floor(currentTime)
-        }
+        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         context.emit('handleValue', listRes.data, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
 
         const path = await getCatalogPath(fileRow.fileResdata);
@@ -481,7 +476,7 @@ export default defineComponent({
           })
           // fd.append("is_public", listdata.value.is_public)
           // fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
-          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces_task/${route.params.name}/files/upload`, 'post', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
@@ -511,7 +506,7 @@ export default defineComponent({
             fd.append('file', fileNew, `${name ? name + '/' : ''}${namepath}`)
             // console.log('file', fileNew)
           })
-          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces_task/${route.params.name}/files/upload`, 'post', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
@@ -544,7 +539,7 @@ export default defineComponent({
       let newFile = new File([type === 'create' ? textEditor.value : fileTextEditor.value], `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
       let fd = new FormData()
       fd.append('file', newFile, `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces_task/${route.params.name}/files/upload`, 'post', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
