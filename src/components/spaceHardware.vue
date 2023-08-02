@@ -261,7 +261,8 @@ export default defineComponent({
         await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
         return
       }
-      fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
+      // fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
+      fd.append('paid',approveAmount) // 授权代币的金额
       fd.append('space_name', route.params.name)
       fd.append('cfg_name', sleepSelect.value.hardware_name)
       fd.append('duration', ruleForm.usageTime * 3600)
