@@ -52,13 +52,13 @@ export default defineComponent({
     async function refundFun (row) {
       paymentLoad.value = true
       try {
-        console.log('refund_id:', row.refund_id)
+        console.log('refund_id:', row.transaction_hash)
         let gasLimit = await paymentContract.methods
-          .claimRefund(String(row.refund_id))
+          .claimRefund(String(row.transaction_hash))
           .estimateGas({ from: store.state.metaAddress })
 
         const tx = await paymentContract.methods
-          .claimRefund(String(row.refund_id))
+          .claimRefund(String(row.transaction_hash))
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('refund transactionHash:', transactionHash)
