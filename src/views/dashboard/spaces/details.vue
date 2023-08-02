@@ -359,7 +359,7 @@ export default defineComponent({
       space: {},
       job: null,
       files: [],
-      paymentStatus: 'Create'
+      paymentStatus: 'Created'
     })
     const spaceHardDia = ref(false)
 

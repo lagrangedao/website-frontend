@@ -481,7 +481,7 @@ export default defineComponent({
           })
           // fd.append("is_public", listdata.value.is_public)
           // fd.append("name", info.name || `${'Upload ' + fileList.value.length + ' files'}`)
-          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces_task/${route.params.name}/files/upload`, 'post', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
@@ -511,7 +511,7 @@ export default defineComponent({
             fd.append('file', fileNew, `${name ? name + '/' : ''}${namepath}`)
             // console.log('file', fileNew)
           })
-          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+          const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces_task/${route.params.name}/files/upload`, 'post', fd)
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
@@ -544,7 +544,7 @@ export default defineComponent({
       let newFile = new File([type === 'create' ? textEditor.value : fileTextEditor.value], `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
       let fd = new FormData()
       fd.append('file', newFile, `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces_task/${route.params.name}/files/upload`, 'post', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
