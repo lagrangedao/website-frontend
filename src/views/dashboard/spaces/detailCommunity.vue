@@ -41,12 +41,7 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
         const jobData = listRes.data.job || { job_result_uri: '' }
-        const current = Math.floor(Date.now() / 1000)
-        let expireTime = NaN
-        if (listRes.data.space.expiration_time) {
-          const currentTime = (listRes.data.space.expiration_time - current) / 86400
-          expireTime = Math.floor(currentTime)
-        }
+        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)

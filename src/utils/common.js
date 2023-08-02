@@ -237,7 +237,7 @@ async function getUnit(id) {
       unit = 'MATIC'
       name = 'Mumbai Testnet '
       url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
-      url_tx = `${process.env.VUE_APP_MUMBAIBLOCKURL}/tx/`
+      url_tx = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/tx/`
       break
     case 3141:
       unit = 'ETH'
@@ -300,6 +300,27 @@ function hiddAddress(val) {
   else return '-'
 }
 
+async function expireTimeFun(cont) {
+  const current = Math.floor(Date.now() / 1000)
+  let expireTime = {
+    time: NaN,
+    unit: 'day'
+  }
+
+  if (cont) {
+    const currentTime = (cont - current) / 86400
+    if (currentTime < 1) {
+      expireTime.time = (currentTime * 24).toFixed(1) <= 0 ? 0 : (currentTime * 24).toFixed(1)
+      expireTime.unit = 'hours'
+    } else {
+      expireTime.time = currentTime.toFixed(1)
+      expireTime.unit = 'days'
+    }
+  }
+
+  return expireTime
+}
+
 const cmOptions = {
   mode: 'text/x-markdown', // Language mode
   // theme: 'dracula', // Theme
@@ -348,5 +369,6 @@ export default {
   getUnit,
   changeIDLogin,
   hiddAddress,
-  cmOptions
+  cmOptions,
+  expireTimeFun
 }

@@ -1,8 +1,8 @@
 <template>
   <section id="space">
     <el-row class="space_body" v-loading="listLoad">
-      <space-hardware @handleHard="handleHard" :listdata="listdata"></space-hardware>
-      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && listdata.status === 'Create'">
+      <space-hardware @handleHard="handleHard" :listdata="listdata" :renewButton="false"></space-hardware>
+      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && listdata.status === 'Created'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -517,13 +517,8 @@ export default defineComponent({
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
-        listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Create' }
-        const current = Math.floor(Date.now() / 1000)
-        let expireTime = NaN
-        if (listRes.data.space.expiration_time) {
-          const currentTime = (listRes.data.space.expiration_time - current) / 86400
-          expireTime = Math.floor(currentTime)
-        }
+        listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
+        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         context.emit('handleValue', listRes.data, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
         if (listRes.data.nft) {
           if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
