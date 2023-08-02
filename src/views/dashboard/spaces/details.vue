@@ -26,7 +26,7 @@
               <el-icon>
                 <WarningFilled />
               </el-icon>
-              &nbsp;Expires in {{`${expireTime.time} ${expireTime.unit}`}} </el-button>
+              &nbsp;Expires in {{expireTime.time}} {{expireTime.unit}} </el-button>
             <el-button type="warning" plain disabled v-else>
               <el-icon>
                 <WarningFilled />
@@ -64,7 +64,7 @@
           <el-icon>
             <Timer />
           </el-icon>
-          Remaining Time： {{`${expireTime.time} ${expireTime.unit}`}} </div>
+          Remaining Time： {{expireTime.time}} {{expireTime.unit}} </div>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
         <el-tab-pane name="card">
