@@ -670,6 +670,8 @@ export default defineComponent({
             }
           }
           .el-button {
+            width: 200px;
+            max-width: 100%;
             padding: 0.15rem 0.2rem;
             background: lighten($color: #f0f0f0, $amount: 0);
             border-radius: 0.07rem;

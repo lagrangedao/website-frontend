@@ -187,8 +187,6 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   EditPen, Edit, CircleClose
 } from '@element-plus/icons-vue'
-import { async } from 'q';
-
 export default defineComponent({
   name: 'Spaces',
   components: {
@@ -219,50 +217,6 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const tableData = ref([
-      {
-        sentence1: '"The cat sat on the mat."',
-        sentence2: '"The cat did not sit on the mat."',
-        idx: '0',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"The cat did not sit on the mat."',
-        sentence2: '"The cat sat on the mat."',
-        idx: '1',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"When you\'ve got no snow,  it\'s really hard to...',
-        sentence2: '"When you\'ve got snow, it\'s really hard to learn a snowy...',
-        idx: '2',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '3',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '4',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya supports Twitch.tv...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '5',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouy supports media apps...',
-        sentence2: '"Out of the box, Ouya supports Twitch.tv and XBMC media player."',
-        idx: '6',
-        label: '1   (not_entailment)'
-      }
-    ])
     const textEditor = ref('')
     const textEditorChange = ref('')
     const preview = ref(null)
@@ -325,14 +279,12 @@ export default defineComponent({
       listdata.value = []
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
-        // listdata.value = listRes.data.files || []
         const fileLi = listRes.data.files || []
         fileLi.forEach((element, i) => {
           let el = element.name.split('/')
           el.shift()
           el.shift()
           el.shift()
-          // console.log(el.join('/').toLowerCase())
           if (el.join('/').toLowerCase() === 'readme.md') {
             urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
@@ -363,9 +315,21 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
+    function handleAnchorClick (anchor) {
+      const { lineIndex } = anchor
+      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
+
+      if (heading) {
+        preview.value.scrollToTarget({
+          target: heading,
+          scrollContainer: window,
+          top: 0,
+        })
+      }
+    }
     const imgClick = (url, index) => {
       console.log(url, index);
-    };
+    }
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
       var response = await fetch(urlReadme.value)
@@ -387,18 +351,6 @@ export default defineComponent({
           indent: hTags.indexOf(el.tagName)
         }));
       });
-    };
-    function handleAnchorClick (anchor) {
-      const { lineIndex } = anchor
-      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
-
-      if (heading) {
-        preview.value.scrollToTarget({
-          target: heading,
-          scrollContainer: window,
-          top: 0,
-        })
-      }
     }
     async function cardAdd (type) {
       if (type === 'create') createLoad.value = true
@@ -413,30 +365,28 @@ export default defineComponent({
       } else if (type === 'docker') {
         listLoad.value = true
         let fd = await formDataRetrue()
-        // const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
-        // if (uploadRes && uploadRes.status === "success" && uploadRes.data) system.$commonFun.messageTip('success', 'Update  successfully!')
-        // else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
         init()
       }
     }
     async function formDataRetrue () {
+      let uploadRes
       const fileList = ['Dockerfile', 'Readme.md', 'requirements.txt', 'app/_init_.py', 'app/main.py']
       for (let f = 0; f < fileList.length; f++) {
-        let formdata = new FormData()
         let name = fileList[f]
         let response = await fetch(`/static/template/hello-world/${name}`)
         let text = await new Promise(async resolve => {
           resolve(response.text())
         })
+        let formdata = new FormData()
         let newFile = new File([text], name)
         formdata.append('file', newFile, name)
-        const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', formdata)
-        console.log(uploadRes, name)
+        uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', formdata)
+        if (uploadRes && uploadRes.status !== "success") system.$commonFun.messageTip(uploadRes.status, `${uploadRes.message}: ${name}`)
         // sleep 0.1s
         await system.$commonFun.timeout(100)
       }
 
-      return "love you"
+      return uploadRes.message
     }
     function cancelFun () {
       createLoad.value = false
@@ -483,7 +433,6 @@ export default defineComponent({
       system,
       route,
       router,
-      tableData,
       props,
       urlReadme,
       isPreview,
