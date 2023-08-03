@@ -413,16 +413,16 @@ export default defineComponent({
       } else if (type === 'docker') {
         listLoad.value = true
         let fd = await formDataRetrue()
-        const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
-        if (uploadRes && uploadRes.status === "success" && uploadRes.data) system.$commonFun.messageTip('success', 'Update  successfully!')
-        else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
+        // const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+        // if (uploadRes && uploadRes.status === "success" && uploadRes.data) system.$commonFun.messageTip('success', 'Update  successfully!')
+        // else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
         init()
       }
     }
     async function formDataRetrue () {
-      let formdata = new FormData()
       const fileList = ['Dockerfile', 'Readme.md', 'requirements.txt', 'app/_init_.py', 'app/main.py']
       for (let f = 0; f < fileList.length; f++) {
+        let formdata = new FormData()
         let name = fileList[f]
         let response = await fetch(`/static/template/hello-world/${name}`)
         let text = await new Promise(async resolve => {
@@ -430,8 +430,13 @@ export default defineComponent({
         })
         let newFile = new File([text], name)
         formdata.append('file', newFile, name)
+        const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', formdata)
+        console.log(uploadRes, name)
+        // sleep 0.1s
+        await system.$commonFun.timeout(100)
       }
-      return formdata
+
+      return "love you"
     }
     function cancelFun () {
       createLoad.value = false
