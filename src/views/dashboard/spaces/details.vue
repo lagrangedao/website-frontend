@@ -228,7 +228,7 @@
       <div class="box">
         <div class="title">Space 101</div>
         <ul>
-          <li :class="{'strikeout': allData.files.length>0}">Upload Docker file</li>
+          <li :class="{'strikeout': allData.files.length>0}">Upload runnable file</li>
           <li :class="{'strikeout': allData.space.status !== allData.paymentStatus}">Choose the hardware you want</li>
           <li>Done!</li>
         </ul>
