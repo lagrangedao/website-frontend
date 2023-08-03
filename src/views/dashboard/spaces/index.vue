@@ -42,7 +42,9 @@
               <el-card class="box-card" @click="detailFun(ls, l)">
                 <template #header>
                   <div class="card-header">
-                    <span>{{ls.likes}}</span>
+                    <span class="left">{{ls.status}}</span>
+                    <span class="right">{{ls.likes}}</span>
+                    <span class="bottom" v-if="ls.activeOrder && ls.activeOrder.config">{{ls.activeOrder.config.description}}</span>
                   </div>
                   <h1>{{ls.name}}</h1>
                   <!-- <div class="card-owner">
@@ -72,7 +74,9 @@
             <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
-                  <span>{{list.likes}}</span>
+                  <span class="left">{{list.status}}</span>
+                  <span class="right">{{list.likes}}</span>
+                  <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span>
                 </div>
                 <h1>{{list.name}}</h1>
                 <!-- <div class="card-owner">
@@ -488,22 +492,39 @@ export default defineComponent({
               color: #fff;
               cursor: pointer;
               .card-header {
-                position: absolute;
-                right: 0.15rem;
-                top: 0.15rem;
-                display: flex;
-                align-items: center;
                 span {
+                  position: absolute;
                   height: 0.25rem;
-                  padding-left: 0.3rem;
-                  background: url(../../../assets/images/icons/icon_9_1.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
                   font-size: 14px;
                   color: #fff;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
                     font-size: 15px;
+                  }
+                  &.left {
+                    left: 0.15rem;
+                    top: 0.1rem;
+                    font-family: "Helvetica-Bold";
+                    opacity: 0.9;
+                  }
+                  &.right {
+                    right: 0.15rem;
+                    top: 0.1rem;
+                    display: flex;
+                    align-items: center;
+                    padding-left: 0.25rem;
+                    background: url(../../../assets/images/icons/icon_9_1.png)
+                      no-repeat left 0px;
+                    background-size: 0.18rem;
+                  }
+                  &.bottom {
+                    left: 0.15rem;
+                    bottom: 0.05rem;
+                    opacity: 0.9;
+                    font-size: 13px;
+                    @media screen and (min-width: 1800px) {
+                      font-size: 14px;
+                    }
                   }
                 }
               }

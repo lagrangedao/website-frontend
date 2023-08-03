@@ -174,32 +174,26 @@
                   <div class="el-step__arrow"></div>
                 </div>
               </div>
-              <div class="el-step is-simple is-flex">
-                <div class="el-step__head" :class="{'is-success': allData.job.bidder_id, 'is-wait':!allData.job.bidder_id}">
-                  <div class="el-step__icon is-text">
-                    <i v-if="allData.job.bidder_id" class="el-icon el-step__icon-inner is-status">
-                      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="currentColor" d="M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944z"></path>
-                      </svg>
-                    </i>
-                  </div>
-                </div>
-                <div class="el-step__main">
-                  <div class="el-step__title" :class="{'is-success': allData.job.bidder_id, 'is-wait':!allData.job.bidder_id}">
-                    <p v-if="allData.job.bidder_id">CP node id
-                      <el-popover placement="top" :width="300" popper-style="word-break: break-word; text-align: left;" trigger="hover" :content="allData.job.bidder_id">
-                        <template #reference>
-                          <span class="copy" @click="system.$commonFun.copyContent(allData.job.bidder_id, 'Copied')">({{system.$commonFun.hiddAddress(allData.job.bidder_id)}})</span>
-                        </template>
-                      </el-popover>
+            </div>
+            <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
+              <el-col :span="24">
+                <el-descriptions title="You're using:" direction="vertical" :column="bodyWidth" border>
+                  <el-descriptions-item label="Name">{{allData.space.activeOrder.config.name}}</el-descriptions-item>
+                  <el-descriptions-item label="Type">{{allData.space.activeOrder.config.hardware_type}}</el-descriptions-item>
+                  <el-descriptions-item label="Memory">{{allData.space.activeOrder.config.memory}}</el-descriptions-item>
+                  <el-descriptions-item label="VCPU">{{allData.space.activeOrder.config.vcpu}}</el-descriptions-item>
+                  <el-descriptions-item label="Price">{{allData.space.activeOrder.config.price_per_hour}} LAG per hour</el-descriptions-item>
+                  <el-descriptions-item label="Description">{{allData.space.activeOrder.config.description}}</el-descriptions-item>
+                  <el-descriptions-item label="CP Node ID">
+                    <p v-if="allData.job && allData.job.bidder_id">
+                      {{allData.job.bidder_id}}
+                      <i class="icon icon_copy" @click="system.$commonFun.copyContent(allData.job.bidder_id, 'Copied')"></i>
                     </p>
                     <p v-else>Waiting for CP finish deployment</p>
-                  </div>
-                  <div class="el-step__arrow"></div>
-                </div>
-              </div>
-            </div>
-
+                  </el-descriptions-item>
+                </el-descriptions>
+              </el-col>
+            </el-row>
             <div class="logBody">
               {{logsCont.data.job}}
               <br /><br /> {{logsCont.data.task}}
@@ -283,7 +277,7 @@ export default defineComponent({
     const listLoad = ref(true)
     const filedata = ref([])
     const total = ref(0)
-    const bodyWidth = ref(document.body.clientWidth > 1536 ? '1536px' : '90%')
+    const bodyWidth = ref(document.body.clientWidth > 600 ? 6 : 1)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -620,7 +614,7 @@ export default defineComponent({
           margin: 0.1rem 0;
           font-family: inherit;
           font-size: 14px;
-          color: #878c93;
+          // color: #878c93;
           line-height: 1;
           @media screen and (max-width: 1600px) {
             font-size: 13px;
@@ -632,7 +626,8 @@ export default defineComponent({
           &.el-button--warning {
             border: 1px solid rgba(207, 146, 54, 0.5);
             // border-left-color: rgb(253, 246, 236);
-            &:hover {
+            &:hover,
+            &:active {
               color: #fff;
             }
           }
@@ -640,6 +635,9 @@ export default defineComponent({
             &:hover {
               color: inherit;
             }
+          }
+          &.is-disabled {
+            color: #e6a23c;
           }
         }
         .status {
@@ -796,6 +794,9 @@ export default defineComponent({
       display: flex;
       align-items: center;
       font-weight: bold;
+      @media screen and (max-width: 768px) {
+        margin-top: 0.1rem;
+      }
       i {
         margin-right: 3px;
       }
@@ -1032,29 +1033,27 @@ export default defineComponent({
         width: 92%;
         height: calc(100% - 1rem - 18px);
         padding: 0.3rem 4%;
+        overflow-y: scroll;
         @media screen and (max-width: 768px) {
           width: 96%;
           padding: 0.3rem 2%;
         }
-        .el-tab-pane {
-          height: 100%;
-        }
-        .logBody {
-          width: calc(100% - 30px);
-          max-height: 400px;
-          padding: 15px;
-          margin: 0;
-          background-color: #fff;
-          border-radius: 5px;
-          overflow-y: scroll;
-          box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
-        }
+        // .el-tab-pane {
+        //   height: 100%;
+        // }
         .el-steps {
           margin: 0.1rem 0 0.4rem;
           box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
+          @media screen and (max-width: 600px) {
+            flex-wrap: wrap;
+          }
           .el-step {
             flex-basis: 50%;
             text-transform: capitalize;
+            @media screen and (max-width: 600px) {
+              flex-basis: 100%;
+              margin: 0.1rem 0;
+            }
             * {
               word-break: break-word;
             }
@@ -1068,6 +1067,45 @@ export default defineComponent({
           .el-step.is-simple:not(:last-of-type) .el-step__title {
             max-width: 70%;
           }
+        }
+        .logRow {
+          .el-col {
+            word-break: break-word;
+            p {
+              display: flex;
+              align-items: center;
+              .icon {
+                width: 0.23rem;
+                height: 0.23rem;
+                margin: -1px 0 0 0.07rem;
+              }
+              .icon_copy {
+                width: 16px;
+                height: 16px;
+                background: url(../../../assets/images/icons/icon_36.png)
+                  no-repeat left center;
+                background-size: auto 100%;
+                cursor: pointer;
+                @media screen and (min-width: 1800px) {
+                  width: 18px;
+                  height: 18px;
+                }
+                &:hover {
+                  opacity: 0.7;
+                }
+              }
+            }
+          }
+        }
+        .logBody {
+          width: calc(100% - 30px);
+          max-height: 400px;
+          padding: 15px;
+          margin: 0.4rem 0 0;
+          background-color: #fff;
+          border-radius: 5px;
+          overflow-y: scroll;
+          box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
         }
         .uploadBody {
           width: 100%;
