@@ -262,14 +262,19 @@ export default defineComponent({
         return
       }
       // fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
-      fd.append('paid',approveAmount) // 授权代币的金额
+      fd.append('paid', approveAmount) // 授权代币的金额
       fd.append('space_name', route.params.name)
       fd.append('cfg_name', sleepSelect.value.hardware_name)
       fd.append('duration', ruleForm.usageTime * 3600)
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
-      const hardhashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}space/deployment`, 'post', fd)
-      if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+      if (props.renewButton) {
+        const renewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/renew`, 'post', fd)
+        if (renewRes) system.$commonFun.messageTip(renewRes.status, renewRes.message)
+      } else {
+        const hardhashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}space/deployment`, 'post', fd)
+        if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+      }
     }
     function close () {
       if (props.renewButton) context.emit('handleHard', false, true)
