@@ -32,7 +32,7 @@
                 <WarningFilled />
               </el-icon>
               &nbsp;Expired</el-button>
-            <el-button type="warning" plain @click="spaceHardDia = true">Renew</el-button>
+            <el-button type="warning" plain @click="hardwareOperate('renew')">Renew</el-button>
           </el-button-group>
           <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
@@ -51,9 +51,9 @@
             <svg t="1690181902015" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2037" width="200" height="200">
               <path d="M992.627337 593.536l-42.304 0 0-529.536-661.376 0c-16.64 0-26.112 18.944-15.872 32 42.496 54.464 124.288 159.36 124.672 160l360.576 0 0 337.536-42.24 0c-26.176 0-40.832 30.08-24.704 50.688l138.24 177.28c12.544 16.128 36.928 16.128 49.536 0l138.304-177.28c15.936-20.608 1.216-50.688-24.832-50.688zM626.355337 768l-360.576 0 0-337.536 42.24 0c26.176 0 40.832-30.08 24.704-50.688l-138.24-177.28c-12.544-16.128-36.928-16.128-49.536 0l-138.304 177.28c-16 20.608-1.28 50.688 24.768 50.688l42.304 0 0 529.536 661.44 0c16.64 0 26.112-18.944 15.872-32-42.496-54.464-124.288-159.36-124.672-160z"
                 fill="#878c93" p-id="2038"></path>
-            </svg> Reboot
+            </svg> Redeploy
           </div>
-          <div class="logs_style" @click="forkOperate" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+          <div class="logs_style" @click="hardwareOperate('fork')" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
               <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
             </svg> Fork
@@ -195,8 +195,9 @@
               </el-col>
             </el-row>
             <div class="logBody">
-              {{logsCont.data.job}}
-              <br /><br /> {{logsCont.data.task}}
+              <json-viewer :value="logsCont.data.job" :expand-depth=5 copyable boxed sort></json-viewer>
+              <br /><br />
+              <json-viewer :value="logsCont.data.task" :expand-depth=5 copyable boxed sort></json-viewer>
             </div>
           </el-tab-pane>
           <el-tab-pane label="Build" name="Build" v-if="false">
@@ -219,7 +220,7 @@
       </template>
     </el-drawer>
 
-    <div class="note" v-if="noteShow && !forkLoad && !spaceHardDia && !(allData.files.length>0 && allData.space.status !== allData.paymentStatus)">
+    <div class="note" v-if="noteShow && !forkLoad && !dialogCont.spaceHardDia && !(allData.files.length>0 && allData.space.status !== allData.paymentStatus)">
       <div class="close" @click="noteShow=false">
         <el-icon>
           <Close />
@@ -235,7 +236,10 @@
       </div>
     </div>
 
-    <space-hardware v-if="spaceHardDia" @handleHard="handleHard" :listdata="allData.space" :renewButton="true"></space-hardware>
+    <el-dialog v-model="dialogCont.spaceHardFork" title="" :width="diagWidth" :show-close="true" :close-on-click-modal="false">
+      <space-hardware @handleHard="handleHard" :listdata="allData.space" :renewButton="renewButton"></space-hardware>
+    </el-dialog>
+    <space-hardware v-if="dialogCont.spaceHardRenew" @handleHard="handleHard" :listdata="allData.space" :renewButton="renewButton"></space-hardware>
   </section>
 </template>
 <script>
@@ -249,6 +253,7 @@ import spaceHardware from '@/components/spaceHardware.vue'
 import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import JsonViewer from 'vue-json-viewer'
 import {
   Setting, ArrowLeft, WarningFilled, CloseBold, Close, Timer
 } from '@element-plus/icons-vue'
@@ -262,6 +267,7 @@ export default defineComponent({
     detailCommunity,
     detailSetting,
     spaceHardware,
+    JsonViewer,
     Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer
   },
   setup () {
@@ -278,6 +284,7 @@ export default defineComponent({
     const filedata = ref([])
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth > 600 ? 6 : 1)
+    const diagWidth = ref(document.body.clientWidth > 1536 ? '1536px' : '90%')
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -354,7 +361,12 @@ export default defineComponent({
       files: [],
       paymentStatus: 'Created'
     })
-    const spaceHardDia = ref(false)
+    const dialogCont = reactive({
+      spaceHardFork: false,
+      spaceHardRenew: false,
+      spaceHardDia: false
+    })
+    const renewButton = ref('renew')
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -397,14 +409,11 @@ export default defineComponent({
       }
       forkLoad.value = false
     }
-    const forkOperate = async () => {
-      forkLoad.value = true
-      const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/duplicate`, 'post', {})
-      if (forkRes && forkRes.status === 'success') {
-        system.$commonFun.messageTip('success', forkRes.message ? forkRes.message : 'Fork successfully!')
-        router.push({ name: 'spaceDetail', params: { wallet_address: metaAddress.value, name: route.params.name, tabs: 'card' } })
-      } else system.$commonFun.messageTip('error', forkRes.message ? forkRes.message : forkRes.error ? forkRes.error : 'Fork failed!')
-      init()
+    const hardwareOperate = async (type) => {
+      if (type === 'renew') dialogCont.spaceHardRenew = true
+      else dialogCont.spaceHardFork = true
+      renewButton.value = type
+      dialogCont.spaceHardDia = true
     }
     function init () {
       activeName.value = route.params.tabs || 'card'
@@ -471,7 +480,10 @@ export default defineComponent({
       // console.log(tab, event)
     }
     function handleHard (val, refresh) {
-      spaceHardDia.value = val
+      dialogCont.spaceHardDia = val
+      dialogCont.spaceHardRenew = val
+      dialogCont.spaceHardFork = val
+      if (refresh) likesValue.value = !likesValue.value
     }
     onActivated(() => init())
     watch(route, (to, from) => {
@@ -495,6 +507,7 @@ export default defineComponent({
       total,
       activeName,
       bodyWidth,
+      diagWidth,
       system,
       route,
       router,
@@ -506,10 +519,11 @@ export default defineComponent({
       noteShow,
       allData,
       drawerName,
-      spaceHardDia,
+      dialogCont,
+      renewButton,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick,
-      forkOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard
+      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard
     }
   }
 })
@@ -1099,12 +1113,10 @@ export default defineComponent({
         }
         .logBody {
           width: calc(100% - 30px);
-          max-height: 400px;
           padding: 15px;
           margin: 0.4rem 0 0;
           background-color: #fff;
           border-radius: 5px;
-          overflow-y: scroll;
           box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
         }
         .uploadBody {

@@ -1,7 +1,7 @@
 <template>
-  <div id="hardware">
-    <div v-if="!props.renewButton">
-      <div class="space-hard" v-if="!props.renewButton && props.listdata.activeOrder && props.listdata.activeOrder.config">
+  <div id="hardware" v-loading="forkLoad">
+    <div v-if="props.renewButton !== 'renew'">
+      <div class="space-hard" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config">
         <el-row class="space_hardware" :gutter="30">
           <el-col :span="24">
             <el-descriptions title="You're using:" direction="vertical" :column="6" border>
@@ -18,7 +18,7 @@
       <div class="space-hard">
         <el-row class="space_hardware" :gutter="30">
           <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6">
-            <div class="sleep_style">
+            <div class="sleep_style" v-if="props.renewButton === 'setting'">
               <div class="title_tip flex">
                 <p>
                   Sleep time settings
@@ -62,6 +62,7 @@
                 </span>.
               </p>
             </div>
+            <p class="p-4 fork" v-else @click="forkDuplicate('fork')">Just Fork, choose config later</p>
           </el-col>
           <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="18" class="hardware-right">
             <!-- <div class="price_switch flex">
@@ -74,7 +75,7 @@
                   fill="currentColor" fill-opacity="0.3"></path>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M5 4C4.44771 4 4 4.44771 4 5V7C4 7.55227 4.44771 8 5 8H7C7.55227 8 8 7.55227 8 7V5C8 4.44771 7.55227 4 7 4H5Z" fill-opacity="0.5"></path>
               </svg>
-              <span v-if="props.listdata.activeOrder === null">Space Hardware</span>
+              <span v-if="props.listdata.activeOrder === null || props.renewButton !== 'setting'">Space Hardware</span>
               <span v-else>Update Hardware</span>
             </h2>
             <p class="p-2">Choose a hardware for your Space.</p>
@@ -82,9 +83,9 @@
             <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
               <el-divider content-position="left">{{item.label}}</el-divider>
               <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o">
-                <el-card class="box-card" :class="{'active': props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))),'is-disabled':ol.hardware_status !== 'available'}"
+                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))),'is-disabled':ol.hardware_status !== 'available'}"
                   @click="sleepChange(ol)">
-                  <div class="abo" v-if="props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))">
+                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))">
                     <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
                       <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
                         fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
@@ -160,7 +161,7 @@ export default defineComponent({
   components: {},
   props: {
     listdata: { type: Object, default: {} },
-    renewButton: { type: Boolean, default: false }
+    renewButton: { type: String, default: 'setting' }
   },
   setup (props, context) {
     const store = useStore()
@@ -171,7 +172,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const ruleForm = reactive({
-      usageTime: 1,
+      usageTime: 24,
       sleepTime: '259200',
       sleepTimeOption: [
         {
@@ -210,6 +211,7 @@ export default defineComponent({
     const hardwareLoad = ref(false)
     const machinesLoad = ref(false)
     const sleepVisible = ref(false)
+    const forkLoad = ref(false)
     const sleepSelect = ref({})
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
     const tokenAddress = process.env.VUE_APP_LLL_ADDRESS
@@ -220,6 +222,13 @@ export default defineComponent({
     async function hardwareFun () {
       hardwareLoad.value = true
       try {
+        if (props.renewButton === 'fork') {
+          const forkRes = await forkDuplicate()
+          if (forkRes !== 'success') {
+            closePart()
+            return
+          }
+        }
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
         const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'ether')
         const approveAmount = pricePerHour * ruleForm.usageTime
@@ -240,16 +249,33 @@ export default defineComponent({
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
             await hardwareHash(transactionHash, approveAmount)
-            hardwareLoad.value = false
-            sleepVisible.value = false
+            closePart()
             context.emit('handleHard', false, true)
           })
           .on('error', () => hardwareLoad.value = false)
       } catch (err) {
         console.log('err', err)
         if (err && err.message) system.$commonFun.messageTip('error', err.message)
-        hardwareLoad.value = false
+        closePart()
+        if (props.renewButton === 'fork') context.emit('handleHard', false, false)
       }
+    }
+
+    function closePart () {
+      hardwareLoad.value = false
+      sleepVisible.value = false
+    }
+
+    async function forkDuplicate (type) {
+      forkLoad.value = true
+      const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/duplicate`, 'post', {})
+      if (forkRes && forkRes.status === 'success') {
+        system.$commonFun.messageTip('success', forkRes.message ? forkRes.message : 'Fork successfully!')
+        if (type) context.emit('handleHard', false, true)
+        router.push({ name: 'spaceDetail', params: { wallet_address: metaAddress.value, name: route.params.name, tabs: 'card' } })
+      } else system.$commonFun.messageTip('error', forkRes.message ? forkRes.message : 'Fork failed!')
+      forkLoad.value = false
+      return forkRes.status
     }
 
     async function hardwareHash (tx_hash, approveAmount) {
@@ -268,7 +294,7 @@ export default defineComponent({
       fd.append('duration', ruleForm.usageTime * 3600)
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
-      if (props.renewButton) {
+      if (props.renewButton === 'renew') {
         const renewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/renew`, 'post', fd)
         if (renewRes) system.$commonFun.messageTip(renewRes.status, renewRes.message)
       } else {
@@ -277,12 +303,12 @@ export default defineComponent({
       }
     }
     function close () {
-      if (props.renewButton) context.emit('handleHard', false, true)
+      if (props.renewButton === 'renew') context.emit('handleHard', false, false)
       else sleepVisible.value = false
     }
     function sleepChange (row) {
       if (row.hardware_status.toLowerCase() !== 'available' || (props.listdata.activeOrder && (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))) return false
-      ruleForm.usageTime = 1
+      ruleForm.usageTime = 24
       sleepSelect.value = row
       sleepVisible.value = true
     }
@@ -307,7 +333,7 @@ export default defineComponent({
       machinesLoad.value = true
       const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
       if (machinesRes && machinesRes.status === 'success') {
-        if (props.renewButton) {
+        if (props.renewButton === 'renew') {
           if (props.listdata.activeOrder === null) return
           for (let hard = 0; hard < machinesRes.data.hardware.length; hard++) {
             if (machinesRes.data.hardware[hard].hardware_name === props.listdata.activeOrder.config.name) {
@@ -335,7 +361,8 @@ export default defineComponent({
       hardwareOptions,
       hardwareLoad,
       machinesLoad,
-      sleepChange, hardwareFun, close
+      forkLoad,
+      sleepChange, hardwareFun, close, forkDuplicate
     }
   }
 })
@@ -361,6 +388,9 @@ export default defineComponent({
       padding: 0.3rem 0.2rem;
       color: #000;
       line-height: 1.5;
+      .el-col {
+        position: relative;
+      }
       h2 {
         margin: 0 0 0.12rem;
         font-size: 20px;
@@ -429,6 +459,14 @@ export default defineComponent({
           border-radius: 0.05rem;
           white-space: nowrap;
           cursor: pointer;
+        }
+      }
+      .fork {
+        position: absolute;
+        bottom: 0;
+        cursor: pointer;
+        &:hover {
+          text-decoration: underline;
         }
       }
       .hardware-right {

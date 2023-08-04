@@ -9,12 +9,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="chain_id" label="chain id" width="100" />
-        <el-table-column prop="token" label="token">
+        <el-table-column prop="token" label="token" v-if="paymentType.toLowerCase() !== 'provider'">
           <template #default="scope">
             <span>LAG</span>
           </template>
         </el-table-column>
-        <el-table-column prop="order" label="space name">
+        <el-table-column prop="order" label="space name" v-if="paymentType.toLowerCase() !== 'provider'">
           <template #default="scope">
             <span>{{scope.row.order.space_name}}</span>
           </template>
@@ -22,8 +22,14 @@
         <el-table-column prop="amount" label="amount" />
         <el-table-column prop="status" label="status" width="120">
           <template #default="scope">
-            <el-button type="primary" v-if="scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
-            <span v-else>{{scope.row.status}}</span>
+            <div v-if="paymentType.toLowerCase() !== 'provider'">
+              <el-button type="primary" v-if="scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
+              <span v-else>{{scope.row.status}}</span>
+            </div>
+            <div v-else>
+              <el-button type="primary" v-if="scope.row.job.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
+              <span v-else>{{scope.row.job.status}}</span>
+            </div>
           </template>
         </el-table-column>
       </el-table>
