@@ -1,7 +1,7 @@
 <template>
   <section id="space">
     <el-row class="space_body" v-loading="listLoad">
-      <space-hardware @handleHard="handleHard" :listdata="listdata" :renewButton="false"></space-hardware>
+      <space-hardware @handleHard="handleHard" :listdata="listdata" :renewButton="'setting'"></space-hardware>
       <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && listdata.status === 'Created'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->

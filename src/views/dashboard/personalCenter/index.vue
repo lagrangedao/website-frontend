@@ -38,9 +38,9 @@
               <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
             </el-button>
             <br /><br />
-<!--            <el-button type="" text bg>-->
-<!--              <router-link :to="{name:'paymentHistory', query: {type: 'provider'}}">Provider Payment History</router-link>-->
-<!--            </el-button>-->
+            <!-- <el-button type="" text bg>
+              <router-link :to="{name:'paymentHistory', query: {type: 'provider'}}">Provider Payment History</router-link>
+            </el-button> -->
           </div>
           <div class="media">
             <a v-if="listdata.user.homepage" :href="listdata.user.homepage" target="_blank" class="homepage"></a>
