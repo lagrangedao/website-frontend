@@ -118,7 +118,7 @@
             <img v-if="fileTextType === 'image'" :src="fileTextEditor" :alt="fileBody.title" class="img_file">
             <div v-else-if="fileTextType === 'text'" v-loading="uploadLoad">
               <div class="mirror">
-                <Codemirror v-model:value="fileTextEditor" :options="metaAddress === route.params.wallet_address ? system.$commonFun.cmOptions:system.$commonFun.cmOptionsReadOnly" border placeholder="" @blur="onBlur" />
+                <Codemirror v-model:value="fileTextEditor" :options="system.$commonFun.cmOptions(metaAddress === route.params.wallet_address)" border placeholder="" @blur="onBlur" />
               </div>
               <!-- <v-md-editor v-model="fileTextEditor" height="450px"></v-md-editor> -->
               <el-button-group class="ml-4 worktop">

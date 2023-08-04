@@ -321,30 +321,19 @@ async function expireTimeFun(cont) {
   return expireTime
 }
 
-const cmOptions = {
-  mode: 'text/x-markdown', // Language mode
-  // theme: 'dracula', // Theme
-  lineNumbers: true, // Show line number
-  smartIndent: true, // Smart indent
-  indentUnit: 4, // The smart indent unit is 2 spaces in length
-  foldGutter: true, // Code folding
-  matchBrackets: true,
-  autoCloseBrackets: true,
-  styleActiveLine: true, // Display the style of the selected row
-  readOnly: false,
-}
-
-const cmOptionsReadOnly = {
-  mode: 'text/x-markdown', // Language mode
-  // theme: 'dracula', // Theme
-  lineNumbers: true, // Show line number
-  smartIndent: true, // Smart indent
-  indentUnit: 4, // The smart indent unit is 2 spaces in length
-  foldGutter: true, // Code folding
-  matchBrackets: true,
-  autoCloseBrackets: true,
-  styleActiveLine: true, // Display the style of the selected row
-  readOnly: true,
+function cmOptions(owner) {
+  return {
+    mode: 'text/x-markdown', // Language mode
+    // theme: 'dracula', // Theme
+    lineNumbers: true, // Show line number
+    smartIndent: true, // Smart indent
+    indentUnit: 4, // The smart indent unit is 2 spaces in length
+    foldGutter: true, // Code folding
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    styleActiveLine: true, // Display the style of the selected row
+    readOnly: !owner,
+  }
 }
 
 const Web3 = require('web3');
@@ -383,6 +372,5 @@ export default {
   changeIDLogin,
   hiddAddress,
   cmOptions,
-  cmOptionsReadOnly,
   expireTimeFun
 }
