@@ -21,7 +21,7 @@
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||expireTime.unit==='hours')">
+          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
             <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
               <el-icon>
                 <WarningFilled />

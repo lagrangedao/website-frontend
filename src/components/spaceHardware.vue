@@ -15,10 +15,10 @@
           </el-col>
         </el-row>
       </div>
-      <div class="space-hard">
+      <div :class="{'space-hard':true, 'space-hard-fork': props.renewButton === 'fork'}">
         <el-row class="space_hardware" :gutter="30">
-          <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6">
-            <div class="sleep_style" v-if="props.renewButton === 'setting'">
+          <el-col :md="props.renewButton === 'fork'?0:24" :lg="props.renewButton === 'fork'?0:6">
+            <div class="sleep_style">
               <div class="title_tip flex">
                 <p>
                   Sleep time settings
@@ -62,9 +62,8 @@
                 </span>.
               </p>
             </div>
-            <p class="p-4 fork" v-else @click="forkDuplicate('fork')">Just Fork, choose config later</p>
           </el-col>
-          <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="18" class="hardware-right">
+          <el-col :xs="24" :sm="24" :md="24" :lg="props.renewButton === 'fork'?24:18" class="hardware-right">
             <!-- <div class="price_switch flex">
                 Display price:
                 <el-switch v-model="ruleForm.displayPrice" size="small" active-text="per month" inactive-text="per hour" />
@@ -104,6 +103,9 @@
             </el-row>
           </el-col>
         </el-row>
+        <div class="fork-btn" v-if="props.renewButton === 'fork'">
+          <el-button type="info" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
+        </div>
       </div>
     </div>
     <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" title="Confirm hardware update" :width="dialogWidth">
@@ -126,6 +128,17 @@
           </div>
           <div class="time flex">
             <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+          </div>
+          <div class="title_tip flex">
+            <div class="flex">
+              Region
+            </div>
+            <el-divider />
+          </div>
+          <div class="time flex">
+            <el-select v-model="regionData.regionValue" class="m-region" placeholder="Region">
+              <el-option v-for="item in regionData.regionOption" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
           </div>
           <el-divider />
           <p class="p-1">Make sure to follow
@@ -206,6 +219,10 @@ export default defineComponent({
       ],
       pauseSpace: false,
       displayPrice: false
+    })
+    const regionData = reactive({
+      regionValue: '',
+      regionOption: []
     })
     const hardwareOptions = ref([])
     const hardwareLoad = ref(false)
@@ -294,13 +311,10 @@ export default defineComponent({
       fd.append('duration', ruleForm.usageTime * 3600)
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
-      if (props.renewButton === 'renew') {
-        const renewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/renew`, 'post', fd)
-        if (renewRes) system.$commonFun.messageTip(renewRes.status, renewRes.message)
-      } else {
-        const hardhashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}space/deployment`, 'post', fd)
-        if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
-      }
+      fd.append('region', regionData.regionValue)
+      const urlRes = props.renewButton === 'renew' ? `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/renew` : `${process.env.VUE_APP_BASEAPI}space/deployment`
+      const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
+      if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
     }
     function close () {
       if (props.renewButton === 'renew') context.emit('handleHard', false, false)
@@ -329,6 +343,17 @@ export default defineComponent({
       })
       return listArr
     }
+    async function regionList (list) {
+      let arr = []
+      if (!list) return arr
+      list.forEach(l => {
+        arr.push({
+          value: l,
+          label: l
+        })
+      })
+      return arr
+    }
     async function init (params) {
       machinesLoad.value = true
       const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
@@ -342,6 +367,10 @@ export default defineComponent({
             }
           }
         } else hardwareOptions.value = await listArray(machinesRes.data.hardware)
+        if (machinesRes.data.region) {
+          regionData.regionOption = await regionList(machinesRes.data.region)
+          regionData.regionValue = machinesRes.data.region[0]
+        }
       } else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
       machinesLoad.value = false
     }
@@ -362,6 +391,7 @@ export default defineComponent({
       hardwareLoad,
       machinesLoad,
       forkLoad,
+      regionData,
       sleepChange, hardwareFun, close, forkDuplicate
     }
   }
@@ -370,6 +400,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 #hardware {
   width: 100%;
+  .flex {
+    display: flex;
+    align-items: center;
+  }
   .space-hard {
     width: 100%;
     margin: 0.15rem 0;
@@ -379,10 +413,6 @@ export default defineComponent({
     color: #606060;
     text-align: left;
     overflow: hidden;
-    .flex {
-      display: flex;
-      align-items: center;
-    }
     :deep(.space_hardware) {
       position: relative;
       padding: 0.3rem 0.2rem;
@@ -549,6 +579,9 @@ export default defineComponent({
                 }
               }
             }
+          }
+          .m-region {
+            margin: 0;
           }
         }
       }
@@ -718,6 +751,28 @@ export default defineComponent({
         //     margin-top: 0.2rem;
         //   }
         // }
+      }
+    }
+    .fork-btn {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 0.2rem 0.2rem;
+      .el-button {
+        span {
+          cursor: inherit;
+        }
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+    &.space-hard-fork {
+      margin: 0;
+      :deep(.space_hardware) {
+        padding: 0.1rem 0.2rem 0.3rem;
+        .hardware-right {
+          border: 0;
+        }
       }
     }
   }
@@ -904,6 +959,14 @@ export default defineComponent({
               .el-input__inner {
                 background-color: transparent;
                 opacity: 0.8;
+              }
+            }
+          }
+          &.m-region {
+            margin: 0;
+            .el-input {
+              .el-input__inner {
+                max-width: 155px;
               }
             }
           }

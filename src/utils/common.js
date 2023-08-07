@@ -310,7 +310,7 @@ async function expireTimeFun(cont) {
   if (cont) {
     const currentTime = (cont - current) / 86400
     if (currentTime < 1) {
-      expireTime.time = (currentTime * 24).toFixed(1) <= 0 ? 0 : (currentTime * 24).toFixed(1)
+      expireTime.time = (currentTime * 24).toFixed(1) <= 0 ? NaN : (currentTime * 24).toFixed(1)
       expireTime.unit = 'hours'
     } else {
       expireTime.time = currentTime.toFixed(1)
