@@ -27,8 +27,8 @@
               <span v-else>{{scope.row.status}}</span>
             </div>
             <div v-else>
-              <el-button type="primary" v-if="scope.row.job.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
-              <span v-else>{{scope.row.job.status}}</span>
+              <el-button type="primary" v-if="scope.row.claimed === false" plain @click="refundFun(scope.row, 'claim')">Claim</el-button>
+              <span v-else>Claimed</span>
             </div>
           </template>
         </el-table-column>
@@ -55,22 +55,38 @@ export default defineComponent({
     const paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
     const paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
 
-    async function refundFun (row) {
+    async function refundFun (row, type) {
       paymentLoad.value = true
       try {
-        console.log('refund_id:', row.transaction_hash)
-        let gasLimit = await paymentContract.methods
-          .claimRefund(String(row.transaction_hash))
-          .estimateGas({ from: store.state.metaAddress })
+        if (type) {
+          console.log('task_uuid:', row.job.task_uuid)
+          let gasLimit = await paymentContract.methods
+            .claimReward(String(row.job.task_uuid))
+            .estimateGas({ from: store.state.metaAddress })
 
-        const tx = await paymentContract.methods
-          .claimRefund(String(row.transaction_hash))
-          .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-          .on('transactionHash', async (transactionHash) => {
-            console.log('refund transactionHash:', transactionHash)
-            refundStatus(row)
-          })
-          .on('error', () => paymentLoad.value = false)
+          const tx = await paymentContract.methods
+            .claimReward(String(row.job.task_uuid))
+            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+            .on('transactionHash', async (transactionHash) => {
+              console.log('claim transactionHash:', transactionHash)
+              claimStatus(row)
+            })
+            .on('error', () => paymentLoad.value = false)
+        } else {
+          console.log('refund_id:', row.transaction_hash)
+          let gasLimit = await paymentContract.methods
+            .claimRefund(String(row.transaction_hash))
+            .estimateGas({ from: store.state.metaAddress })
+
+          const tx = await paymentContract.methods
+            .claimRefund(String(row.transaction_hash))
+            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+            .on('transactionHash', async (transactionHash) => {
+              console.log('refund transactionHash:', transactionHash)
+              refundStatus(row)
+            })
+            .on('error', () => paymentLoad.value = false)
+        }
       } catch (err) {
         console.log('err', err)
         paymentLoad.value = false
@@ -84,6 +100,16 @@ export default defineComponent({
       formData.append('chain_id', row.chain_id)
       const refundRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/refund`, 'post', formData)
       if (!refundRes || refundRes.status !== 'success') if (refundRes.message) system.$commonFun.messageTip('error', refundRes.message)
+      init()
+    }
+    async function claimStatus (row) {
+      paymentLoad.value = true
+      let formData = new FormData()
+      formData.append('tx_hash', row.transaction_hash)
+      formData.append('chain_id', row.chain_id)
+      formData.append('uuid', row.job.task_uuid)
+      const claimRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/provider/payments`, 'post', formData)
+      if (!claimRes || claimRes.status !== 'success') if (claimRes.message) system.$commonFun.messageTip('error', claimRes.message)
       init()
     }
     async function init (params) {
