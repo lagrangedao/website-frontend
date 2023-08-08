@@ -6,9 +6,12 @@
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
               <b>No space card yet</b>
-              <p v-if="metaAddress === route.params.wallet_address">Create a new space card by using following template</p>
+              <p v-if="metaAddress === route.params.wallet_address">
+                <span v-if="fileSpaceData.length === 0">Create a new space card by using following template</span>
+                <span v-else>Create a new space card by creating a Readme.md file</span>
+              </p>
             </div>
-            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address">
+            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address && fileSpaceData.length === 0">
               <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="col-title">
                 <b>Start with hello-world template</b>
               </el-col>
@@ -206,6 +209,7 @@ export default defineComponent({
     const value = ref('')
     const urlReadme = ref('')
     const urlReadmeName = ref('')
+    const fileSpaceData = ref([])
     const isPreview = ref(true)
     const currentPage1 = ref(1)
     const small = ref(false)
@@ -286,11 +290,16 @@ export default defineComponent({
           el.shift()
           el.shift()
           if (el.join('/').toLowerCase() === 'readme.md') {
+            if (element.gateway === null) {
+              init()
+              return
+            }
             urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
             getTitle(urlReadme.value)
           }
         })
+        fileSpaceData.value = fileLi
         const jobData = listRes.data.job || { job_result_uri: '' }
         const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
@@ -435,6 +444,7 @@ export default defineComponent({
       router,
       props,
       urlReadme,
+      fileSpaceData,
       isPreview,
       templateData,
       createLoad,
