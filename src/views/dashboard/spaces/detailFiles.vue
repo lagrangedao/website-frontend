@@ -540,12 +540,12 @@ export default defineComponent({
       let fd = new FormData()
       fd.append('file', newFile, `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
       const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
-      await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
         // if (uploadRes.data.job) system.$commonFun.messageTip('success', `${type === 'create' ? 'Create ' + textInfo.name + ' successfully!' : 'Update ' + fileBody.title + ' successfully!'}`)
         // else system.$commonFun.messageTip('error', uploadRes.message)
       } else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
+      await system.$commonFun.timeout(1000)
       reset()
       init()
     }

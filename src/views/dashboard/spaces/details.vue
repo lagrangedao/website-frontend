@@ -418,6 +418,7 @@ export default defineComponent({
     function init () {
       activeName.value = route.params.tabs || 'card'
       forkLoad.value = false
+      noteShow.value = true
       parentValue.value = ''
       logsValue.value = ''
       expireTime.time = NaN
