@@ -278,6 +278,7 @@ export default defineComponent({
       return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
     }
     async function init () {
+      let gate = false
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.value = []
@@ -290,19 +291,24 @@ export default defineComponent({
           el.shift()
           el.shift()
           if (el.join('/').toLowerCase() === 'readme.md') {
-            if (element.gateway === null) {
-              init()
+            if (element.gateway !== null) {
+              urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
+              urlReadmeName.value = el.join('/')
+              getTitle(urlReadme.value)
+            } else {
+              gate = true
               return
             }
-            urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
-            urlReadmeName.value = el.join('/')
-            getTitle(urlReadme.value)
           }
         })
         fileSpaceData.value = fileLi
         const jobData = listRes.data.job || { job_result_uri: '' }
         const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+        if (!gate) context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+      }
+      if (gate) {
+        init()
+        return
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
