@@ -2,7 +2,41 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body" v-loading="listLoad">
-        <iframe v-if="listdata.job_result_uri" :src="`${listdata.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
+        <el-tabs class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0">
+          <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
+            <template #label>
+              <span class="custom-tabs-label">
+                <el-icon v-if="job.is_leading_job.toString() === 'true'">
+                  <svg t="1691559408290" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9394" width="200" height="200">
+                    <path d="M610.304 384a51.2 51.2 0 0 0 38.656 25.6l194.048 27.904a12.8 12.8 0 0 1 7.168 21.76l-140.544 135.936a51.2 51.2 0 0 0-14.592 45.056l33.024 192a12.8 12.8 0 0 1-18.432 13.568l-173.824-90.88a51.2 51.2 0 0 0-47.616 0l-173.824 90.88a12.8 12.8 0 0 1-18.432-13.568l33.024-192a51.2 51.2 0 0 0-14.592-45.056L173.824 460.8a12.8 12.8 0 0 1 7.168-21.76L375.04 409.6a51.2 51.2 0 0 0 38.656-25.6l86.784-174.848a12.8 12.8 0 0 1 23.04 0zM512 25.6a56.064 56.064 0 0 0-51.2 31.232l-115.712 232.96A51.2 51.2 0 0 1 307.2 317.44L48.384 354.816A56.064 56.064 0 0 0 17.152 450.56L204.8 631.808a51.2 51.2 0 0 1 14.848 45.056l-44.288 256a56.32 56.32 0 0 0 80.64 58.88l230.4-120.832a51.2 51.2 0 0 1 47.616 0l230.4 120.832a56.32 56.32 0 0 0 81.92-59.136l-44.288-256a51.2 51.2 0 0 1 17.152-44.8l187.136-181.248a56.064 56.064 0 0 0-31.232-95.744L716.8 317.44a51.2 51.2 0 0 1-38.4-27.648L563.2 56.832A56.064 56.064 0 0 0 512 25.6z"
+                      p-id="9395"></path>
+                  </svg>
+                </el-icon>
+                <span>CP {{j+1}}</span>
+              </span>
+            </template>
+            <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
+          </el-tab-pane>
+        </el-tabs>
+        <div class="deployment" v-if="listdata.space.status === 'Deploying'">
+          <div class="title">Deployment machine</div>
+          <el-descriptions :column="2" direction="vertical" border v-for="deploy in listdata.space.deploy_mechine_list" :key="deploy">
+            <el-descriptions-item label="CP Node ID">
+              <div class="flex">{{system.$commonFun.hiddAddress(deploy.node_id)}}
+                <i class="icon icon_copy" @click="system.$commonFun.copyContent(deploy.node_id, 'Copied')"></i>
+              </div>
+            </el-descriptions-item>
+            <el-descriptions-item label="Status">{{deploy.status}}</el-descriptions-item>
+          </el-descriptions>
+          <div class="info">
+            <el-alert :closable="false" title="If you observe the CP status as 'completed', yet the Space remains in a waiting state, it indicates that the monitoring system is in the process of verifying CP's task. Please be patient." type="info" />
+          </div>
+        </div>
+        <div class="deployment" v-else-if="listdata.space.status === 'Assigning task'">
+          <div>
+            <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
+          </div>
+        </div>
       </el-row>
     </div>
   </section>
@@ -31,7 +65,7 @@ export default defineComponent({
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const listLoad = ref(true)
     const listdata = reactive({
-      job_result_uri: '',
+      jobResult: [],
       space: {}
     })
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -42,23 +76,27 @@ export default defineComponent({
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
     }
+    async function jobList (list) {
+      let arr = list || []
+      for (let j = 0; j < arr.length; j++) {
+        const response = await fetch(arr[j].job_result_uri)
+        const textUri = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+      }
+      return arr
+    }
     async function init () {
       if (route.params.tabs !== 'app') return
       listLoad.value = true
-      listdata.job_result_uri = ''
+      listdata.jobResult = []
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
-        const jobData = listRes.data.job || { job_result_uri: '' }
+        listdata.jobResult = await jobList(listRes.data.job)
         listdata.space = listRes.data.space
-        if (jobData.job_result_uri) {
-          const response = await fetch(jobData.job_result_uri)
-          const textUri = await new Promise(async resolve => {
-            resolve(response.text())
-          })
-          listdata.job_result_uri = JSON.parse(textUri).job_result_uri
-        } else listdata.job_result_uri = jobData.job_result_uri
         const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -122,6 +160,68 @@ export default defineComponent({
     }
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
+    }
+    .deployment {
+      width: 98%;
+      margin: 0.2rem auto;
+      .title {
+        margin: 0.1rem 0 0.25rem;
+        font-size: 0.2rem;
+        font-weight: bold;
+        text-transform: capitalize;
+      }
+      .el-descriptions {
+        .flex {
+          display: flex;
+          align-items: center;
+          .icon_copy {
+            width: 14px;
+            height: 14px;
+            margin: 0 0 0 5px;
+            background: url(../../../assets/images/icons/icon_36.png) no-repeat
+              left center;
+            background-size: auto 100%;
+            cursor: pointer;
+            @media screen and (min-width: 1800px) {
+              width: 18px;
+              height: 18px;
+            }
+            &:hover {
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+      .info {
+        margin-top: 0.5rem;
+      }
+    }
+    .app-tabs {
+      width: 98%;
+      margin: 0.1rem auto 0;
+      .el-tabs__header {
+        max-width: none !important;
+        padding: 0 !important;
+      }
+
+      .el-tabs__item {
+        .custom-tabs-label {
+          display: flex;
+          align-items: center;
+          i {
+            margin: -4px 5px 0 0;
+            font-size: 16px;
+            color: #c37af9;
+            @media screen and (max-width: 1600px) {
+              font-size: 14px;
+            }
+          }
+        }
+        &.is-active,
+        &:hover {
+          color: #c37af9 !important;
+        }
+      }
     }
     .space_iframe {
       width: 100%;

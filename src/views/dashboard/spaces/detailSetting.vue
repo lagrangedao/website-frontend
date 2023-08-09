@@ -519,7 +519,7 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
         const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
+        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
         if (listRes.data.nft) {
           if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
           let contract_address = listRes.data.nft.contract_address

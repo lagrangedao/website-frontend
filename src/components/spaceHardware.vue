@@ -15,29 +15,33 @@
           </el-col>
         </el-row>
       </div>
-      <div :class="{'space-hard':true, 'space-hard-fork': props.renewButton === 'fork'}">
+      <div :class="{'space-hard':true}">
         <el-row class="space_hardware" :gutter="30">
-          <el-col :md="props.renewButton === 'fork'?0:24" :lg="props.renewButton === 'fork'?0:6">
+          <el-col :md="24" :lg="6" class="hardware-left">
             <div class="sleep_style">
               <div class="title_tip flex">
                 <p>
-                  Sleep time settings
-                  <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                    <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
-                    <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
-                    <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
-                  </svg>
+                  Start time settings
+                  <el-popover placement="top-start" :width="200" trigger="hover" content="If the task isn't successfully taken by the CP within the specified time, we will consider it a failed and refund your tokens.">
+                    <template #reference>
+                      <div>
+                        <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                          <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
+                          <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
+                          <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
+                        </svg>
+                      </div>
+                    </template>
+                  </el-popover>
                 </p>
                 <el-divider />
               </div>
               <div class="time flex">
-                Sleep after
-                <el-select v-model="ruleForm.sleepTime" disabled class="m-2" placeholder="Select" size="small">
+                Start after
+                <el-select v-model="ruleForm.sleepTime" class="m-2" placeholder="Select" size="small">
                   <el-option v-for="item in ruleForm.sleepTimeOption" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
-                of inactivity
               </div>
-              <p class="p-4">Upgrade to a paid Hardware to set a custom sleep time.</p>
               <div class="title_tip flex pause_margin">
                 <p>
                   Pause Space
@@ -62,8 +66,11 @@
                 </span>.
               </p>
             </div>
+            <div class="fork-btn" v-if="props.renewButton === 'fork'">
+              <el-button type="info" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
+            </div>
           </el-col>
-          <el-col :xs="24" :sm="24" :md="24" :lg="props.renewButton === 'fork'?24:18" class="hardware-right">
+          <el-col :md="24" :lg="18" class="hardware-right">
             <!-- <div class="price_switch flex">
                 Display price:
                 <el-switch v-model="ruleForm.displayPrice" size="small" active-text="per month" inactive-text="per hour" />
@@ -103,9 +110,6 @@
             </el-row>
           </el-col>
         </el-row>
-        <div class="fork-btn" v-if="props.renewButton === 'fork'">
-          <el-button type="info" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
-        </div>
       </div>
     </div>
     <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" title="Confirm hardware update" :width="dialogWidth">
@@ -120,25 +124,54 @@
           </div>
         </el-card>
         <div class="sleep_style">
-          <div class="title_tip flex">
-            <div class="flex">
-              Usage Time
+          <div>
+            <div class="title_tip flex">
+              <div class="flex">
+                Usage Time
+              </div>
+              <el-divider />
             </div>
-            <el-divider />
-          </div>
-          <div class="time flex">
-            <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
-          </div>
-          <div class="title_tip flex">
-            <div class="flex">
-              Region
+            <div class="time flex">
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
-            <el-divider />
           </div>
-          <div class="time flex">
-            <el-select v-model="regionData.regionValue" class="m-region" placeholder="Region">
-              <el-option v-for="item in regionData.regionOption" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
+          <div>
+            <div class="title_tip flex">
+              <div class="flex">
+                Region
+              </div>
+              <el-divider />
+            </div>
+            <div class="time flex">
+              <el-select v-model="regionData.regionValue" class="m-region" placeholder="Region">
+                <el-option v-for="item in regionData.regionOption" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </div>
+          </div>
+          <div v-if="props.renewButton === 'renew'">
+            <div class="title_tip flex">
+              <div class="flex">
+                Start time settings
+                <el-popover placement="top-start" :width="200" trigger="hover" content="If the task isn't successfully taken by the CP within the specified time, we will consider it a failed and refund your tokens.">
+                  <template #reference>
+                    <div>
+                      <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                        <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
+                        <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
+                        <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
+                      </svg>
+                    </div>
+                  </template>
+                </el-popover>
+              </div>
+              <el-divider />
+            </div>
+            <div class="time flex">
+              Start after
+              <el-select v-model="ruleForm.sleepTime" class="m-2" placeholder="Select" size="small">
+                <el-option v-for="item in ruleForm.sleepTimeOption" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </div>
           </div>
           <el-divider />
           <p class="p-1">Make sure to follow
@@ -186,35 +219,41 @@ export default defineComponent({
     const router = useRouter()
     const ruleForm = reactive({
       usageTime: 24,
-      sleepTime: '259200',
+      sleepTime: '20',
       sleepTimeOption: [
         {
-          value: '-1',
-          label: "Don't sleep",
+          value: '20',
+          label: "20 minutes",
         }, {
-          value: '300',
-          label: "5 minutes",
-        }, {
-          value: '900',
-          label: "15 minutes",
-        }, {
-          value: '1800',
+          value: '30',
           label: "30 minutes",
         }, {
-          value: '3600',
-          label: "1 hour",
+          value: '40',
+          label: "40 minutes",
         }, {
-          value: '36000',
-          label: "10 hours",
+          value: '50',
+          label: "50 minutes",
         }, {
-          value: '86400',
-          label: "24 hours",
+          value: '60',
+          label: "60 minutes",
         }, {
-          value: '259200',
-          label: "72 hours",
+          value: '70',
+          label: "70 minutes",
         }, {
-          value: '604800',
-          label: "1 week",
+          value: '80',
+          label: "80 minutes",
+        }, {
+          value: '90',
+          label: "90 minutes",
+        }, {
+          value: '100',
+          label: "100 minutes",
+        }, {
+          value: '110',
+          label: "110 minutes",
+        }, {
+          value: '120',
+          label: "120 minutes",
         }
       ],
       pauseSpace: false,
@@ -312,7 +351,8 @@ export default defineComponent({
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
       fd.append('region', regionData.regionValue)
-      const urlRes = props.renewButton === 'renew' ? `${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/renew` : `${process.env.VUE_APP_BASEAPI}space/deployment`
+      fd.append('start_in', ruleForm.sleepTime * 60)
+      const urlRes = `${process.env.VUE_APP_BASEAPI}space/deployment`
       const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
       if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
     }
@@ -412,6 +452,7 @@ export default defineComponent({
     border-radius: 0.1rem;
     color: #606060;
     text-align: left;
+    word-break: break-word;
     overflow: hidden;
     :deep(.space_hardware) {
       position: relative;
@@ -503,6 +544,9 @@ export default defineComponent({
         max-height: 430px;
         border-left: 1px solid #dcdfe6;
         overflow-y: scroll;
+      }
+      .hardware-left {
+        padding-bottom: 0.5rem;
       }
       .sleep_style {
         margin: 0 0 0.28rem;
@@ -754,9 +798,12 @@ export default defineComponent({
       }
     }
     .fork-btn {
+      position: absolute;
+      bottom: 0;
+      left: 0;
       display: flex;
       justify-content: flex-end;
-      padding: 0 0.2rem 0.2rem;
+      padding: 0 0.2rem;
       .el-button {
         span {
           cursor: inherit;

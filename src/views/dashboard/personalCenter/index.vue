@@ -112,8 +112,8 @@
             <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<2: true">
               <template #header>
                 <div class="card-warn" v-if="list.expiration_time !== null && ((list.expireTime <=5&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))">
-                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime} ${list.expireTimeUnit}, please click to the details page to renew`"
-                    popper-style="word-break: break-word; text-align: left;">
+                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime
+              < 0.1 ? '3': list.expireTime} ${list.expireTimeUnit}, please click to the details page to renew`" popper-style="word-break: break-word; text-align: left;">
                     <template #reference>
                       <el-icon>
                         <Warning />

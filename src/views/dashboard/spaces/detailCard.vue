@@ -302,9 +302,8 @@ export default defineComponent({
           }
         })
         fileSpaceData.value = fileLi
-        const jobData = listRes.data.job || { job_result_uri: '' }
         const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        if (!gate) context.emit('handleValue', listRes.data, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+        if (!gate) context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
       }
       if (gate) {
         init()
