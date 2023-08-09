@@ -138,7 +138,11 @@
             <el-tab-pane label="Upload file(S）">
               <el-upload class="upload-demo" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" action="#" multiple :auto-upload="false">
                 <div class="el-upload__text el-upload-dragger uploadDigFolder">
-                  Drag files/folders here or click to browse from your computer.
+                  <div>
+                    Drag files/folders here or click to browse from your computer.
+                    <p class="m-p">The frontend supports uploads of files totaling up to 50MB and no more than 100 files simultaneously. For bulkier or greater quantities of files, kindly utilize our CLI:
+                      <a href="https://github.com/lagrangedao/lagrange-cli" target="_blank">https://github.com/lagrangedao/lagrange-cli</a>.</p>
+                  </div>
                 </div>
                 <!-- <template #tip>
                   <div class="el-upload__tip">
@@ -148,11 +152,11 @@
               </el-upload>
               <el-form :label-position="'top'" ref="ruleFormRef" :model="info" :rules="rules" @submit.native.prevent>
                 <el-form-item label="Commit changes" prop="name">
-                  <el-input v-model="info.name" :placeholder="'Upload '+fileList.length+' files'" />
+                  <el-input v-model="info.name" :placeholder="`Upload ${fileList.length} files (${sizeChange(totalSize)})`" />
                 </el-form-item>
               </el-form>
               <el-button-group class="ml-4">
-                <el-button @click="commitFun" :disabled="fileList.length===0">Commit changes</el-button>
+                <el-button @click="commitFun" :disabled="fileList.length===0 || fileList.length > 100 || totalSize > totalMaximum">Commit changes</el-button>
                 <el-button @click="cancelFun">Cancel</el-button>
               </el-button-group>
             </el-tab-pane>
@@ -283,6 +287,8 @@ export default defineComponent({
       _originPath: {},
       title: ''
     })
+    const totalSize = ref(0)
+    const totalMaximum = 50 * 1024 * 1024
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -311,7 +317,7 @@ export default defineComponent({
           peopleName.value = listRes.data.owner.full_name || ''
         }
         const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job ? listRes.data.job.job_source_uri : '', expireTime, listRes.data.nft)
+        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
 
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)
@@ -388,11 +394,11 @@ export default defineComponent({
       return system.$commonFun.momentFun(dateItem)
     }
     function handleChange (uploadFile, uploadFiles) {
-      // console.log(uploadFile, uploadFiles)
+      // console.log('handleChange:', uploadFiles)
       fileList.value = uploadFiles
     }
     function handleRemove (file, uploadFiles) {
-      // console.log(file, uploadFiles)
+      // console.log('handleRemove:', uploadFiles)
       fileList.value = uploadFiles
     }
     function folderModeOn () {
@@ -450,7 +456,7 @@ export default defineComponent({
           fileCont.raw = new File([file], path)
           // stateUpload.files.push(fileCont)
           fileList.value.push(fileCont)
-          // console.log(fileList.value)
+          totalFiles(fileList.value)
         }, e => { console.log(e) })
       } else {
         let reader = entry.createReader()
@@ -540,12 +546,9 @@ export default defineComponent({
       let fd = new FormData()
       fd.append('file', newFile, `${name ? name + '/' : ''}${type === 'create' ? textInfo.name : fileBody.title}`)
       const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
-      if (uploadRes && uploadRes.status === "success") {
-        system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
-        // if (uploadRes.data.job) system.$commonFun.messageTip('success', `${type === 'create' ? 'Create ' + textInfo.name + ' successfully!' : 'Update ' + fileBody.title + ' successfully!'}`)
-        // else system.$commonFun.messageTip('error', uploadRes.message)
-      } else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
-      await system.$commonFun.timeout(1000)
+      await system.$commonFun.timeout(3000)
+      if (uploadRes && uploadRes.status === "success") system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
+      else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
       reset()
       init()
     }
@@ -556,6 +559,7 @@ export default defineComponent({
       stateUpload.files = []
       textInfo.name = ''
       textEditor.value = ''
+      totalSize.value = 0
     }
     function reset () {
       labelTab.value = 'list'
@@ -569,6 +573,7 @@ export default defineComponent({
       fileRow.fileResdata = []
       fileRow.filedata = []
       fileRow.fileTitle = []
+      totalSize.value = 0
     }
     async function fileEdit (row) {
       handleCommand('edit')
@@ -610,7 +615,7 @@ export default defineComponent({
       else if (fileTextType.value === 'text') fileTextEditor.value = text
       else fileTextEditor.value = url
       uploadLoad.value = false
-    };
+    }
     function downFile () {
       var link = document.createElement('a');
       link.href = fileTextEditor.value
@@ -765,6 +770,13 @@ export default defineComponent({
     const onBlur = (option) => {
       // console.log("update:value", option.getValue())
     }
+    async function totalFiles (list) {
+      // console.log(list, list.length)
+      totalSize.value = 0
+      for (let s = 0; s < list.length; s++) {
+        totalSize.value += list[s].size
+      }
+    }
     onMounted(() => {
       reset()
       window.scrollTo(0, 0)
@@ -772,6 +784,9 @@ export default defineComponent({
     })
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
+    })
+    watch(fileList, (newValue, oldValue) => {
+      totalFiles(newValue)
     })
     watch(() => props.likesValue, () => {
       init()
@@ -806,6 +821,8 @@ export default defineComponent({
       fileTextShow,
       fileTextType,
       blobSize,
+      totalSize,
+      totalMaximum,
       init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
       calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile, onBlur
@@ -1133,6 +1150,22 @@ export default defineComponent({
               .el-upload__text {
                 font-size: inherit;
               }
+              .m-p {
+                width: 90%;
+                max-width: 800px;
+                margin: 0.15rem auto 0;
+                font-size: 15px;
+                color: #8c8c8c;
+                @media screen and (max-width: 1600px) {
+                  font-size: 14px;
+                }
+                a {
+                  color: inherit;
+                  &:hover {
+                    text-decoration: underline;
+                  }
+                }
+              }
             }
           }
         }
@@ -1153,7 +1186,10 @@ export default defineComponent({
                 .el-input__inner {
                   height: auto;
                   padding: 0.05rem 0.1rem;
-                  font-size: inherit;
+                  font-size: 16px;
+                  @media screen and (max-width: 1600px) {
+                    font-size: 14px;
+                  }
                 }
               }
             }
