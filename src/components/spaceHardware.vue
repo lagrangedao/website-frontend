@@ -350,6 +350,7 @@ export default defineComponent({
     function sleepChange (row) {
       if (row.hardware_status.toLowerCase() !== 'available' && props.renewButton === 'renew') {
         system.$commonFun.messageTip('warning', 'There are no corresponding resources for the current configuration, unable to renew. Please try again later')
+        close()
         return
       }
       else if (row.hardware_status.toLowerCase() !== 'available' || (props.listdata.activeOrder && (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))) return false
