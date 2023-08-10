@@ -379,11 +379,14 @@ export default defineComponent({
       } else if (type === 'docker') {
         listLoad.value = true
         let fd = await formDataRetrue()
+        const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
+        await system.$commonFun.timeout(1000)
+        if (uploadRes && uploadRes.status !== "success") system.$commonFun.messageTip(uploadRes.status, `${uploadRes.message}: ${name}`)
         init()
       }
     }
     async function formDataRetrue () {
-      let uploadRes
+      let formdata = new FormData()
       const fileList = ['Dockerfile', 'Readme.md', 'requirements.txt', 'app/_init_.py', 'app/main.py']
       for (let f = 0; f < fileList.length; f++) {
         let name = fileList[f]
@@ -391,16 +394,11 @@ export default defineComponent({
         let text = await new Promise(async resolve => {
           resolve(response.text())
         })
-        let formdata = new FormData()
         let newFile = new File([text], name)
         formdata.append('file', newFile, name)
-        uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', formdata)
-        if (uploadRes && uploadRes.status !== "success") system.$commonFun.messageTip(uploadRes.status, `${uploadRes.message}: ${name}`)
-        // sleep 0.1s
-        await system.$commonFun.timeout(100)
       }
 
-      return uploadRes.message
+      return formdata
     }
     function cancelFun () {
       createLoad.value = false

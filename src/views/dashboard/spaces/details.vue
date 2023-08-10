@@ -43,7 +43,7 @@
                 p-id="2676" fill="#878c93"></path>
             </svg> Request License
           </div>
-          <div class="logs_style" v-if="logsValue" @click="drawer = true">
+          <div class="logs_style" v-if="logsValue" @click="logDrawer">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
@@ -237,13 +237,7 @@
             <el-tab-pane v-for="(job, j) in logsCont.data" :key="j">
               <template #label>
                 <span class="custom-tabs-label">
-                  <el-icon v-if="job.is_leading_job.toString() === 'true'">
-                    <svg t="1691559408290" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9394" width="200" height="200">
-                      <path d="M610.304 384a51.2 51.2 0 0 0 38.656 25.6l194.048 27.904a12.8 12.8 0 0 1 7.168 21.76l-140.544 135.936a51.2 51.2 0 0 0-14.592 45.056l33.024 192a12.8 12.8 0 0 1-18.432 13.568l-173.824-90.88a51.2 51.2 0 0 0-47.616 0l-173.824 90.88a12.8 12.8 0 0 1-18.432-13.568l33.024-192a51.2 51.2 0 0 0-14.592-45.056L173.824 460.8a12.8 12.8 0 0 1 7.168-21.76L375.04 409.6a51.2 51.2 0 0 0 38.656-25.6l86.784-174.848a12.8 12.8 0 0 1 23.04 0zM512 25.6a56.064 56.064 0 0 0-51.2 31.232l-115.712 232.96A51.2 51.2 0 0 1 307.2 317.44L48.384 354.816A56.064 56.064 0 0 0 17.152 450.56L204.8 631.808a51.2 51.2 0 0 1 14.848 45.056l-44.288 256a56.32 56.32 0 0 0 80.64 58.88l230.4-120.832a51.2 51.2 0 0 1 47.616 0l230.4 120.832a56.32 56.32 0 0 0 81.92-59.136l-44.288-256a51.2 51.2 0 0 1 17.152-44.8l187.136-181.248a56.064 56.064 0 0 0-31.232-95.744L716.8 317.44a51.2 51.2 0 0 1-38.4-27.648L563.2 56.832A56.064 56.064 0 0 0 512 25.6z"
-                        p-id="9395"></path>
-                    </svg>
-                  </el-icon>
-                  <span>CP {{j+1}}</span>
+                  <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
                 </span>
               </template>
               <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
@@ -464,6 +458,7 @@ export default defineComponent({
       allData.space = dataRes.space || {}
       allData.files = dataRes.files || []
       if (log) {
+        log = await system.$commonFun.sortBoole(log)
         logsCont.data = await jobList(log)
         logsValue.value = log
       } else {
@@ -558,6 +553,10 @@ export default defineComponent({
       dialogCont.spaceHardFork = val
       if (refresh) likesValue.value = !likesValue.value
     }
+    function logDrawer () {
+      drawer.value = true
+      drawerName.value = 'Overview'
+    }
     onActivated(() => init())
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
@@ -596,7 +595,7 @@ export default defineComponent({
       renewButton,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick,
-      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard
+      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
     }
   }
 })
@@ -1292,13 +1291,20 @@ export default defineComponent({
         .custom-tabs-label {
           display: flex;
           align-items: center;
+          line-height: 1;
           i {
-            margin: -4px 5px 0 0;
+            margin: 0 5px 0 0;
             font-size: 16px;
             color: #c37af9;
             @media screen and (max-width: 1600px) {
               font-size: 14px;
             }
+          }
+          .span-cp {
+            padding-left: 20px;
+            background: url(../../../assets/images/icons/start_job.png)
+              no-repeat left center;
+            background-size: 13px;
           }
         }
         &.is-active {

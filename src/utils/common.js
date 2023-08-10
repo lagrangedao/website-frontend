@@ -32,7 +32,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
   } catch (err) {
     console.error(err, err.response)
     messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
-    if (err.response && err.response.status === 401) {
+    if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
     } else if (err.response) {
       // The request has been sent, but the status code of the server response is not within the range of 2xx
@@ -50,6 +50,11 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
 
 async function timeout(delay) {
   return new Promise((resolve) => setTimeout(resolve, delay))
+}
+
+async function sortBoole(arr) {
+  if (!arr) return null
+  return arr.sort((a, b) => b.is_leading_job - a.is_leading_job)
 }
 
 async function Init(callback) {
@@ -362,6 +367,7 @@ if (typeof window.ethereum === 'undefined') {
 export default {
   sendRequest,
   timeout,
+  sortBoole,
   Init,
   web3Init,
   login,
