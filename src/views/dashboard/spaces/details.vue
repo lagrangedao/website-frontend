@@ -186,14 +186,14 @@
                     </div>
                   </div>
                   <div class="el-step__main">
-                    <div class="el-step__title" :class="{'is-success': allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction', 'is-wait':!(allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction')}">Assigning task Complete</div>
+                    <div class="el-step__title" :class="{'is-success': allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction', 'is-wait':!(allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction')}">Assigning to provider Complete</div>
                     <div class="el-step__arrow"></div>
                   </div>
                 </div>
                 <div class="el-step is-simple is-flex">
-                  <div class="el-step__head" :class="{'is-success': allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning task', 'is-wait':!(allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning task')}">
+                  <div class="el-step__head" :class="{'is-success': allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning to provider', 'is-wait':!(allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning to provider')}">
                     <div class="el-step__icon is-text">
-                      <i v-if="allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning task'" class="el-icon el-step__icon-inner is-status">
+                      <i v-if="allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning to provider'" class="el-icon el-step__icon-inner is-status">
                         <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                           <path fill="currentColor" d="M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944z"></path>
                         </svg>
@@ -201,7 +201,7 @@
                     </div>
                   </div>
                   <div class="el-step__main">
-                    <div class="el-step__title" :class="{'is-success':allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning task', 'is-wait':!(allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning task')}">Deploying Complete</div>
+                    <div class="el-step__title" :class="{'is-success':allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning to provider', 'is-wait':!(allData.space.status !== allData.paymentStatus && allData.space.status !== 'Waiting for transaction' && allData.space.status !== 'Assigning to provider')}">Deploying Complete</div>
                     <div class="el-step__arrow"></div>
                   </div>
                 </div>
