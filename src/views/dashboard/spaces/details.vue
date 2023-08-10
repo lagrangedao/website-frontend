@@ -43,7 +43,7 @@
                 p-id="2676" fill="#878c93"></path>
             </svg> Request License
           </div>
-          <div class="logs_style" v-if="logsValue" @click="drawer = true">
+          <div class="logs_style" v-if="logsValue" @click="logDrawer">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
@@ -458,6 +458,7 @@ export default defineComponent({
       allData.space = dataRes.space || {}
       allData.files = dataRes.files || []
       if (log) {
+        log = await system.$commonFun.sortBoole(log)
         logsCont.data = await jobList(log)
         logsValue.value = log
       } else {
@@ -552,6 +553,10 @@ export default defineComponent({
       dialogCont.spaceHardFork = val
       if (refresh) likesValue.value = !likesValue.value
     }
+    function logDrawer () {
+      drawer.value = true
+      drawerName.value = 'Overview'
+    }
     onActivated(() => init())
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
@@ -590,7 +595,7 @@ export default defineComponent({
       renewButton,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
       NumFormat, handleCurrentChange, handleSizeChange, handleClick,
-      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard
+      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
     }
   }
 })

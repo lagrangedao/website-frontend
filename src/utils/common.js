@@ -52,6 +52,11 @@ async function timeout(delay) {
   return new Promise((resolve) => setTimeout(resolve, delay))
 }
 
+async function sortBoole(arr) {
+  if (!arr) return null
+  return arr.sort((a, b) => b.is_leading_job - a.is_leading_job)
+}
+
 async function Init(callback) {
   if (typeof window.ethereum === 'undefined') {
     window.open('https://metamask.io/download.html')
@@ -362,6 +367,7 @@ if (typeof window.ethereum === 'undefined') {
 export default {
   sendRequest,
   timeout,
+  sortBoole,
   Init,
   web3Init,
   login,

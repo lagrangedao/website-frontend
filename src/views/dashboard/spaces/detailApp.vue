@@ -30,6 +30,11 @@
             <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
           </div>
         </div>
+        <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
+          <div>
+            <el-alert :closable="false" title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting." type="warning" />
+          </div>
+        </div>
       </el-row>
     </div>
   </section>
@@ -88,6 +93,7 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         listdata.jobResult = await jobList(listRes.data.job)
         listdata.space = listRes.data.space
+        listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
         const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
       }
