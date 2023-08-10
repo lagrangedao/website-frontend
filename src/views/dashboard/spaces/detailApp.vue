@@ -25,7 +25,7 @@
             <el-table-column prop="status" label="Status" />
           </el-table>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Assigning task'">
+        <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
           <div>
             <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
           </div>
