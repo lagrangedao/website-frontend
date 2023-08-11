@@ -250,6 +250,12 @@
                       </p>
                       <p v-else>Waiting for CP finish deployment</p>
                     </el-descriptions-item>
+                    <el-descriptions-item label="provider_status">
+                      {{job.provider_status}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="provider_online">
+                      {{job.provider_online ? 'Online' : 'Offline'}}
+                    </el-descriptions-item>
                   </el-descriptions>
                 </el-col>
               </el-row>

@@ -7,7 +7,7 @@
             <template #label>
               <span class="custom-tabs-label">
                 <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{j+1}}
-                  <small v-if="job.cp_status">({{job.cp_status}})</small>
+                  <small v-if="job.provider_online">({{job.provider_online ? 'online' : 'offline'}})</small>
                 </span>
               </span>
             </template>
