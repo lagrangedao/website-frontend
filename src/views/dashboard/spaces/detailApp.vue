@@ -16,7 +16,7 @@
         </el-tabs>
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
-          <el-table :data="listdata.space.deploy_mechine_list" border style="width: 100%">
+          <el-table :data="listdata.space.jobs_status" border style="width: 100%">
             <el-table-column prop="node_id" label="CP Node ID">
               <template #default="scope">
                 <div class="flex">{{system.$commonFun.hiddAddress(scope.row.node_id)}}
