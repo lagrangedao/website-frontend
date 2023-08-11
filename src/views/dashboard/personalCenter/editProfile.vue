@@ -27,7 +27,7 @@
         </div>
         <div class="flex flex-row" v-if="ruleForm.avatar">
           <img class="img" :src="ruleForm.avatar" />
-          <div class="remove" @click="removeAvatar">Remove</div>
+          <!-- <div class="remove" @click="removeAvatar">Remove</div> -->
         </div>
       </el-form-item>
       <el-form-item prop="homepage">

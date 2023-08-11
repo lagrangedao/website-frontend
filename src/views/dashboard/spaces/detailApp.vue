@@ -6,7 +6,9 @@
           <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
             <template #label>
               <span class="custom-tabs-label">
-                <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{j+1}}
+                  <small v-if="job.cp_status">({{job.cp_status}})</small>
+                </span>
               </span>
             </template>
             <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>

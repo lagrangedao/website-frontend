@@ -133,7 +133,7 @@
             <div class="title_tip flex">
               <div class="flex">
                 Start time settings
-                <el-popover placement="top-start" :width="200" trigger="hover" content="If the task isn't successfully taken by the CP within the specified time, we will consider it a failed and refund your tokens.">
+                <el-popover placement="top-start" :width="200" trigger="hover" content="If the task isn't successfully taken by the CP within the specified time, we will consider it as failed and refund your tokens.">
                   <template #reference>
                     <div>
                       <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
