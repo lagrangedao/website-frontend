@@ -11,8 +11,8 @@
                     <small>
                       CP Status:
                       <br/>
-                      {{ job.provider_online ? 'Online' : 'Offline' }}, 
-                      {{ job.provider_status }}
+                      {{ job.provider_status.online ? 'Online' : 'Offline' }},
+                      {{ job.provider_status.status }}
                     </small>
                   </template>
                   <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{ j + 1 }}</span>
