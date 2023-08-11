@@ -6,33 +6,46 @@
           <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
             <template #label>
               <span class="custom-tabs-label">
-                <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                <el-tooltip placement="top">
+                  <template #content>
+                    <small>
+                      CP Status:
+                      <br/>
+                      {{ job.provider_status.online ? 'Online' : 'Offline' }},
+                      {{ job.provider_status.status }}
+                    </small>
+                  </template>
+                  <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{ j + 1 }}</span>
+                </el-tooltip>
               </span>
             </template>
-            <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
+            <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`"
+                    title="Space app" class="space_iframe"></iframe>
           </el-tab-pane>
         </el-tabs>
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
-          <el-table :data="listdata.space.deploy_mechine_list" border style="width: 100%">
+          <el-table :data="listdata.space.jobs_status" border style="width: 100%">
             <el-table-column prop="node_id" label="CP Node ID">
               <template #default="scope">
-                <div class="flex">{{system.$commonFun.hiddAddress(scope.row.node_id)}}
+                <div class="flex">{{ system.$commonFun.hiddAddress(scope.row.node_id) }}
                   <i class="icon icon_copy" @click="system.$commonFun.copyContent(scope.row.node_id, 'Copied')"></i>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="status" label="Status" />
+            <el-table-column prop="status" label="Status"/>
           </el-table>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
           <div>
-            <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
+            <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning"/>
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
           <div>
-            <el-alert :closable="false" title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting." type="warning" />
+            <el-alert :closable="false"
+                      title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting."
+                      type="warning"/>
           </div>
         </div>
       </el-row>
@@ -40,9 +53,21 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
-import { useStore } from "vuex"
-import { useRouter, useRoute } from 'vue-router'
+import {
+  defineComponent,
+  computed,
+  onMounted,
+  onActivated,
+  onDeactivated,
+  watch,
+  ref,
+  reactive,
+  getCurrentInstance,
+  toRefs,
+  nextTick
+} from 'vue'
+import {useStore} from "vuex"
+import {useRouter, useRoute} from 'vue-router'
 import {
   EditPen, Edit, CircleClose
 } from '@element-plus/icons-vue'
@@ -55,12 +80,14 @@ export default defineComponent({
     CircleClose
   },
   props: {
-    urlChange: { type: String, default: 'app' },
-    likesValue: { type: Boolean, default: false }
+    urlChange: {type: String, default: 'app'},
+    likesValue: {type: Boolean, default: false}
   },
-  setup (props, context) {
+  setup(props, context) {
     const store = useStore()
-    const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
+    const lagLogin = computed(() => {
+      return String(store.state.lagLogin) === 'true'
+    })
     const listLoad = ref(true)
     const listdata = reactive({
       jobResult: [],
@@ -71,10 +98,14 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
 
-    function handleClick (tab, event) {
-      router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
+    function handleClick(tab, event) {
+      router.push({
+        name: 'spaceDetail',
+        params: {wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name}
+      })
     }
-    async function jobList (list) {
+
+    async function jobList(list) {
       let arr = list || []
       for (let j = 0; j < arr.length; j++) {
         const response = await fetch(arr[j].job_result_uri)
@@ -85,7 +116,8 @@ export default defineComponent({
       }
       return arr
     }
-    async function init () {
+
+    async function init() {
       if (route.params.tabs !== 'app') return
       listLoad.value = true
       listdata.jobResult = []
@@ -100,12 +132,15 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }
-    onActivated(() => { })
+
+    onActivated(() => {
+    })
     onMounted(() => {
       window.scrollTo(0, 0)
       init()
     })
-    onDeactivated(() => { })
+    onDeactivated(() => {
+    })
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'app') {
@@ -138,14 +173,17 @@ export default defineComponent({
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
+
   .mark {
     display: flex;
     flex-wrap: wrap;
+
     .left,
     .right {
       width: 50%;
     }
   }
+
   :deep(.space_body) {
     display: flex;
     align-items: stretch;
@@ -160,35 +198,40 @@ export default defineComponent({
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
     }
+
     .deployment {
       width: 98%;
       margin: 0.2rem auto 0.4rem;
+
       .title {
         margin: 0.1rem 0 0.25rem;
         font-size: 0.2rem;
         font-weight: bold;
         text-transform: capitalize;
       }
+
       .el-table {
         tr {
           th {
             background-color: #f5f7fa;
           }
+
           .flex {
             display: flex;
             align-items: center;
+
             .icon_copy {
               width: 14px;
               height: 14px;
               margin: 0 0 0 5px;
-              background: url(../../../assets/images/icons/icon_36.png)
-                no-repeat left center;
+              background: url(../../../assets/images/icons/icon_36.png) no-repeat left center;
               background-size: auto 100%;
               cursor: pointer;
               @media screen and (min-width: 1800px) {
                 width: 18px;
                 height: 18px;
               }
+
               &:hover {
                 opacity: 0.7;
               }
@@ -196,13 +239,16 @@ export default defineComponent({
           }
         }
       }
+
       .info {
         margin-top: 0.5rem;
       }
     }
+
     .app-tabs {
       width: 98%;
       margin: 0.1rem auto 0;
+
       .el-tabs__header {
         max-width: none !important;
         padding: 0 !important;
@@ -213,6 +259,7 @@ export default defineComponent({
           display: flex;
           align-items: center;
           line-height: 1;
+
           i {
             margin: 0 5px 0 0;
             font-size: 16px;
@@ -221,19 +268,21 @@ export default defineComponent({
               font-size: 14px;
             }
           }
+
           .span-cp {
             padding-left: 20px;
-            background: url(../../../assets/images/icons/start_job.png)
-              no-repeat left center;
+            background: url(../../../assets/images/icons/start_job.png) no-repeat left center;
             background-size: 13px;
           }
         }
+
         &.is-active,
         &:hover {
           color: #c37af9 !important;
         }
       }
     }
+
     .space_iframe {
       width: 100%;
       overflow: auto;
@@ -267,6 +316,7 @@ export default defineComponent({
       @media screen and (min-height: 1200px) and (min-width: 769px) {
         min-height: 985px;
       }
+
       &.space_text {
         padding: 11px;
         background-color: #000;
@@ -283,12 +333,14 @@ export default defineComponent({
         }
       }
     }
+
     .readme_text {
       position: relative;
       padding: 0.5rem 0.3rem 0.3rem 0;
       @media screen and (max-width: 992px) {
         padding: 0.3rem 0;
       }
+
       .readme_body {
         display: flex;
         justify-content: center;
@@ -298,6 +350,7 @@ export default defineComponent({
         background-color: #fbfbfc;
         border: 1px solid #f1f1f1;
         border-radius: 5px;
+
         b,
         p {
           display: block;
@@ -306,6 +359,7 @@ export default defineComponent({
           text-align: center;
         }
       }
+
       &::after {
         position: absolute;
         content: "";
@@ -319,10 +373,12 @@ export default defineComponent({
         }
       }
     }
+
     .left {
       position: relative;
       padding: 0.3rem 0;
       background-color: #fff;
+
       .labelList {
         margin: 0.2rem 0 0.4rem;
         text-align: left;
@@ -330,12 +386,14 @@ export default defineComponent({
         position: sticky;
         top: 0.2rem;
         width: 100%;
+
         .sticky_element {
           // position: fixed;
           // top: 10px;
           // display: block;
           // max-width: 16.6666666667%;
         }
+
         .title {
           padding: 0.05rem 0;
           margin: 0 0 0.1rem;
@@ -348,6 +406,7 @@ export default defineComponent({
             font-size: 16px;
           }
         }
+
         .sub_title {
           padding: 0.05rem 0;
           margin: 0.1rem 0 0;
@@ -360,6 +419,7 @@ export default defineComponent({
             font-size: 14px;
           }
         }
+
         ul {
           li {
             a {
@@ -381,9 +441,11 @@ export default defineComponent({
               @media screen and (max-width: 441px) {
                 font-size: 13px;
               }
+
               &:hover {
                 text-decoration: underline;
               }
+
               &.disbled {
                 color: #cccccc;
               }
@@ -391,8 +453,10 @@ export default defineComponent({
           }
         }
       }
+
       .list {
         margin: 0.2rem 0.16rem 0;
+
         .title {
           display: flex;
           justify-content: space-between;
@@ -406,29 +470,31 @@ export default defineComponent({
           @media screen and (max-width: 1440px) {
             font-size: 14px;
           }
+
           .icon {
             width: 0.22rem;
             height: 0.22rem;
             margin: 0 0.13rem 0 0;
           }
+
           .icon_sizes {
-            background: url(../../../assets/images/icons/icon_7.png) no-repeat
-              left center;
+            background: url(../../../assets/images/icons/icon_7.png) no-repeat left center;
             background-size: 17px;
           }
+
           .icon_licenses {
-            background: url(../../../assets/images/icons/icon_8.png) no-repeat
-              left center;
+            background: url(../../../assets/images/icons/icon_8.png) no-repeat left center;
             background-size: 17px;
           }
+
           .icon_spaces {
             width: 16px;
             height: 16px;
             margin: 0 5px 0 0;
-            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
-              left center;
+            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat left center;
             background-size: 100%;
           }
+
           b {
             font-size: 17px;
             color: #000;
@@ -439,6 +505,7 @@ export default defineComponent({
               font-size: 15px;
             }
           }
+
           small {
             font-size: 14px;
             font-weight: bold;
@@ -450,6 +517,7 @@ export default defineComponent({
               font-size: 12px;
             }
           }
+
           p {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -457,19 +525,23 @@ export default defineComponent({
             white-space: nowrap;
             text-align: left;
             line-height: 1;
+
             .icon {
               display: block;
               float: left;
             }
           }
         }
+
         .cont {
           padding: 0.25rem 0.06rem;
+
           .el-row {
             .el-col {
               max-width: max-content;
               width: auto;
               flex: auto;
+
               a {
                 display: flex;
                 padding: 0;
@@ -485,61 +557,64 @@ export default defineComponent({
                 @media screen and (max-width: 1440px) {
                   font-size: 12px;
                 }
+
                 &:hover {
                   opacity: 0.9;
                 }
+
                 .a_text {
                   padding: 0.03rem 0.07rem;
                 }
+
                 .a_button {
                   display: flex;
                   align-items: center;
                   width: 100%;
                   padding: 0.05rem 0.15rem;
                   background: linear-gradient(180deg, #fefefe, #f0f0f0);
+
                   i {
                     margin-right: 3px;
                     font-size: 15px;
                   }
                 }
+
                 .icon {
                   width: 0.3rem;
                   height: 0.26rem;
                   padding: 0;
                 }
+
                 .icon_sizes {
-                  background: url(../../../assets/images/icons/icon_7.png)
-                    no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_7.png) no-repeat left center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
                     background-size: 15px;
                   }
                 }
+
                 .icon_licenses {
                   width: 0.28rem;
-                  background: url(../../../assets/images/icons/icon_21.png)
-                    no-repeat right center;
+                  background: url(../../../assets/images/icons/icon_21.png) no-repeat right center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
                     background-size: 15px;
                   }
                 }
+
                 .icon_01 {
-                  background: #fef7ef
-                    url(../../../assets/images/icons/icon_22.png) no-repeat
-                    center;
+                  background: #fef7ef url(../../../assets/images/icons/icon_22.png) no-repeat center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
                     background-size: 15px;
                   }
                 }
+
                 .icon_02 {
-                  background: #f0f3ff
-                    url(../../../assets/images/icons/icon_29.png) no-repeat
-                    center;
+                  background: #f0f3ff url(../../../assets/images/icons/icon_29.png) no-repeat center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
@@ -547,6 +622,7 @@ export default defineComponent({
                   }
                 }
               }
+
               .more {
                 float: left;
                 padding: 5px 8px;
@@ -559,6 +635,7 @@ export default defineComponent({
                 @media screen and (min-width: 1800px) {
                   font-size: 15px;
                 }
+
                 &:hover {
                   background-color: #f5f6f8;
                 }
@@ -566,6 +643,7 @@ export default defineComponent({
             }
           }
         }
+
         &:nth-child(1) {
           .cont {
             .el-row {
@@ -573,10 +651,12 @@ export default defineComponent({
                 a {
                   display: flex;
                   align-items: center;
+
                   &:hover {
                     background-color: #eee;
                   }
                 }
+
                 // &:nth-child(1) {
                 //   a {
                 //     .icon {
@@ -679,6 +759,7 @@ export default defineComponent({
             }
           }
         }
+
         &:nth-child(2) {
           .cont {
             .el-row {
@@ -692,6 +773,7 @@ export default defineComponent({
             }
           }
         }
+
         &:nth-child(3) {
           .cont {
             .el-row {
@@ -705,6 +787,7 @@ export default defineComponent({
             }
           }
         }
+
         &:nth-child(4) {
           .cont {
             .el-row {
@@ -712,6 +795,7 @@ export default defineComponent({
                 a {
                   display: flex;
                   align-items: center;
+
                   &:hover {
                     background-color: #eee;
                   }
@@ -721,20 +805,24 @@ export default defineComponent({
           }
         }
       }
+
       .labelModel {
         padding: 0.2rem 0.16rem;
         border-top: 1px solid #f1f1f1;
         border-bottom: 1px solid #f1f1f1;
         text-align: left;
+
         ul {
           display: flex;
           flex-wrap: wrap;
+
           li {
             width: auto;
             padding: 0.07rem;
             margin: 0.03rem 0.08rem 0.03rem 0;
             border: 1px solid #f1f1f1;
             border-radius: 0.07rem;
+
             p {
               color: #878c93;
               font-size: 12px;
@@ -742,6 +830,7 @@ export default defineComponent({
                 font-size: 14px;
               }
             }
+
             b,
             a {
               color: #606060;
@@ -753,29 +842,36 @@ export default defineComponent({
           }
         }
       }
+
       .list_body {
         padding: 0 0.16rem;
+
         .el-col {
           margin: 0.05rem 0;
           max-width: 350px;
           @media screen and (max-width: 768px) {
             max-width: none;
           }
+
           .box-card {
             padding: 0.1rem 0.2rem;
             background-color: #fff;
             border-color: #e4e4e4;
             border-radius: 0.1rem;
             box-shadow: none;
+
             * {
               cursor: pointer;
             }
+
             .el-card__header {
               padding: 0;
               border: 0;
+
               .card-header {
                 display: flex;
                 justify-content: space-between;
+
                 .name {
                   display: flex;
                   align-items: center;
@@ -784,6 +880,7 @@ export default defineComponent({
                   color: #606060;
                   @media screen and (min-width: 441px) {
                   }
+
                   b {
                     width: calc(100% - 0.6rem);
                     padding: 0;
@@ -806,17 +903,18 @@ export default defineComponent({
                     }
                   }
                 }
+
                 img {
                   width: 0.4rem;
                   margin: 0.05rem 0.1rem 0 0;
                   border-radius: 100%;
                   border: 2px solid #7405ff;
                 }
+
                 span {
                   height: 0.25rem;
                   padding-left: 0.23rem;
-                  background: url(../../../assets/images/icons/icon_9.png)
-                    no-repeat left 2px;
+                  background: url(../../../assets/images/icons/icon_9.png) no-repeat left 2px;
                   background-size: 0.17rem;
                   font-size: 13px;
                   color: #000;
@@ -827,8 +925,10 @@ export default defineComponent({
                 }
               }
             }
+
             .el-card__body {
               padding: 0.05rem 0 0;
+
               .text {
                 display: flex;
                 justify-content: flex-start;
@@ -839,34 +939,36 @@ export default defineComponent({
                 @media screen and (min-width: 1800px) {
                   font-size: 15px;
                 }
+
                 .icon {
                   width: 20px;
                   height: 20px;
                   margin: 0 6px 0 0;
                 }
+
                 .icon_text {
-                  background: url(../../../assets/images/icons/icon_10.png)
-                    no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_10.png) no-repeat left center;
                   background-size: 100%;
                 }
+
                 .icon_time {
                   width: 15px;
-                  background: url(../../../assets/images/icons/icon_11.png)
-                    no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_11.png) no-repeat left center;
                   background-size: 100%;
                 }
+
                 .icon_up {
                   width: 15px;
                   margin: 0 3px 0 0;
-                  background: url(../../../assets/images/icons/icon_20.png)
-                    no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_20.png) no-repeat left center;
                   background-size: 100%;
                 }
+
                 .icon_image {
-                  background: url(../../../assets/images/icons/icon_30.png)
-                    no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_30.png) no-repeat left center;
                   background-size: 100%;
                 }
+
                 .small {
                   margin-top: 3px;
                   color: #9ca3b1;
@@ -876,11 +978,14 @@ export default defineComponent({
                     font-size: 13px;
                   }
                 }
+
                 .el-row {
                   width: 100%;
                   margin: 0.1rem 0 0.25rem;
+
                   .el-col {
                     margin: 0.05rem 0;
+
                     a {
                       display: block;
                       padding-top: 0.05rem;
@@ -896,10 +1001,12 @@ export default defineComponent({
                       @media screen and (max-width: 1440px) {
                         font-size: 12px;
                       }
+
                       &:hover {
                         opacity: 0.9;
                       }
                     }
+
                     &:nth-child(2n + 2) {
                       a {
                         background-color: #dfbafa;
@@ -908,6 +1015,7 @@ export default defineComponent({
                     }
                   }
                 }
+
                 .ellipsis {
                   width: calc(100% - 26px);
                   font-family: "FIRACODE-REGULAR";
@@ -918,9 +1026,11 @@ export default defineComponent({
                   line-height: 1.5;
                 }
               }
+
               .item {
                 justify-content: space-between;
                 margin: 0.2rem 0 0;
+
                 .item_body {
                   display: flex;
                   align-items: center;
@@ -928,56 +1038,63 @@ export default defineComponent({
               }
             }
           }
+
           &:hover {
             .box-card {
               background-color: #7405ff;
+
               .el-card__header {
                 .card-header {
                   .name {
                     color: #fff;
                   }
+
                   img {
                     border: 2px solid #fff;
                   }
+
                   span {
-                    background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 2px;
+                    background: url(../../../assets/images/icons/icon_9_1.png) no-repeat left 2px;
                     background-size: 0.17rem;
                     color: #fff;
                   }
                 }
               }
+
               .el-card__body {
                 .text {
                   color: #fff;
+
                   .icon_text {
-                    background: url(../../../assets/images/icons/icon_10_1.png)
-                      no-repeat left center;
+                    background: url(../../../assets/images/icons/icon_10_1.png) no-repeat left center;
                     background-size: 100%;
                   }
+
                   .icon_time {
-                    background: url(../../../assets/images/icons/icon_11_1.png)
-                      no-repeat left center;
+                    background: url(../../../assets/images/icons/icon_11_1.png) no-repeat left center;
                     background-size: 100%;
                   }
+
                   .icon_up {
-                    background: url(../../../assets/images/icons/icon_20_1.png)
-                      no-repeat left center;
+                    background: url(../../../assets/images/icons/icon_20_1.png) no-repeat left center;
                     background-size: 100%;
                   }
+
                   .icon_image {
-                    background: url(../../../assets/images/icons/icon_30_1.png)
-                      no-repeat left center;
+                    background: url(../../../assets/images/icons/icon_30_1.png) no-repeat left center;
                     background-size: 100%;
                   }
+
                   .small {
                     color: #fff;
                   }
+
                   .el-row {
                     .el-col {
                       a {
                         background-color: #fff;
                       }
+
                       &:nth-child(2n + 2) {
                         a {
                           background-color: #dfbafa;
@@ -991,6 +1108,7 @@ export default defineComponent({
             }
           }
         }
+
         .list_nodata {
           display: flex;
           justify-content: center;
@@ -1001,14 +1119,17 @@ export default defineComponent({
         }
       }
     }
+
     .left_light,
     .readme_text {
       font-family: "FIRACODE-LIGHT";
     }
+
     .right {
       position: relative;
       padding: 0.4rem 0.2rem;
       font-family: "FIRACODE-LIGHT";
+
       .data {
         padding: 0.1rem 0 0;
         margin: 0 0 0.4rem;
@@ -1016,6 +1137,7 @@ export default defineComponent({
         border-radius: 0.1rem;
         color: #606060;
         overflow: hidden;
+
         .top {
           display: flex;
           align-items: center;
@@ -1023,6 +1145,7 @@ export default defineComponent({
           flex-wrap: wrap;
           padding: 0.1rem 4%;
           font-size: 0.19rem;
+
           .top_text {
             display: flex;
             align-items: center;
@@ -1038,6 +1161,7 @@ export default defineComponent({
             @media screen and (max-width: 441px) {
               font-size: 14px;
             }
+
             b {
               padding: 0.08rem 0.25rem;
               margin: 0 0.17rem 0 0;
@@ -1048,9 +1172,11 @@ export default defineComponent({
               color: #fff;
               border-radius: 0.09rem;
             }
+
             .el-input {
               max-width: 3.45rem;
               margin: 0.1rem 0 0 0;
+
               .el-input__inner {
                 // padding-left: 0.35rem;
                 // background: url(../../../assets/images/icons/icon_10_2.png)
@@ -1062,8 +1188,10 @@ export default defineComponent({
                   font-size: 15px;
                 }
               }
+
               .el-input__prefix {
                 padding: 0;
+
                 .el-icon {
                   svg {
                     width: 0.22rem;
@@ -1073,6 +1201,7 @@ export default defineComponent({
                 }
               }
             }
+
             .el-button {
               padding: 0.03rem 0.1rem;
               margin: 0 0 0 0.2rem;
@@ -1080,6 +1209,7 @@ export default defineComponent({
               border-radius: 5px;
               font-family: inherit;
             }
+
             .span {
               width: 100%;
               color: #606060;
@@ -1092,6 +1222,7 @@ export default defineComponent({
               }
             }
           }
+
           .el-button {
             width: auto;
             height: auto;
@@ -1107,14 +1238,18 @@ export default defineComponent({
             }
           }
         }
+
         .el-table {
           margin: 0.1rem 0 0;
+
           .el-table__inner-wrapper {
             tr {
               color: #000;
+
               th,
               td {
                 padding: 0.13rem 0;
+
                 .cell {
                   overflow: hidden;
                   text-overflow: ellipsis;
@@ -1123,10 +1258,12 @@ export default defineComponent({
                   -webkit-line-clamp: 2;
                   -webkit-box-orient: vertical;
                 }
+
                 &:nth-child(3) {
                   text-align: right;
                 }
               }
+
               th {
                 padding: 0.18rem 0;
               }
@@ -1134,8 +1271,10 @@ export default defineComponent({
           }
         }
       }
+
       .text {
         text-align: left;
+
         p {
           padding: 0.02rem 0;
           font-size: 18px;
@@ -1152,6 +1291,7 @@ export default defineComponent({
           }
         }
       }
+
       &::after {
         position: absolute;
         content: "";
@@ -1164,6 +1304,7 @@ export default defineComponent({
           width: 0px;
         }
       }
+
       &::before {
         position: absolute;
         content: "";

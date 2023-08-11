@@ -242,13 +242,28 @@
               </template>
               <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
                 <el-col :span="24">
-                  <el-descriptions title="You're using:" direction="vertical" :column="bodyWidth" border>
+                  <el-descriptions title="CP Status:" direction="vertical" :column="bodyWidth" border>
                     <el-descriptions-item label="CP Node ID">
                       <p v-if="job.bidder_id">
-                        {{job.bidder_id}}
+                        {{system.$commonFun.hiddAddress(job.bidder_id)}}
                         <i class="icon icon_copy" @click="system.$commonFun.copyContent(job.bidder_id, 'Copied')"></i>
                       </p>
                       <p v-else>Waiting for CP finish deployment</p>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Provider status">
+                      {{job.provider_status.status}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Provider online">
+                      {{job.provider_status.online ? 'Online' : 'Offline'}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Name">
+                      {{job.provider_status.name}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Score">
+                      {{job.provider_status.score}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Multi address">
+                      {{job.provider_status.multi_address}}
                     </el-descriptions-item>
                   </el-descriptions>
                 </el-col>
