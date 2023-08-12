@@ -233,6 +233,9 @@
                   </el-descriptions>
                 </el-col>
               </el-row>
+              <div class="logBody">
+                <json-viewer :value="allData.task" :expand-depth=5 copyable boxed sort></json-viewer>
+              </div>
             </el-tab-pane>
             <el-tab-pane v-for="(job, j) in logsCont.data" :key="j">
               <template #label>
@@ -242,6 +245,7 @@
               </template>
               <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
                 <el-col :span="24">
+                  <el-alert v-if="!job.job_result_uri" :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
                   <el-descriptions title="CP Status:" direction="vertical" :column="bodyWidth" border>
                     <el-descriptions-item label="CP Node ID">
                       <p v-if="job.bidder_id">
@@ -266,9 +270,7 @@
                 </el-col>
               </el-row>
               <div class="logBody">
-                <json-viewer :value="job.job_textUri.job" :expand-depth=5 copyable boxed sort></json-viewer>
-                <br /><br />
-                <json-viewer :value="job.job_textUri.task" :expand-depth=5 copyable boxed sort></json-viewer>
+                <json-viewer :value="job" :expand-depth=6 copyable boxed sort></json-viewer>
               </div>
             </el-tab-pane>
             <el-tab-pane label="Build" name="Build" v-if="false">
@@ -386,6 +388,7 @@ export default defineComponent({
       space: {},
       job: null,
       files: [],
+      task: {},
       paymentStatus: 'Created'
     })
     const dialogCont = reactive({
@@ -416,6 +419,8 @@ export default defineComponent({
         const textUri = await new Promise(async resolve => {
           resolve(response.text())
         })
+        // console.log(arr[j].bidder_id)
+        // console.log(textUri)
         arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
       }
       return arr
@@ -425,9 +430,10 @@ export default defineComponent({
       var numRe = new RegExp(numReg)
       allData.space = dataRes.space || {}
       allData.files = dataRes.files || []
+      allData.task = dataRes.task || {}
       if (log) {
         log = await system.$commonFun.sortBoole(log)
-        logsCont.data = await jobList(log)
+        logsCont.data = log
         logsValue.value = log
       } else {
         logsValue.value = ''
@@ -1149,6 +1155,9 @@ export default defineComponent({
                   opacity: 0.7;
                 }
               }
+            }
+            .el-alert {
+              margin: 0 0 0.3rem;
             }
           }
         }

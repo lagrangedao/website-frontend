@@ -10,17 +10,17 @@
                   <template #content>
                     <small>
                       CP Status:
-                      <br/>
-                      {{ job.provider_status.online ? 'Online' : 'Offline' }},
-                      {{ job.provider_status.status }}
+                      <br/> {{ job.provider_status.online ? 'Online' : 'Offline' }}, {{ job.provider_status.status }}
                     </small>
                   </template>
                   <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{ j + 1 }}</span>
                 </el-tooltip>
               </span>
             </template>
-            <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`"
-                    title="Space app" class="space_iframe"></iframe>
+            <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
+            <div v-else>
+              <el-alert :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
+            </div>
           </el-tab-pane>
         </el-tabs>
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
@@ -33,19 +33,17 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="status" label="Status"/>
+            <el-table-column prop="status" label="Status" />
           </el-table>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
           <div>
-            <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning"/>
+            <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
           <div>
-            <el-alert :closable="false"
-                      title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting."
-                      type="warning"/>
+            <el-alert :closable="false" title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting." type="warning" />
           </div>
         </div>
       </el-row>
@@ -66,8 +64,8 @@ import {
   toRefs,
   nextTick
 } from 'vue'
-import {useStore} from "vuex"
-import {useRouter, useRoute} from 'vue-router'
+import { useStore } from "vuex"
+import { useRouter, useRoute } from 'vue-router'
 import {
   EditPen, Edit, CircleClose
 } from '@element-plus/icons-vue'
@@ -80,10 +78,10 @@ export default defineComponent({
     CircleClose
   },
   props: {
-    urlChange: {type: String, default: 'app'},
-    likesValue: {type: Boolean, default: false}
+    urlChange: { type: String, default: 'app' },
+    likesValue: { type: Boolean, default: false }
   },
-  setup(props, context) {
+  setup (props, context) {
     const store = useStore()
     const lagLogin = computed(() => {
       return String(store.state.lagLogin) === 'true'
@@ -98,26 +96,30 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
 
-    function handleClick(tab, event) {
+    function handleClick (tab, event) {
       router.push({
         name: 'spaceDetail',
-        params: {wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name}
+        params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name }
       })
     }
 
-    async function jobList(list) {
+    async function jobList (list) {
       let arr = list || []
       for (let j = 0; j < arr.length; j++) {
-        const response = await fetch(arr[j].job_result_uri)
-        const textUri = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+        if (arr[j].job_result_uri) {
+          const response = await fetch(arr[j].job_result_uri)
+          const textUri = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+        } else {
+          arr[j].job_result_uri = ''
+        }
       }
       return arr
     }
 
-    async function init() {
+    async function init () {
       if (route.params.tabs !== 'app') return
       listLoad.value = true
       listdata.jobResult = []
@@ -224,7 +226,8 @@ export default defineComponent({
               width: 14px;
               height: 14px;
               margin: 0 0 0 5px;
-              background: url(../../../assets/images/icons/icon_36.png) no-repeat left center;
+              background: url(../../../assets/images/icons/icon_36.png)
+                no-repeat left center;
               background-size: auto 100%;
               cursor: pointer;
               @media screen and (min-width: 1800px) {
@@ -271,7 +274,8 @@ export default defineComponent({
 
           .span-cp {
             padding-left: 20px;
-            background: url(../../../assets/images/icons/start_job.png) no-repeat left center;
+            background: url(../../../assets/images/icons/start_job.png)
+              no-repeat left center;
             background-size: 13px;
           }
         }
@@ -478,12 +482,14 @@ export default defineComponent({
           }
 
           .icon_sizes {
-            background: url(../../../assets/images/icons/icon_7.png) no-repeat left center;
+            background: url(../../../assets/images/icons/icon_7.png) no-repeat
+              left center;
             background-size: 17px;
           }
 
           .icon_licenses {
-            background: url(../../../assets/images/icons/icon_8.png) no-repeat left center;
+            background: url(../../../assets/images/icons/icon_8.png) no-repeat
+              left center;
             background-size: 17px;
           }
 
@@ -491,7 +497,8 @@ export default defineComponent({
             width: 16px;
             height: 16px;
             margin: 0 5px 0 0;
-            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat left center;
+            background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
+              left center;
             background-size: 100%;
           }
 
@@ -586,7 +593,8 @@ export default defineComponent({
                 }
 
                 .icon_sizes {
-                  background: url(../../../assets/images/icons/icon_7.png) no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_7.png)
+                    no-repeat left center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
@@ -596,7 +604,8 @@ export default defineComponent({
 
                 .icon_licenses {
                   width: 0.28rem;
-                  background: url(../../../assets/images/icons/icon_21.png) no-repeat right center;
+                  background: url(../../../assets/images/icons/icon_21.png)
+                    no-repeat right center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
@@ -605,7 +614,9 @@ export default defineComponent({
                 }
 
                 .icon_01 {
-                  background: #fef7ef url(../../../assets/images/icons/icon_22.png) no-repeat center;
+                  background: #fef7ef
+                    url(../../../assets/images/icons/icon_22.png) no-repeat
+                    center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
@@ -614,7 +625,9 @@ export default defineComponent({
                 }
 
                 .icon_02 {
-                  background: #f0f3ff url(../../../assets/images/icons/icon_29.png) no-repeat center;
+                  background: #f0f3ff
+                    url(../../../assets/images/icons/icon_29.png) no-repeat
+                    center;
                   background-size: 17px;
                   @media screen and (max-width: 768px) {
                     width: 25px;
@@ -914,7 +927,8 @@ export default defineComponent({
                 span {
                   height: 0.25rem;
                   padding-left: 0.23rem;
-                  background: url(../../../assets/images/icons/icon_9.png) no-repeat left 2px;
+                  background: url(../../../assets/images/icons/icon_9.png)
+                    no-repeat left 2px;
                   background-size: 0.17rem;
                   font-size: 13px;
                   color: #000;
@@ -947,25 +961,29 @@ export default defineComponent({
                 }
 
                 .icon_text {
-                  background: url(../../../assets/images/icons/icon_10.png) no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_10.png)
+                    no-repeat left center;
                   background-size: 100%;
                 }
 
                 .icon_time {
                   width: 15px;
-                  background: url(../../../assets/images/icons/icon_11.png) no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_11.png)
+                    no-repeat left center;
                   background-size: 100%;
                 }
 
                 .icon_up {
                   width: 15px;
                   margin: 0 3px 0 0;
-                  background: url(../../../assets/images/icons/icon_20.png) no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_20.png)
+                    no-repeat left center;
                   background-size: 100%;
                 }
 
                 .icon_image {
-                  background: url(../../../assets/images/icons/icon_30.png) no-repeat left center;
+                  background: url(../../../assets/images/icons/icon_30.png)
+                    no-repeat left center;
                   background-size: 100%;
                 }
 
@@ -1054,7 +1072,8 @@ export default defineComponent({
                   }
 
                   span {
-                    background: url(../../../assets/images/icons/icon_9_1.png) no-repeat left 2px;
+                    background: url(../../../assets/images/icons/icon_9_1.png)
+                      no-repeat left 2px;
                     background-size: 0.17rem;
                     color: #fff;
                   }
@@ -1066,22 +1085,26 @@ export default defineComponent({
                   color: #fff;
 
                   .icon_text {
-                    background: url(../../../assets/images/icons/icon_10_1.png) no-repeat left center;
+                    background: url(../../../assets/images/icons/icon_10_1.png)
+                      no-repeat left center;
                     background-size: 100%;
                   }
 
                   .icon_time {
-                    background: url(../../../assets/images/icons/icon_11_1.png) no-repeat left center;
+                    background: url(../../../assets/images/icons/icon_11_1.png)
+                      no-repeat left center;
                     background-size: 100%;
                   }
 
                   .icon_up {
-                    background: url(../../../assets/images/icons/icon_20_1.png) no-repeat left center;
+                    background: url(../../../assets/images/icons/icon_20_1.png)
+                      no-repeat left center;
                     background-size: 100%;
                   }
 
                   .icon_image {
-                    background: url(../../../assets/images/icons/icon_30_1.png) no-repeat left center;
+                    background: url(../../../assets/images/icons/icon_30_1.png)
+                      no-repeat left center;
                     background-size: 100%;
                   }
 
