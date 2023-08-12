@@ -28,7 +28,7 @@
             Solutions
           </el-menu-item>
           <el-menu-item index="dashboard">
-            Data Dashboard
+            Provider
           </el-menu-item>
           <el-menu-item index="6">
             Pricing
