@@ -223,5 +223,28 @@ export default defineComponent({
     min-height: 100%;
   }
 }
+
+.mirror {
+  margin: auto;
+  @media screen and (max-width: 1600px) {
+    // padding: 0.4rem 0.16rem 0.9rem;
+  }
+  @media screen and (min-width: 1280px) {
+    max-width: 1280px;
+  }
+  @media screen and (min-width: 1536px) {
+    max-width: 1536px;
+  }
+  .codemirror-container {
+    font-size: 15px;
+    color: #878c93;
+    @media screen and (max-width: 1600px) {
+      font-size: 14px;
+    }
+    @media screen and (max-width: 768px) {
+      font-size: 13px;
+    }
+  }
+}
 </style>
 

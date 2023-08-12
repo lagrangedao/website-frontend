@@ -13,6 +13,13 @@ import Web3 from 'web3'
 import commonFun from '@/utils/common'
 import echarts from '@/utils/echarts'
 import CryptoJS from 'crypto-js'
+// codemirror-editor-vue3
+// language  
+// import "codemirror/mode/javascript/javascript.js";
+// // theme
+// // import "codemirror/theme/dracula.css";
+// import "codemirror/theme/ayu-mirage.css";
+// import "codemirror/theme/neo.css";
 // edit
 import VueMarkdownEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
@@ -37,7 +44,7 @@ VueMarkdownEditor.lang.use('en-US', enUS);
 VueMarkdownEditor.use(githubTheme, {
     Hljs: hljs,
 });
-console.log('update time: 2023-07-12')
+
 const app = createApp(App)
 app.config.globalProperties.$commonFun = commonFun
 app.config.globalProperties.$Web3 = Web3

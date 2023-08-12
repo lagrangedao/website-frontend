@@ -30,7 +30,7 @@
           <div class="title">
             <div class="title_left">
               Your Computing Providers
-              <el-button size="large" v-if="computeShow" class="token_button token_manage" @click="addVisible=true">Add</el-button>
+              <el-button size="large" v-if="computeShow" class="token_button token_manage" :disabled="apiToken===''?true:false" @click="addVisible=true">Add</el-button>
               <el-button size="large" v-if="computeShow" class="token_button token_manage" @click="getdataList">Refresh</el-button>
             </div>
             <div class="title_right" v-if="!listLoad">
@@ -200,7 +200,10 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}api_token`, 'get')
       if (listRes && listRes.status === 'success') {
         if (listRes.data) return listRes.data.token.token
-        // else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
+        else {
+          system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'No token found.')
+          return ''
+        }
       }
       return ''
     }
@@ -223,10 +226,11 @@ export default defineComponent({
     }
     async function createCom () {
       listLoad.value = true
-      let fd = new FormData()
-      fd.append('name', ruleForm.name)
-      fd.append('node_id', ruleForm.node_id)
-      fd.append('multi_address', ruleForm.multi_address)
+      const fd = {
+        'name': ruleForm.name,
+        'node_id': ruleForm.node_id,
+        'multi_address': ruleForm.multi_address
+      }
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp`, 'post', fd, apiToken.value)
       if (listRes && listRes.status === 'success') {
         system.$commonFun.messageTip('success', listRes.message ? listRes.message : 'Success!')
@@ -310,6 +314,7 @@ export default defineComponent({
       multipleSelection,
       multipleTableRef,
       rules,
+      apiToken,
       getdataList, createCom, deleteCom, detailSetting, calculateDiffTime, momentFilter, handleChange, handleRemove, handleSelectionChange
     }
   }

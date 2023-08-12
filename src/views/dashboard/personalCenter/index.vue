@@ -33,6 +33,15 @@
             </div>
             <div class="desc">None yet</div>
           </div>
+          <div class="personal">
+            <el-button type="" text bg>
+              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
+            </el-button>
+            <br /><br />
+            <el-button type="" text bg>
+              <router-link :to="{name:'paymentHistory', query: {type: 'provider'}}">Provider Payment History</router-link>
+            </el-button>
+          </div>
           <div class="media">
             <a v-if="listdata.user.homepage" :href="listdata.user.homepage" target="_blank" class="homepage"></a>
             <a v-if="listdata.user.twitter_username" :href="'https://twitter.com/'+listdata.user.twitter_username" target="_blank" class="twitter"></a>
@@ -102,9 +111,9 @@
           <el-col :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
             <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<2: true">
               <template #header>
-                <div class="card-warn" v-if="list.expiration_time !== null && list.expireTime <= 7">
-                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime < 0 ? 'This space has expired, please click to the details page to restart':`This Space will expire in ${list.expireTime} days, please click to the details page to renew`"
-                    popper-style="word-break: break-word; text-align: left;">
+                <div class="card-warn" v-if="list.expiration_time !== null && ((list.expireTime <=5&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))">
+                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime
+              < 0.1 ? '3': list.expireTime} ${list.expireTimeUnit}, please click to the details page to renew`" popper-style="word-break: break-word; text-align: left;">
                     <template #reference>
                       <el-icon>
                         <Warning />
@@ -343,16 +352,15 @@ export default defineComponent({
         licenseIndex.value = listRes.data.received_licenses.length
         dataSetIndex.value = listRes.data.dataset.length
         spacesIndex.value = listRes.data.space.length
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar)
+        store.dispatch('setAccessAvatar', listRes.data.user.avatar ? `${listRes.data.gateway}/ipfs/${listRes.data.user.avatar}` : '')
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
         let datasetList = []
-        listdata.spaces.forEach(space => {
+        listdata.spaces.forEach(async space => {
           const current = Math.floor(Date.now() / 1000)
-          if (space.expiration_time) {
-            const currentTime = (space.expiration_time - current) / 86400
-            space.expireTime = Math.floor(currentTime)
-          } else space.expireTime = current
+          const expireTime = await system.$commonFun.expireTimeFun(space.expiration_time)
+          space.expireTime = expireTime.time || current
+          space.expireTimeUnit = expireTime.unit
           spaceList.push(space.name)
         })
         listdata.datasets.forEach(space => datasetList.push(space.name))
@@ -662,6 +670,8 @@ export default defineComponent({
             }
           }
           .el-button {
+            width: 200px;
+            max-width: 100%;
             padding: 0.15rem 0.2rem;
             background: lighten($color: #f0f0f0, $amount: 0);
             border-radius: 0.07rem;

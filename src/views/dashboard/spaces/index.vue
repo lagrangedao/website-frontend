@@ -28,9 +28,45 @@
               <el-button @click="clearMethod('clear')">Clear</el-button>
             </div>
           </div>
-          <div class="title" style="cursor: pointer;" @click="sortChange('likes')">
-            Spaces of the week
-            <i class="icon icon_week"></i>
+        </div>
+        <div class="week" v-if="pagin.pageNo<=1 && optionsValue === 'updated' && !searchValue">
+          <div class="top">
+            <div class="title">
+              Spaces of the week
+              <i class="icon icon_week"></i>
+            </div>
+          </div>
+
+          <el-row :gutter="32" class="list_body" v-loading="listLoad">
+            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="ls in spaceLikesData" :key="ls">
+              <el-card class="box-card" @click="detailFun(ls, l)">
+                <template #header>
+                  <div class="card-header">
+                    <span class="left">{{ls.status}}</span>
+                    <span class="right">{{ls.likes}}</span>
+                    <span class="bottom" v-if="ls.activeOrder && ls.activeOrder.config">{{ls.activeOrder.config.description}}</span>
+                  </div>
+                  <h1>{{ls.name}}</h1>
+                  <!-- <div class="card-owner">
+                    <span>Owner: {{ls.wallet_address}}</span>
+                  </div> -->
+                </template>
+                <div class="text">
+                  <div class="text_left">
+                    <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
+                    <i class="icon"></i>
+                    <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || hiddAddress(ls.wallet_address)}}</span>
+                  </div>
+                  <span>{{momentFilter(ls.created_at)}}</span>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+
+          <div class="top">
+            <div class="title title_all">
+              All running spaces, recently uploaded first
+            </div>
           </div>
         </div>
         <el-row :gutter="32" class="list_body" v-loading="listLoad">
@@ -38,7 +74,9 @@
             <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
-                  <span>{{list.likes}}</span>
+                  <span class="left">{{list.status}}</span>
+                  <span class="right">{{list.likes}}</span>
+                  <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span>
                 </div>
                 <h1>{{list.name}}</h1>
                 <!-- <div class="card-owner">
@@ -83,6 +121,7 @@ export default defineComponent({
     const listLoad = ref(true)
     const spaceData = ref([])
     const spaceDataAll = ref([])
+    const spaceLikesData = ref([])
     const options = ref([
       // {
       //   value: 'downloads',
@@ -129,7 +168,7 @@ export default defineComponent({
       pagin.total = 0
       pagin.sort = 'updated'
       optionsValue.value = 'updated'
-      if (type) init()
+      if (type) init('', 1)
     }
     function filterData (spaceData, val) {
       if (val === '') return spaceDataAll.value
@@ -153,16 +192,21 @@ export default defineComponent({
       pagin.pageNo = 1
       init()
     }
-    async function init (name) {
+    async function init (name, typeLikes) {
       listLoad.value = true
       spaceData.value = []
       const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
       const params = {
         limit: pagin.pageSize,
-        offset: page,
+        offset: page * pagin.pageSize,
         sort: pagin.sort, // alphabetical， updated
         name: searchValue.value,
         public_address: name || ''
+      }
+
+      if (typeLikes) {
+        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify({ sort: 'likes', limit: 3 })}`, 'get')
+        if (likesRes) spaceLikesData.value = likesRes.spaces || []
       }
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
       if (listRes) {
@@ -187,13 +231,13 @@ export default defineComponent({
     }
     onActivated(() => {
       window.scrollTo(0, 0)
-      init()
+      init('', 1)
     })
     onDeactivated(() => {
       clearMethod()
     })
     watch(lagLogin, (newValue, oldValue) => {
-      if (!lagLogin.value) init()
+      if (!lagLogin.value) init('', 1)
     })
     return {
       accessAvatar,
@@ -206,6 +250,7 @@ export default defineComponent({
       listLoad,
       spaceData,
       spaceDataAll,
+      spaceLikesData,
       pagin,
       system,
       route,
@@ -420,6 +465,9 @@ export default defineComponent({
               center;
             background-size: 100%;
           }
+          &.title_all {
+            padding: 0.07rem 0.35rem;
+          }
         }
       }
       .list_body {
@@ -444,22 +492,39 @@ export default defineComponent({
               color: #fff;
               cursor: pointer;
               .card-header {
-                position: absolute;
-                right: 0.15rem;
-                top: 0.15rem;
-                display: flex;
-                align-items: center;
                 span {
+                  position: absolute;
                   height: 0.25rem;
-                  padding-left: 0.3rem;
-                  background: url(../../../assets/images/icons/icon_9_1.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
                   font-size: 14px;
                   color: #fff;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
                     font-size: 15px;
+                  }
+                  &.left {
+                    left: 0.15rem;
+                    top: 0.1rem;
+                    font-family: "Helvetica-Bold";
+                    opacity: 0.9;
+                  }
+                  &.right {
+                    right: 0.15rem;
+                    top: 0.1rem;
+                    display: flex;
+                    align-items: center;
+                    padding-left: 0.25rem;
+                    background: url(../../../assets/images/icons/icon_9_1.png)
+                      no-repeat left 0px;
+                    background-size: 0.18rem;
+                  }
+                  &.bottom {
+                    left: 0.15rem;
+                    bottom: 0.05rem;
+                    opacity: 0.9;
+                    font-size: 13px;
+                    @media screen and (min-width: 1800px) {
+                      font-size: 14px;
+                    }
                   }
                 }
               }

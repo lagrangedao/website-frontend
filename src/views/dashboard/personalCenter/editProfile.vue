@@ -15,7 +15,7 @@
           <el-input v-model="ruleForm.name" placeholder="Full name" />
         </div>
       </el-form-item>
-      <!-- <el-form-item prop="avatar">
+      <el-form-item prop="avatar">
         <label class="label">
           Avatar
           <span class="span">(optional)</span>
@@ -27,9 +27,9 @@
         </div>
         <div class="flex flex-row" v-if="ruleForm.avatar">
           <img class="img" :src="ruleForm.avatar" />
-          <div class="remove" @click="removeAvatar">Remove</div>
+          <!-- <div class="remove" @click="removeAvatar">Remove</div> -->
         </div>
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item prop="homepage">
         <label class="label">
           Homepage
@@ -149,11 +149,11 @@ export default defineComponent({
       listLoad.value = true
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
       if (listRes && listRes.status === 'success') {
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar)
+        store.dispatch('setAccessAvatar', listRes.data.user.avatar ? `${listRes.data.gateway}/ipfs/${listRes.data.user.avatar}` : '')
         store.dispatch('setAccessName', listRes.data.user.full_name)
         profileName.value = listRes.data.user.full_name
         ruleForm.name = listRes.data.user.full_name
-        ruleForm.avatar = listRes.data.user.avatar
+        ruleForm.avatar = listRes.data.user.avatar ? `${listRes.data.gateway}/ipfs/${listRes.data.user.avatar}` : ''
         ruleForm.homepage = listRes.data.user.homepage
         ruleForm.github = listRes.data.user.github_username
         ruleForm.twitter = listRes.data.user.twitter_username
@@ -189,6 +189,7 @@ export default defineComponent({
           }
           await system.$commonFun.timeout(500)
           system.$commonFun.messageTip('success', 'Update successfully!')
+          fileList.value = []
           listLoad.value = false
         } else {
           console.log('error submit!', fields)
@@ -214,14 +215,13 @@ export default defineComponent({
       let fd = new FormData()
       fileList.value.forEach(file => {
         let fileNew = new File([file.raw], `${new Date().getTime() + file.name}`)
-        fd.append('file', fileNew, `${new Date().getTime() + file.name}`)
-        console.log('file', fileNew)
+        fd.append('avatar', fileNew, `${new Date().getTime() + file.name}`)
+        // console.log('file', fileNew)
       })
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/profile/files`, 'post', fd)
-      await system.$commonFun.timeout(500)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/profile/avatar`, 'post', fd)
       if (uploadRes && uploadRes.status === "success") {
-        if (uploadRes.data.files) return uploadRes.data.files[0].url
-      }
+        if (uploadRes.data) return `${uploadRes.data.gateway}/ipfs/${uploadRes.data.user.avatar}`
+      } else system.$commonFun.messageTip('error', 'Failed to upload avatar!')
       return ruleForm.avatar
     }
     function reset () {

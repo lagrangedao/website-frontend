@@ -742,7 +742,8 @@ export default defineComponent({
     }
     footer {
       position: absolute;
-      width: 100%;
+      width: auto;
+      max-width: 100%;
       bottom: 0.3rem;
       right: 0.16rem;
       min-height: 0.5rem;

@@ -238,7 +238,7 @@ export default defineComponent({
       const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
       const params = {
         limit: pagin.pageSize,
-        offset: page,
+        offset: page * pagin.pageSize,
         sort: pagin.sort, // alphabetical， updated
         name: searchValue.value
       }

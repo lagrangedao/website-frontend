@@ -469,7 +469,7 @@ export default defineComponent({
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
-            else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+            else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
           init()
@@ -498,7 +498,7 @@ export default defineComponent({
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
-            else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+            else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
           init()
@@ -530,7 +530,7 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data.files) system.$commonFun.messageTip('success', `${type === 'create' ? 'Create ' + textInfo.name + ' successfully!' : 'Update ' + fileBody.title + ' successfully!'}`)
-        else system.$commonFun.messageTip('error', uploadRes.message)
+        else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
       } else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
       reset()
       init()
