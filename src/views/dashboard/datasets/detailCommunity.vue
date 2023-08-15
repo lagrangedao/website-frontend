@@ -43,9 +43,6 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       renameLoad.value = false
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     async function init () {
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
@@ -68,7 +65,7 @@ export default defineComponent({
       route,
       router,
       props,
-      renameFun, momentFilter
+      renameFun
     }
   }
 })

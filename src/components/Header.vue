@@ -6,16 +6,16 @@
         <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." />
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
-        <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="/dataset">
+        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+          <el-menu-item index="dataset">
             <i class="icon icon_datasets"></i>
             Datasets
           </el-menu-item>
-          <!-- <el-menu-item index="/models">
+          <!-- <el-menu-item index="models">
             <i class="icon icon_models"></i>
             Models
           </el-menu-item> -->
-          <el-menu-item index="/spaces">
+          <el-menu-item index="spaces">
             <i class="icon icon_spaces"></i>
             Spaces
           </el-menu-item>
@@ -27,6 +27,9 @@
             <i class="icon icon_solutions"></i>
             Solutions
           </el-menu-item>
+          <el-menu-item index="dashboard">
+            Provider
+          </el-menu-item>
           <el-menu-item index="6">
             Pricing
           </el-menu-item>
@@ -34,6 +37,7 @@
             <w3m-core-button></w3m-core-button>
             <button id="my-button" @click="web3modal.openModal()">Connect Wallet</button>
           </el-menu-item> -->
+
           <el-menu-item index="signature" v-if="!lagLogin">
             &nbsp;
             <span class="loginBtn">Login</span>
@@ -44,9 +48,9 @@
                 <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt="">
               </router-link>
             </template>
-            <el-menu-item index="/create_dataset">+ New Dataset</el-menu-item>
-            <el-menu-item index="/create_space">+ New Space</el-menu-item>
-            <!-- <el-menu-item index="/create_organizations">Create Organizations</el-menu-item> -->
+            <el-menu-item index="create_dataset">+ New Dataset</el-menu-item>
+            <el-menu-item index="create_space">+ New Space</el-menu-item>
+            <!-- <el-menu-item index="create_organizations">Create Organizations</el-menu-item> -->
             <el-menu-item index="settings">Settings</el-menu-item>
             <el-menu-item index="sign_out">Sign Out</el-menu-item>
           </el-sub-menu>
@@ -86,8 +90,17 @@ export default defineComponent({
     }
     async function handleSelect (key, keyPath) {
       // console.log(key) //  
-      if (key === '/personal_center') store.dispatch('setNavLogin', true)
-      else if (key === '4') window.open('https://docs.lagrangedao.org')
+      if (key === 'personal_center') {
+        router.push({ path: '/personal_center' })
+        store.dispatch('setNavLogin', true)
+      } else if (key === '4') window.open('https://docs.lagrangedao.org')
+      else if (key === 'dataset') router.push({ path: '/dataset' })
+      else if (key === 'models') router.push({ path: '/models' })
+      else if (key === 'spaces') router.push({ path: '/spaces' })
+      else if (key === 'create_space') router.push({ path: '/create_space' })
+      else if (key === 'create_dataset') router.push({ path: '/create_dataset' })
+      else if (key === 'create_organizations') router.push({ path: '/create_organizations' })
+      else if (key === 'dashboard') window.open(process.env.VUE_APP_DASHBOARD_LINK)
       else if (key === 'settings') router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
       else if (key === 'sign_out') {
         system.$commonFun.signOutFun()
@@ -100,9 +113,9 @@ export default defineComponent({
     }
     function activeMenu (row) {
       const name = row || route.name
-      if (name.indexOf('dataset') > -1) activeIndex.value = '/dataset'
-      else if (name.indexOf('model') > -1) activeIndex.value = '/models'
-      else if (name.indexOf('space') > -1) activeIndex.value = '/spaces'
+      if (name.indexOf('dataset') > -1) activeIndex.value = 'dataset'
+      else if (name.indexOf('model') > -1) activeIndex.value = 'models'
+      else if (name.indexOf('space') > -1) activeIndex.value = 'spaces'
       else activeIndex.value = name
     }
 

@@ -39,8 +39,8 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
     }
   } catch (err) {
     console.error(err, err.response)
-    messageTip('error', err.response ? err.response.statusText : 'Request failed. Please try again later!')
-    if (err.response && err.response.status === 401) {
+    messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
     } else if (err.response) {
       // The request has been sent, but the status code of the server response is not within the range of 2xx
@@ -58,6 +58,11 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
 
 async function timeout(delay) {
   return new Promise((resolve) => setTimeout(resolve, delay))
+}
+
+async function sortBoole(arr) {
+  if (!arr) return null
+  return arr.sort((a, b) => b.is_leading_job - a.is_leading_job)
 }
 
 async function Init(callback) {
@@ -247,26 +252,35 @@ async function getUnit(id) {
   let unit = 'ETH'
   let name = ''
   let url = ''
+  let url_tx = ''
   switch (id) {
+    case 1:
+      unit = 'ETH'
+      name = 'Ethereum Mainnet '
+      break
     case 56:
       unit = 'BNB'
       name = 'Binance Smart Chain Mainnet '
       url = `${process.env.VUE_APP_BSCBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_BSCBLOCKURL}/tx/`
       break
     case 97:
       unit = 'tBNB'
       name = 'Binance Smart Chain Testnet '
       url = `${process.env.VUE_APP_BSCTESTNETBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_BSCTESTNETBLOCKURL}/tx/`
       break
     case 137:
       unit = 'MATIC'
       name = 'Polygon Mainnet '
       url = `${process.env.VUE_APP_POLYGONBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_POLYGONBLOCKURL}/tx/`
       break
     case 80001:
       unit = 'MATIC'
       name = 'Mumbai Testnet '
       url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/tx/`
       break
     case 3141:
       unit = 'ETH'
@@ -276,12 +290,14 @@ async function getUnit(id) {
       unit = 'ETH'
       name = 'Sepolia Testnet '
       url = `${process.env.VUE_APP_SEPOLIABLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_SEPOLIABLOCKURL}/tx/`
       break
   }
   return ({
     unit,
     name,
-    url
+    url,
+    url_tx
   })
 }
 
@@ -327,17 +343,70 @@ function hiddAddress(val) {
   else return '-'
 }
 
-const cmOptions = {
-  mode: 'text/x-markdown', // Language mode
-  // theme: 'dracula', // Theme
-  lineNumbers: true, // Show line number
-  smartIndent: true, // Smart indent
-  indentUnit: 4, // The smart indent unit is 2 spaces in length
-  foldGutter: true, // Code folding
-  matchBrackets: true,
-  autoCloseBrackets: true,
-  styleActiveLine: true, // Display the style of the selected row
-  readOnly: false,
+function NumFormat(value) {
+  if (String(value) === '0') return '0'
+  else if (!value) return '-'
+  var intPartArr = String(value).split('.')
+  var intPartFormat = intPartArr[0]
+    .toString()
+    .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
+  return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
+}
+
+function calculateDiffTime(startTime) {
+  var endTime = Math.round(new Date() / 1000)
+  var timeDiff = endTime - startTime
+  var year = timeDiff > (86400 * 365) ? parseInt(timeDiff / 86400 / 365) : 0
+  var month = timeDiff > (86400 * 30) ? parseInt(timeDiff / 86400 / 30) : 0
+  var day = parseInt(timeDiff / 86400)
+  var hour = parseInt((timeDiff % 86400) / 3600)
+  var minute = parseInt((timeDiff % 3600) / 60)
+  var m = parseInt((timeDiff % 60))
+  if (year > 0) return `about ${year}${year > 1 ? ' years' : ' year'} ago`
+  if (month > 0) return `${month} ${month > 1 ? ' months' : ' month'} ago`
+  if (day > 0) return `${day} ${day > 1 ? ' days' : ' day'} ago`
+  else if (hour > 0) return `${hour} ${hour > 1 ? ' hours' : ' hour'} ago`
+  else if (minute > 0) return `${minute} ${minute > 1 ? ' minutes' : ' minute'} ago`
+  else if (m > 0) return `${m} ${m > 1 ? ' seconds' : ' second'} ago`
+  else return '-'
+}
+
+async function expireTimeFun(cont) {
+  const current = Math.floor(Date.now() / 1000)
+  let expireTime = {
+    time: NaN,
+    unit: 'day'
+  }
+
+  if (cont) {
+    const currentTime = (cont - current) / 86400
+    if (currentTime < 1) {
+      const c = currentTime * 24
+      if (c < 0.05) expireTime.time = c
+      else expireTime.time = c.toFixed(1) <= 0 ? NaN : (currentTime * 24).toFixed(1)
+      expireTime.unit = c < 0.05 ? 'minutes' : 'hours'
+    } else {
+      expireTime.time = currentTime.toFixed(1)
+      expireTime.unit = 'days'
+    }
+  }
+
+  return expireTime
+}
+
+function cmOptions(owner) {
+  return {
+    mode: 'text/x-markdown', // Language mode
+    // theme: 'dracula', // Theme
+    lineNumbers: true, // Show line number
+    smartIndent: true, // Smart indent
+    indentUnit: 4, // The smart indent unit is 2 spaces in length
+    foldGutter: true, // Code folding
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    styleActiveLine: true, // Display the style of the selected row
+    readOnly: !owner,
+  }
 }
 
 const Web3 = require('web3');
@@ -364,6 +433,7 @@ if (typeof window.ethereum === 'undefined') {
 export default {
   sendRequest,
   timeout,
+  sortBoole,
   Init,
   web3Init,
   login,
@@ -375,6 +445,9 @@ export default {
   getUnit,
   changeIDLogin,
   hiddAddress,
+  performSignin,
+  NumFormat,
+  calculateDiffTime,
   cmOptions,
-  performSignin
+  expireTimeFun
 }

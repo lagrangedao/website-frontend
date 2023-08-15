@@ -38,22 +38,13 @@ export default defineComponent({
     const router = useRouter()
 
     async function init () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
-        const jobData = listRes.data.job || { job_result_uri: '' }
-        const current = Math.floor(Date.now() / 1000)
-        let expireTime = current
-        if (listRes.data.space.expiration_time) {
-          const currentTime = (listRes.data.space.expiration_time - current) / 86400
-          expireTime = Math.floor(currentTime)
-        }
-        context.emit('handleValue', listRes.data.space, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
+        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       renameLoad.value = false
-    }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
     }
     onMounted(() => {
       info.name = ''
@@ -70,8 +61,7 @@ export default defineComponent({
       system,
       route,
       router,
-      props,
-      momentFilter
+      props
     }
   }
 })

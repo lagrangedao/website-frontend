@@ -6,9 +6,12 @@
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
               <b>No space card yet</b>
-              <p v-if="metaAddress === route.params.wallet_address">Create a new space card by using following template</p>
+              <p v-if="metaAddress === route.params.wallet_address">
+                <span v-if="fileSpaceData.length === 0">Create a new space card by using following template</span>
+                <span v-else>Create a new space card by creating a Readme.md file</span>
+              </p>
             </div>
-            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address">
+            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address && fileSpaceData.length === 0">
               <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="col-title">
                 <b>Start with hello-world template</b>
               </el-col>
@@ -54,8 +57,8 @@
         <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="left left_light">
           <div class="list">
             <div class="title">
-              Downloads last month
-              <b>1,149,560</b>
+              Space Total Views
+              <b>{{system.$commonFun.NumFormat(listdata.stats.views) || 0}}</b>
             </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme">
@@ -90,7 +93,7 @@
                   </a>
                 </el-col>
               </el-row>
-              <el-row :gutter="12">
+              <el-row :gutter="12" v-if="false">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
                   <router-link to="">
                     <i class="icon icon_01"></i>
@@ -106,7 +109,7 @@
               </el-row>
             </div>
           </div>
-          <div class="labelModel">
+          <div class="labelModel" v-if="false">
             <ul>
               <li>
                 <p>Homepage:</p>
@@ -126,7 +129,7 @@
               </li>
             </ul>
           </div>
-          <div class="list">
+          <div class="list" v-if="false">
             <div class="title">
               <p :title="'Models trained or fine-tuned on '+route.params.name">
                 <i class="icon icon_datasets"></i>
@@ -135,8 +138,8 @@
               </p>
             </div>
           </div>
-          <el-row class="list_body" v-loading="false">
-            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata" :key="l">
+          <el-row class="list_body" v-if="false" v-loading="false">
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata.files" :key="l">
               <el-card class="box-card" @click="detailFun(list, l)">
                 <template #header>
                   <div class="card-header">
@@ -187,8 +190,6 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   EditPen, Edit, CircleClose
 } from '@element-plus/icons-vue'
-import { async } from 'q';
-
 export default defineComponent({
   name: 'Spaces',
   components: {
@@ -208,61 +209,21 @@ export default defineComponent({
     const value = ref('')
     const urlReadme = ref('')
     const urlReadmeName = ref('')
+    const fileSpaceData = ref([])
     const isPreview = ref(true)
     const currentPage1 = ref(1)
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref([])
+    const listdata = reactive({
+      files: [],
+      stats: {}
+    })
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const tableData = ref([
-      {
-        sentence1: '"The cat sat on the mat."',
-        sentence2: '"The cat did not sit on the mat."',
-        idx: '0',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"The cat did not sit on the mat."',
-        sentence2: '"The cat sat on the mat."',
-        idx: '1',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"When you\'ve got no snow,  it\'s really hard to...',
-        sentence2: '"When you\'ve got snow, it\'s really hard to learn a snowy...',
-        idx: '2',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '3',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '4',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya supports Twitch.tv...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '5',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouy supports media apps...',
-        sentence2: '"Out of the box, Ouya supports Twitch.tv and XBMC media player."',
-        idx: '6',
-        label: '1   (not_entailment)'
-      }
-    ])
     const textEditor = ref('')
     const textEditorChange = ref('')
     const preview = ref(null)
@@ -300,7 +261,7 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
-        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+        else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
       } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
       init()
       isPreview.value = true
@@ -310,47 +271,42 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     async function init () {
+      let gate = false
       if (route.params.tabs !== 'card') return
       listLoad.value = true
-      listdata.value = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}`, 'get')
+      listdata.files = []
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
-        // listdata.value = listRes.data.files || []
         const fileLi = listRes.data.files || []
         fileLi.forEach((element, i) => {
           let el = element.name.split('/')
           el.shift()
           el.shift()
           el.shift()
-          // console.log(el.join('/').toLowerCase())
           if (el.join('/').toLowerCase() === 'readme.md') {
-            urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
-            urlReadmeName.value = el.join('/')
-            getTitle(urlReadme.value)
+            if (element.gateway !== null) {
+              urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
+              urlReadmeName.value = el.join('/')
+              getTitle(urlReadme.value)
+            } else {
+              gate = true
+              return
+            }
           }
         })
-        const jobData = listRes.data.job || { job_result_uri: '' }
-        const current = Math.floor(Date.now() / 1000)
-        let expireTime = current
-        if (listRes.data.space.expiration_time) {
-          const currentTime = (listRes.data.space.expiration_time - current) / 86400
-          expireTime = Math.floor(currentTime)
-        }
-        context.emit('handleValue', listRes.data.space, jobData ? jobData.job_source_uri : '', expireTime, listRes.data.nft)
+        fileSpaceData.value = fileLi
+        listdata.stats = listRes.data.stats
+        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
+        if (!gate) context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
+      }
+      if (gate) {
+        init()
+        return
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
-      listdata.value = [
+      listdata.files = [
         {
           is_public: "1",
           name: "Frigg"
@@ -368,9 +324,21 @@ export default defineComponent({
     function detailFun (row, index) {
       console.log(row, index)
     }
+    function handleAnchorClick (anchor) {
+      const { lineIndex } = anchor
+      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
+
+      if (heading) {
+        preview.value.scrollToTarget({
+          target: heading,
+          scrollContainer: window,
+          top: 0,
+        })
+      }
+    }
     const imgClick = (url, index) => {
       console.log(url, index);
-    };
+    }
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
       var response = await fetch(urlReadme.value)
@@ -392,18 +360,6 @@ export default defineComponent({
           indent: hTags.indexOf(el.tagName)
         }));
       });
-    };
-    function handleAnchorClick (anchor) {
-      const { lineIndex } = anchor
-      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
-
-      if (heading) {
-        preview.value.scrollToTarget({
-          target: heading,
-          scrollContainer: window,
-          top: 0,
-        })
-      }
     }
     async function cardAdd (type) {
       if (type === 'create') createLoad.value = true
@@ -419,8 +375,8 @@ export default defineComponent({
         listLoad.value = true
         let fd = await formDataRetrue()
         const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
-        if (uploadRes && uploadRes.status === "success" && uploadRes.data) system.$commonFun.messageTip('success', 'Update  successfully!')
-        else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+        await system.$commonFun.timeout(1000)
+        if (uploadRes && uploadRes.status !== "success") system.$commonFun.messageTip(uploadRes.status, `${uploadRes.message}: ${name}`)
         init()
       }
     }
@@ -436,6 +392,7 @@ export default defineComponent({
         let newFile = new File([text], name)
         formdata.append('file', newFile, name)
       }
+
       return formdata
     }
     function cancelFun () {
@@ -483,14 +440,14 @@ export default defineComponent({
       system,
       route,
       router,
-      tableData,
       props,
       urlReadme,
+      fileSpaceData,
       isPreview,
       templateData,
       createLoad,
       textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick,
+      init, handleCurrentChange, handleSizeChange, detailFun, handleClick,
       cardAdd, cancelFun
     }
   }

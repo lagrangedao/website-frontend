@@ -101,7 +101,7 @@
       <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="18" class="right">
         <div class="top">
           <div class="top_text">
-            <b>Models</b> {{NumFormat(pagin.total)}}
+            <b>Models</b> {{system.$commonFun.NumFormat(pagin.total)}}
             <el-input v-model="searchValue" clearable @input="searchChange" class="w-50 m-2" placeholder="Filter by name" />
           </div>
           <el-select v-model="optionsValue" @change="sortChange" class="m-2" placeholder="Sort: Alphabetical">
@@ -129,12 +129,12 @@
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+                <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
               </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                  <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
                 <!-- <div class="item_body">
                   <i class="icon icon_up"></i>
@@ -242,15 +242,6 @@ export default defineComponent({
       })
       return data
     }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     function detailFun (row, index) {
       // console.log(row, index)
       router.push({ name: 'modelsDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
@@ -266,7 +257,7 @@ export default defineComponent({
       const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
       const params = {
         limit: pagin.pageSize,
-        offset: page,
+        offset: page * pagin.pageSize,
         sort: pagin.sort, // alphabetical， updated
         name: searchValue.value
       }
@@ -278,13 +269,6 @@ export default defineComponent({
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
-    }
-    function momentFilter (data) {
-      return system.$commonFun.momentFun(data)
-    }
-    function hiddAddress (val) {
-      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
-      else return '-'
     }
     onActivated(() => {
       window.scrollTo(0, 0)
@@ -313,7 +297,7 @@ export default defineComponent({
       listdata,
       bodyWidth,
       system,
-      init, NumFormat, handleCurrentChange, handleSizeChange, momentFilter, detailFun, hiddAddress, searchChange, sortChange
+      init, handleCurrentChange, handleSizeChange, detailFun, searchChange, sortChange
     }
   }
 })

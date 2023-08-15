@@ -66,7 +66,7 @@
             <template #default="scope">
               <div>
                 <span v-if="scope.row.isDir">-</span>
-                <span v-else :title="momentFilter(scope.row._originPath.created_at)">{{ calculateDiffTime(scope.row._originPath.created_at)}}</span>
+                <span v-else :title="system.$commonFun.momentFun(scope.row._originPath.created_at)">{{ system.$commonFun.calculateDiffTime(scope.row._originPath.created_at)}}</span>
               </div>
             </template>
           </el-table-column>
@@ -76,8 +76,8 @@
             <div class="left">
               <img :src="people_img" class="people" width="30" height="30" alt=""> {{metaAddress === route.params.wallet_address?accessName:'-'}}
             </div>
-            <div class="right" :title="momentFilter(fileBody._originPath.created_at)">
-              {{calculateDiffTime(fileBody._originPath.created_at)}}
+            <div class="right" :title="system.$commonFun.momentFun(fileBody._originPath.created_at)">
+              {{system.$commonFun.calculateDiffTime(fileBody._originPath.created_at)}}
             </div>
           </div>
           <div v-if="!fileTextShow" v-loading="uploadLoad">
@@ -369,9 +369,6 @@ export default defineComponent({
       await system.$commonFun.timeout(1000)
       if (command === 'upload') addEvent()
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     function handleChange (uploadFile, uploadFiles) {
       // console.log(uploadFile, uploadFiles)
       fileList.value = uploadFiles
@@ -469,7 +466,7 @@ export default defineComponent({
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
-            else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+            else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
           init()
@@ -498,7 +495,7 @@ export default defineComponent({
           await system.$commonFun.timeout(500)
           if (uploadRes && uploadRes.status === "success") {
             if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Upload files successfully!')
-            else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
+            else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
           init()
@@ -530,7 +527,7 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
         if (uploadRes.data.files) system.$commonFun.messageTip('success', `${type === 'create' ? 'Create ' + textInfo.name + ' successfully!' : 'Update ' + fileBody.title + ' successfully!'}`)
-        else system.$commonFun.messageTip('error', uploadRes.message)
+        else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
       } else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
       reset()
       init()
@@ -620,23 +617,6 @@ export default defineComponent({
       else system.$commonFun.messageTip('error', 'Delete failed!')
       reset()
       init()
-    }
-    function calculateDiffTime (startTime) {
-      var endTime = Math.round(new Date() / 1000)
-      var timeDiff = endTime - startTime
-      var year = timeDiff > (86400 * 365) ? parseInt(timeDiff / 86400 / 365) : 0
-      var month = timeDiff > (86400 * 30) ? parseInt(timeDiff / 86400 / 30) : 0
-      var day = parseInt(timeDiff / 86400)
-      var hour = parseInt((timeDiff % 86400) / 3600)
-      var minute = parseInt((timeDiff % 3600) / 60)
-      var m = parseInt((timeDiff % 60))
-      if (year > 0) return `about ${year}${year > 1 ? ' years' : ' year'} ago`
-      if (month > 0) return `${month} ${month > 1 ? ' months' : ' month'} ago`
-      if (day > 0) return `${day} ${day > 1 ? ' days' : ' day'} ago`
-      else if (hour > 0) return `${hour} ${hour > 1 ? ' hours' : ' hour'} ago`
-      else if (minute > 0) return `${minute} ${minute > 1 ? ' minutes' : ' minute'} ago`
-      else if (m > 0) return `${m} ${m > 1 ? ' seconds' : ' second'} ago`
-      else return '-'
     }
     function sizeChange (bytes) {
       if (bytes === 0) return '0 B'
@@ -785,9 +765,9 @@ export default defineComponent({
       fileTextShow,
       fileTextType,
       blobSize,
-      init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
+      init, handleCommand, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile
+      fileEdit, editChange, downFile, sizeChange, deleteFile
     }
   }
 })

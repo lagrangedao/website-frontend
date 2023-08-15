@@ -178,9 +178,6 @@ export default defineComponent({
         // window.location.reload()
       })
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     function settingDetail (row) {
       router.push({ name: 'personalCenterProfile', params: { menu: row } })
     }
@@ -213,7 +210,7 @@ export default defineComponent({
       prevType,
       listLoad,
       fileList,
-      isLogin, signIn, fn, momentFilter, settingDetail,
+      isLogin, signIn, fn, settingDetail,
     }
   }
 })
