@@ -2,7 +2,7 @@
   <section id="space">
     <el-row class="space_body" v-loading="listLoad">
       <space-hardware @handleHard="handleHard" :listdata="listdata" :renewButton="'setting'"></space-hardware>
-      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && listdata.status === 'Created'">
+      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -290,9 +290,6 @@ export default defineComponent({
     const router = useRouter()
     const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     const submitForm = async (formEl) => {
       if (!formEl) return
       await ruleFormRef.value.validate(async (valid, fields) => {
@@ -596,7 +593,7 @@ export default defineComponent({
       manageDOI,
       eventArgs,
       chainIdRes,
-      props, submitForm, submitDeleteForm, momentFilter,
+      props, submitForm, submitDeleteForm,
       handleChange, requestInitData, beforeClose, requestNFT, refreshContract, handleHard
     }
   }

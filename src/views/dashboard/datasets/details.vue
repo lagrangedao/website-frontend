@@ -190,15 +190,6 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     function detailFun (row, index) {
       console.log(row, index)
     }
@@ -278,7 +269,7 @@ export default defineComponent({
       nft,
       ntfLoad,
       likeValue, likesValue, likeOwner, nftTokens,
-      NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, back,
+      handleCurrentChange, handleSizeChange, detailFun, handleClick, back,
       handleValue, reqNFT, likeMethod
     }
   }

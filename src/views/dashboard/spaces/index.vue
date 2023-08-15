@@ -55,9 +55,9 @@
                   <div class="text_left">
                     <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
                     <i class="icon"></i>
-                    <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || hiddAddress(ls.wallet_address)}}</span>
+                    <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || system.$commonFun.hiddAddress(ls.wallet_address)}}</span>
                   </div>
-                  <span>{{momentFilter(ls.created_at)}}</span>
+                  <span>{{system.$commonFun.momentFun(ls.created_at)}}</span>
                 </div>
               </el-card>
             </el-col>
@@ -87,9 +87,9 @@
                 <div class="text_left">
                   <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
                   <i class="icon"></i>
-                  <span class="small" @click.stop="searchChange(list)">{{list.full_name || hiddAddress(list.wallet_address)}}</span>
+                  <span class="small" @click.stop="searchChange(list)">{{list.full_name || system.$commonFun.hiddAddress(list.wallet_address)}}</span>
                 </div>
-                <span>{{momentFilter(list.created_at)}}</span>
+                <span>{{system.$commonFun.momentFun(list.created_at)}}</span>
               </div>
             </el-card>
           </el-col>
@@ -178,15 +178,6 @@ export default defineComponent({
       })
       return data
     }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     function sortChange (val) {
       pagin.sort = val
       pagin.pageNo = 1
@@ -222,13 +213,6 @@ export default defineComponent({
       // console.log(row, index)
       router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
-    function hiddAddress (val) {
-      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
-      else return '-'
-    }
     onActivated(() => {
       window.scrollTo(0, 0)
       init('', 1)
@@ -255,7 +239,7 @@ export default defineComponent({
       system,
       route,
       router,
-      handleSizeChange, handleCurrentChange, searchChange, detailFun, momentFilter, hiddAddress,
+      handleSizeChange, handleCurrentChange, searchChange, detailFun,
       sortChange, clearMethod
     }
   }

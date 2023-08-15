@@ -11,8 +11,9 @@
               {{ listdata.user.full_name || '-'}}
             </div>
             <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
+            <div class="desc">Network: {{info.network||'-'}}</div>
             <div class="desc">Balance: {{info.balance||'-'}} {{info.unit}}</div>
-            <div class="desc">Wallet Address: {{hiddAddress(metaAddress)}}
+            <div class="desc">Wallet Address: {{system.$commonFun.hiddAddress(metaAddress)}}
               <el-icon v-if="metaAddress" @click="system.$commonFun.copyContent(metaAddress, 'Copied')">
                 <CopyDocument />
               </el-icon>
@@ -88,7 +89,7 @@
                 <el-dropdown-menu>
                   <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests_notifications" :key="c">
                     <div class="drop_body">
-                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your {{child.source_type ? (child.source_type):''}} license:
+                      <p>{{ child.recipient_address? system.$commonFun.hiddAddress(child.recipient_address):'Someone else' }} is requesting your {{child.source_type ? (child.source_type):''}} license:
                         <b>{{child.name}}</b>
                       </p>
                       <el-button @click="licenseMetaData(child)" type="primary" size="small">Approve</el-button>
@@ -167,12 +168,12 @@
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+                <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
               </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                  <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
                 <!-- <div class="item_body">
                   <i class="icon icon_up"></i>
@@ -205,8 +206,8 @@
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
-                <p class="ellipsis" v-if="list.type === 'Space License'">{{hiddAddress(list.space_owner)}}</p>
-                <p class="ellipsis" v-else>{{hiddAddress(list.dataset_owner)}}</p>
+                <p class="ellipsis" v-if="list.type === 'Space License'">{{system.$commonFun.hiddAddress(list.space_owner)}}</p>
+                <p class="ellipsis" v-else>{{system.$commonFun.hiddAddress(list.dataset_owner)}}</p>
               </div>
               <div class="text item">
                 <div class="item_body">
@@ -217,7 +218,7 @@
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                  <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
               </div>
             </el-card>
@@ -260,7 +261,8 @@ export default defineComponent({
     const info = reactive({
       address: '',
       balance: '',
-      unit: ''
+      unit: '',
+      network: ''
     })
     const options = ref([
       // {
@@ -323,8 +325,9 @@ export default defineComponent({
           info.balance = Number(balanceAll).toFixed(4)
         })
         const chainId = await system.$commonFun.web3Init.eth.net.getId()
-        const { unit } = await system.$commonFun.getUnit(chainId)
+        const { unit, name } = await system.$commonFun.getUnit(chainId)
         info.unit = unit
+        info.network = name || chainId
         // await system.$commonFun.timeout(500)
         if (lagLogin.value) getdataList()
         else await signIn()
@@ -408,13 +411,6 @@ export default defineComponent({
         system.$commonFun.signOutFun()
         // window.location.reload()
       })
-    }
-    function hiddAddress (val) {
-      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
-      else return '-'
-    }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
     }
     function detailFun (row, type) {
       if (type === 'dataset') router.push({ name: 'datasetDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
@@ -501,7 +497,7 @@ export default defineComponent({
       bodyWidth,
       dataNFTRequest,
       dataNFTRow,
-      isLogin, signIn, getdataList, fn, momentFilter, detailFun, editProfile, hiddAddress,
+      isLogin, signIn, getdataList, fn, detailFun, editProfile,
       handleCommand, licenseFun, licenseMetaData, handleChange
     }
   }

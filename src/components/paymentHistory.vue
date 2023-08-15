@@ -3,7 +3,7 @@
     <div class="payment-history">
       <div class="title">{{paymentType.toLowerCase() === 'provider'?'provider Payment history':'user Payment history'}}</div>
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%">
-        <el-table-column prop="transaction_hash" label="transaction hash">
+        <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
           <template #default="scope">
             <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
           </template>
@@ -12,6 +12,11 @@
         <el-table-column prop="token" label="token" v-if="paymentType.toLowerCase() !== 'provider'">
           <template #default="scope">
             <span>LAG</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="message" label="refund reason" v-if="paymentType.toLowerCase() !== 'provider'" min-width="120">
+          <template #default="scope">
+            <span>{{scope.row.message || '-'}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="order" label="space name" v-if="paymentType.toLowerCase() !== 'provider'">

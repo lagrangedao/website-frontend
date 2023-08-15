@@ -177,9 +177,6 @@ export default defineComponent({
       var re = new RegExp('^(?!mailto:)(?:(?:http|https|ftp)://|//)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$', 'i');
       return re.test(str_url);
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     function detailFun (row, index) {
       // console.log(row, index)
       router.push({ name: 'datasetDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
@@ -248,7 +245,7 @@ export default defineComponent({
       listLoad,
       fileList,
       deleteVisible,
-      momentFilter, detailFun, editAvatar,
+      detailFun, editAvatar,
       handleChange, handleRemove, removeAvatar
     }
   }

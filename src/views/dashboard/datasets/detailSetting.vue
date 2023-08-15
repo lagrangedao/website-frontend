@@ -262,10 +262,6 @@ export default defineComponent({
     const moreLoad = ref(false)
     const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
-
     const submitForm = async (formEl) => {
       if (!formEl) return
       await ruleFormRef.value.validate(async (valid, fields) => {
@@ -571,7 +567,7 @@ export default defineComponent({
       router,
       moreLoad,
       chainIdRes,
-      props, submitForm, submitDeleteForm, momentFilter, beforeClose,
+      props, submitForm, submitDeleteForm, beforeClose,
       handleChange, requestInitData, requestNFT, refreshContract
     }
   }

@@ -175,9 +175,6 @@ export default defineComponent({
         // window.location.reload()
       })
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     function settingDetail (row, type) {
       if (type) router.push({ name: 'personalCenterProfile', params: { menu: 'organizations' } })
       else router.push({ name: 'organizationsSettings', params: { submenu: row } })
@@ -211,7 +208,7 @@ export default defineComponent({
       prevType,
       listLoad,
       fileList,
-      isLogin, signIn, fn, momentFilter, settingDetail,
+      isLogin, signIn, fn, settingDetail,
     }
   }
 })

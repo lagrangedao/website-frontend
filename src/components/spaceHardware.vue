@@ -124,8 +124,8 @@
               <el-divider/>
             </div>
             <div class="time flex">
-              <el-select v-model="regionData.regionValue" class="m-region" placeholder="Region">
-                <el-option v-for="item in regionData.regionOption" :key="item.value" :label="item.label" :value="item.value" />
+              <el-select v-model="sleepSelect.regionValue" class="m-region" placeholder="Region">
+                <el-option v-for="item in sleepSelect.regionOption" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </div>
           </div>
@@ -260,10 +260,6 @@ export default defineComponent({
       pauseSpace: false,
       displayPrice: false
     })
-    const regionData = reactive({
-      regionValue: '',
-      regionOption: []
-    })
     const hardwareOptions = ref([])
     const hardwareLoad = ref(false)
     const machinesLoad = ref(false)
@@ -277,6 +273,8 @@ export default defineComponent({
     const paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
 
     async function hardwareFun () {
+      const net = await networkEstimate()
+      if (!net) return
       hardwareLoad.value = true
       try {
         if (props.renewButton === 'fork') {
@@ -297,11 +295,11 @@ export default defineComponent({
 
 
         let gasLimit = await paymentContract.methods
-          .makePayment(route.params.wallet_address, route.params.name, sleepSelect.value.hardware_id, ruleForm.usageTime)
+          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
           .estimateGas({ from: store.state.metaAddress })
 
         const tx = await paymentContract.methods
-          .makePayment(route.params.wallet_address, route.params.name, sleepSelect.value.hardware_id, ruleForm.usageTime)
+          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
           .send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
@@ -338,15 +336,22 @@ export default defineComponent({
       return forkRes.status
     }
 
-    async function hardwareHash (tx_hash, approveAmount) {
-      let fd = new FormData()
+    async function networkEstimate () {
       let chainID = '80001'
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       if (getID.toString() !== chainID) {
         const { name } = await system.$commonFun.getUnit(Number(chainID))
         await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
-        return
+        return false
       }
+      return true
+    }
+
+    async function hardwareHash (tx_hash, approveAmount) {
+      const net = await networkEstimate()
+      if (!net) return
+      const getID = await system.$commonFun.web3Init.eth.net.getId()
+      let fd = new FormData()
       // fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
       fd.append('paid', approveAmount) // 授权代币的金额
       fd.append('space_name', route.params.name)
@@ -354,7 +359,7 @@ export default defineComponent({
       fd.append('duration', ruleForm.usageTime * 3600)
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
-      fd.append('region', regionData.regionValue)
+      fd.append('region', sleepSelect.value.regionValue)
       fd.append('start_in', ruleForm.sleepTime * 60)
       const urlRes = `${process.env.VUE_APP_BASEAPI}space/deployment`
       const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
@@ -366,7 +371,7 @@ export default defineComponent({
       else sleepVisible.value = false
     }
 
-    function sleepChange (row) {
+    async function sleepChange (row) {
       if (row.hardware_status.toLowerCase() !== 'available' && props.renewButton === 'renew') {
         system.$commonFun.messageTip('warning', 'There are no corresponding resources for the current configuration, unable to renew. Please try again later')
         close()
@@ -374,6 +379,8 @@ export default defineComponent({
       } else if (row.hardware_status.toLowerCase() !== 'available' || (props.listdata.activeOrder && (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))) return false
       ruleForm.usageTime = 24
       sleepSelect.value = row
+      sleepSelect.value.regionOption = await regionList(row.region)
+      sleepSelect.value.regionValue = row.region && row.region[0] ? row.region[0] : ''
       ruleForm.sleepTime = sleepSelect.value.hardware_type.toLowerCase() === 'gpu' ? '20' : '1'
       sleepVisible.value = true
     }
@@ -389,7 +396,9 @@ export default defineComponent({
           list: []
         }
       ]
-      arrayList.forEach(hard => {
+      arrayList.forEach(async hard => {
+        hard.regionOption = await regionList(hard.region)
+        hard.regionValue = hard.region && hard.region[0] ? hard.region[0] : ''
         if (hard.hardware_type.toLowerCase() === 'cpu') listArr[0].list.push(hard)
         else listArr[1].list.push(hard)
       })
@@ -421,10 +430,6 @@ export default defineComponent({
             }
           }
         } else hardwareOptions.value = await listArray(machinesRes.data.hardware)
-        if (machinesRes.data.region) {
-          regionData.regionOption = await regionList(machinesRes.data.region)
-          regionData.regionValue = machinesRes.data.region[0]
-        }
       } else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
       machinesLoad.value = false
     }
@@ -446,7 +451,6 @@ export default defineComponent({
       hardwareLoad,
       machinesLoad,
       forkLoad,
-      regionData,
       sleepChange, hardwareFun, close, forkDuplicate
     }
   }
