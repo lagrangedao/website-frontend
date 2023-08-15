@@ -162,15 +162,6 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     async function init () {
       if (route.name !== 'modelsDetail') return
       listLoad.value = true
@@ -254,7 +245,7 @@ export default defineComponent({
       route,
       router,
       tableData,
-      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList, copyName, back
+      init, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList, copyName, back
     }
   }
 })

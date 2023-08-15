@@ -39,6 +39,10 @@
         <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
           <div>
             <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
+            <p>If your waiting time is prolonged, you might consider:
+              <el-button plain @click="hardRedeploy">Redeploy</el-button>.
+              <br /> The tokens you paid will be refunded shortly. You can view and request a refund in
+              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">&lt;User Payment History&gt;</router-link>.</p>
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
@@ -135,6 +139,10 @@ export default defineComponent({
       listLoad.value = false
     }
 
+    function hardRedeploy () {
+      context.emit('hardRedeploy', true)
+    }
+
     onActivated(() => {
     })
     onMounted(() => {
@@ -161,7 +169,7 @@ export default defineComponent({
       system,
       route,
       router,
-      init, handleClick
+      init, handleClick, hardRedeploy
     }
   }
 })
@@ -245,6 +253,22 @@ export default defineComponent({
 
       .info {
         margin-top: 0.5rem;
+      }
+
+      p {
+        padding-top: 0.3rem;
+        line-height: 2;
+        .el-button {
+          height: auto;
+          padding: 5px 10px;
+        }
+        a {
+          text-decoration: underline;
+          color: inherit;
+          &:hover {
+            color: #c37af9;
+          }
+        }
       }
     }
 

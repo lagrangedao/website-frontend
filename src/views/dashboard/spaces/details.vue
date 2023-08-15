@@ -99,7 +99,7 @@
                 <span>App</span>
               </span>
             </template>
-            <detail-app @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'app'"></detail-app>
+            <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'app'"></detail-app>
           </el-tab-pane>
           <el-tab-pane name="files">
             <template #label>
@@ -403,15 +403,6 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     async function jobList (list) {
       let arr = list || []
       for (let j = 0; j < arr.length; j++) {
@@ -424,6 +415,9 @@ export default defineComponent({
         arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
       }
       return arr
+    }
+    const hardRedeploy = (dialog) => {
+      if (dialog) hardwareOperate('renew')
     }
     const handleValue = async (dataRes, log, exTime, nftCont) => {
       var numReg = /^[0-9]*$/
@@ -566,8 +560,8 @@ export default defineComponent({
       drawerName,
       dialogCont,
       renewButton,
-      parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
-      NumFormat, handleCurrentChange, handleSizeChange, handleClick,
+      parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue, hardRedeploy,
+      handleCurrentChange, handleSizeChange, handleClick,
       hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
     }
   }

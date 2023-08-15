@@ -386,26 +386,6 @@ export default defineComponent({
       getdataList()
     }
 
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
-    function calculateDiffTime (startTime) {
-      var endTime = Math.round(new Date() / 1000)
-      var timeDiff = endTime - startTime
-      var year = timeDiff > (86400 * 365) ? parseInt(timeDiff / 86400 / 365) : 0
-      var month = timeDiff > (86400 * 30) ? parseInt(timeDiff / 86400 / 30) : 0
-      var day = parseInt(timeDiff / 86400)
-      var hour = parseInt((timeDiff % 86400) / 3600)
-      var minute = parseInt((timeDiff % 3600) / 60)
-      var m = parseInt((timeDiff % 60))
-      if (year > 0) return `about ${year}${year > 1 ? ' years' : ' year'} ago`
-      if (month > 0) return `${month} ${month > 1 ? ' months' : ' month'} ago`
-      if (day > 0) return `${day} ${day > 1 ? ' days' : ' day'} ago`
-      else if (hour > 0) return `${hour} ${hour > 1 ? ' hours' : ' hour'} ago`
-      else if (minute > 0) return `${minute} ${minute > 1 ? ' minutes' : ' minute'} ago`
-      else if (m > 0) return `${m} ${m > 1 ? ' seconds' : ' second'} ago`
-      else return '-'
-    }
     function detailSetting () {
       // router.push({ name: 'organizationsSettings', params: { submenu: 'profile' } })
     }
@@ -482,7 +462,7 @@ export default defineComponent({
       expiration_month_options,
       expiration_year,
       expiration_year_options,
-      getdataList, createCom, deleteCom, detailSetting, calculateDiffTime, momentFilter, handleChange, handleRemove, handleSelectionChange
+      getdataList, createCom, deleteCom, detailSetting, handleChange, handleRemove, handleSelectionChange
     }
   }
 })

@@ -312,15 +312,6 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     async function init () {
       if (route.params.tabs !== 'card') return
       listLoad.value = true
@@ -468,7 +459,7 @@ export default defineComponent({
       templateData,
       createLoad,
       textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick,
+      init, getData, handleCurrentChange, handleSizeChange, detailFun, handleClick,
       cardAdd, cancelFun
     }
   }

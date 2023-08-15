@@ -181,9 +181,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
 
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     const submitForm = async (formEl) => {
       if (!formEl) return
       await ruleFormRef.value.validate(async (valid, fields) => {
@@ -281,7 +278,7 @@ export default defineComponent({
       system,
       route,
       router,
-      props, submitForm, submitDeleteForm, momentFilter
+      props, submitForm, submitDeleteForm
     }
   }
 })

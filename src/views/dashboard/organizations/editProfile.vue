@@ -208,9 +208,6 @@ export default defineComponent({
       // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     function detailFun (row, index) {
       // console.log(row, index)
       router.push({ name: 'datasetDetail', params: { name: row.name, tabs: 'card' } })
@@ -302,7 +299,7 @@ export default defineComponent({
       prevType,
       listLoad,
       fileList,
-      getdataList, momentFilter, detailFun, submitForm, editAvatar,
+      getdataList, detailFun, submitForm, editAvatar,
       handleChange, handleRemove, removeAvatar
     }
   }

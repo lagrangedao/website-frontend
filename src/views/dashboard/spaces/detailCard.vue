@@ -57,8 +57,8 @@
         <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="left left_light">
           <div class="list">
             <div class="title">
-              Downloads last month
-              <b>1,149,560</b>
+              Space Total Views
+              <b>{{system.$commonFun.NumFormat(listdata.stats.views) || 0}}</b>
             </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme">
@@ -93,7 +93,7 @@
                   </a>
                 </el-col>
               </el-row>
-              <el-row :gutter="12">
+              <el-row :gutter="12" v-if="false">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
                   <router-link to="">
                     <i class="icon icon_01"></i>
@@ -109,7 +109,7 @@
               </el-row>
             </div>
           </div>
-          <div class="labelModel">
+          <div class="labelModel" v-if="false">
             <ul>
               <li>
                 <p>Homepage:</p>
@@ -129,7 +129,7 @@
               </li>
             </ul>
           </div>
-          <div class="list">
+          <div class="list" v-if="false">
             <div class="title">
               <p :title="'Models trained or fine-tuned on '+route.params.name">
                 <i class="icon icon_datasets"></i>
@@ -138,8 +138,8 @@
               </p>
             </div>
           </div>
-          <el-row class="list_body" v-loading="false">
-            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata" :key="l">
+          <el-row class="list_body" v-if="false" v-loading="false">
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata.files" :key="l">
               <el-card class="box-card" @click="detailFun(list, l)">
                 <template #header>
                   <div class="card-header">
@@ -215,7 +215,10 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref([])
+    const listdata = reactive({
+      files: [],
+      stats: {}
+    })
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
@@ -268,20 +271,11 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     async function init () {
       let gate = false
       if (route.params.tabs !== 'card') return
       listLoad.value = true
-      listdata.value = []
+      listdata.files = []
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
         const fileLi = listRes.data.files || []
@@ -302,6 +296,7 @@ export default defineComponent({
           }
         })
         fileSpaceData.value = fileLi
+        listdata.stats = listRes.data.stats
         const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         if (!gate) context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
       }
@@ -311,7 +306,7 @@ export default defineComponent({
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
-      listdata.value = [
+      listdata.files = [
         {
           is_public: "1",
           name: "Frigg"
@@ -452,7 +447,7 @@ export default defineComponent({
       templateData,
       createLoad,
       textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick,
+      init, handleCurrentChange, handleSizeChange, detailFun, handleClick,
       cardAdd, cancelFun
     }
   }
