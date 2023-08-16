@@ -132,9 +132,8 @@ export default defineComponent({
         listdata.jobResult = await jobList(listRes.data.job)
         listdata.space = listRes.data.space
         listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
       }
+      context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }

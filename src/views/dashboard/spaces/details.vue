@@ -419,30 +419,41 @@ export default defineComponent({
     const hardRedeploy = (dialog) => {
       if (dialog) hardwareOperate('renew')
     }
-    const handleValue = async (dataRes, log, exTime, nftCont) => {
+    async function requestAll () {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
-      allData.space = dataRes.space || {}
-      allData.files = dataRes.files || []
-      allData.task = dataRes.task || {}
-      if (log) {
-        log = await system.$commonFun.sortBoole(log)
-        logsCont.data = log
-        logsValue.value = log
-      } else {
-        logsValue.value = ''
-        logsCont.data = []
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        allData.space = listRes.data.space
+        allData.task = listRes.data.task
+        parentValue.value = numRe.test(listRes.data.space.status) ? '' : listRes.data.space.status
+        likeValue.value = listRes.data.space.likes || 0
+        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
+        expireTime.time = expireTime.time
+        expireTime.unit = expireTime.unit
+        if (listRes.data.job) {
+          const log = await system.$commonFun.sortBoole(listRes.data.job)
+          logsCont.data = log
+          logsValue.value = log
+        } else {
+          logsValue.value = ''
+          logsCont.data = []
+        }
+      } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
+
+      const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
+      if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
+        nft.contract_address = listNftRes.data.contract_address
+        nft.chain_id = listNftRes.data.chain_id
+        nftTokens.value = listNftRes.data.tokens || []
       }
-      expireTime.time = exTime.time
-      expireTime.unit = exTime.unit
-      parentValue.value = numRe.test(dataRes.space.status) ? '' : dataRes.space.status
-      likeValue.value = dataRes.space.likes || 0
-      if (nftCont) {
-        nft.contract_address = nftCont.contract_address
-        nft.chain_id = nftCont.chain_id
-        nftTokens.value = nftCont.tokens || []
-      }
+
+      const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
+      if (listFilesRes && listFilesRes.status === 'success') allData.files = listFilesRes.data || []
       forkLoad.value = false
+    }
+    const handleValue = async (dataRes) => {
+      if (dataRes) requestAll()
     }
     const hardwareOperate = async (type) => {
       if (type === 'renew') dialogCont.spaceHardRenew = true
@@ -460,6 +471,7 @@ export default defineComponent({
       logsCont.data = []
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
+      if (route.params.tabs !== 'files' && route.params.tabs !== 'settings') requestAll()
       if (metaAddress.value) likesData()
       else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
     }

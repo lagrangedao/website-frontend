@@ -321,7 +321,7 @@ export default defineComponent({
               system.$commonFun.messageTip('error', listRes.data.message);
             }
           } else {
-            const errorMessage = listRes?.message || 'Upload failed!';
+            const errorMessage = listRes ?.message || 'Upload failed!';
             system.$commonFun.messageTip('error', errorMessage);
           }
 
@@ -530,30 +530,31 @@ export default defineComponent({
       listLoad.value = true
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
-        if (listRes.data.nft) {
-          if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
-          let contract_address = listRes.data.nft.contract_address
-          const getID = await system.$commonFun.web3Init.eth.net.getId()
-          if (listRes.data.nft.chain_id && getID.toString() !== listRes.data.nft.chain_id) {
-            const { name } = await system.$commonFun.getUnit(Number(listRes.data.nft.chain_id))
-            await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
-            listRes.data.nft.tokens = []
-          } else if (contract_address) {
-            let { url } = await system.$commonFun.getUnit(parseInt(listRes.data.nft.chain_id), 16)
-            const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
-            // const tokens_contact = await getTokenURI(nft_contract, contract_address, listRes.data.nft.chain_id)
-            const tokens_list = await mapTokens(listRes.data.nft.tokens, nft_contract, contract_address, listRes.data.space.gateway)
-            // listRes.data.nft.tokens = tokens_contact.concat(tokens_list)
-            listRes.data.nft.chain_url = url
-            listRes.data.nft.tokens = tokens_list
-          }
+      if (listRes && listRes.status === 'success') listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
+
+      const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
+      if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
+        if (listNftRes.data.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
+        let contract_address = listNftRes.data.contract_address
+        const getID = await system.$commonFun.web3Init.eth.net.getId()
+        if (listNftRes.data.chain_id && getID.toString() !== listNftRes.data.chain_id) {
+          const { name } = await system.$commonFun.getUnit(Number(listNftRes.data.chain_id))
+          await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+          listNftRes.data.tokens = []
+        } else if (contract_address) {
+          let { url } = await system.$commonFun.getUnit(parseInt(listNftRes.data.chain_id), 16)
+          const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
+          // const tokens_contact = await getTokenURI(nft_contract, contract_address, listNftRes.data.chain_id)
+          const tokens_list = await mapTokens(listNftRes.data.tokens, nft_contract, contract_address, listRes.data.space.gateway)
+          // listNftRes.data.tokens = tokens_contact.concat(tokens_list)
+          listNftRes.data.chain_url = url
+          listNftRes.data.tokens = tokens_list
         }
-        nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
+
+        nftdata.value = listNftRes.data || { contract_address: null, tokens: [], status: 'not generated' }
       }
+
+      context.emit('handleValue', true)
       // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
