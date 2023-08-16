@@ -468,22 +468,22 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: center;
-              height: 1.85rem;
+              height: 1.6rem;
               padding: 0;
               border: 0;
               border-radius: 0.1rem;
-              font-size: 0.305rem;
+              font-size: 0.2rem;
               color: #fff;
               cursor: pointer;
               .card-header {
                 span {
                   position: absolute;
                   height: 0.25rem;
-                  font-size: 14px;
+                  font-size: 12px;
                   color: #fff;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
-                    font-size: 15px;
+                    font-size: 13px;
                   }
                   &.left {
                     left: 0.15rem;
@@ -505,9 +505,9 @@ export default defineComponent({
                     left: 0.15rem;
                     bottom: 0.05rem;
                     opacity: 0.9;
-                    font-size: 13px;
+                    font-size: 12px;
                     @media screen and (min-width: 1800px) {
-                      font-size: 14px;
+                      font-size: 13px;
                     }
                   }
                 }
@@ -531,7 +531,7 @@ export default defineComponent({
               h1 {
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
                 cursor: pointer;
-                font-size: 0.3rem;
+                font-size: 0.2rem;
                 font-weight: 900;
                 overflow: hidden;
                 text-overflow: ellipsis;
