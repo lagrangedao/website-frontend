@@ -35,6 +35,7 @@ module.exports = {
     /[/\\]node_modules[/\\](.+?)?@wagmi(.*)/,
     /[/\\]node_modules[/\\](.+?)?viem(.*)/,
     /[/\\]node_modules[/\\](.+?)?@web3modal(.*)/,
+    /[/\\]node_modules[/\\](.+?)?@noble(.*)/
   ],
 
   configureWebpack: (config) => {
