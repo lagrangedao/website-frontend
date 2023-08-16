@@ -159,7 +159,6 @@ export default defineComponent({
         ruleForm.twitter = listRes.data.user.twitter_username
       } else {
         reset()
-        system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
       }
       // await system.$commonFun.timeout(500)
       listLoad.value = false

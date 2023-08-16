@@ -337,6 +337,7 @@ export default defineComponent({
       const chainId = await ethereum.request({ method: 'eth_chainId' })
       const lStatus = await system.$commonFun.login()
       if (lStatus) getdataList()
+      else signIn()
       // else window.location.reload()
       return false
       store.dispatch('setNavLogin', false)
