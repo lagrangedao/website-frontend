@@ -217,7 +217,10 @@ export default defineComponent({
     const listLoad = ref(true)
     const listdata = reactive({
       files: [],
-      stats: {}
+      stats: {},
+      space: {},
+      job: null,
+      task: null
     })
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -276,9 +279,13 @@ export default defineComponent({
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.files = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        const fileLi = listRes.data.files || []
+
+      const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${store.state.metaAddress}&&space_name=${route.params.name}`, 'get')
+      if (listStatsRes && listStatsRes.status === 'success') listdata.stats = listStatsRes.data.stats
+
+      const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
+      if (listFilesRes && listFilesRes.status === 'success') {
+        const fileLi = listFilesRes.data || []
         fileLi.forEach((element, i) => {
           let el = element.name.split('/')
           el.shift()
@@ -296,30 +303,16 @@ export default defineComponent({
           }
         })
         fileSpaceData.value = fileLi
-        listdata.stats = listRes.data.stats
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        if (!gate) context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
+        listdata.files = fileLi
       }
+
       if (gate) {
         init()
         return
       }
+      context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
       listLoad.value = false
-      listdata.files = [
-        {
-          is_public: "1",
-          name: "Frigg"
-        },
-        {
-          is_public: "1",
-          name: "Travis"
-        },
-        {
-          is_public: "1",
-          name: "Tyree"
-        }
-      ]
     }
     function detailFun (row, index) {
       console.log(row, index)

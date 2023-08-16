@@ -235,7 +235,6 @@ export default defineComponent({
     const peopleName = ref('')
     const tableLayout = ref('fixed')
     const labelTab = ref('list')
-    const listdata = reactive({})
     const fileRow = reactive({
       fileAlldata: [],
       fileResdata: [],
@@ -306,19 +305,10 @@ export default defineComponent({
     async function init () {
       if (route.name !== 'spaceDetail') return
       listLoad.value = true
-      listdata.value = {}
       fileRow.fileTitle = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
-        fileRow.fileResdata = listRes.data.files || []
-        listdata.value = listRes.data.space || { name: route.params.name }
-        if (listRes.data.owner) {
-          if (listRes.data.owner.avatar) peopleAvatarImg.value = listRes.data.owner.avatar && listRes.data.owner.gateway ? `${listRes.data.owner.gateway}/ipfs/${listRes.data.owner.avatar}` : ''
-          peopleName.value = listRes.data.owner.full_name || ''
-        }
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
-
+        fileRow.fileResdata = listRes.data || []
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)
         const r = await treeify(path);
@@ -332,6 +322,13 @@ export default defineComponent({
         fileRow.filedata = await sortList(fileRow.fileAlldata)
         // console.log(fileRow.filedata)
       }
+
+      const listOnwerRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/${store.state.metaAddress}`, 'get')
+      if (listOnwerRes && listOnwerRes.status === 'success') {
+        if (listOnwerRes.data.avatar) peopleAvatarImg.value = listOnwerRes.data.avatar && listOnwerRes.data.gateway ? `${listOnwerRes.data.gateway}/ipfs/${listOnwerRes.data.avatar}` : ''
+        peopleName.value = listOnwerRes.data.full_name || ''
+      }
+      context.emit('handleValue', true)
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }
@@ -779,7 +776,6 @@ export default defineComponent({
       peopleAvatarImg,
       tableLayout,
       labelTab,
-      listdata,
       fileRow,
       listLoad,
       fileList,

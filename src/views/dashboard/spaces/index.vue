@@ -38,7 +38,7 @@
           </div>
 
           <el-row :gutter="32" class="list_body" v-loading="listLoad">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="ls in spaceLikesData" :key="ls">
+            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="ls in spaceLikesData" :key="ls">
               <el-card class="box-card" @click="detailFun(ls, l)">
                 <template #header>
                   <div class="card-header">
@@ -70,7 +70,7 @@
           </div>
         </div>
         <el-row :gutter="32" class="list_body" v-loading="listLoad">
-          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="list in spaceData" :key="list">
+          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="list in spaceData" :key="list">
             <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
@@ -196,7 +196,7 @@ export default defineComponent({
       }
 
       if (typeLikes) {
-        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify({ sort: 'likes', limit: 3 })}`, 'get')
+        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify({ sort: 'likes', limit: 8 })}`, 'get')
         if (likesRes) spaceLikesData.value = likesRes.spaces || []
       }
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
