@@ -60,13 +60,7 @@ export default defineComponent({
       ethereum.on('accountsChanged', function (account) {
         // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
         if (!prevType.value) return false
-        store.dispatch('setMetaAddress', '')
-        store.dispatch('setNavLogin', false)
-        store.dispatch('setLogin', false)
-        store.dispatch('setAccessToken', '')
-        store.dispatch('setAccessSpace', '')
-        store.dispatch('setAccessDataset', '')
-        window.location.reload()
+        system.$commonFun.signOutFun()
       })
       // 监听metamask网络断开
       ethereum.on('disconnect', (code, reason) => {
