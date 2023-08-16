@@ -43,7 +43,7 @@
                 p-id="2676" fill="#878c93"></path>
             </svg> Request License
           </div>
-          <div class="logs_style" v-if="logsValue" @click="logDrawer">
+          <div class="logs_style" @click="logDrawer">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
@@ -221,6 +221,21 @@
                   </div>
                 </div>
               </div>
+              <el-row class="logRow" :gutter="30">
+                <el-col :span="24">
+                  <el-descriptions title="Space Info:" direction="vertical" :column="bodyWidth" border>
+                    <el-descriptions-item label="Visibility">{{allData.space.is_public?'Public':'Private'}}</el-descriptions-item>
+                    <el-descriptions-item label="License Type">{{allData.space.license}}</el-descriptions-item>
+                    <el-descriptions-item label="SDK Type">{{allData.space.sdk}}</el-descriptions-item>
+                    <el-descriptions-item label="Space UUID">
+                      <p>
+                        {{allData.space.uuid}}
+                        <i class="icon icon_copy" @click="system.$commonFun.copyContent(allData.space.uuid, 'Copied')"></i>
+                      </p>
+                    </el-descriptions-item>
+                  </el-descriptions>
+                </el-col>
+              </el-row>
               <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
                 <el-col :span="24">
                   <el-descriptions title="You're using:" direction="vertical" :column="bodyWidth" border>
@@ -230,14 +245,15 @@
                     <el-descriptions-item label="VCPU">{{allData.space.activeOrder.config.vcpu}}</el-descriptions-item>
                     <el-descriptions-item label="Price">{{allData.space.activeOrder.config.price_per_hour}} LAG per hour</el-descriptions-item>
                     <el-descriptions-item label="Description">{{allData.space.activeOrder.config.description}}</el-descriptions-item>
+                    <el-descriptions-item label="Expiration Time">{{system.$commonFun.momentFun(allData.space.expiration_time) || '-'}}</el-descriptions-item>
                   </el-descriptions>
                 </el-col>
               </el-row>
-              <div class="logBody">
+              <div class="logBody" v-if="allData.task">
                 <json-viewer :value="allData.task" :expand-depth=5 copyable boxed sort></json-viewer>
               </div>
             </el-tab-pane>
-            <el-tab-pane v-for="(job, j) in logsCont.data" :key="j">
+            <el-tab-pane v-for="(job, j) in logsCont.data" v-if="logsCont.data" :key="j">
               <template #label>
                 <span class="custom-tabs-label">
                   <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
@@ -356,7 +372,7 @@ export default defineComponent({
     const listLoad = ref(true)
     const filedata = ref([])
     const total = ref(0)
-    const bodyWidth = ref(document.body.clientWidth > 600 ? 6 : 1)
+    const bodyWidth = ref(document.body.clientWidth > 600 ? 7 : 1)
     const diagWidth = ref(document.body.clientWidth > 1536 ? '1536px' : '90%')
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -1003,7 +1019,7 @@ export default defineComponent({
         list-style-type: disc;
         li {
           margin: 0 0 0.1rem;
-          font-size: 0.16rem;
+          font-size: 0.15rem;
           font-weight: 600;
           font-style: normal;
           font-stretch: normal;
@@ -1098,18 +1114,18 @@ export default defineComponent({
       }
       .el-tabs__content {
         width: 92%;
-        height: calc(100% - 1rem - 18px);
-        padding: 0.3rem 4%;
+        height: calc(100% - 0.8rem - 18px);
+        padding: 0.2rem 4%;
         overflow-y: scroll;
         @media screen and (max-width: 768px) {
           width: 96%;
-          padding: 0.3rem 2%;
+          padding: 0.2rem 2%;
         }
         // .el-tab-pane {
         //   height: 100%;
         // }
         .el-steps {
-          margin: 0.1rem 0 0.4rem;
+          margin: 0.1rem 0 0.2rem;
           box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
           @media screen and (max-width: 600px) {
             flex-wrap: wrap;
@@ -1136,6 +1152,7 @@ export default defineComponent({
           }
         }
         .logRow {
+          margin: 0.2rem 0;
           .el-col {
             word-break: break-word;
             p {

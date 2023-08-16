@@ -10,23 +10,23 @@
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
           <el-menu-item index="dataset">
-            <i class="icon icon_datasets"></i>
+            <i class="icon-style icon_datasets"></i>
             Datasets
           </el-menu-item>
           <!-- <el-menu-item index="models">
-            <i class="icon icon_models"></i>
+            <i class="icon-style icon_models"></i>
             Models
           </el-menu-item> -->
           <el-menu-item index="spaces">
-            <i class="icon icon_spaces"></i>
+            <i class="icon-style icon_spaces"></i>
             Spaces
           </el-menu-item>
           <el-menu-item index="4">
-            <i class="icon icon_docs"></i>
+            <i class="icon-style icon_docs"></i>
             Docs
           </el-menu-item>
           <el-menu-item index="5">
-            <i class="icon icon_solutions"></i>
+            <i class="icon-style icon_solutions"></i>
             Solutions
           </el-menu-item>
           <el-menu-item index="dashboard">
@@ -35,36 +35,36 @@
           <el-menu-item index="6">
             Pricing
           </el-menu-item>
-          <!-- <el-menu-item index="7">
-            &nbsp;
-            <svg class="mr-1.5 text-gray-500 w-5 group-hover:text-gray-400 dark:text-gray-300 dark:group-hover:text-gray-400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="21px"
-              height="21px" viewBox="0 0 32 18" preserveAspectRatio="xMidYMid meet">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 3.30221C14.4504 2.836 14.8284 2.45807 15.2946 2.45807H28.4933C28.9595 2.45807 29.3374 2.836 29.3374 3.30221C29.3374 3.76842 28.9595 4.14635 28.4933 4.14635H15.2946C14.8284 4.14635 14.4504 3.76842 14.4504 3.30221Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 9.00002C14.4504 8.53382 14.8284 8.15588 15.2946 8.15588H28.4933C28.9595 8.15588 29.3374 8.53382 29.3374 9.00002C29.3374 9.46623 28.9595 9.84417 28.4933 9.84417H15.2946C14.8284 9.84417 14.4504 9.46623 14.4504 9.00002Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 14.6978C14.4504 14.2316 14.8284 13.8537 15.2946 13.8537H28.4933C28.9595 13.8537 29.3374 14.2316 29.3374 14.6978C29.3374 15.164 28.9595 15.542 28.4933 15.542H15.2946C14.8284 15.542 14.4504 15.164 14.4504 14.6978Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M1.94549 6.87377C2.27514 6.54411 2.80962 6.54411 3.13928 6.87377L6.23458 9.96907L9.32988 6.87377C9.65954 6.54411 10.194 6.54411 10.5237 6.87377C10.8533 7.20343 10.8533 7.73791 10.5237 8.06756L6.23458 12.3567L1.94549 8.06756C1.61583 7.73791 1.61583 7.20343 1.94549 6.87377Z"
-                fill="currentColor"></path>
-            </svg>
-          </el-menu-item> -->
           <el-menu-item index="personal_center" v-if="!lagLogin">
             &nbsp;
             <span class="loginBtn">Login</span>
           </el-menu-item>
-          <el-sub-menu index="8" v-else>
-            <template #title>
-              <router-link to="/personal_center" class="loginImg">
-                <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt="">
-              </router-link>
-            </template>
-            <el-menu-item index="create_dataset">+ New Dataset</el-menu-item>
-            <el-menu-item index="create_space">+ New Space</el-menu-item>
-            <!-- <el-menu-item index="create_organizations">Create Organizations</el-menu-item> -->
-            <el-menu-item index="settings">Settings</el-menu-item>
-            <el-menu-item index="sign_out">Sign Out</el-menu-item>
-          </el-sub-menu>
+          <el-menu-item index="8" v-else>
+            <div class="set">
+              <el-dropdown split-button @command="handleSelect" :hide-on-click="true" trigger="click">
+                <router-link to="/personal_center" class="loginImg">
+                  {{system.$commonFun.hiddAddress(metaAddress)}}
+                </router-link>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="create_dataset">
+                      + New Dataset
+                    </el-dropdown-item>
+                    <el-dropdown-item command="create_space">
+                      + New Space
+                    </el-dropdown-item>
+                    <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
+                    <el-dropdown-item command="settings">
+                      Settings
+                    </el-dropdown-item>
+                    <el-dropdown-item command="sign_out">
+                      Sign Out
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </el-menu-item>
         </el-menu>
       </el-col>
     </el-row>
@@ -74,9 +74,10 @@
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import { ArrowDown } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'header_page',
-  components: {},
+  components: { ArrowDown },
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
@@ -112,8 +113,8 @@ export default defineComponent({
       else if (key === 'dashboard') window.open(process.env.VUE_APP_DASHBOARD_LINK)
       else if (key === 'settings') router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
       else if (key === 'sign_out') {
-        system.$commonFun.signOutFun()
-        // await system.$commonFun.timeout(200)
+        await system.$commonFun.signOutFun()
+        await system.$commonFun.timeout(200)
         window.location.reload()
       }
       else store.dispatch('setNavLogin', false)
@@ -198,7 +199,7 @@ export default defineComponent({
       }
       .net {
         position: relative;
-        padding: 0 0 0 13px;
+        padding: 4px 0 0 13px;
         font-size: 14px;
         @media screen and (max-width: 1680px) {
           font-size: 13px;
@@ -213,7 +214,7 @@ export default defineComponent({
           content: "";
           width: 6px;
           height: 6px;
-          margin-top: -3px;
+          margin-top: -1px;
           background-color: #fff;
           border-radius: 6px;
         }
@@ -269,7 +270,7 @@ export default defineComponent({
           @media screen and (min-width: 1800px) {
             font-size: 15px;
           }
-          .icon {
+          .icon-style {
             width: 21px;
             height: 20px;
             margin: -1px 6px 0 0;
@@ -322,6 +323,34 @@ export default defineComponent({
               color: #fff;
               opacity: 0.9;
               cursor: pointer;
+            }
+          }
+          .set {
+            vertical-align: middle;
+            * {
+              vertical-align: middle;
+            }
+            .el-button-group > .el-button {
+              border-radius: 7px;
+              &:first-child {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+              }
+              &:last-child {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+              }
+            }
+            .el-icon {
+              margin: auto;
+              cursor: pointer;
+              svg {
+                width: 1em;
+                cursor: pointer;
+                path {
+                  cursor: pointer;
+                }
+              }
             }
           }
           &.is-active,
