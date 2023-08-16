@@ -293,46 +293,47 @@ export default defineComponent({
     const submitForm = async (formEl) => {
       if (!formEl) return;
 
-      try {
-        const { valid, fields } = await ruleFormRef.value.validate();
-
-        // if (!valid) {
-        //   system.$commonFun.messageTip('error', 'Validation failed!'+valid);
-        //   console.log('Validation errors:', fields);
-        //   return;
-        // }
+      ruleFormRef.value.validate(async (valid, fields) => {
+        if (!valid) {
+          system.$commonFun.messageTip('error', 'Validation failed!');
+          console.log('Validation errors:', fields);
+          return;
+        }
 
         renameLoad.value = true;
 
-        const formData = new FormData();
-        formData.append('name', route.params.name);
-        formData.append('is_public', listdata.value.is_public); // public:1, private:0
-        formData.append('new_name', ruleForm.name);
+        try {
+          const formData = new FormData();
+          formData.append('name', route.params.name);
+          formData.append('is_public', listdata.value.is_public); // public:1, private:0
+          formData.append('new_name', ruleForm.name);
 
-        const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/update`, 'post', formData);
-        await system.$commonFun.timeout(500);
+          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/update`, 'post', formData);
+          await system.$commonFun.timeout(500);
 
-        if (listRes && listRes.status === 'success') {
-          if (listRes.data.space) {
-            accessSpace.value.splice(settingIndex.value, 1, ruleForm.name);
-            store.dispatch('setAccessSpace', JSON.stringify(accessSpace.value));
-            system.$commonFun.messageTip('success', 'Update successfully!');
-            router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings' } });
+          if (listRes && listRes.status === 'success') {
+            if (listRes.data.space) {
+              accessSpace.value.splice(settingIndex.value, 1, ruleForm.name);
+              store.dispatch('setAccessSpace', JSON.stringify(accessSpace.value));
+              system.$commonFun.messageTip('success', 'Update successfully!');
+              router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings' } });
+            } else {
+              system.$commonFun.messageTip('error', listRes.data.message);
+            }
           } else {
-            system.$commonFun.messageTip('error', listRes.data.message);
+            const errorMessage = listRes?.message || 'Upload failed!';
+            system.$commonFun.messageTip('error', errorMessage);
           }
-        } else {
-          const errorMessage = listRes?.message || 'Upload failed! Please try again later.';
-          system.$commonFun.messageTip('error', errorMessage);
-        }
 
-      } catch (error) {
-        system.$commonFun.messageTip('error', error.message || 'An unexpected error occurred!');
-      } finally {
-        ruleForm.name = '';
-        renameLoad.value = false;
-      }
+        } catch (error) {
+          system.$commonFun.messageTip('error', error.message || 'An unexpected error occurred!');
+        } finally {
+          ruleForm.name = '';
+          renameLoad.value = false;
+        }
+      });
     }
+
 
     const submitDeleteForm = async (formEl) => {
       if (!formEl) return
