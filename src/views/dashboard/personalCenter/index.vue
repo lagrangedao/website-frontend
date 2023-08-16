@@ -1046,11 +1046,11 @@ export default defineComponent({
                   background: url(../../../assets/images/icons/icon_9.png)
                     no-repeat left 0px;
                   background-size: 0.2rem;
-                  font-size: 14px;
+                  font-size: 12px;
                   color: #000;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
-                    font-size: 15px;
+                    font-size: 13px;
                   }
                 }
                 &.card-datasets {
@@ -1309,7 +1309,7 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: center;
-              height: 1.85rem;
+              height: 1.6rem;
               padding: 0;
               border: 0;
               border-radius: 0.1rem;
@@ -1349,11 +1349,11 @@ export default defineComponent({
                   background: url(../../../assets/images/icons/icon_9_1.png)
                     no-repeat left 0px;
                   background-size: 0.2rem;
-                  font-size: 14px;
+                  font-size: 12px;
                   color: #fff;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
-                    font-size: 15px;
+                    font-size: 13px;
                   }
                 }
               }
@@ -1361,7 +1361,7 @@ export default defineComponent({
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
                 // text-transform: capitalize;
                 cursor: pointer;
-                font-size: 0.3rem;
+                font-size: 0.2rem;
                 letter-spacing: 1px;
                 overflow: hidden;
                 text-overflow: ellipsis;
