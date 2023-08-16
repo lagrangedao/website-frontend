@@ -3,7 +3,9 @@
     <el-row class="headerStyle">
       <el-col :xs="20" :sm="20" :md="20" :lg="8" :xl="8" class="logoImg">
         <img :src="logo" @click="header_logo" alt='' />
-        <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." />
+        <el-divider direction="vertical" />
+        <div class="net">{{info.network||'-'}}</div>
+        <!-- <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." /> -->
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
@@ -84,6 +86,9 @@ export default defineComponent({
     const people_img = require("@/assets/images/dashboard/people_default.png")
     const searchValue = ref('')
     const activeIndex = ref('')
+    const info = reactive({
+      network: ''
+    })
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -113,12 +118,16 @@ export default defineComponent({
       }
       else store.dispatch('setNavLogin', false)
     }
-    function activeMenu (row) {
-      const name = row || route.name
-      if (name.indexOf('dataset') > -1) activeIndex.value = 'dataset'
-      else if (name.indexOf('model') > -1) activeIndex.value = 'models'
-      else if (name.indexOf('space') > -1) activeIndex.value = 'spaces'
-      else activeIndex.value = name
+    async function activeMenu (row) {
+      const nameMenu = row || route.name
+      if (nameMenu.indexOf('dataset') > -1) activeIndex.value = 'dataset'
+      else if (nameMenu.indexOf('model') > -1) activeIndex.value = 'models'
+      else if (nameMenu.indexOf('space') > -1) activeIndex.value = 'spaces'
+      else activeIndex.value = nameMenu
+
+      const chainId = await system.$commonFun.web3Init.eth.net.getId()
+      const { name } = await system.$commonFun.getUnit(chainId)
+      info.network = name || `Chain ID: ${chainId}`
     }
     onMounted(() => activeMenu())
     watch(route, (to, from) => {
@@ -133,6 +142,7 @@ export default defineComponent({
       people_img,
       searchValue,
       activeIndex,
+      info,
       bodyWidth,
       system,
       header_logo, handleSelect
@@ -160,19 +170,60 @@ export default defineComponent({
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
     }
+    @media screen and (max-width: 441px) {
+      padding: 0 2%;
+    }
     .logoImg {
       display: flex;
       align-items: center;
       width: auto;
       height: 0.42rem;
       cursor: pointer;
+      color: #fff;
+      @media screen and (max-width: 441px) {
+        width: 50%;
+        height: auto;
+      }
       img {
         display: block;
         height: 100%;
         width: auto;
         max-width: 100%;
-        margin: 0 0.35rem 0 0;
         cursor: pointer;
+        @media screen and (max-width: 441px) {
+          width: 100%;
+          max-width: 105px;
+          height: auto;
+        }
+      }
+      .net {
+        position: relative;
+        padding: 0 0 0 13px;
+        font-size: 14px;
+        @media screen and (max-width: 1680px) {
+          font-size: 13px;
+        }
+        @media screen and (max-width: 768px) {
+          font-size: 12px;
+        }
+        &::before {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          content: "";
+          width: 6px;
+          height: 6px;
+          margin-top: -3px;
+          background-color: #fff;
+          border-radius: 6px;
+        }
+      }
+      :deep(.el-divider) {
+        margin: 0 0.15rem;
+        border-color: transparent;
+        @media screen and (max-width: 441px) {
+          margin: 0 10px;
+        }
       }
       :deep(.el-input) {
         .el-input__inner {
@@ -329,23 +380,6 @@ export default defineComponent({
 }
 
 @media screen and (max-width: 1024px) {
-}
-@media screen and (max-width: 441px) {
-  .headerCont {
-    .headerStyle {
-      padding: 0 2%;
-      .logoImg {
-        width: 50%;
-        height: auto;
-        img {
-          width: 100%;
-          max-width: 105px;
-          height: auto;
-          margin: 0 10px 0 0;
-        }
-      }
-    }
-  }
 }
 </style>
 <style>
