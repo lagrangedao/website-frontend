@@ -370,6 +370,7 @@ export default defineComponent({
         const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
         await system.$commonFun.timeout(1000)
         if (uploadRes && uploadRes.status !== "success") system.$commonFun.messageTip(uploadRes.status, `${uploadRes.message}: ${name}`)
+        context.emit('handleValue', true, 'files')
         init()
       }
     }
@@ -415,9 +416,9 @@ export default defineComponent({
         init()
       }
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       lagLogin,
       metaAddress,

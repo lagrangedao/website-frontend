@@ -435,7 +435,7 @@ export default defineComponent({
     const hardRedeploy = (dialog) => {
       if (dialog) hardwareOperate('renew')
     }
-    async function requestAll () {
+    async function requestDetail () {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
@@ -456,20 +456,40 @@ export default defineComponent({
           logsCont.data = []
         }
       } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
-
+    }
+    async function requestNft () {
       const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
       if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
         nft.contract_address = listNftRes.data.contract_address
         nft.chain_id = listNftRes.data.chain_id
         nftTokens.value = listNftRes.data.tokens || []
       }
-
+    }
+    async function requestFiles () {
       const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listFilesRes && listFilesRes.status === 'success') allData.files = listFilesRes.data || []
       forkLoad.value = false
     }
-    const handleValue = async (dataRes) => {
-      if (dataRes) requestAll()
+    async function requestAll (type) {
+      switch (type) {
+        case 'files':
+          requestFiles()
+          break
+        case 'setting':
+          requestDetail()
+          requestNft()
+          break
+        case 'delete':
+          break
+        default:
+          requestDetail()
+          requestFiles()
+          requestNft()
+          break
+      }
+    }
+    const handleValue = async (dataRes, type) => {
+      if (type) requestAll(type)
     }
     const hardwareOperate = async (type) => {
       if (type === 'renew') dialogCont.spaceHardRenew = true
@@ -487,7 +507,7 @@ export default defineComponent({
       logsCont.data = []
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
-      if (route.params.tabs !== 'files' && route.params.tabs !== 'settings') requestAll()
+      requestAll()
       if (metaAddress.value) likesData()
       else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
     }
@@ -533,6 +553,7 @@ export default defineComponent({
         const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
       }
       likesValue.value = !likesValue.value
+      requestAll()
       likesData()
     }
     const likesData = async () => {
@@ -547,7 +568,10 @@ export default defineComponent({
       dialogCont.spaceHardDia = val
       dialogCont.spaceHardRenew = val
       dialogCont.spaceHardFork = val
-      if (refresh) likesValue.value = !likesValue.value
+      if (refresh) {
+        requestAll()
+        likesValue.value = !likesValue.value
+      }
     }
     function logDrawer () {
       drawer.value = true
@@ -556,9 +580,10 @@ export default defineComponent({
     onActivated(() => init())
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
+      requestDetail()
       if (to.params.tabs === 'card') {
         window.scrollTo(0, 0)
-        init()
+        // init()
       }
     })
     return {

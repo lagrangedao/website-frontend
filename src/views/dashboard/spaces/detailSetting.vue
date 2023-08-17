@@ -386,6 +386,7 @@ export default defineComponent({
             await generateMintHash(transactionHash)
             generateLoad.value = false
             dialogDOIVisible.value = false
+            context.emit('handleValue', true, 'setting')
             requestInitData()
           })
           .on('error', () => generateLoad.value = false)
@@ -439,6 +440,7 @@ export default defineComponent({
             await requestDataInfo(transactionHash)
             generateLoad.value = false
             dialogDOIVisible.value = false
+            context.emit('handleValue', true, 'setting')
             requestInitData()
           })
           .on('error', () => generateLoad.value = false)
@@ -462,6 +464,7 @@ export default defineComponent({
     async function refreshContract (type) {
       listLoad.value = true
       if (type) {
+        context.emit('handleValue', true, 'setting')
         requestInitData(type)
         return
       }
@@ -554,7 +557,6 @@ export default defineComponent({
         nftdata.value = listNftRes.data || { contract_address: null, tokens: [], status: 'not generated' }
       }
 
-      context.emit('handleValue', true)
       // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
@@ -567,10 +569,16 @@ export default defineComponent({
     }
     function handleChange (val, refresh) {
       dataNFTRequest.value = val
-      if (refresh) requestInitData()
+      if (refresh) {
+        context.emit('handleValue', true, 'setting')
+        requestInitData()
+      }
     }
     function handleHard (val, refresh) {
-      if (refresh) requestInitData()
+      if (refresh) {
+        context.emit('handleValue', true, 'setting')
+        requestInitData()
+      }
     }
     onMounted(async () => {
       window.scrollTo(0, 0)
@@ -582,9 +590,9 @@ export default defineComponent({
       ruleForm.name = ''
       ruleForm.delete = ''
     })
-    watch(() => props.likesValue, () => {
-      requestInitData()
-    })
+    // watch(() => props.likesValue, () => {
+    //   requestInitData()
+    // })
     return {
       lagLogin,
       metaAddress,

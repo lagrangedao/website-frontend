@@ -25,7 +25,7 @@
         </el-tabs>
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
-          <el-table :data="listdata.space.jobs_status" border style="width: 100%">
+          <el-table :data="listdata.jobs_status" border style="width: 100%">
             <el-table-column prop="node_id" label="CP Node ID">
               <template #default="scope">
                 <div class="flex">{{ system.$commonFun.hiddAddress(scope.row.node_id) }}
@@ -34,6 +34,12 @@
               </template>
             </el-table-column>
             <el-table-column prop="status" label="Status" />
+            <el-table-column prop="job_textUri" label="Quick Look">
+              <template #default="scope">
+                <a v-if="scope.row.job_textUri" :href="scope.row.job_textUri" target="_blank">{{scope.row.job_textUri}}</a>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
@@ -93,6 +99,7 @@ export default defineComponent({
     const listLoad = ref(true)
     const listdata = reactive({
       jobResult: [],
+      jobs_status: [],
       space: {}
     })
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -109,16 +116,18 @@ export default defineComponent({
 
     async function jobList (list) {
       let arr = list || []
-      for (let j = 0; j < arr.length; j++) {
-        if (arr[j].job_result_uri) {
-          const response = await fetch(arr[j].job_result_uri)
-          const textUri = await new Promise(async resolve => {
-            resolve(response.text())
-          })
-          arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
-        } else {
-          arr[j].job_result_uri = ''
+      try {
+        for (let j = 0; j < arr.length; j++) {
+          if (arr[j].job_result_uri) {
+            const response = await fetch(arr[j].job_result_uri)
+            const textUri = await new Promise(async resolve => {
+              resolve(response.text())
+            })
+            arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+          } else arr[j].job_result_uri = ''
         }
+      } catch (err) {
+        console.log('err', err)
       }
       return arr
     }
@@ -130,12 +139,29 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.jobResult = await jobList(listRes.data.job)
+        if (listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
         listdata.space = listRes.data.space
         listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
       }
       context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
       listLoad.value = false
+    }
+
+    async function jobStatusList (list) {
+      let arr = list || []
+      try {
+        for (let j = 0; j < arr.length; j++) {
+          const response = await fetch(arr[j].result_uri)
+          const textUri = await new Promise(async (resolve, reject) => {
+            resolve(response.text())
+          })
+          arr[j].job_textUri = textUri ? JSON.parse(textUri).job_result_uri : ''
+        }
+      } catch (err) {
+        console.log('err', err)
+      }
+      return arr
     }
 
     function hardRedeploy () {
@@ -157,9 +183,9 @@ export default defineComponent({
         init()
       }
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       lagLogin,
       listLoad,
@@ -245,6 +271,13 @@ export default defineComponent({
               &:hover {
                 opacity: 0.7;
               }
+            }
+          }
+
+          td {
+            a {
+              text-decoration: underline;
+              color: inherit;
             }
           }
         }

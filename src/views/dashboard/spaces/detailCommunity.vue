@@ -52,9 +52,9 @@ export default defineComponent({
       window.scrollTo(0, 0)
       init()
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       lagLogin,
       info,
