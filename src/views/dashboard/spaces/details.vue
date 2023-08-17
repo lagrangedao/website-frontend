@@ -444,9 +444,9 @@ export default defineComponent({
         allData.task = listRes.data.task
         parentValue.value = numRe.test(listRes.data.space.status) ? '' : listRes.data.space.status
         likeValue.value = listRes.data.space.likes || 0
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        expireTime.time = expireTime.time
-        expireTime.unit = expireTime.unit
+        const expireTimeCont = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
+        expireTime.time = expireTimeCont.time
+        expireTime.unit = expireTimeCont.unit
         if (listRes.data.job) {
           const log = await system.$commonFun.sortBoole(listRes.data.job)
           logsCont.data = log
