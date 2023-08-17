@@ -263,7 +263,7 @@ export default defineComponent({
     const ruleEditName = ref(null)
     const validateInput = (rule, value, callback) => {
       if (!checkSpecialKey(value)) {
-        callback(new Error("The file name cannot contain any of the following characters: \\/:*?\"<>|"));
+        callback(new Error("The file name cannot contain any of the following characters: \\:*?\"<>|"));
       } else {
         callback();
       }
@@ -294,7 +294,7 @@ export default defineComponent({
 
     function checkSpecialKey (str) {
       let specialKey =
-        "\\/:*?\"<>|";
+        "\\:*?\"<>|";
       for (let i = 0; i < str.length; i++) {
         if (specialKey.indexOf(str.substr(i, 1)) != -1) {
           return false;
@@ -323,12 +323,11 @@ export default defineComponent({
         // console.log(fileRow.filedata)
       }
 
-      const listOnwerRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/${store.state.metaAddress}`, 'get')
+      const listOnwerRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/${route.params.wallet_address}`, 'get')
       if (listOnwerRes && listOnwerRes.status === 'success') {
         if (listOnwerRes.data.avatar) peopleAvatarImg.value = listOnwerRes.data.avatar && listOnwerRes.data.gateway ? `${listOnwerRes.data.gateway}/ipfs/${listOnwerRes.data.avatar}` : ''
         peopleName.value = listOnwerRes.data.full_name || ''
       }
-      context.emit('handleValue', true)
       await system.$commonFun.timeout(500)
       listLoad.value = false
     }
@@ -484,6 +483,7 @@ export default defineComponent({
             // else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
+          context.emit('handleValue', true, 'files')
           init()
         } else {
           console.log('error submit!', fields)
@@ -514,6 +514,7 @@ export default defineComponent({
             // else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
+          context.emit('handleValue', true, 'files')
           init()
         } else {
           console.log('error submit!', fields)
@@ -544,6 +545,7 @@ export default defineComponent({
       if (uploadRes && uploadRes.status === "success") system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
       else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
       reset()
+      context.emit('handleValue', true, 'files')
       init()
     }
     function cancelFun () {
@@ -633,6 +635,7 @@ export default defineComponent({
       if (deleteRes && deleteRes.status === 'success') system.$commonFun.messageTip('success', deleteRes.message || 'Delete successfully!')
       else system.$commonFun.messageTip('error', 'Delete failed!')
       reset()
+      context.emit('handleValue', true, 'files')
       init()
     }
     function sizeChange (bytes) {
@@ -765,9 +768,9 @@ export default defineComponent({
     watch(fileList, (newValue, oldValue) => {
       totalFiles(newValue)
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       peopleName,
       metaAddress,

@@ -43,7 +43,7 @@
             <div class="set">
               <el-dropdown split-button @command="handleSelect" :hide-on-click="true" trigger="click">
                 <router-link to="/personal_center" class="loginImg">
-                  {{system.$commonFun.hiddAddress(metaAddress)}}
+                  <img :src="accessAvatar||people_img" width="20" height="20" alt=""> {{system.$commonFun.hiddAddress(metaAddress)}}
                 </router-link>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -333,6 +333,7 @@ export default defineComponent({
             .el-button-group > .el-button {
               border-radius: 7px;
               &:first-child {
+                padding-left: 10px;
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
               }
@@ -350,6 +351,20 @@ export default defineComponent({
                 path {
                   cursor: pointer;
                 }
+              }
+            }
+            .loginImg {
+              display: flex;
+              align-items: center;
+              cursor: pointer;
+              img {
+                width: 23px;
+                height: 23px;
+                margin: 0 5px 0 0;
+                cursor: pointer;
+                background-color: #fff;
+                border: 1px solid #b9b9b9;
+                border-radius: 50%;
               }
             }
           }
