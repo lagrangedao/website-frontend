@@ -31,9 +31,14 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
     }
   } catch (err) {
     console.error(err, err.response)
-    messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    const time = await throttle()
+    if (time) messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
+    } else if (err.response && err.response.status === 404) {
+      router.push({
+        name: 'main'
+      })
     } else if (err.response) {
       // The request has been sent, but the status code of the server response is not within the range of 2xx
       // console.log(err.response.data)
@@ -159,6 +164,16 @@ async function performSignin(sig) {
   }
 }
 
+async function gatewayGain() {
+  try {
+    const response = await sendRequest(`${process.env.VUE_APP_BASEAPI}gateway`, 'get')
+    if (response && response.data.gateway) store.dispatch('setGateway', response.data.gateway)
+  } catch (err) {
+    // console.log('login err:', err)
+    messageTip('error', 'Gateway not found')
+  }
+}
+
 async function messageTip(type, text) {
   ElMessage({
     showClose: true,
@@ -174,6 +189,7 @@ async function signOutFun() {
   store.dispatch('setMetaAddress', '')
   store.dispatch('setAccessSpace', '')
   store.dispatch('setAccessDataset', '')
+  store.dispatch('setGateway', '')
   router.push({
     name: 'main'
   })
@@ -414,5 +430,6 @@ export default {
   NumFormat,
   calculateDiffTime,
   cmOptions,
-  expireTimeFun
+  expireTimeFun,
+  gatewayGain
 }

@@ -60,7 +60,7 @@
               <b>1,149,560</b>
             </div>
             <div class="cont">
-              <el-row :gutter="12" v-if="urlReadme">
+              <el-row :gutter="12" v-if="urlReadme && userGateway">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
                   <a>
                     <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
@@ -205,6 +205,7 @@ export default defineComponent({
   setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const userGateway = computed(() => (store.state.gateway))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const searchValue = ref('')
     const value = ref('')
@@ -316,7 +317,7 @@ export default defineComponent({
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.value = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
         // listdata.value = listRes.data.files || []
         const fileLi = listRes.data.files || []
@@ -327,12 +328,11 @@ export default defineComponent({
           el.shift()
           // console.log(el.join('/').toLowerCase())
           if (el.join('/').toLowerCase() === 'readme.md') {
-            urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
+            urlReadme.value = `${userGateway.value}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
-            getTitle(urlReadme.value)
+            if (userGateway.value) getTitle(urlReadme.value)
           }
         })
-        context.emit('handleValue', listRes.data.dataset, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -434,12 +434,13 @@ export default defineComponent({
         init()
       }
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       lagLogin,
       metaAddress,
+      userGateway,
       searchValue,
       value,
       currentPage1,

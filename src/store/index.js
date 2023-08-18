@@ -13,6 +13,7 @@ export default createStore({
     accessName: sessionStorage.getItem('access_name') || '-',
     accessSpace: sessionStorage.getItem('access_space') || '',
     accessDataset: sessionStorage.getItem('access_dataset') || '',
+    gateway: sessionStorage.getItem('lag_gateway') || ''
   },
   mutations: {
     SET_METAADDRESS: (state, metaAddress) => {
@@ -46,6 +47,10 @@ export default createStore({
     SET_ACCESSDATASET: (state, accessDataset) => {
       state.accessDataset = accessDataset
       sessionStorage.setItem('access_dataset', accessDataset)
+    },
+    SET_GATEWAY: (state, gateway) => {
+      state.gateway = gateway
+      sessionStorage.setItem('lag_gateway', gateway)
     }
   },
   actions: {
@@ -89,6 +94,11 @@ export default createStore({
       commit
     }, accessDataset) {
       commit('SET_ACCESSDATASET', accessDataset)
+    },
+    setGateway({
+      commit
+    }, gateway) {
+      commit('SET_GATEWAY', gateway)
     }
   },
   getters: {

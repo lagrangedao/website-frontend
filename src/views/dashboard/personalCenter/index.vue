@@ -245,6 +245,7 @@ import {
   Warning, CopyDocument
 } from '@element-plus/icons-vue'
 import dataNft from '@/components/dataNFT.vue'
+import { clearInterval } from 'timers';
 export default defineComponent({
   name: 'Personal Center',
   components: {
@@ -333,11 +334,22 @@ export default defineComponent({
         else await signIn()
       })
     }
+    async function signSetIn (t) {
+      let time = t || 0
+      let timer = null
+      timer = setInterval(() => {
+        if (time > 3) {
+          clearInterval(timer)
+          if (store.state.accessToken) getdataList()
+          else signIn()
+        } else time += 1
+      }, 1000)
+    }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
       const lStatus = await system.$commonFun.login()
       if (lStatus) getdataList()
-      else signIn()
+      else signSetIn()
       // else window.location.reload()
       return false
       store.dispatch('setNavLogin', false)
@@ -356,7 +368,7 @@ export default defineComponent({
         licenseIndex.value = listRes.data.received_licenses.length
         dataSetIndex.value = listRes.data.dataset.length
         spacesIndex.value = listRes.data.space.length
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar ? `${listRes.data.gateway}/ipfs/${listRes.data.user.avatar}` : '')
+        store.dispatch('setAccessAvatar', listRes.data.user.avatar && store.state.gateway ? `${store.state.gateway}/ipfs/${listRes.data.user.avatar}` : '')
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
         let datasetList = []
@@ -396,7 +408,7 @@ export default defineComponent({
       //   store.dispatch('setMetaAddress', account[0])
       //   store.dispatch('setNavLogin', false)
       //   store.dispatch('setLogin', false)
-      //   store.dispatch('setAccessToken', '')
+      //   store.dispatch('setAccessToken', '') store.dispatch('setGateway', '')
       //   window.location.reload()
       // })
       // networkChanged
@@ -417,7 +429,7 @@ export default defineComponent({
       if (type === 'dataset') router.push({ name: 'datasetDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'space') router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'model') router.push({ name: 'modelsDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
-      else if (type === 'licenses') if (row.cid && row.cid !== 'undefined') window.open(`${row.gateway}/ipfs/${row.cid}`)
+      else if (type === 'licenses') if (row.cid && row.cid !== 'undefined' && store.state.gateway) window.open(`${store.state.gateway}/ipfs/${row.cid}`)
     }
     function editProfile (row, index) {
       // console.log(row, index)
@@ -436,7 +448,6 @@ export default defineComponent({
     }
     async function licenseFun (row, type) {
       listLoad.value = true
-      console.log(row.source_type)
       const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${row.source_type === "Space" ? 'spaces' : 'datasets'}/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
       // const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
       if (approveRes && approveRes.status === 'success') system.$commonFun.messageTip('success', approveRes.message ? approveRes.message : 'Request successful.')

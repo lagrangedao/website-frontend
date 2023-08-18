@@ -59,7 +59,8 @@
           <el-table-column label="url" min-width="140">
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
-              <a v-else :href="`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <a v-else-if="userGateway" :href="`${userGateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${userGateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <span v-else>-</span>
             </template>
           </el-table-column>
           <el-table-column label="Created At" align="right" min-width="110">
@@ -84,7 +85,7 @@
             <div class="worktop" style="justify-content: space-between;">
               <ul>
                 <li v-if="fileTextType !== 'binary'">
-                  <a :href="`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`" target="_blank" :title="fileBody.title">
+                  <a :href="userGateway?`${userGateway}/ipfs/${fileBody._originPath.cid}`:''" target="_blank" :title="fileBody.title">
                     <svg class="mr-raw" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" style="transform: rotate(360deg);">
                       <path d="M31 16l-7 7l-1.41-1.41L28.17 16l-5.58-5.59L24 9l7 7z" fill="currentColor"></path>
                       <path d="M1 16l7-7l1.41 1.41L3.83 16l5.58 5.59L8 23l-7-7z" fill="currentColor"></path>
@@ -228,13 +229,13 @@ export default defineComponent({
   setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const userGateway = computed(() => (store.state.gateway))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const accessName = computed(() => (store.state.accessName))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const people_img = require("@/assets/images/dashboard/people_default.png")
     const tableLayout = ref('fixed')
     const labelTab = ref('list')
-    const listdata = reactive({})
     const fileRow = reactive({
       fileAlldata: [],
       fileResdata: [],
@@ -303,12 +304,10 @@ export default defineComponent({
     async function init () {
       if (route.name !== 'datasetDetail') return
       listLoad.value = true
-      listdata.value = {}
       fileRow.fileTitle = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
         fileRow.fileResdata = listRes.data.files || []
-        listdata.value = listRes.data.dataset || { name: route.params.name }
 
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)
@@ -322,7 +321,6 @@ export default defineComponent({
         // console.log(fileRow.fileAlldata)
         fileRow.filedata = await sortList(fileRow.fileAlldata)
         // console.log(fileRow.filedata)
-        context.emit('handleValue', listRes.data.dataset, listRes.data.nft)
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -558,13 +556,14 @@ export default defineComponent({
       fileRow.fileTitle = []
     }
     async function fileEdit (row) {
+      if (!userGateway.value) return
       handleCommand('edit')
       uploadLoad.value = true
       fileTextEditor.value = ''
       fileTextShow.value = false
       fileBody._originPath = row._originPath
       fileBody.title = row.title
-      await getTitle(`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`)
+      await getTitle(`${userGateway.value}/ipfs/${fileBody._originPath.cid}`)
     }
     const getTitle = async (url) => {
       if (!url) return
@@ -739,18 +738,18 @@ export default defineComponent({
     watch(lagLogin, (newValue, oldValue) => {
       if (!lagLogin.value) init()
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       accessAvatar,
       accessName,
+      userGateway,
       metaAddress,
       lagLogin,
       people_img,
       tableLayout,
       labelTab,
-      listdata,
       fileRow,
       listLoad,
       fileList,
