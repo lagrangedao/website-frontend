@@ -333,11 +333,22 @@ export default defineComponent({
         else await signIn()
       })
     }
+    async function signSetIn (t) {
+      let time = t || 0
+      let timer = null
+      timer = setInterval(() => {
+        if (time > 3) {
+          clearInterval(timer)
+          if (store.state.accessToken) getdataList()
+          else signIn()
+        } else time += 1
+      }, 1000)
+    }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
       const lStatus = await system.$commonFun.login()
       if (lStatus) getdataList()
-      else signIn()
+      else signSetIn()
       // else window.location.reload()
       return false
       store.dispatch('setNavLogin', false)
