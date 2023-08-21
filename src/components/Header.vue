@@ -426,10 +426,60 @@ export default defineComponent({
 @media screen and (max-width: 1024px) {
 }
 </style>
-<style>
+<style lang="scss">
 .loginImg {
   display: flex;
   cursor: pointer;
+}
+
+.el-menu--horizontal .el-menu .el-menu-item,
+.el-menu--horizontal .el-menu .el-sub-menu__title {
+  height: auto;
+  padding: 10px;
+  line-height: 1.2;
+  .set {
+    vertical-align: middle;
+    * {
+      vertical-align: middle;
+    }
+    .el-button-group > .el-button {
+      border-radius: 7px;
+      &:first-child {
+        padding-left: 10px;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      &:last-child {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+    .el-icon {
+      margin: auto;
+      cursor: pointer;
+      svg {
+        width: 1em;
+        cursor: pointer;
+        path {
+          cursor: pointer;
+        }
+      }
+    }
+    .loginImg {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      img {
+        width: 23px;
+        height: 23px;
+        margin: 0 5px 0 0;
+        cursor: pointer;
+        background-color: #fff;
+        border: 1px solid #b9b9b9;
+        border-radius: 50%;
+      }
+    }
+  }
 }
 </style>
 

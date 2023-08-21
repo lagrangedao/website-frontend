@@ -60,6 +60,10 @@
               Space Total Views
               <b>{{system.$commonFun.NumFormat(listdata.stats.views) || 0}}</b>
             </div>
+            <div class="title">
+              Space Total Forked
+              <b>{{system.$commonFun.NumFormat(listdata.stats.forks) || 0}}</b>
+            </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
