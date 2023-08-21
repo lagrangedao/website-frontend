@@ -599,6 +599,7 @@ export default defineComponent({
         uploadLoad.value = false
       } catch (err) {
         console.log('err dataset files:', err)
+        system.$commonFun.messageTip('error', err)
       }
     }
     function downFile () {

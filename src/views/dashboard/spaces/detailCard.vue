@@ -360,6 +360,7 @@ export default defineComponent({
         })
       } catch (err) {
         console.log('err space card:', err)
+        system.$commonFun.messageTip('error', err)
       }
     }
     async function cardAdd (type) {
@@ -411,6 +412,8 @@ export default defineComponent({
     }
     onActivated(() => { })
     onMounted(() => {
+      textEditor.value = ''
+      titles.value = ''
       urlReadme.value = ''
       createLoad.value = false
       window.scrollTo(0, 0)
@@ -426,6 +429,8 @@ export default defineComponent({
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'card') {
+        textEditor.value = ''
+        titles.value = ''
         urlReadme.value = ''
         createLoad.value = false
         window.scrollTo(0, 0)

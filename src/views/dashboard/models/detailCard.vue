@@ -337,6 +337,7 @@ export default defineComponent({
         })
       } catch (err) {
         console.log('err model card:', err)
+        system.$commonFun.messageTip('error', err)
       }
     }
     function handleAnchorClick (anchor) {
@@ -407,6 +408,8 @@ export default defineComponent({
     }
     onActivated(() => { })
     onMounted(() => {
+      textEditor.value = ''
+      titles.value = ''
       urlReadme.value = ''
       window.scrollTo(0, 0)
       init()
@@ -422,6 +425,8 @@ export default defineComponent({
     watch(route, (to, from) => {
       if (to.name !== 'modelsDetail') return
       if (to.params.tabs === 'card') {
+        textEditor.value = ''
+        titles.value = ''
         urlReadme.value = ''
         window.scrollTo(0, 0)
         init()

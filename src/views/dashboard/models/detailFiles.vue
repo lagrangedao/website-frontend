@@ -595,6 +595,7 @@ export default defineComponent({
         uploadLoad.value = false
       } catch (err) {
         console.log('err model files:', err)
+        system.$commonFun.messageTip('error', err)
       }
     }
     function downFile () {

@@ -618,6 +618,7 @@ export default defineComponent({
         uploadLoad.value = false
       } catch (err) {
         console.log('err space files:', err)
+        system.$commonFun.messageTip('error', err)
       }
     }
     function downFile () {
