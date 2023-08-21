@@ -568,35 +568,40 @@ export default defineComponent({
     }
     const getTitle = async (url) => {
       if (!url) return
-      var response = await fetch(url);
-      const resType = response.headers.get("content-type")
-      const text = await new Promise(async resolve => {
-        if (resType.indexOf('image') > -1) {
-          fileTextType.value = 'image'
-          resolve(response.arrayBuffer())
-        }
-        else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
-          fileTextType.value = 'text'
-          resolve(response.text())
-        } else {
-          fileTextType.value = 'binary'
-          resolve(response.arrayBuffer())
-        }
-      })
-      let blob = new Blob([text])
-      blobSize.value = blob.size
-      // let reader = new FileReader();
-      // reader.readAsArrayBuffer(blob);
-      // reader.onload = function () {
-      //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
-      //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
-      //   console.log('SHA256',hash)
-      // }
-      if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
-      else if (fileTextType.value === 'text') fileTextEditor.value = text
-      else fileTextEditor.value = url
-      uploadLoad.value = false
-    };
+      try {
+        var response = await fetch(url);
+        const resType = response.headers.get("content-type")
+        const text = await new Promise(async resolve => {
+          if (resType.indexOf('image') > -1) {
+            fileTextType.value = 'image'
+            resolve(response.arrayBuffer())
+          }
+          else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
+            fileTextType.value = 'text'
+            resolve(response.text())
+          } else {
+            fileTextType.value = 'binary'
+            resolve(response.arrayBuffer())
+          }
+        })
+        let blob = new Blob([text])
+        blobSize.value = blob.size
+        // let reader = new FileReader();
+        // reader.readAsArrayBuffer(blob);
+        // reader.onload = function () {
+        //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
+        //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
+        //   console.log('SHA256',hash)
+        // }
+        if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
+        else if (fileTextType.value === 'text') fileTextEditor.value = text
+        else fileTextEditor.value = url
+        uploadLoad.value = false
+      } catch (err) {
+        console.log('err dataset files:', err)
+        system.$commonFun.messageTip('error', err)
+      }
+    }
     function downFile () {
       var link = document.createElement('a');
       link.href = fileTextEditor.value

@@ -380,10 +380,14 @@ export default defineComponent({
       else if (command === 'create') createText()
     }
     async function createText () {
-      var response = await fetch(`/static/template/create.md`)
-      textEditor.value = await new Promise(async resolve => {
-        resolve(response.text())
-      })
+      try {
+        var response = await fetch(`/static/template/create.md`)
+        textEditor.value = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+      } catch (err) {
+        console.log('err space create.md:', err)
+      }
       uploadLoad.value = false
     }
     function handleChange (uploadFile, uploadFiles) {
@@ -582,35 +586,40 @@ export default defineComponent({
     }
     const getTitle = async (url) => {
       if (!url) return
-      var response = await fetch(url);
-      const resType = response.headers.get("content-type")
-      const text = await new Promise(async resolve => {
-        if (resType.indexOf('image') > -1) {
-          fileTextType.value = 'image'
-          resolve(response.arrayBuffer())
-        }
-        else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
-          fileTextType.value = 'text'
-          resolve(response.text())
-        } else {
-          fileTextType.value = 'binary'
-          resolve(response.arrayBuffer())
-        }
-      })
-      let blob = new Blob([text])
-      blobSize.value = blob.size
+      try {
+        var response = await fetch(url);
+        const resType = response.headers.get("content-type")
+        const text = await new Promise(async resolve => {
+          if (resType.indexOf('image') > -1) {
+            fileTextType.value = 'image'
+            resolve(response.arrayBuffer())
+          }
+          else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
+            fileTextType.value = 'text'
+            resolve(response.text())
+          } else {
+            fileTextType.value = 'binary'
+            resolve(response.arrayBuffer())
+          }
+        })
+        let blob = new Blob([text])
+        blobSize.value = blob.size
 
-      // let reader = new FileReader();
-      // reader.readAsArrayBuffer(blob);
-      // reader.onload = function () {
-      //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
-      //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
-      //   console.log('SHA256', hash)
-      // }
-      if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
-      else if (fileTextType.value === 'text') fileTextEditor.value = text
-      else fileTextEditor.value = url
-      uploadLoad.value = false
+        // let reader = new FileReader();
+        // reader.readAsArrayBuffer(blob);
+        // reader.onload = function () {
+        //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
+        //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
+        //   console.log('SHA256', hash)
+        // }
+        if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
+        else if (fileTextType.value === 'text') fileTextEditor.value = text
+        else fileTextEditor.value = url
+        uploadLoad.value = false
+      } catch (err) {
+        console.log('err space files:', err)
+        system.$commonFun.messageTip('error', err)
+      }
     }
     function downFile () {
       var link = document.createElement('a');

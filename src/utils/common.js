@@ -31,9 +31,14 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
     }
   } catch (err) {
     console.error(err, err.response)
-    messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    const time = await throttle()
+    if (time) messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
+    } else if (err.response && err.response.status === 404) {
+      router.push({
+        name: 'main'
+      })
     } else if (err.response) {
       // The request has been sent, but the status code of the server response is not within the range of 2xx
       // console.log(err.response.data)

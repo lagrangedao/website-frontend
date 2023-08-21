@@ -90,7 +90,7 @@
                 <span>Space card</span>
               </span>
             </template>
-            <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName"></detail-card>
+            <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
           </el-tab-pane>
           <el-tab-pane name="app">
             <template #label>
@@ -421,14 +421,16 @@ export default defineComponent({
     async function handleCurrentChange (val) { }
     async function jobList (list) {
       let arr = list || []
-      for (let j = 0; j < arr.length; j++) {
-        const response = await fetch(arr[j].job_source_uri)
-        const textUri = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        // console.log(arr[j].bidder_id)
-        // console.log(textUri)
-        arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
+      try {
+        for (let j = 0; j < arr.length; j++) {
+          const response = await fetch(arr[j].job_source_uri)
+          const textUri = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
+        }
+      } catch (err) {
+        console.log('err space detail job:', err)
       }
       return arr
     }

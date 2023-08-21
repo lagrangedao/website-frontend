@@ -363,26 +363,31 @@ export default defineComponent({
     };
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
-      var response = await fetch(urlReadme.value)
-      textEditor.value = await new Promise(async resolve => {
-        resolve(response.text())
-      })
-      nextTick(() => {
-        const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-        titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-        if (!titles.value.length) {
-          titles.value = [];
-          return;
-        }
+      try {
+        var response = await fetch(urlReadme.value)
+        textEditor.value = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        nextTick(() => {
+          const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+          titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+          if (!titles.value.length) {
+            titles.value = [];
+            return;
+          }
 
-        const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-        titles.value = titles.value.map(el => ({
-          title: el.innerText,
-          lineIndex: el.getAttribute('data-v-md-line'),
-          indent: hTags.indexOf(el.tagName)
-        }));
-      });
-    };
+          const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+          titles.value = titles.value.map(el => ({
+            title: el.innerText,
+            lineIndex: el.getAttribute('data-v-md-line'),
+            indent: hTags.indexOf(el.tagName)
+          }));
+        })
+      } catch (err) {
+        console.log('err datasets card:', err)
+        system.$commonFun.messageTip('error', err)
+      }
+    }
     function handleAnchorClick (anchor) {
       const { lineIndex } = anchor
       const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
@@ -399,12 +404,17 @@ export default defineComponent({
       if (type === 'create') createLoad.value = true
       else if (type === 'lag' || type === 'hugging') {
         listLoad.value = true
-        var response = await fetch(type === 'lag' ? `/static/template/lagrangedao-README.md` : `/static/template/huggingface-README.md`)
-        textEditor.value = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        listLoad.value = false
-        createLoad.value = true
+        try {
+          var response = await fetch(type === 'lag' ? `/static/template/lagrangedao-README.md` : `/static/template/huggingface-README.md`)
+          textEditor.value = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          listLoad.value = false
+          createLoad.value = true
+        } catch (err) {
+          console.log('err add datasets card:', err)
+          listLoad.value = false
+        }
       }
     }
     function cancelFun () {
@@ -413,6 +423,8 @@ export default defineComponent({
     }
     onActivated(() => { })
     onMounted(() => {
+      textEditor.value = ''
+      titles.value = ''
       urlReadme.value = ''
       createLoad.value = false
       window.scrollTo(0, 0)
@@ -428,6 +440,8 @@ export default defineComponent({
     watch(route, (to, from) => {
       if (to.name !== 'datasetDetail') return
       if (to.params.tabs === 'card') {
+        textEditor.value = ''
+        titles.value = ''
         urlReadme.value = ''
         createLoad.value = false
         window.scrollTo(0, 0)
