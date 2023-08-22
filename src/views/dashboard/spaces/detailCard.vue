@@ -43,9 +43,9 @@
           <div class="labelList" id="permiss">
             <ul>
               <li>{{titles}}</li>
-              <!-- <li v-for="(anchor, index) in titles" :key="index + 'art'">
+              <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
-              </li> -->
+              </li>
             </ul>
           </div>
         </el-col>
