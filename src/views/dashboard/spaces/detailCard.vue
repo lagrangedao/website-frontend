@@ -49,7 +49,7 @@
           </div>
         </el-col>
         <el-col v-show="urlReadme && isPreview" :xs="24" :sm="24" :md="13" :lg="14" :xl="14" class="right">
-          <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
+          <v-md-preview v-if="textEditor" :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
         <el-col v-show="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
           <v-md-editor v-model="textEditorChange"></v-md-editor>
@@ -290,7 +290,7 @@ export default defineComponent({
       const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listFilesRes && listFilesRes.status === 'success') {
         const fileLi = listFilesRes.data || []
-        fileLi.forEach((element, i) => {
+        fileLi.forEach(async (element, i) => {
           let el = element.name.split('/')
           el.shift()
           el.shift()
@@ -299,7 +299,7 @@ export default defineComponent({
             if (element.gateway !== null) {
               urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
               urlReadmeName.value = el.join('/')
-              getTitle(urlReadme.value)
+              await getTitle(urlReadme.value)
             } else {
               gate = true
               return
@@ -313,9 +313,7 @@ export default defineComponent({
         init()
         return
       }
-      console.log('gate')
-      context.emit('handleValue', false)
-      console.log('gate jinlai')
+      // context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
       listLoad.value = false
       console.log('listLoad', listLoad.value)
