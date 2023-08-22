@@ -52,7 +52,7 @@
               <span>Dataset card</span>
             </span>
           </template>
-          <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName"></detail-card>
+          <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>

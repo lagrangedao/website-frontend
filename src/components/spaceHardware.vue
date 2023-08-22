@@ -95,7 +95,7 @@
     <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" title="Confirm hardware update" :width="dialogWidth">
       <div v-loading="hardwareLoad">
         <div class="title-hard">The hardware of
-          <span>{{ accessName || metaAddress }}/{{ route.params.name }}</span> will be switched to:
+          <span>{{ accessName || system.$commonFun.hiddAddress(metaAddress) }}/{{ route.params.name }}</span> will be switched to:
         </div>
         <el-card class="box-card">
           <h5>{{ sleepSelect.hardware_name }}</h5>
@@ -287,11 +287,16 @@ export default defineComponent({
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
         const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'ether')
         const approveAmount = pricePerHour * ruleForm.usageTime
-        // const token_decimals = await tokenContract.methods.decimals().call().then()
 
-        const approve_tx = await tokenContract.methods.approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether')).send({
-          from: store.state.metaAddress
-        })
+        let approveGasLimit = await tokenContract.methods
+          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether'))
+          .estimateGas({ from: store.state.metaAddress })
+
+        const approve_tx = await tokenContract.methods
+          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether'))
+          .send({
+            from: store.state.metaAddress, gasLimit: approveGasLimit
+          })
 
 
         let gasLimit = await paymentContract.methods
@@ -450,6 +455,7 @@ export default defineComponent({
     return {
       route,
       accessName,
+      metaAddress,
       bodyWidth,
       system,
       props,

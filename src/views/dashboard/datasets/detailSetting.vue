@@ -365,7 +365,7 @@ export default defineComponent({
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
-      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'post', fd)
+      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/mint_hash`, 'post', fd)
     }
 
     async function beforeClose () {

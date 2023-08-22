@@ -60,6 +60,10 @@
               Space Total Views
               <b>{{system.$commonFun.NumFormat(listdata.stats.views) || 0}}</b>
             </div>
+            <div class="title">
+              Space Total Forked
+              <b>{{system.$commonFun.NumFormat(listdata.stats.forks) || 0}}</b>
+            </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme && userGateway">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
@@ -281,7 +285,7 @@ export default defineComponent({
       listLoad.value = true
       listdata.files = []
 
-      const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${store.state.metaAddress}&&space_name=${route.params.name}`, 'get')
+      const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${route.params.wallet_address}&&space_name=${route.params.name}`, 'get')
       if (listStatsRes && listStatsRes.status === 'success') listdata.stats = listStatsRes.data.stats
 
       const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
@@ -334,36 +338,46 @@ export default defineComponent({
     }
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
-      var response = await fetch(urlReadme.value)
-      textEditor.value = await new Promise(async resolve => {
-        resolve(response.text())
-      })
-      nextTick(() => {
-        const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-        titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-        if (!titles.value.length) {
-          titles.value = [];
-          return;
-        }
+      try {
+        var response = await fetch(urlReadme.value)
+        textEditor.value = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        nextTick(() => {
+          const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+          titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+          if (!titles.value.length) {
+            titles.value = [];
+            return;
+          }
 
-        const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-        titles.value = titles.value.map(el => ({
-          title: el.innerText,
-          lineIndex: el.getAttribute('data-v-md-line'),
-          indent: hTags.indexOf(el.tagName)
-        }));
-      });
+          const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+          titles.value = titles.value.map(el => ({
+            title: el.innerText,
+            lineIndex: el.getAttribute('data-v-md-line'),
+            indent: hTags.indexOf(el.tagName)
+          }));
+        })
+      } catch (err) {
+        console.log('err space card:', err)
+        system.$commonFun.messageTip('error', err)
+      }
     }
     async function cardAdd (type) {
       if (type === 'create') createLoad.value = true
       else if (type === 'lag' || type === 'hugging') {
         listLoad.value = true
-        var response = await fetch(type === 'lag' ? `/static/template/lagrangedao-README.md` : `/static/template/huggingface-README.md`)
-        textEditor.value = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        listLoad.value = false
-        createLoad.value = true
+        try {
+          var response = await fetch(type === 'lag' ? `/static/template/lagrangedao-README.md` : `/static/template/huggingface-README.md`)
+          textEditor.value = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          listLoad.value = false
+          createLoad.value = true
+        } catch (err) {
+          listLoad.value = false
+          console.log('err space template:', err)
+        }
       } else if (type === 'docker') {
         listLoad.value = true
         let fd = await formDataRetrue()
@@ -376,17 +390,20 @@ export default defineComponent({
     }
     async function formDataRetrue () {
       let formdata = new FormData()
-      const fileList = ['Dockerfile', 'Readme.md', 'requirements.txt', 'app/_init_.py', 'app/main.py']
-      for (let f = 0; f < fileList.length; f++) {
-        let name = fileList[f]
-        let response = await fetch(`/static/template/hello-world/${name}`)
-        let text = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        let newFile = new File([text], name)
-        formdata.append('file', newFile, name)
+      try {
+        const fileList = ['Dockerfile', 'Readme.md', 'requirements.txt', 'app/_init_.py', 'app/main.py']
+        for (let f = 0; f < fileList.length; f++) {
+          let name = fileList[f]
+          let response = await fetch(`/static/template/hello-world/${name}`)
+          let text = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          let newFile = new File([text], name)
+          formdata.append('file', newFile, name)
+        }
+      } catch (err) {
+        console.log('err space hello-world:', err)
       }
-
       return formdata
     }
     function cancelFun () {
@@ -395,6 +412,8 @@ export default defineComponent({
     }
     onActivated(() => { })
     onMounted(() => {
+      textEditor.value = ''
+      titles.value = ''
       urlReadme.value = ''
       createLoad.value = false
       window.scrollTo(0, 0)
@@ -410,6 +429,8 @@ export default defineComponent({
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'card') {
+        textEditor.value = ''
+        titles.value = ''
         urlReadme.value = ''
         createLoad.value = false
         window.scrollTo(0, 0)
