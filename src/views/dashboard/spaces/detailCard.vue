@@ -1,8 +1,8 @@
 <template>
   <section id="dataset">
     <div id="datasetBody">
-      <el-row class="dataset_body" v-loading="listLoad">
-        <el-col v-show="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
+      <el-row class="dataset_body">
+        <el-col v-show="!urlReadme" v-loading="listLoad" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
               <b>No space card yet</b>
@@ -42,6 +42,8 @@
         <el-col v-show="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
             <ul>
+              <li>{{isPreview}}</li>
+              <li>{{listLoad }}</li>
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
@@ -65,8 +67,11 @@
               <b>{{system.$commonFun.NumFormat(listdata.stats.forks) || 0}}</b>
             </div>
             <div class="cont">
-              <el-row :gutter="12" v-if="urlReadme">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress && metaAddress === route.params.wallet_address">
+              <el-row :gutter="12" v-show="urlReadme">
+                {{metaAddress}}
+                <br />{{route.params.wallet_address}}
+                <br />{{urlReadme}}
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-show="isPreview && metaAddress && metaAddress === route.params.wallet_address">
                   <a>
                     <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
                       <el-icon>
@@ -97,91 +102,8 @@
                   </a>
                 </el-col>
               </el-row>
-              <el-row :gutter="12" v-if="false">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="">
-                    <i class="icon icon_01"></i>
-                    <span class="a_text">Image Classification</span>
-                  </router-link>
-                </el-col>
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="">
-                    <i class="icon icon_02"></i>
-                    <span class="a_text">Translation</span>
-                  </router-link>
-                </el-col>
-              </el-row>
             </div>
           </div>
-          <div class="labelModel" v-if="false">
-            <ul>
-              <li>
-                <p>Homepage:</p>
-                <b>github.com</b>
-              </li>
-              <li>
-                <p>Size of downloaded space files:</p>
-                <b>55.66MB</b>
-              </li>
-              <li>
-                <p>Size of the generated space:</p>
-                <b>238.01MB</b>
-              </li>
-              <li>
-                <p>Total amount of disk used:</p>
-                <b>293.67MB</b>
-              </li>
-            </ul>
-          </div>
-          <div class="list" v-if="false">
-            <div class="title">
-              <p :title="'Models trained or fine-tuned on '+route.params.name">
-                <i class="icon icon_datasets"></i>
-                Models trained or fine-tuned on
-                <small>{{route.params.name}}</small>
-              </p>
-            </div>
-          </div>
-          <el-row class="list_body" v-if="false" v-loading="false">
-            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata.files" :key="l">
-              <el-card class="box-card" @click="detailFun(list, l)">
-                <template #header>
-                  <div class="card-header">
-                    <div class="name">
-                      <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
-                      <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
-                      <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
-                      <b>{{list.name}}</b>
-                    </div>
-                    <span>27</span>
-                  </div>
-                </template>
-                <div class="text">
-                  <i class="icon icon_image"></i>
-                  <p class="ellipsis">argilla/news-summary</p>
-                </div>
-                <!-- <div class="text">
-                                  <el-row :gutter="6">
-                                      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                          <router-link to="" class="ellipsis">
-                                              {{list.license}}
-                                          </router-link>
-                                      </el-col>
-                                  </el-row>
-                              </div> -->
-                <div class="text item">
-                  <div class="item_body">
-                    <i class="icon icon_time"></i>
-                    <span class="small">5 Sept 2022 - 5 Oct 2022</span>
-                  </div>
-                  <!-- <div class="item_body">
-                    <i class="icon icon_up"></i>
-                    <span class="small">5.15M</span>
-                  </div> -->
-                </div>
-              </el-card>
-            </el-col>
-          </el-row>
         </el-col>
       </el-row>
     </div>
