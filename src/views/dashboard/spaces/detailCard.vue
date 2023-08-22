@@ -1,8 +1,8 @@
 <template>
   <section id="dataset">
     <div id="datasetBody">
-      <el-row class="dataset_body">
-        <el-col v-show="!urlReadme" v-loading="listLoad" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
+      <el-row class="dataset_body" v-loading="listLoad">
+        <el-col v-show="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
               <b>No space card yet</b>
@@ -42,11 +42,10 @@
         <el-col v-show="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
             <ul>
-              <li>{{isPreview}}</li>
-              <li>{{listLoad }}</li>
-              <li v-for="(anchor, index) in titles" :key="index + 'art'">
+              <li>{{titles}}</li>
+              <!-- <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
-              </li>
+              </li> -->
             </ul>
           </div>
         </el-col>
@@ -68,9 +67,6 @@
             </div>
             <div class="cont">
               <el-row :gutter="12" v-show="urlReadme">
-                {{metaAddress}}
-                <br />{{route.params.wallet_address}}
-                <br />{{urlReadme}}
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-show="isPreview && metaAddress && metaAddress === route.params.wallet_address">
                   <a>
                     <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
@@ -267,21 +263,23 @@ export default defineComponent({
         })
         await nextTick(() => {
           if (!textEditor.value) return
-          const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-          titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-          if (!titles.value.length) {
-            titles.value = [];
-            return;
-          }
-          console.log('titles: ', titles.value)
+          if (preview.value) {
+            const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+            titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+            if (!titles.value.length) {
+              titles.value = [];
+              return;
+            }
+            console.log('titles: ', titles.value)
 
-          const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-          titles.value = titles.value.map(el => ({
-            title: el.innerText,
-            lineIndex: el.getAttribute('data-v-md-line'),
-            indent: hTags.indexOf(el.tagName)
-          }));
-          console.log('titles111: ', titles.value)
+            const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+            titles.value = titles.value.map(el => ({
+              title: el.innerText,
+              lineIndex: el.getAttribute('data-v-md-line'),
+              indent: hTags.indexOf(el.tagName)
+            }));
+            console.log('titles111: ', titles.value)
+          }
         })
       } catch (err) {
         console.log('err space card:', err)
