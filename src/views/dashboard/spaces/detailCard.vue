@@ -339,6 +339,7 @@ export default defineComponent({
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
       try {
+        console.log('try')
         var response = await fetch(urlReadme.value)
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
