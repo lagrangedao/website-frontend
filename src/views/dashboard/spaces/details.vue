@@ -21,7 +21,7 @@
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
+          <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
             <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
               <el-icon>
                 <WarningFilled />
@@ -120,7 +120,7 @@
             </template>
             <detail-community @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'community'"></detail-community>
           </el-tab-pane>
-          <el-tab-pane name="settings" v-if="metaAddress === route.params.wallet_address">
+          <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
             <template #label>
               <span class="custom-tabs-label">
                 <!-- <i class="icon icon_spaces"></i> -->

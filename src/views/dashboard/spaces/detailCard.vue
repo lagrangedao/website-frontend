@@ -6,12 +6,12 @@
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
               <b>No space card yet</b>
-              <p v-if="metaAddress === route.params.wallet_address">
+              <p v-if="metaAddress && metaAddress === route.params.wallet_address">
                 <span v-if="fileSpaceData.length === 0">Create a new space card by using following template</span>
                 <span v-else>Create a new space card by creating a Readme.md file</span>
               </p>
             </div>
-            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address && fileSpaceData.length === 0">
+            <el-row class="card" :gutter="20" v-if="metaAddress && metaAddress === route.params.wallet_address && fileSpaceData.length === 0">
               <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="col-title">
                 <b>Start with hello-world template</b>
               </el-col>
@@ -42,11 +42,9 @@
         <el-col v-show="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
             <ul>
-              {{urlReadme}}
-              <br /> {{titles}}
-              <!-- <li v-for="(anchor, index) in titles" :key="index + 'art'">
+              <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
-              </li> -->
+              </li>
             </ul>
           </div>
         </el-col>
@@ -68,7 +66,7 @@
             </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress && metaAddress === route.params.wallet_address">
                   <a>
                     <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
                       <el-icon>
