@@ -301,7 +301,6 @@ export default defineComponent({
               urlReadmeName.value = el.join('/')
               getTitle(urlReadme.value)
             } else {
-              console.log('element.gateway', element.gateway)
               gate = true
               return
             }
@@ -310,14 +309,16 @@ export default defineComponent({
         fileSpaceData.value = fileLi
         listdata.files = fileLi
       }
-      console.log('gate:', gate)
       if (gate) {
         init()
         return
       }
+      console.log('gate')
       context.emit('handleValue', false)
+      console.log('gate jinlai')
       await system.$commonFun.timeout(500)
       listLoad.value = false
+      console.log('listLoad', listLoad.value)
     }
     function detailFun (row, index) {
       console.log(row, index)
@@ -340,17 +341,13 @@ export default defineComponent({
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
       try {
-        console.log('try')
         var response = await fetch(urlReadme.value)
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
         await nextTick(() => {
           if (!textEditor.value) return
-          console.log('preview:', preview.value)
-          console.log('preview querySelectorAll:', preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6'))
           const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-          console.log(anchors)
           titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
           if (!titles.value.length) {
             titles.value = [];
@@ -363,6 +360,7 @@ export default defineComponent({
             lineIndex: el.getAttribute('data-v-md-line'),
             indent: hTags.indexOf(el.tagName)
           }));
+          console.log('hTags: ', hTags)
         })
       } catch (err) {
         console.log('err space card:', err)
