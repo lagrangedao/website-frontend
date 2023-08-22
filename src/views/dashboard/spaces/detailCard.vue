@@ -344,7 +344,9 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
-        nextTick(() => {
+        await nextTick(() => {
+          console.log(textEditor.value)
+          if (!textEditor.value) return
           const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
           titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
           if (!titles.value.length) {
