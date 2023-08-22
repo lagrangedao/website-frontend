@@ -301,6 +301,7 @@ export default defineComponent({
               urlReadmeName.value = el.join('/')
               getTitle(urlReadme.value)
             } else {
+              console.log('element.gateway', element.gateway)
               gate = true
               return
             }
@@ -309,7 +310,7 @@ export default defineComponent({
         fileSpaceData.value = fileLi
         listdata.files = fileLi
       }
-
+      console.log('gate:', gate)
       if (gate) {
         init()
         return
