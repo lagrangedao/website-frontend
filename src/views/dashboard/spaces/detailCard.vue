@@ -343,6 +343,7 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
+        await system.$commonFun.timeout(1000)
         nextTick(() => {
           if (preview.value) {
             const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
