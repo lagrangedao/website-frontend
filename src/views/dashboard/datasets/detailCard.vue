@@ -6,9 +6,9 @@
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
               <b>No dataset card yet</b>
-              <p v-if="metaAddress === route.params.wallet_address">Create a new dataset card by using following template</p>
+              <p v-if="metaAddress && metaAddress === route.params.wallet_address">Create a new dataset card by using following template</p>
             </div>
-            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address">
+            <el-row class="card" :gutter="20" v-if="metaAddress && metaAddress === route.params.wallet_address">
               <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" v-for="card in templateData" :key="card">
                 <el-card class="box-card" shadow="hover" @click="cardAdd(card.type)">
                   <template #header>
@@ -61,7 +61,7 @@
             </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress && metaAddress === route.params.wallet_address">
                   <a>
                     <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
                       <el-icon>

@@ -73,7 +73,7 @@
           </template>
           <detail-community @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'community'"></detail-community>
         </el-tab-pane>
-        <el-tab-pane name="settings" v-if="metaAddress === route.params.wallet_address">
+        <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
           <template #label>
             <span class="custom-tabs-label">
               <!-- <i class="icon icon_datasets"></i> -->
