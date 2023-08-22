@@ -1,7 +1,7 @@
 <template>
   <section id="dataset">
     <div id="datasetBody">
-      <el-row class="dataset_body" v-loading="!urlReadme">
+      <el-row class="dataset_body">
         <el-col v-show="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
@@ -42,9 +42,11 @@
         <el-col v-show="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
             <ul>
-              <li v-for="(anchor, index) in titles" :key="index + 'art'">
+              {{urlReadme}}
+              <br /> {{titles}}
+              <!-- <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
-              </li>
+              </li> -->
             </ul>
           </div>
         </el-col>
@@ -351,6 +353,7 @@ export default defineComponent({
             titles.value = [];
             return;
           }
+          console.log('titles: ', titles.value)
 
           const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
           titles.value = titles.value.map(el => ({
@@ -358,7 +361,7 @@ export default defineComponent({
             lineIndex: el.getAttribute('data-v-md-line'),
             indent: hTags.indexOf(el.tagName)
           }));
-          console.log('hTags: ', hTags)
+          console.log('titles111: ', titles.value)
         })
       } catch (err) {
         console.log('err space card:', err)
