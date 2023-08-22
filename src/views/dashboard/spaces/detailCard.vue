@@ -338,16 +338,15 @@ export default defineComponent({
     }
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
+      var response = await fetch(urlReadme.value)
+      console.log(response)
+      textEditor.value = await new Promise(async resolve => {
+        resolve(response.text())
+      })
       try {
-        console.log('try')
-        var response = await fetch(urlReadme.value)
-        textEditor.value = await new Promise(async resolve => {
-          resolve(response.text())
-        })
         await nextTick(() => {
-          if (!textEditor.value) return
+          console.log("nextTick")
           const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-          console.log(anchors)
           titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
           if (!titles.value.length) {
             titles.value = [];
@@ -361,10 +360,11 @@ export default defineComponent({
             indent: hTags.indexOf(el.tagName)
           }));
         })
-      } catch (err) {
-        console.log('err space card:', err)
-        system.$commonFun.messageTip('error', err)
       }
+      catch (e) {
+        console.log(e)
+      }
+
     }
     async function cardAdd (type) {
       if (type === 'create') createLoad.value = true
