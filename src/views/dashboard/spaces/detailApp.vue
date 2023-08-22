@@ -56,6 +56,11 @@
             <el-alert :closable="false" title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting." type="warning" />
           </div>
         </div>
+        <div class="deployment" v-else-if="listdata.space.status === 'Stopped'">
+          <div>
+            <el-alert :closable="false" title="This Space is not running" type="warning" />
+          </div>
+        </div>
       </el-row>
     </div>
   </section>
