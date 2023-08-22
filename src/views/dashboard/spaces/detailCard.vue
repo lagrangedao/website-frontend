@@ -2,7 +2,7 @@
   <section id="dataset">
     <div id="datasetBody">
       <el-row class="dataset_body" v-loading="listLoad">
-        <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
+        <el-col v-show="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
               <b>No space card yet</b>
@@ -39,7 +39,7 @@
             </el-tabs>
           </div>
         </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
+        <el-col v-show="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
             <ul>
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
@@ -48,10 +48,10 @@
             </ul>
           </div>
         </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="24" :md="13" :lg="14" :xl="14" class="right">
+        <el-col v-show="urlReadme && isPreview" :xs="24" :sm="24" :md="13" :lg="14" :xl="14" class="right">
           <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
-        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
+        <el-col v-show="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
           <v-md-editor v-model="textEditorChange"></v-md-editor>
         </el-col>
         <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="left left_light">
@@ -345,9 +345,9 @@ export default defineComponent({
           resolve(response.text())
         })
         await nextTick(() => {
-          console.log(textEditor.value)
           if (!textEditor.value) return
           const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+          console.log(anchors)
           titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
           if (!titles.value.length) {
             titles.value = [];
