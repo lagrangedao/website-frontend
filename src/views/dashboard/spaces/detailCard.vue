@@ -1,7 +1,7 @@
 <template>
   <section id="dataset">
     <div id="datasetBody">
-      <el-row class="dataset_body">
+      <el-row class="dataset_body" v-loading="listLoad">
         <el-col v-show="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
