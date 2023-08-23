@@ -66,7 +66,6 @@ export default defineComponent({
         store.dispatch('setAccessToken', '')
         store.dispatch('setAccessSpace', '')
         store.dispatch('setAccessDataset', '')
-        store.dispatch('setGateway', '')
         window.location.reload()
       })
       // 监听metamask网络断开

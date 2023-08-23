@@ -165,6 +165,7 @@ async function performSignin(sig) {
 }
 
 async function gatewayGain() {
+  if (store.state.gateway) return
   try {
     const response = await sendRequest(`${process.env.VUE_APP_BASEAPI}gateway`, 'get')
     if (response && response.data.gateway) store.dispatch('setGateway', response.data.gateway)
@@ -189,7 +190,6 @@ async function signOutFun() {
   store.dispatch('setMetaAddress', '')
   store.dispatch('setAccessSpace', '')
   store.dispatch('setAccessDataset', '')
-  store.dispatch('setGateway', '')
   router.push({
     name: 'main'
   })
