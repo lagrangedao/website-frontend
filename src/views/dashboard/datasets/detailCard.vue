@@ -302,7 +302,7 @@ export default defineComponent({
       const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.name}/files/upload`, 'post', fd)
       await system.$commonFun.timeout(500)
       if (uploadRes && uploadRes.status === "success") {
-        if (uploadRes.data.files) system.$commonFun.messageTip('success', 'Update ' + urlReadmeName.value + ' successfully!')
+        if (uploadRes.data.files) system.$commonFun.messageTip(uploadRes.status, 'Update ' + urlReadmeName.value + ' successfully!')
         else system.$commonFun.messageTip(uploadRes.status, uploadRes.message)
       } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
       init()
@@ -319,8 +319,7 @@ export default defineComponent({
       listdata.value = []
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
-        // listdata.value = listRes.data.files || []
-        const fileLi = listRes.data.files || []
+        const fileLi = listRes.data || []
         fileLi.forEach((element, i) => {
           let el = element.name.split('/')
           el.shift()

@@ -307,7 +307,7 @@ export default defineComponent({
       fileRow.fileTitle = []
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
-        fileRow.fileResdata = listRes.data.files || []
+        fileRow.fileResdata = listRes.data || []
 
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)

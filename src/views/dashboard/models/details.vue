@@ -104,7 +104,6 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref({})
     const filedata = ref([])
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -121,29 +120,12 @@ export default defineComponent({
     async function init () {
       if (route.name !== 'modelsDetail') return
       listLoad.value = true
-      listdata.value = {}
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
-        filedata.value = listRes.data.files || []
-        listdata.value = listRes.data.dataset || { name: route.params.name }
+        filedata.value = listRes.data || []
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
-
-      // listdata.value = [
-      //   {
-      //     is_public: "1",
-      //     name: "Frigg"
-      //   },
-      //   {
-      //     is_public: "1",
-      //     name: "Travis"
-      //   },
-      //   {
-      //     is_public: "1",
-      //     name: "Tyree"
-      //   }
-      // ]
     }
     function detailFun (row, index) {
       console.log(row, index)
@@ -193,7 +175,6 @@ export default defineComponent({
       background,
       listLoad,
       filedata,
-      listdata,
       total,
       activeName,
       bodyWidth,

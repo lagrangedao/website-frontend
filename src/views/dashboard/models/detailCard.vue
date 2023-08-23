@@ -271,8 +271,7 @@ export default defineComponent({
       listdata.value = []
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        // listdata.value = listRes.data.files || []
-        const fileLi = listRes.data.files || []
+        const fileLi = listRes.data || []
         fileLi.forEach((element, i) => {
           let el = element.name.split('/')
           el.shift()
