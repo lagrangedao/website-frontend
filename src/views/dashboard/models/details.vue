@@ -112,50 +112,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const activeName = ref('card')
-    const tableData = ref([
-      {
-        sentence1: '"The cat sat on the mat."',
-        sentence2: '"The cat did not sit on the mat."',
-        idx: '0',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"The cat did not sit on the mat."',
-        sentence2: '"The cat sat on the mat."',
-        idx: '1',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"When you\'ve got no snow,  it\'s really hard to...',
-        sentence2: '"When you\'ve got snow, it\'s really hard to learn a snowy...',
-        idx: '2',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '3',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '4',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya supports Twitch.tv...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '5',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouy supports media apps...',
-        sentence2: '"Out of the box, Ouya supports Twitch.tv and XBMC media player."',
-        idx: '6',
-        label: '1   (not_entailment)'
-      }
-    ])
 
     function handleClick (tab, event) {
       router.push({ name: 'modelsDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -244,7 +200,6 @@ export default defineComponent({
       system,
       route,
       router,
-      tableData,
       init, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList, copyName, back
     }
   }

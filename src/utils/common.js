@@ -164,6 +164,16 @@ async function performSignin(sig) {
   }
 }
 
+async function gatewayGain() {
+  try {
+    const response = await sendRequest(`${process.env.VUE_APP_BASEAPI}gateway`, 'get')
+    if (response && response.data.gateway) store.dispatch('setGateway', response.data.gateway)
+  } catch (err) {
+    // console.log('login err:', err)
+    messageTip('error', 'Gateway not found')
+  }
+}
+
 async function messageTip(type, text) {
   ElMessage({
     showClose: true,
@@ -179,6 +189,7 @@ async function signOutFun() {
   store.dispatch('setMetaAddress', '')
   store.dispatch('setAccessSpace', '')
   store.dispatch('setAccessDataset', '')
+  store.dispatch('setGateway', '')
   router.push({
     name: 'main'
   })
@@ -419,5 +430,6 @@ export default {
   NumFormat,
   calculateDiffTime,
   cmOptions,
-  expireTimeFun
+  expireTimeFun,
+  gatewayGain
 }

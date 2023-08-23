@@ -161,7 +161,7 @@ export default defineComponent({
       //   store.dispatch('setMetaAddress', account[0])
       //   store.dispatch('setNavLogin', false)
       //   store.dispatch('setLogin', false)
-      //   store.dispatch('setAccessToken', '')
+      //   store.dispatch('setAccessToken', '') store.dispatch('setGateway', '')
       //   window.location.reload()
       // })
       // networkChanged

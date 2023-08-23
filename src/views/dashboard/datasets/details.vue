@@ -196,13 +196,19 @@ export default defineComponent({
     function back () {
       router.push({ path: '/dataset' })
     }
-    const handleValue = async (value, nftData) => {
-      nft.contract_address = nftData.contract_address
-      nft.chain_id = nftData.chain_id
-      likeValue.value = value.likes || 0
-      ntfLoad.value = false
-      nftTokens.value = nftData.tokens || []
-      if (nftData.tokens && nftData.tokens.length > 0) nft.ipfs_uri = nftData.tokens[0].cid && nftData.tokens[0].cid !== 'undefined' ? `${value.gateway}/ipfs/${nftData.tokens[0].cid}` : ''
+    async function requestDetail () {
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        nft.contract_address = listRes.data.nft.contract_address
+        nft.chain_id = listRes.data.nft.chain_id
+        likeValue.value = listRes.data.dataset.likes || 0
+        ntfLoad.value = false
+        nftTokens.value = listRes.data.nft.tokens || []
+        if (listRes.data.nft.tokens && listRes.data.nft.tokens.length > 0) nft.ipfs_uri = listRes.data.nft.tokens[0].cid && listRes.data.nft.tokens[0].cid !== 'undefined' && store.state.gateway ? `${store.state.gateway}/ipfs/${listRes.data.nft.tokens[0].cid}` : ''
+      } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
+    }
+    const handleValue = async (value, type) => {
+      if (type) requestDetail()
     }
     async function reqNFT () {
       if (!nft.contract_address || nftTokens.value.length === 0 || !nft.ipfs_uri) return
@@ -234,6 +240,7 @@ export default defineComponent({
         const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
       }
       likesValue.value = !likesValue.value
+      requestDetail()
       likesData()
     }
     const likesData = async () => {
@@ -245,6 +252,7 @@ export default defineComponent({
       activeName.value = route.params.tabs || 'card'
       window.scrollTo(0, 0)
       settingOneself.value = accessDataset.value.some(ele => ele === route.params.name)
+      requestDetail()
       if (metaAddress.value) likesData()
       else if (activeName.value === 'settings') router.push({ name: 'datasetDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
     })

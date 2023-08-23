@@ -57,7 +57,8 @@
               </el-table-column>
               <el-table-column prop="token_id" label="Token ID">
                 <template #default="scope">
-                  <a :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
+                  <a v-if="userGateway" :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
+                  <span v-else>{{ scope.row.token_id }}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="owner_address" label="Owner Address" min-width="140">
@@ -69,7 +70,7 @@
               <el-table-column prop="status" label="Status" />
               <el-table-column label="Share License Info" min-width="110">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined'?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Get shared link</el-button>
+                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined' && userGateway?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Get shared link</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
@@ -202,6 +203,7 @@ export default defineComponent({
       return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
     })
     const metaAddressFull = computed(() => (store.state.metaAddress))
+    const userGateway = computed(() => (store.state.gateway))
     const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
     const ruleForm = reactive({
       name: '',
@@ -516,7 +518,7 @@ export default defineComponent({
         return ''
       }
     }
-    async function mapTokens (list, nft_contract, contract_address, gateway) {
+    async function mapTokens (list, nft_contract, contract_address) {
       const number = list ? list.length : 0
       for (let token = 0; token < number; token++) {
         let { name, url } = await system.$commonFun.getUnit(parseInt(list[token].chain_id), 16)
@@ -524,7 +526,7 @@ export default defineComponent({
         list[token].owner_address = list[token].token_id && list[token].token_id !== null ? await ownerAddress(nft_contract, list[token].token_id) : ''
         list[token].chain_name = name
         list[token].chain_url = url
-        list[token].ipfs_url = `${gateway}/ipfs/${list[token].cid}`
+        list[token].ipfs_url = userGateway.value ? `${userGateway.value}/ipfs/${list[token].cid}` : ''
       }
       return list
     }
@@ -548,7 +550,7 @@ export default defineComponent({
           let { url } = await system.$commonFun.getUnit(parseInt(listNftRes.data.chain_id), 16)
           const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
           // const tokens_contact = await getTokenURI(nft_contract, contract_address, listNftRes.data.chain_id)
-          const tokens_list = await mapTokens(listNftRes.data.tokens, nft_contract, contract_address, listRes.data.space.gateway)
+          const tokens_list = await mapTokens(listNftRes.data.tokens, nft_contract, contract_address)
           // listNftRes.data.tokens = tokens_contact.concat(tokens_list)
           listNftRes.data.chain_url = url
           listNftRes.data.tokens = tokens_list
@@ -596,6 +598,7 @@ export default defineComponent({
     return {
       lagLogin,
       metaAddress,
+      userGateway,
       renameLoad,
       deleteLoad,
       doiLoad,

@@ -59,7 +59,8 @@
           <el-table-column label="url" min-width="140">
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
-              <a v-else :href="`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <a v-else-if="userGateway" :href="`${userGateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${userGateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <span v-else>-</span>
             </template>
           </el-table-column>
           <el-table-column label="Created At" align="right" min-width="110">
@@ -84,7 +85,7 @@
             <div class="worktop" style="justify-content: space-between;">
               <ul>
                 <li v-if="fileTextType !== 'binary'">
-                  <a :href="`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`" target="_blank" :title="fileBody.title">
+                  <a :href="userGateway?`${userGateway}/ipfs/${fileBody._originPath.cid}`:''" target="_blank" :title="fileBody.title">
                     <svg class="mr-raw" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" style="transform: rotate(360deg);">
                       <path d="M31 16l-7 7l-1.41-1.41L28.17 16l-5.58-5.59L24 9l7 7z" fill="currentColor"></path>
                       <path d="M1 16l7-7l1.41 1.41L3.83 16l5.58 5.59L8 23l-7-7z" fill="currentColor"></path>
@@ -229,6 +230,7 @@ export default defineComponent({
   setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const userGateway = computed(() => (store.state.gateway))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const peopleImg = require("@/assets/images/dashboard/people_default.png")
     const peopleAvatarImg = ref('')
@@ -325,7 +327,7 @@ export default defineComponent({
 
       const listOnwerRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/${route.params.wallet_address}`, 'get')
       if (listOnwerRes && listOnwerRes.status === 'success') {
-        if (listOnwerRes.data.avatar) peopleAvatarImg.value = listOnwerRes.data.avatar && listOnwerRes.data.gateway ? `${listOnwerRes.data.gateway}/ipfs/${listOnwerRes.data.avatar}` : ''
+        if (listOnwerRes.data.avatar) peopleAvatarImg.value = listOnwerRes.data.avatar && userGateway.value ? `${userGateway.value}/ipfs/${listOnwerRes.data.avatar}` : ''
         peopleName.value = listOnwerRes.data.full_name || ''
       }
       await system.$commonFun.timeout(500)
@@ -576,13 +578,14 @@ export default defineComponent({
       totalSize.value = 0
     }
     async function fileEdit (row) {
+      if (!userGateway.value) return
       handleCommand('edit')
       uploadLoad.value = true
       fileTextEditor.value = ''
       fileTextShow.value = false
       fileBody._originPath = row._originPath
       fileBody.title = row.title
-      await getTitle(`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`)
+      await getTitle(`${userGateway.value}/ipfs/${fileBody._originPath.cid}`)
     }
     const getTitle = async (url) => {
       if (!url) return
@@ -783,6 +786,7 @@ export default defineComponent({
     return {
       peopleName,
       metaAddress,
+      userGateway,
       lagLogin,
       peopleImg,
       peopleAvatarImg,

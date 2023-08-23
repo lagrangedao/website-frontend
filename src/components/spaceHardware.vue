@@ -401,6 +401,7 @@ export default defineComponent({
           list: []
         }
       ]
+      // arrayList.sort((a, b) => a['hardware_name'].localeCompare(b['hardware_name']))
       arrayList.forEach(async hard => {
         hard.regionOption = await regionList(hard.region)
         hard.regionValue = hard.region && hard.region[0] ? hard.region[0] : ''
