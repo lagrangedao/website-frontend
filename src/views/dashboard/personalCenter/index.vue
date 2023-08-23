@@ -427,7 +427,7 @@ export default defineComponent({
     }
     function detailFun (row, type) {
       if (type === 'dataset') router.push({ name: 'datasetDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
-      else if (type === 'space') router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
+      else if (type === 'space') router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'app' } })
       else if (type === 'model') router.push({ name: 'modelsDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'licenses') if (row.cid && row.cid !== 'undefined' && store.state.gateway) window.open(`${store.state.gateway}/ipfs/${row.cid}`)
     }

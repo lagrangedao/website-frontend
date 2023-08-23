@@ -41,7 +41,7 @@
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
-            <ul>
+            <ul v-if="titles">
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
@@ -343,20 +343,23 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
+        await system.$commonFun.timeout(1000)
         nextTick(() => {
-          const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-          titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-          if (!titles.value.length) {
-            titles.value = [];
-            return;
-          }
+          if (preview.value) {
+            const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+            titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+            if (!titles.value.length) {
+              titles.value = [];
+              return;
+            }
 
-          const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-          titles.value = titles.value.map(el => ({
-            title: el.innerText,
-            lineIndex: el.getAttribute('data-v-md-line'),
-            indent: hTags.indexOf(el.tagName)
-          }));
+            const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+            titles.value = titles.value.map(el => ({
+              title: el.innerText,
+              lineIndex: el.getAttribute('data-v-md-line'),
+              indent: hTags.indexOf(el.tagName)
+            }));
+          }
         })
       } catch (err) {
         console.log('err space card:', err)

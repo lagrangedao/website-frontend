@@ -6,9 +6,9 @@
           <div class="readme_body" v-if="!createLoad">
             <div class="desc">
               <b>No dataset card yet</b>
-              <p v-if="metaAddress === route.params.wallet_address">Create a new dataset card by using following template</p>
+              <p v-if="metaAddress && metaAddress === route.params.wallet_address">Create a new dataset card by using following template</p>
             </div>
-            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address">
+            <el-row class="card" :gutter="20" v-if="metaAddress && metaAddress === route.params.wallet_address">
               <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" v-for="card in templateData" :key="card">
                 <el-card class="box-card" shadow="hover" @click="cardAdd(card.type)">
                   <template #header>
@@ -40,7 +40,7 @@
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
-            <ul>
+            <ul v-if="titles">
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
@@ -61,7 +61,7 @@
             </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme && userGateway">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress && metaAddress === route.params.wallet_address">
                   <a>
                     <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
                       <el-icon>
@@ -368,20 +368,23 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
+        await system.$commonFun.timeout(1000)
         nextTick(() => {
-          const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-          titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-          if (!titles.value.length) {
-            titles.value = [];
-            return;
-          }
+          if (preview.value) {
+            const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+            titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+            if (!titles.value.length) {
+              titles.value = [];
+              return;
+            }
 
-          const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-          titles.value = titles.value.map(el => ({
-            title: el.innerText,
-            lineIndex: el.getAttribute('data-v-md-line'),
-            indent: hTags.indexOf(el.tagName)
-          }));
+            const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+            titles.value = titles.value.map(el => ({
+              title: el.innerText,
+              lineIndex: el.getAttribute('data-v-md-line'),
+              indent: hTags.indexOf(el.tagName)
+            }));
+          }
         })
       } catch (err) {
         console.log('err datasets card:', err)

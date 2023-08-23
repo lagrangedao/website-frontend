@@ -211,7 +211,7 @@ export default defineComponent({
     }
     function detailFun (row, index) {
       // console.log(row, index)
-      router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
+      router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'app' } })
     }
     onActivated(() => {
       window.scrollTo(0, 0)

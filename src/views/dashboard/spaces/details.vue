@@ -21,7 +21,7 @@
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
+          <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
             <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
               <el-icon>
                 <WarningFilled />
@@ -83,15 +83,6 @@
               Running as {{allData.space.activeOrder.config.description}} </div>
         </div>
         <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
-          <el-tab-pane name="card">
-            <template #label>
-              <span class="custom-tabs-label">
-                <i class="icon icon_spaces"></i>
-                <span>Space card</span>
-              </span>
-            </template>
-            <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
-          </el-tab-pane>
           <el-tab-pane name="app">
             <template #label>
               <span class="custom-tabs-label">
@@ -100,6 +91,15 @@
               </span>
             </template>
             <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'app'"></detail-app>
+          </el-tab-pane>
+          <el-tab-pane name="card">
+            <template #label>
+              <span class="custom-tabs-label">
+                <i class="icon icon_spaces"></i>
+                <span>Space card</span>
+              </span>
+            </template>
+            <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName"></detail-card>
           </el-tab-pane>
           <el-tab-pane name="files">
             <template #label>
@@ -120,7 +120,7 @@
             </template>
             <detail-community @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'community'"></detail-community>
           </el-tab-pane>
-          <el-tab-pane name="settings" v-if="metaAddress === route.params.wallet_address">
+          <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
             <template #label>
               <span class="custom-tabs-label">
                 <!-- <i class="icon icon_spaces"></i> -->
@@ -377,7 +377,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const activeName = ref('card')
+    const activeName = ref('app')
     const settingOneself = ref(false)
     const forkLoad = ref(false)
     const parentValue = ref('')
@@ -500,7 +500,7 @@ export default defineComponent({
       dialogCont.spaceHardDia = true
     }
     function init () {
-      activeName.value = route.params.tabs || 'card'
+      activeName.value = route.params.tabs || 'app'
       forkLoad.value = false
       noteShow.value = true
       parentValue.value = ''
@@ -511,7 +511,7 @@ export default defineComponent({
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
       requestAll()
       if (metaAddress.value) likesData()
-      else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
+      else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'app' } })
     }
     function back () {
       router.push({ path: '/spaces' })
