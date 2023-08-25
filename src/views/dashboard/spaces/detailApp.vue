@@ -121,8 +121,8 @@ export default defineComponent({
 
     async function jobList (list) {
       let arr = list || []
-      try {
-        for (let j = 0; j < arr.length; j++) {
+      for (let j = 0; j < arr.length; j++) {
+        try {
           if (arr[j].job_result_uri) {
             const response = await fetch(arr[j].job_result_uri)
             const textUri = await new Promise(async resolve => {
@@ -130,9 +130,10 @@ export default defineComponent({
             })
             arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
           } else arr[j].job_result_uri = ''
+        } catch (err) {
+          console.log('err', err)
+          arr[j].job_result_uri = ''
         }
-      } catch (err) {
-        console.log('err', err)
       }
       return arr
     }
@@ -155,16 +156,17 @@ export default defineComponent({
 
     async function jobStatusList (list) {
       let arr = list || []
-      try {
-        for (let j = 0; j < arr.length; j++) {
+      for (let j = 0; j < arr.length; j++) {
+        try {
           const response = await fetch(arr[j].result_uri)
           const textUri = await new Promise(async (resolve, reject) => {
             resolve(response.text())
           })
           arr[j].job_textUri = textUri ? JSON.parse(textUri).job_result_uri : ''
+        } catch (err) {
+          console.log('err', err)
+          arr[j].job_textUri = ''
         }
-      } catch (err) {
-        console.log('err', err)
       }
       return arr
     }

@@ -263,11 +263,13 @@ export default defineComponent({
       uploadFolderRef: null
     })
     const ruleEditName = ref(null)
-    const validateInput = (rule, value, callback) => {
+    const validateInput = async (rule, value, callback) => {
       if (!checkSpecialKey(value)) {
         callback(new Error("The file name cannot contain any of the following characters: \\:*?\"<>|"));
       } else {
-        callback();
+        const res = await checkFolder(value)
+        if (!res) callback(new Error("The format of the folder name is incorrect"));
+        else callback()
       }
     }
     const textInfo = reactive({
@@ -303,6 +305,15 @@ export default defineComponent({
         }
       }
       return true;
+    }
+    async function checkFolder (val) {
+      const name = val.split('/')
+      const key = ['.', '..']
+      for (let n = 0; n < name.length; n++) {
+        const checkName = await key.some(t => t === name[n])
+        if (checkName) return false
+      }
+      return true
     }
     async function init () {
       if (route.name !== 'spaceDetail') return
@@ -549,7 +560,7 @@ export default defineComponent({
       const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
       await system.$commonFun.timeout(3000)
       if (uploadRes && uploadRes.status === "success") system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
-      else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
+      else system.$commonFun.messageTip('error', uploadRes ? uploadRes.message : type === 'create' ? 'Create failed!' : 'Update failed!')
       reset()
       context.emit('handleValue', true, 'files')
       init()
