@@ -421,16 +421,17 @@ export default defineComponent({
     async function handleCurrentChange (val) { }
     async function jobList (list) {
       let arr = list || []
-      try {
-        for (let j = 0; j < arr.length; j++) {
+      for (let j = 0; j < arr.length; j++) {
+        try {
           const response = await fetch(arr[j].job_source_uri)
           const textUri = await new Promise(async resolve => {
             resolve(response.text())
           })
           arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
+        } catch (err) {
+          console.log('err space detail job:', err)
+          arr[j].job_textUri = {}
         }
-      } catch (err) {
-        console.log('err space detail job:', err)
       }
       return arr
     }
