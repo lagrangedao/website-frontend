@@ -1,5 +1,5 @@
 <template>
-  <section id="dataset">
+  <section id="dataset" ref="datasetCardRef">
     <div id="datasetBody">
       <el-row class="dataset_body" v-loading="listLoad">
         <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
@@ -40,7 +40,7 @@
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
-            <ul v-if="titles">
+            <ul v-show="titles">
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
@@ -216,56 +216,13 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
+    const datasetCardRef = ref(null)
     const listdata = ref([])
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const tableData = ref([
-      {
-        sentence1: '"The cat sat on the mat."',
-        sentence2: '"The cat did not sit on the mat."',
-        idx: '0',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"The cat did not sit on the mat."',
-        sentence2: '"The cat sat on the mat."',
-        idx: '1',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"When you\'ve got no snow,  it\'s really hard to...',
-        sentence2: '"When you\'ve got snow, it\'s really hard to learn a snowy...',
-        idx: '2',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '3',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '4',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya supports Twitch.tv...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '5',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouy supports media apps...',
-        sentence2: '"Out of the box, Ouya supports Twitch.tv and XBMC media player."',
-        idx: '6',
-        label: '1   (not_entailment)'
-      }
-    ])
     const textEditor = ref('')
     const textEditorChange = ref('')
     const preview = ref(null)
@@ -334,7 +291,7 @@ export default defineComponent({
         })
       }
       await system.$commonFun.timeout(500)
-      listLoad.value = false
+      if (!urlReadme.value || !userGateway.value) listLoad.value = false
       listdata.value = [
         {
           is_public: "1",
@@ -374,6 +331,7 @@ export default defineComponent({
             titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
             if (!titles.value.length) {
               titles.value = [];
+              listLoad.value = false
               return;
             }
 
@@ -383,11 +341,14 @@ export default defineComponent({
               lineIndex: el.getAttribute('data-v-md-line'),
               indent: hTags.indexOf(el.tagName)
             }));
+            scroll()
           }
+          listLoad.value = false
         })
       } catch (err) {
         console.log('err datasets card:', err)
         system.$commonFun.messageTip('error', err)
+        listLoad.value = false
       }
     }
     function handleAnchorClick (anchor) {
@@ -423,13 +384,31 @@ export default defineComponent({
       createLoad.value = false
       textEditor.value = ''
     }
-    onActivated(() => { })
-    onMounted(() => {
+    function scroll () {
+      let line = window.location.hash
+      if (!line) return
+      else line = line.slice(1).toLocaleLowerCase()
+      nextTick(() => {
+        const heading = datasetCardRef.value.querySelector(`[data-v-md-heading="${line}"]`)
+        if (heading) {
+          preview.value.scrollToTarget({
+            target: heading,
+            scrollContainer: window,
+            top: 0,
+          })
+        }
+      })
+    }
+    function resetFun () {
       textEditor.value = ''
       titles.value = ''
       urlReadme.value = ''
       createLoad.value = false
       window.scrollTo(0, 0)
+    }
+    onActivated(() => { })
+    onMounted(() => {
+      resetFun()
       init()
     })
     onDeactivated(() => { })
@@ -440,15 +419,16 @@ export default defineComponent({
       if (!lagLogin.value) init()
     })
     watch(route, (to, from) => {
-      if (to.name !== 'datasetDetail') return
-      if (to.params.tabs === 'card') {
-        textEditor.value = ''
-        titles.value = ''
-        urlReadme.value = ''
-        createLoad.value = false
-        window.scrollTo(0, 0)
-        init()
+      if (to.name !== 'datasetDetail') {
+        resetFun()
+        return
       }
+      if (to.params.tabs === 'card') {
+        if (!urlReadme.value) {
+          resetFun()
+          init()
+        } else scroll()
+      } else resetFun()
     })
     // watch(() => props.likesValue, () => {
     //   init()
@@ -469,7 +449,7 @@ export default defineComponent({
       system,
       route,
       router,
-      tableData,
+      datasetCardRef,
       props,
       urlReadme,
       isPreview,
@@ -680,7 +660,7 @@ export default defineComponent({
           // max-width: 16.6666666667%;
         }
         .title {
-          padding: 0.05rem 0;
+          padding: 0;
           margin: 0 0 0.1rem;
           font-size: 0.2rem;
           color: #000000;
