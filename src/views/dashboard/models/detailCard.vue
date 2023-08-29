@@ -273,11 +273,7 @@ export default defineComponent({
       if (listRes && listRes.status === 'success') {
         const fileLi = listRes.data || []
         fileLi.forEach((element, i) => {
-          let el = element.name.split('/')
-          el.shift()
-          el.shift()
-          el.shift()
-          // console.log(el.join('/').toLowerCase())
+          let el = element.name.split('/').slice(3)
           if (el.join('/').toLowerCase() === 'readme.md') {
             urlReadme.value = `${store.state.gateway}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
