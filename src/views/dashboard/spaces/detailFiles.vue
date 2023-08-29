@@ -114,7 +114,7 @@
                   </a>
                 </li>
               </ul>
-              <small>{{sizeChange(blobSize)}}</small>
+              <small>{{system.$commonFun.sizeChange(blobSize)}}</small>
             </div>
             <img v-if="fileTextType === 'image'" :src="fileTextEditor" :alt="fileBody.title" class="img_file">
             <div v-else-if="fileTextType === 'text'" v-loading="uploadLoad">
@@ -153,7 +153,7 @@
               </el-upload>
               <el-form :label-position="'top'" ref="ruleFormRef" :model="info" :rules="rules" @submit.native.prevent>
                 <el-form-item label="Commit changes" prop="name">
-                  <el-input v-model="info.name" :placeholder="`Upload ${fileList.length} files (${sizeChange(totalSize)})`" />
+                  <el-input v-model="info.name" :placeholder="`Upload ${fileList.length} files (${system.$commonFun.sizeChange(totalSize)})`" />
                 </el-form-item>
               </el-form>
               <el-button-group class="ml-4">
@@ -661,16 +661,6 @@ export default defineComponent({
       context.emit('handleValue', true, 'files')
       init()
     }
-    function sizeChange (bytes) {
-      if (bytes === 0) return '0 B'
-      if (!bytes) return '-'
-      var k = 1024 // or 1000
-      var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      var i = Math.floor(Math.log(bytes) / Math.log(k))
-
-      if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-    }
 
     const treeify = (nodeList) => {
       const root = {
@@ -828,7 +818,7 @@ export default defineComponent({
       totalMaximum,
       init, handleCommand, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      fileEdit, editChange, downFile, sizeChange, deleteFile, onBlur
+      fileEdit, editChange, downFile, deleteFile, onBlur
     }
   }
 })

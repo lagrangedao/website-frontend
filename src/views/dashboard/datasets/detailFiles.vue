@@ -123,7 +123,7 @@
                   </a>
                 </li>
               </ul>
-              <small>{{sizeChange(blobSize)}}</small>
+              <small>{{system.$commonFun.sizeChange(blobSize)}}</small>
             </div>
             <img v-if="fileTextType === 'image'" :src="fileTextEditor" :alt="fileBody.title" class="img_file">
             <v-md-preview v-else-if="fileTextType === 'text'" :text="fileTextEditor" ref="preview" id="preview"></v-md-preview>
@@ -626,16 +626,6 @@ export default defineComponent({
       reset()
       init()
     }
-    function sizeChange (bytes) {
-      if (bytes === 0) return '0 B'
-      if (!bytes) return '-'
-      var k = 1024 // or 1000
-      var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      var i = Math.floor(Math.log(bytes) / Math.log(k))
-
-      if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-    }
 
     const treeify = (nodeList) => {
       const root = {
@@ -778,7 +768,7 @@ export default defineComponent({
       blobSize,
       init, handleCommand, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      fileEdit, editChange, downFile, sizeChange, deleteFile
+      fileEdit, editChange, downFile, deleteFile
     }
   }
 })
