@@ -63,11 +63,28 @@
               <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column label="Created At" align="right" min-width="110">
+          <el-table-column label="Created At" align="center" min-width="110">
             <template #default="scope">
               <div>
                 <span v-if="scope.row.isDir">-</span>
                 <span v-else :title="system.$commonFun.momentFun(scope.row._originPath.created_at)">{{ system.$commonFun.calculateDiffTime(scope.row._originPath.created_at)}}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="Actions" align="center" width="110" v-if="metaAddress === route.params.wallet_address">
+            <template #default="scope">
+              <div class="hot-cold-box" v-if="!scope.row.isDir">
+                <svg @click="fileEdit(scope.row)" class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                  <path d="M2 26h28v2H2z" fill="currentColor"></path>
+                  <path d="M25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10l3.6 3.6l-10 10H6z" fill="currentColor"></path>
+                </svg>
+                <svg @click="deleteFile(scope.row.title)" class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
+                  viewBox="0 0 32 32">
+                  <path d="M12 12h2v12h-2z" fill="currentColor"></path>
+                  <path d="M18 12h2v12h-2z" fill="currentColor"></path>
+                  <path d="M4 6v2h2v20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8h2V6zm4 22V8h16v20z" fill="currentColor"></path>
+                  <path d="M12 2h8v2h-8z" fill="currentColor"></path>
+                </svg>
               </div>
             </template>
           </el-table-column>
@@ -103,7 +120,7 @@
                   </a>
                 </li>
                 <li>
-                  <a @click="deleteFile" :class="{'disable': metaAddress !== route.params.wallet_address}">
+                  <a @click="deleteFile()" :class="{'disable': metaAddress !== route.params.wallet_address}">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                       <path d="M12 12h2v12h-2z" fill="currentColor"></path>
                       <path d="M18 12h2v12h-2z" fill="currentColor"></path>
@@ -114,7 +131,7 @@
                   </a>
                 </li>
               </ul>
-              <small>{{sizeChange(blobSize)}}</small>
+              <small>{{system.$commonFun.sizeChange(blobSize)}}</small>
             </div>
             <img v-if="fileTextType === 'image'" :src="fileTextEditor" :alt="fileBody.title" class="img_file">
             <div v-else-if="fileTextType === 'text'" v-loading="uploadLoad">
@@ -153,7 +170,7 @@
               </el-upload>
               <el-form :label-position="'top'" ref="ruleFormRef" :model="info" :rules="rules" @submit.native.prevent>
                 <el-form-item label="Commit changes" prop="name">
-                  <el-input v-model="info.name" :placeholder="`Upload ${fileList.length} files (${sizeChange(totalSize)})`" />
+                  <el-input v-model="info.name" :placeholder="`Upload ${fileList.length} files (${system.$commonFun.sizeChange(totalSize)})`" />
                 </el-form-item>
               </el-form>
               <el-button-group class="ml-4">
@@ -384,13 +401,16 @@ export default defineComponent({
     async function handleCommand (command) {
       uploadLoad.value = command === 'create'
       labelTab.value = command
+      await pathPush()
+      await system.$commonFun.timeout(1000)
+      if (command === 'upload') addEvent()
+      else if (command === 'create') createText()
+    }
+    async function pathPush () {
       pathList.value = []
       fileRow.fileTitle.forEach((element, i) => {
         pathList.value.push(element.title)
       })
-      await system.$commonFun.timeout(1000)
-      if (command === 'upload') addEvent()
-      else if (command === 'create') createText()
     }
     async function createText () {
       try {
@@ -633,6 +653,8 @@ export default defineComponent({
       } catch (err) {
         console.log('err space files:', err)
         system.$commonFun.messageTip('error', err)
+        reset()
+        init()
       }
     }
     function downFile () {
@@ -646,11 +668,15 @@ export default defineComponent({
       if (metaAddress.value !== route.params.wallet_address) return
       fileTextShow.value = !fileTextShow.value
     }
-    async function deleteFile () {
+    async function deleteFile (filesTitle) {
       if (metaAddress.value !== route.params.wallet_address) return
+      if (filesTitle) {
+        listLoad.value = true
+        await pathPush()
+      }
       uploadLoad.value = true
       let name = pathList.value.join('/') || ''
-      let fileNew = `${name ? name + '/' : ''}${fileBody.title}`
+      let fileNew = `${name ? name + '/' : ''}${filesTitle ? filesTitle : fileBody.title}`
       let paramsBody = {
         filename: fileNew
       }
@@ -660,16 +686,6 @@ export default defineComponent({
       reset()
       context.emit('handleValue', true, 'files')
       init()
-    }
-    function sizeChange (bytes) {
-      if (bytes === 0) return '0 B'
-      if (!bytes) return '-'
-      var k = 1024 // or 1000
-      var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      var i = Math.floor(Math.log(bytes) / Math.log(k))
-
-      if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     }
 
     const treeify = (nodeList) => {
@@ -828,7 +844,7 @@ export default defineComponent({
       totalMaximum,
       init, handleCommand, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      fileEdit, editChange, downFile, sizeChange, deleteFile, onBlur
+      fileEdit, editChange, downFile, deleteFile, onBlur
     }
   }
 })
@@ -989,6 +1005,26 @@ export default defineComponent({
                 }
                 &:hover {
                   text-decoration: underline;
+                }
+              }
+              .hot-cold-box {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+                i,
+                svg {
+                  width: 15px;
+                  height: 15px;
+                  margin: 0 0.05rem;
+                  cursor: pointer;
+                  path {
+                    cursor: inherit;
+                  }
+                  &:hover {
+                    color: #c37af9;
+                  }
                 }
               }
             }

@@ -353,6 +353,17 @@ function calculateDiffTime(startTime) {
   else return '-'
 }
 
+function sizeChange(bytes) {
+  if (bytes === 0) return '0 B'
+  if (!bytes) return '-'
+  var k = 1024 // or 1000
+  var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  var i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
 async function expireTimeFun(cont) {
   const current = Math.floor(Date.now() / 1000)
   let expireTime = {
@@ -429,6 +440,7 @@ export default {
   hiddAddress,
   NumFormat,
   calculateDiffTime,
+  sizeChange,
   cmOptions,
   expireTimeFun,
   gatewayGain

@@ -63,11 +63,29 @@
               <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column label="Created At" align="right" min-width="110">
+          <el-table-column label="Created At" align="center" min-width="110">
             <template #default="scope">
               <div>
                 <span v-if="scope.row.isDir">-</span>
                 <span v-else :title="system.$commonFun.momentFun(scope.row._originPath.created_at)">{{ system.$commonFun.calculateDiffTime(scope.row._originPath.created_at)}}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="Actions" align="center" width="110" v-if="metaAddress === route.params.wallet_address">
+            <template #default="scope">
+              <div class="hot-cold-box" v-if="!scope.row.isDir">
+                <svg @click="fileEdit(scope.row)" class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                  <path d="M2 26h28v2H2z" fill="currentColor"></path>
+                  <path d="M25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10l3.6 3.6l-10 10H6z" fill="currentColor"></path>
+                </svg>
+                <!-- `${scope.row._patName?scope.row._patName+'/':''}${scope.row.title}` -->
+                <svg @click="deleteFile(scope.row.title)" class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
+                  viewBox="0 0 32 32">
+                  <path d="M12 12h2v12h-2z" fill="currentColor"></path>
+                  <path d="M18 12h2v12h-2z" fill="currentColor"></path>
+                  <path d="M4 6v2h2v20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8h2V6zm4 22V8h16v20z" fill="currentColor"></path>
+                  <path d="M12 2h8v2h-8z" fill="currentColor"></path>
+                </svg>
               </div>
             </template>
           </el-table-column>
@@ -94,15 +112,6 @@
                     raw
                   </a>
                 </li>
-                <li v-if="fileTextType === 'text'">
-                  <a @click="editChange" :class="{'disable': metaAddress !== route.params.wallet_address}">
-                    <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                      <path d="M2 26h28v2H2z" fill="currentColor"></path>
-                      <path d="M25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10l3.6 3.6l-10 10H6z" fill="currentColor"></path>
-                    </svg>
-                    edit
-                  </a>
-                </li>
                 <li v-else>
                   <a @click="downFile">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" viewBox="0 0 32 32" style="transform: rotate(360deg);">
@@ -112,7 +121,7 @@
                   </a>
                 </li>
                 <li>
-                  <a @click="deleteFile" :class="{'disable': metaAddress !== route.params.wallet_address}">
+                  <a @click="deleteFile()" :class="{'disable': metaAddress !== route.params.wallet_address}">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                       <path d="M12 12h2v12h-2z" fill="currentColor"></path>
                       <path d="M18 12h2v12h-2z" fill="currentColor"></path>
@@ -123,22 +132,25 @@
                   </a>
                 </li>
               </ul>
-              <small>{{sizeChange(blobSize)}}</small>
+              <small>{{system.$commonFun.sizeChange(blobSize)}}</small>
             </div>
             <img v-if="fileTextType === 'image'" :src="fileTextEditor" :alt="fileBody.title" class="img_file">
-            <v-md-preview v-else-if="fileTextType === 'text'" :text="fileTextEditor" ref="preview" id="preview"></v-md-preview>
+            <!-- <v-md-preview v-else-if="fileTextType === 'text'" :text="fileTextEditor" ref="preview" id="preview"></v-md-preview> -->
+            <div v-else-if="fileTextType === 'text'" v-loading="uploadLoad">
+              <div class="mirror">
+                <Codemirror v-model:value="fileTextEditor" :options="system.$commonFun.cmOptions(metaAddress === route.params.wallet_address)" border placeholder="" />
+              </div>
+              <!-- <v-md-editor v-model="fileTextEditor" height="450px"></v-md-editor> -->
+              <el-button-group class="ml-4 worktop">
+                <el-button @click="commitEditFun('edit')" v-if="metaAddress === route.params.wallet_address" :disabled="!fileBody.title">Commit changes</el-button>
+                <el-button @click="cancelFun">Cancel</el-button>
+              </el-button-group>
+            </div>
             <div class="tip_down" v-else>
               This file contains binary data. It cannot be displayed, but you can still
               <a @click="downFile">download</a>
               it.
             </div>
-          </div>
-          <div v-else v-loading="uploadLoad">
-            <v-md-editor v-model="fileTextEditor" height="450px"></v-md-editor>
-            <el-button-group class="ml-4 worktop">
-              <el-button @click="commitEditFun('edit')" :disabled="!fileBody.title">Commit changes</el-button>
-              <el-button @click="cancelFun">Cancel</el-button>
-            </el-button-group>
           </div>
         </div>
         <div v-else-if="labelTab === 'upload'" class="uploadBody">
@@ -183,7 +195,10 @@
         <div v-else-if="labelTab === 'create'" class="uploadBody">
           <el-tabs type="border-card" v-loading="uploadLoad">
             <el-tab-pane label="Create new file">
-              <v-md-editor v-model="textEditor"></v-md-editor>
+              <div class="mirror">
+                <Codemirror v-model:value="textEditor" :options="system.$commonFun.cmOptions" border placeholder="" />
+              </div>
+              <!-- <v-md-editor v-model="textEditor"></v-md-editor> -->
               <el-form :label-position="'top'" ref="ruleEditName" :model="textInfo" :rules="rulesEdit">
                 <el-form-item label="File name" prop="name">
                   <el-input v-model="textInfo.name" :placeholder="'Name your file'" />
@@ -212,7 +227,7 @@ import {
   UploadFilled,
   EditPen
 } from '@element-plus/icons-vue'
-import { async } from 'q';
+import Codemirror from "codemirror-editor-vue3"
 export default defineComponent({
   name: 'Datasets',
   components: {
@@ -221,7 +236,8 @@ export default defineComponent({
     Folder,
     Plus,
     UploadFilled,
-    EditPen
+    EditPen,
+    Codemirror
   },
   props: {
     likesValue: { type: Boolean, default: false }
@@ -262,11 +278,13 @@ export default defineComponent({
       uploadFolderRef: null
     })
     const ruleEditName = ref(null)
-    const validateInput = (rule, value, callback) => {
+    const validateInput = async (rule, value, callback) => {
       if (!checkSpecialKey(value)) {
         callback(new Error("The file name cannot contain any of the following characters: \\/:*?\"<>|"));
       } else {
-        callback();
+        const res = await checkFolder(value)
+        if (!res) callback(new Error("The format of the folder name is incorrect"));
+        else callback()
       }
     }
     const textInfo = reactive({
@@ -293,13 +311,22 @@ export default defineComponent({
 
     function checkSpecialKey (str) {
       let specialKey =
-        "\\/:*?\"<>|";
+        "\\:*?\"<>|";
       for (let i = 0; i < str.length; i++) {
         if (specialKey.indexOf(str.substr(i, 1)) != -1) {
           return false;
         }
       }
       return true;
+    }
+    async function checkFolder (val) {
+      const name = val.split('/')
+      const key = ['.', '..']
+      for (let n = 0; n < name.length; n++) {
+        const checkName = await key.some(t => t === name[n])
+        if (checkName) return false
+      }
+      return true
     }
     async function init () {
       if (route.name !== 'datasetDetail') return
@@ -363,13 +390,29 @@ export default defineComponent({
       listLoad.value = false
     }
     async function handleCommand (command) {
+      uploadLoad.value = command === 'create'
       labelTab.value = command
+      await pathPush()
+      await system.$commonFun.timeout(1000)
+      if (command === 'upload') addEvent()
+      else if (command === 'create') createText()
+    }
+    async function pathPush () {
       pathList.value = []
       fileRow.fileTitle.forEach((element, i) => {
         pathList.value.push(element.title)
       })
-      await system.$commonFun.timeout(1000)
-      if (command === 'upload') addEvent()
+    }
+    async function createText () {
+      try {
+        var response = await fetch(`/static/template/create.md`)
+        textEditor.value = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+      } catch (err) {
+        console.log('err space create.md:', err)
+      }
+      uploadLoad.value = false
     }
     function handleChange (uploadFile, uploadFiles) {
       // console.log(uploadFile, uploadFiles)
@@ -599,6 +642,8 @@ export default defineComponent({
       } catch (err) {
         console.log('err dataset files:', err)
         system.$commonFun.messageTip('error', err)
+        reset()
+        init()
       }
     }
     function downFile () {
@@ -612,11 +657,15 @@ export default defineComponent({
       if (metaAddress.value !== route.params.wallet_address) return
       fileTextShow.value = !fileTextShow.value
     }
-    async function deleteFile () {
+    async function deleteFile (filesTitle) {
       if (metaAddress.value !== route.params.wallet_address) return
+      if (filesTitle) {
+        listLoad.value = true
+        await pathPush()
+      }
       uploadLoad.value = true
       let name = pathList.value.join('/') || ''
-      let fileNew = `${name ? name + '/' : ''}${fileBody.title}`
+      let fileNew = `${name ? name + '/' : ''}${filesTitle ? filesTitle : fileBody.title}`
       let paramsBody = {
         filename: fileNew
       }
@@ -625,16 +674,6 @@ export default defineComponent({
       else system.$commonFun.messageTip('error', 'Delete failed!')
       reset()
       init()
-    }
-    function sizeChange (bytes) {
-      if (bytes === 0) return '0 B'
-      if (!bytes) return '-'
-      var k = 1024 // or 1000
-      var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      var i = Math.floor(Math.log(bytes) / Math.log(k))
-
-      if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     }
 
     const treeify = (nodeList) => {
@@ -778,7 +817,7 @@ export default defineComponent({
       blobSize,
       init, handleCommand, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      fileEdit, editChange, downFile, sizeChange, deleteFile
+      fileEdit, editChange, downFile, deleteFile
     }
   }
 })
@@ -938,6 +977,26 @@ export default defineComponent({
                 }
                 &:hover {
                   text-decoration: underline;
+                }
+              }
+              .hot-cold-box {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+                i,
+                svg {
+                  width: 15px;
+                  height: 15px;
+                  margin: 0 0.05rem;
+                  cursor: pointer;
+                  path {
+                    cursor: inherit;
+                  }
+                  &:hover {
+                    color: #c37af9;
+                  }
                 }
               }
             }

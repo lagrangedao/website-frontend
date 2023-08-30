@@ -1,5 +1,5 @@
 <template>
-  <section id="dataset">
+  <section id="dataset" ref="spaceCardRef">
     <div id="datasetBody">
       <el-row class="dataset_body" v-loading="listLoad">
         <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
@@ -41,7 +41,7 @@
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
-            <ul v-if="titles">
+            <ul v-show="titles">
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
@@ -217,6 +217,7 @@ export default defineComponent({
     const fileSpaceData = ref([])
     const isPreview = ref(true)
     const currentPage1 = ref(1)
+    const spaceCardRef = ref(null)
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
@@ -292,10 +293,7 @@ export default defineComponent({
       if (listFilesRes && listFilesRes.status === 'success') {
         const fileLi = listFilesRes.data || []
         fileLi.forEach((element, i) => {
-          let el = element.name.split('/')
-          el.shift()
-          el.shift()
-          el.shift()
+          let el = element.name.split('/').slice(3)
           if (el.join('/').toLowerCase() === 'readme.md') {
             urlReadme.value = `${userGateway.value}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
@@ -316,7 +314,7 @@ export default defineComponent({
       // }
       context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
-      listLoad.value = false
+      if (!urlReadme.value || !userGateway.value) listLoad.value = false
     }
     function detailFun (row, index) {
       console.log(row, index)
@@ -350,6 +348,7 @@ export default defineComponent({
             titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
             if (!titles.value.length) {
               titles.value = [];
+              listLoad.value = false
               return;
             }
 
@@ -359,11 +358,14 @@ export default defineComponent({
               lineIndex: el.getAttribute('data-v-md-line'),
               indent: hTags.indexOf(el.tagName)
             }));
+            scroll()
           }
+          listLoad.value = false
         })
       } catch (err) {
         console.log('err space card:', err)
         system.$commonFun.messageTip('error', err)
+        listLoad.value = false
       }
     }
     async function cardAdd (type) {
@@ -413,13 +415,31 @@ export default defineComponent({
       createLoad.value = false
       textEditor.value = ''
     }
-    onActivated(() => { })
-    onMounted(() => {
+    function scroll () {
+      let line = window.location.hash
+      if (!line) return
+      else line = line.slice(1).toLocaleLowerCase()
+      nextTick(() => {
+        const heading = spaceCardRef.value.querySelector(`[data-v-md-heading="${line}"]`)
+        if (heading) {
+          preview.value.scrollToTarget({
+            target: heading,
+            scrollContainer: window,
+            top: 0,
+          })
+        }
+      })
+    }
+    function resetFun () {
       textEditor.value = ''
       titles.value = ''
       urlReadme.value = ''
       createLoad.value = false
       window.scrollTo(0, 0)
+    }
+    onActivated(() => { })
+    onMounted(() => {
+      resetFun()
       init()
     })
     onDeactivated(() => { })
@@ -430,20 +450,22 @@ export default defineComponent({
       if (!lagLogin.value) init()
     })
     watch(route, (to, from) => {
-      if (to.name !== 'spaceDetail') return
-      if (to.params.tabs === 'card') {
-        textEditor.value = ''
-        titles.value = ''
-        urlReadme.value = ''
-        createLoad.value = false
-        window.scrollTo(0, 0)
-        init()
+      if (to.name !== 'spaceDetail') {
+        resetFun()
+        return
       }
+      if (to.params.tabs === 'card') {
+        if (!urlReadme.value) {
+          resetFun()
+          init()
+        } else scroll()
+      } else resetFun()
     })
     // watch(() => props.likesValue, () => {
     //   init()
     // })
     return {
+      spaceCardRef,
       lagLogin,
       metaAddress,
       userGateway,
@@ -677,7 +699,7 @@ export default defineComponent({
           // max-width: 16.6666666667%;
         }
         .title {
-          padding: 0.05rem 0;
+          padding: 0;
           margin: 0 0 0.1rem;
           font-size: 0.2rem;
           color: #000000;

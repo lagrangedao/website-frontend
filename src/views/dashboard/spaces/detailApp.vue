@@ -145,7 +145,7 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.jobResult = await jobList(listRes.data.job)
-        if (listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
+        if (listRes.data.space.status === 'Deploying' && listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
         listdata.space = listRes.data.space
         listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
       }
@@ -158,11 +158,13 @@ export default defineComponent({
       let arr = list || []
       for (let j = 0; j < arr.length; j++) {
         try {
-          const response = await fetch(arr[j].result_uri)
-          const textUri = await new Promise(async (resolve, reject) => {
-            resolve(response.text())
-          })
-          arr[j].job_textUri = textUri ? JSON.parse(textUri).job_result_uri : ''
+          if (arr[j].result_uri) {
+            const response = await fetch(arr[j].result_uri)
+            const textUri = await new Promise(async (resolve, reject) => {
+              resolve(response.text())
+            })
+            arr[j].job_textUri = textUri ? JSON.parse(textUri).job_result_uri : ''
+          } else arr[j].job_textUri = ''
         } catch (err) {
           console.log('err', err)
           arr[j].job_textUri = ''
@@ -184,6 +186,7 @@ export default defineComponent({
     onDeactivated(() => {
     })
     watch(route, (to, from) => {
+      listdata.space = {}
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'app') {
         window.scrollTo(0, 0)
