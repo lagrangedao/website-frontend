@@ -201,7 +201,7 @@
               <!-- <v-md-editor v-model="textEditor"></v-md-editor> -->
               <el-form :label-position="'top'" ref="ruleEditName" :model="textInfo" :rules="rulesEdit">
                 <el-form-item label="File name" prop="name">
-                  <el-input v-model="textInfo.name" :placeholder="'Name your file'" />
+                  <el-input v-model="textInfo.name" :placeholder="'Name your file'" maxlength="96" />
                 </el-form-item>
               </el-form>
               <el-button-group class="ml-4">
@@ -280,7 +280,7 @@ export default defineComponent({
     const ruleEditName = ref(null)
     const validateInput = async (rule, value, callback) => {
       if (!checkSpecialKey(value)) {
-        callback(new Error("The file name cannot contain any of the following characters: \\/:*?\"<>|"));
+        callback(new Error("File name not valid. Only '.','_','-' are accepted. '..' and '--' are forbidden. Max length is 96."));
       } else {
         const res = await checkFolder(value)
         if (!res) callback(new Error("The format of the folder name is incorrect"));
@@ -311,12 +311,15 @@ export default defineComponent({
 
     function checkSpecialKey (str) {
       let specialKey =
-        "\\:*?\"<>|";
+        "[~!#$^&*()=|{}':;'\\[\\],<>?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
+      // let specialKey =
+      //   "\\:*?\"<>|";
       for (let i = 0; i < str.length; i++) {
         if (specialKey.indexOf(str.substr(i, 1)) != -1) {
           return false;
         }
       }
+      if (str.indexOf('..') > -1 || str.indexOf('--') > -1) return false
       return true;
     }
     async function checkFolder (val) {

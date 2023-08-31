@@ -253,40 +253,46 @@
                 <json-viewer :value="allData.task" :expand-depth=5 copyable boxed sort></json-viewer>
               </div>
             </el-tab-pane>
-            <el-tab-pane v-for="(job, j) in logsCont.data" v-if="logsCont.data" :key="j">
+            <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data" :key="j">
               <template #label>
                 <span class="custom-tabs-label">
-                  <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                  <span :class="{'span-cp': dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
                 </span>
               </template>
               <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
                 <el-col :span="24">
-                  <el-alert v-if="!job.job_result_uri" :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
+                  <el-alert v-if="!dataJob.job.job_result_uri" :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
                   <el-descriptions title="CP Status:" direction="vertical" :column="bodyWidth" border>
                     <el-descriptions-item label="CP Node ID">
-                      <p v-if="job.bidder_id">
-                        {{system.$commonFun.hiddAddress(job.bidder_id)}}
-                        <i class="icon icon_copy" @click="system.$commonFun.copyContent(job.bidder_id, 'Copied')"></i>
+                      <p v-if="dataJob.job.bidder_id">
+                        {{system.$commonFun.hiddAddress(dataJob.job.bidder_id)}}
+                        <i class="icon icon_copy" @click="system.$commonFun.copyContent(dataJob.job.bidder_id, 'Copied')"></i>
                       </p>
                       <p v-else>Waiting for CP finish deployment</p>
                     </el-descriptions-item>
                     <el-descriptions-item label="Provider status">
-                      {{job.provider_status.status}}, {{job.provider_status.online ? 'Online' : 'Offline'}}
+                      {{dataJob.job.provider_status.status}}, {{dataJob.job.provider_status.online ? 'Online' : 'Offline'}}
                     </el-descriptions-item>
                     <el-descriptions-item label="Name">
-                      {{job.provider_status.name}}
+                      {{dataJob.job.provider_status.name}}
                     </el-descriptions-item>
                     <el-descriptions-item label="Score">
-                      {{job.provider_status.score}}
+                      {{dataJob.job.provider_status.score}}
                     </el-descriptions-item>
                     <el-descriptions-item label="Multi address">
-                      {{job.provider_status.multi_address}}
+                      {{dataJob.job.provider_status.multi_address}}
                     </el-descriptions-item>
                   </el-descriptions>
                 </el-col>
               </el-row>
               <div class="logBody">
-                <json-viewer :value="job" :expand-depth=6 copyable boxed sort></json-viewer>
+                <json-viewer :value="dataJob.job" :expand-depth=6 copyable boxed sort></json-viewer>
+              </div>
+              <div class="titleLog">Logs</div>
+              <div class="logBody">
+                <json-viewer :value="logsCont.buildLog" :expand-depth=6 copyable boxed sort></json-viewer>
+                <br />
+                <json-viewer :value="logsCont.containerLog" :expand-depth=6 copyable boxed sort></json-viewer>
               </div>
             </el-tab-pane>
             <el-tab-pane label="Build" name="Build" v-if="false">
@@ -392,7 +398,9 @@ export default defineComponent({
       time: NaN,
       unit: 'day'    })
     const logsCont = reactive({
-      data: []
+      data: [],
+      buildLog: {},
+      containerLog: {}
     })
     const nft = reactive({
       contract_address: null,
@@ -435,6 +443,21 @@ export default defineComponent({
       }
       return arr
     }
+    async function jobWSList (list) {
+      let logArr = []
+      let arr = list || []
+      for (let j = 0; j < arr.length; j++) {
+        try {
+          let array = {}
+          array.job = arr[j]
+          logArr.push(array)
+        } catch (err) {
+          console.log('err space job:', err)
+          logArr.push(arr[j])
+        }
+      }
+      return logArr
+    }
     const hardRedeploy = (dialog) => {
       if (dialog) hardwareOperate('renew')
     }
@@ -452,7 +475,7 @@ export default defineComponent({
         expireTime.unit = expireTimeCont.unit
         if (listRes.data.job) {
           const log = await system.$commonFun.sortBoole(listRes.data.job)
-          logsCont.data = log
+          logsCont.data = await jobWSList(log)
           logsValue.value = log
         } else {
           logsValue.value = ''
@@ -508,11 +531,34 @@ export default defineComponent({
       logsValue.value = ''
       expireTime.time = NaN
       logsCont.data = []
+      logsCont.buildLog = {}
+      logsCont.containerLog = {}
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
       requestAll()
       if (metaAddress.value) likesData()
       else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'app' } })
+    }
+    const WebSocketFun = (url, index) => {
+      if (typeof (WebSocket) === "undefined") {
+        alert("Your browser does not support sockets")
+      } else {
+        const ws = new WebSocket(url)
+        ws.onerror = function () {
+          console.log("Error in ws connection");
+        };
+        ws.onopen = function () {
+          console.log("ws connection successful")
+        }
+        ws.onmessage = function (event) {
+          console.log('ws data:', event.data)
+          if (index === 1) logsCont.buildLog = event.data || {}
+          else if (index === 2) logsCont.containerLog = event.data || {}
+        }
+        ws.onclose = function () {
+          console.log("ws connection closed");
+        }
+      }
     }
     function back () {
       router.push({ path: '/spaces' })
@@ -564,8 +610,11 @@ export default defineComponent({
       const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
-    const drawerClick = (tab, event) => {
-      // console.log(tab, event)
+    const drawerClick = async (tab, event) => {
+      if (drawerName.value === 'Overview') return
+      let n = Number(drawerName.value) - 1
+      await WebSocketFun(logsCont.data[n].job.build_log, 1)
+      await WebSocketFun(logsCont.data[n].job.container_log, 2)
     }
     function handleHard (val, refresh) {
       dialogCont.spaceHardDia = val
@@ -1211,6 +1260,14 @@ export default defineComponent({
               margin: 0 0 0.3rem;
             }
           }
+        }
+        .titleLog {
+          margin: 0.2rem 0 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+        .titleLog + .logBody {
+          margin-top: 0.2rem;
         }
         .logBody {
           width: calc(100% - 30px);
