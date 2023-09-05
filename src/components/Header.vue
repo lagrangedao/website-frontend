@@ -32,7 +32,7 @@
           <el-menu-item index="dashboard">
             Provider
           </el-menu-item>
-          <el-menu-item index="6">
+          <el-menu-item index="pricing">
             Pricing
           </el-menu-item>
           <el-menu-item index="personal_center" v-if="!lagLogin">
@@ -111,6 +111,7 @@ export default defineComponent({
       else if (key === 'create_dataset') router.push({ path: '/create_dataset' })
       else if (key === 'create_organizations') router.push({ path: '/create_organizations' })
       else if (key === 'dashboard') window.open(process.env.VUE_APP_DASHBOARD_LINK)
+      else if (key === 'pricing') router.push({ path: '/pricing' })
       else if (key === 'settings') router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
       else if (key === 'sign_out') {
         await system.$commonFun.signOutFun()
@@ -124,6 +125,7 @@ export default defineComponent({
       if (nameMenu.indexOf('dataset') > -1) activeIndex.value = 'dataset'
       else if (nameMenu.indexOf('model') > -1) activeIndex.value = 'models'
       else if (nameMenu.indexOf('space') > -1) activeIndex.value = 'spaces'
+      else if (nameMenu.indexOf('pricing') > -1) activeIndex.value = 'pricing'
       else activeIndex.value = nameMenu
 
       const chainId = await system.$commonFun.web3Init.eth.net.getId()

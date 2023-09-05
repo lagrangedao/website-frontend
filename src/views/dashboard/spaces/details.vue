@@ -1307,11 +1307,12 @@ export default defineComponent({
           border-radius: 5px;
           box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
           h4 {
-            margin: 0.2rem 0;
+            margin: 0.1rem 0;
             text-transform: capitalize;
           }
           .box-card {
             max-height: 300px;
+            margin: 0.1rem 0;
             white-space: nowrap;
             color: #525252;
             font-size: 14px;
