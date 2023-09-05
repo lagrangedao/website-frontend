@@ -38,6 +38,8 @@ const termsOfService = () =>
     import ("@/views/dashboard/company/index");
 const paymentHistory = () =>
     import ("@/components/paymentHistory");
+const pricing = () =>
+    import ("@/views/dashboard/pricing/index");
 
 const routes = [{
         path: '/',
@@ -213,6 +215,15 @@ const routes = [{
                 path: '/payment_history',
                 name: 'paymentHistory',
                 component: paymentHistory,
+                meta: {
+                    keepAlive: true,
+                    title: ''
+                }
+            },
+            {
+                path: '/pricing',
+                name: 'pricing',
+                component: pricing,
                 meta: {
                     keepAlive: true,
                     title: ''

@@ -290,9 +290,14 @@
               </div>
               <div class="titleLog">Logs</div>
               <div class="logBody">
-                <json-viewer :value="logsCont.buildLog" :expand-depth=6 copyable boxed sort></json-viewer>
-                <br />
-                <json-viewer :value="logsCont.containerLog" :expand-depth=6 copyable boxed sort></json-viewer>
+                <h4>build</h4>
+                <el-card class="box-card">
+                  <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
+                </el-card>
+                <h4>container</h4>
+                <el-card class="box-card">
+                  <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
+                </el-card>
               </div>
             </el-tab-pane>
             <el-tab-pane label="Build" name="Build" v-if="false">
@@ -345,7 +350,7 @@ import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
 import sharePop from '@/components/share.vue'
 import spaceHardware from '@/components/spaceHardware.vue'
-import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onUnmounted, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import JsonViewer from 'vue-json-viewer'
@@ -399,8 +404,8 @@ export default defineComponent({
       unit: 'day'    })
     const logsCont = reactive({
       data: [],
-      buildLog: {},
-      containerLog: {}
+      buildLog: [],
+      containerLog: []
     })
     const nft = reactive({
       contract_address: null,
@@ -480,6 +485,8 @@ export default defineComponent({
         } else {
           logsValue.value = ''
           logsCont.data = []
+          logsCont.buildLog = []
+          logsCont.containerLog = []
         }
       } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
     }
@@ -531,32 +538,46 @@ export default defineComponent({
       logsValue.value = ''
       expireTime.time = NaN
       logsCont.data = []
-      logsCont.buildLog = {}
-      logsCont.containerLog = {}
+      logsCont.buildLog = []
+      logsCont.containerLog = []
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
       requestAll()
       if (metaAddress.value) likesData()
       else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'app' } })
     }
+    let ws = null
+    const websocketclose = () => {
+      if (ws) ws.close()
+      ws = null
+      console.log("closed")
+    }
     const WebSocketFun = (url, index) => {
       if (typeof (WebSocket) === "undefined") {
         alert("Your browser does not support sockets")
       } else {
-        const ws = new WebSocket(url)
-        ws.onerror = function () {
-          console.log("Error in ws connection");
-        };
-        ws.onopen = function () {
-          console.log("ws connection successful")
+        ws = new WebSocket(url)
+        ws.onopen = () => {
+          // console.log("ws connection successful")
+          if (index === 1) logsCont.buildLog.push("Websocket connection successful")
+          else if (index === 2) logsCont.containerLog.push("Websocket connection successful")
         }
-        ws.onmessage = function (event) {
-          console.log('ws data:', event.data)
-          if (index === 1) logsCont.buildLog = event.data || {}
-          else if (index === 2) logsCont.containerLog = event.data || {}
+        ws.onmessage = (event) => {
+          // console.log('ws data:', event.data)
+          if (event.data) {
+            if (index === 1) logsCont.buildLog.push(event.data)
+            else if (index === 2) logsCont.containerLog.push(event.data)
+          }
         }
-        ws.onclose = function () {
-          console.log("ws connection closed");
+        ws.onerror = () => {
+          // console.log("Websocket connection error")
+          if (index === 1) logsCont.buildLog.push("Websocket connection error")
+          else if (index === 2) logsCont.containerLog.push("Websocket connection error")
+        }
+        ws.onclose = () => {
+          // console.log("ws connection closed")
+          if (index === 1) logsCont.buildLog.push("Websocket connection closed")
+          else if (index === 2) logsCont.containerLog.push("Websocket connection closed")
         }
       }
     }
@@ -611,6 +632,9 @@ export default defineComponent({
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
     const drawerClick = async (tab, event) => {
+      websocketclose()
+      logsCont.buildLog = []
+      logsCont.containerLog = []
       if (drawerName.value === 'Overview') return
       let n = Number(drawerName.value) - 1
       await WebSocketFun(logsCont.data[n].job.build_log, 1)
@@ -630,6 +654,12 @@ export default defineComponent({
       drawerName.value = 'Overview'
     }
     onActivated(() => init())
+    onBeforeUnmount(() => {
+      websocketclose()
+    })
+    watch(drawer, (newValue, oldValue) => {
+      if (!drawer.value) websocketclose()
+    })
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
       requestDetail()
@@ -1276,6 +1306,18 @@ export default defineComponent({
           background-color: #fff;
           border-radius: 5px;
           box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
+          h4 {
+            margin: 0.1rem 0;
+            text-transform: capitalize;
+          }
+          .box-card {
+            max-height: 300px;
+            margin: 0.1rem 0;
+            white-space: nowrap;
+            color: #525252;
+            font-size: 14px;
+            overflow-y: auto;
+          }
         }
         .uploadBody {
           width: 100%;
