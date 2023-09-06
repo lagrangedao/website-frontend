@@ -556,28 +556,33 @@ export default defineComponent({
       if (typeof (WebSocket) === "undefined") {
         alert("Your browser does not support sockets")
       } else {
-        ws = new WebSocket(url)
-        ws.onopen = () => {
-          // console.log("ws connection successful")
-          if (index === 1) logsCont.buildLog.push("Websocket connection successful")
-          else if (index === 2) logsCont.containerLog.push("Websocket connection successful")
-        }
-        ws.onmessage = (event) => {
-          // console.log('ws data:', event.data)
-          if (event.data) {
-            if (index === 1) logsCont.buildLog.push(event.data)
-            else if (index === 2) logsCont.containerLog.push(event.data)
+        try {
+          ws = new WebSocket(url)
+          ws.onopen = () => {
+            // console.log("ws connection successful")
+            if (index === 1) logsCont.buildLog.push("Websocket connection successful")
+            else if (index === 2) logsCont.containerLog.push("Websocket connection successful")
           }
-        }
-        ws.onerror = () => {
-          // console.log("Websocket connection error")
-          if (index === 1) logsCont.buildLog.push("Websocket connection error")
-          else if (index === 2) logsCont.containerLog.push("Websocket connection error")
-        }
-        ws.onclose = () => {
-          // console.log("ws connection closed")
-          if (index === 1) logsCont.buildLog.push("Websocket connection closed")
-          else if (index === 2) logsCont.containerLog.push("Websocket connection closed")
+          ws.onmessage = (event) => {
+            // console.log('ws data:', event.data)
+            if (event.data) {
+              if (index === 1) logsCont.buildLog.push(event.data)
+              else if (index === 2) logsCont.containerLog.push(event.data)
+            }
+          }
+          ws.onerror = () => {
+            // console.log("Websocket connection error")
+            if (index === 1) logsCont.buildLog.push("Websocket connection error")
+            else if (index === 2) logsCont.containerLog.push("Websocket connection error")
+          }
+          ws.onclose = () => {
+            // console.log("ws connection closed")
+            if (index === 1) logsCont.buildLog.push("Websocket connection closed")
+            else if (index === 2) logsCont.containerLog.push("Websocket connection closed")
+          }
+        } catch (err) {
+          if (index === 1) logsCont.buildLog.push(err)
+          else if (index === 2) logsCont.containerLog.push(err)
         }
       }
     }
