@@ -288,8 +288,8 @@
               <div class="logBody">
                 <json-viewer :value="dataJob.job" :expand-depth=6 copyable boxed sort></json-viewer>
               </div>
-              <div class="titleLog">Logs</div>
-              <div class="logBody">
+              <div class="titleLog" v-if="false">Logs</div>
+              <div class="logBody" v-if="false">
                 <h4>build</h4>
                 <el-card class="box-card">
                   <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
@@ -556,28 +556,33 @@ export default defineComponent({
       if (typeof (WebSocket) === "undefined") {
         alert("Your browser does not support sockets")
       } else {
-        ws = new WebSocket(url)
-        ws.onopen = () => {
-          // console.log("ws connection successful")
-          if (index === 1) logsCont.buildLog.push("Websocket connection successful")
-          else if (index === 2) logsCont.containerLog.push("Websocket connection successful")
-        }
-        ws.onmessage = (event) => {
-          // console.log('ws data:', event.data)
-          if (event.data) {
-            if (index === 1) logsCont.buildLog.push(event.data)
-            else if (index === 2) logsCont.containerLog.push(event.data)
+        try {
+          ws = new WebSocket(url)
+          ws.onopen = () => {
+            // console.log("ws connection successful")
+            if (index === 1) logsCont.buildLog.push("Websocket connection successful")
+            else if (index === 2) logsCont.containerLog.push("Websocket connection successful")
           }
-        }
-        ws.onerror = () => {
-          // console.log("Websocket connection error")
-          if (index === 1) logsCont.buildLog.push("Websocket connection error")
-          else if (index === 2) logsCont.containerLog.push("Websocket connection error")
-        }
-        ws.onclose = () => {
-          // console.log("ws connection closed")
-          if (index === 1) logsCont.buildLog.push("Websocket connection closed")
-          else if (index === 2) logsCont.containerLog.push("Websocket connection closed")
+          ws.onmessage = (event) => {
+            // console.log('ws data:', event.data)
+            if (event.data) {
+              if (index === 1) logsCont.buildLog.push(event.data)
+              else if (index === 2) logsCont.containerLog.push(event.data)
+            }
+          }
+          ws.onerror = () => {
+            // console.log("Websocket connection error")
+            if (index === 1) logsCont.buildLog.push("Websocket connection error")
+            else if (index === 2) logsCont.containerLog.push("Websocket connection error")
+          }
+          ws.onclose = () => {
+            // console.log("ws connection closed")
+            if (index === 1) logsCont.buildLog.push("Websocket connection closed")
+            else if (index === 2) logsCont.containerLog.push("Websocket connection closed")
+          }
+        } catch (err) {
+          if (index === 1) logsCont.buildLog.push(err)
+          else if (index === 2) logsCont.containerLog.push(err)
         }
       }
     }
@@ -632,13 +637,13 @@ export default defineComponent({
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
     const drawerClick = async (tab, event) => {
-      websocketclose()
+      // websocketclose()
       logsCont.buildLog = []
       logsCont.containerLog = []
-      if (drawerName.value === 'Overview') return
-      let n = Number(drawerName.value) - 1
-      await WebSocketFun(logsCont.data[n].job.build_log, 1)
-      await WebSocketFun(logsCont.data[n].job.container_log, 2)
+      // if (drawerName.value === 'Overview') return
+      // let n = Number(drawerName.value) - 1
+      // await WebSocketFun(logsCont.data[n].job.build_log, 1)
+      // await WebSocketFun(logsCont.data[n].job.container_log, 2)
     }
     function handleHard (val, refresh) {
       dialogCont.spaceHardDia = val
