@@ -288,8 +288,8 @@
               <div class="logBody">
                 <json-viewer :value="dataJob.job" :expand-depth=6 copyable boxed sort></json-viewer>
               </div>
-              <div class="titleLog">Logs</div>
-              <div class="logBody">
+              <div class="titleLog" v-if="false">Logs</div>
+              <div class="logBody" v-if="false">
                 <h4>build</h4>
                 <el-card class="box-card">
                   <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
@@ -637,13 +637,13 @@ export default defineComponent({
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
     const drawerClick = async (tab, event) => {
-      websocketclose()
+      // websocketclose()
       logsCont.buildLog = []
       logsCont.containerLog = []
-      if (drawerName.value === 'Overview') return
-      let n = Number(drawerName.value) - 1
-      await WebSocketFun(logsCont.data[n].job.build_log, 1)
-      await WebSocketFun(logsCont.data[n].job.container_log, 2)
+      // if (drawerName.value === 'Overview') return
+      // let n = Number(drawerName.value) - 1
+      // await WebSocketFun(logsCont.data[n].job.build_log, 1)
+      // await WebSocketFun(logsCont.data[n].job.container_log, 2)
     }
     function handleHard (val, refresh) {
       dialogCont.spaceHardDia = val
