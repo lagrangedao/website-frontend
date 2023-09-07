@@ -662,7 +662,7 @@ export default defineComponent({
       if (drawerName.value === 'Overview') return
       let n = Number(drawerName.value)
       // 请求logsCont.data[n].space.result_uri地址，获取其中的build_log和container_log
-      if (logsCont.data[n].job.job_result_uri) {
+      if (logsCont.data[n].job.job_result_uri && logsCont.data[n].job.job_result_uri !== 'null') {
         const response = await fetch(logsCont.data[n].job.job_result_uri)
         const textUri = await new Promise(async resolve => {
           resolve(response.text())
@@ -670,18 +670,13 @@ export default defineComponent({
         const logUri = textUri ? JSON.parse(textUri) : {}
         if (logUri.build_log) await WebSocketFun(logUri.build_log, 1)
         if (logUri.container_log) await WebSocketFun(logUri.container_log, 2)
-
-        // logsCont.buildLog = await WebSocketFun(logUri.build_log,1)
-        // logsCont.containerLog = await WebSocketFun(logUri.build_log, 2)
-        // await WebSocketFun(logUri.build_log, 1)
-        // await WebSocketFun(logUri.build_log, 2)
-      } else {
+      } else if (logsCont.data[n].space.jobs_status) {
+        await WebSocketFun(logsCont.data[n].space.jobs_status[n].build_log, 1)
+        await WebSocketFun(logsCont.data[n].space.jobs_status[n].container_log, 2)
+      }else {
         logsCont.buildLog = []
         logsCont.containerLog = []
       }
-
-
-
     }
     function handleHard (val, refresh) {
       dialogCont.spaceHardDia = val
