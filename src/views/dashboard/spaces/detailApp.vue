@@ -355,6 +355,7 @@ export default defineComponent({
 
     .space_iframe {
       width: 100%;
+      min-height: 315px;
       overflow: auto;
       @media screen and (min-height: 500px) and (min-width: 769px) {
         min-height: 315px;
