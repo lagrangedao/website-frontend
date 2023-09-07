@@ -43,7 +43,12 @@
                 p-id="2676" fill="#878c93"></path>
             </svg> Request License
           </div>
-          <div class="logs_style" @click="logDrawer">
+          <div class="logs_style" @click="logDrawer('detail')">
+            <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+              <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+            </svg> Space Detail
+          </div>
+          <div :class="{'logs_style': true, 'is-disabled': parentValue === 'Created' || parentValue === 'Stopped' }" @click="logDrawer('log')">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
@@ -142,7 +147,7 @@
               <CloseBold />
             </el-icon>
           </div>
-          <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick">
+          <el-tabs v-model="drawerName" class="demo-tabs" v-if="drawerType === 'detail'">
             <el-tab-pane label="Overview" name="Overview">
               <div class="el-steps el-steps--simple">
                 <div class="el-step is-simple is-flex">
@@ -288,17 +293,6 @@
               <div class="logBody">
                 <json-viewer :value="dataJob.job" :expand-depth=6 copyable boxed sort></json-viewer>
               </div>
-              <div class="titleLog" v-if="false">Logs</div>
-              <div class="logBody" v-if="false">
-                <h4>build</h4>
-                <el-card class="box-card">
-                  <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
-                </el-card>
-                <h4>container</h4>
-                <el-card class="box-card">
-                  <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
-                </el-card>
-              </div>
             </el-tab-pane>
             <el-tab-pane label="Build" name="Build" v-if="false">
               <div class="uploadBody">
@@ -315,6 +309,30 @@
                   </li>
                 </ul>
               </div>
+            </el-tab-pane>
+          </el-tabs>
+          <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick" v-else>
+            <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data&&logsCont.data.length > 0" :key="j">
+              <template #label>
+                <span class="custom-tabs-label">
+                  <span :class="{'span-cp': dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                </span>
+              </template>
+              <div class="titleLog">Logs</div>
+              <div class="logBody">
+                <h4>build</h4>
+                <el-card class="box-card">
+                  <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
+                </el-card>
+                <h4>container</h4>
+                <el-card class="box-card">
+                  <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
+                </el-card>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="Logs" name="0" v-else>
+              <b> Nothing To Show
+              </b>
             </el-tab-pane>
           </el-tabs>
         </template>
@@ -397,6 +415,7 @@ export default defineComponent({
     const likesValue = ref(false)
     const drawer = ref(false)
     const drawerName = ref('Overview')
+    const drawerType = ref('detail')
     const direction = ref('btt')
     const logsValue = ref('')
     const expireTime = reactive({
@@ -637,13 +656,13 @@ export default defineComponent({
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
     const drawerClick = async (tab, event) => {
-      // websocketclose()
+      websocketclose()
       logsCont.buildLog = []
       logsCont.containerLog = []
-      // if (drawerName.value === 'Overview') return
-      // let n = Number(drawerName.value) - 1
-      // await WebSocketFun(logsCont.data[n].job.build_log, 1)
-      // await WebSocketFun(logsCont.data[n].job.container_log, 2)
+      if (drawerName.value === 'Overview') return
+      let n = Number(drawerName.value)
+      await WebSocketFun(logsCont.data[n].job.build_log, 1)
+      await WebSocketFun(logsCont.data[n].job.container_log, 2)
     }
     function handleHard (val, refresh) {
       dialogCont.spaceHardDia = val
@@ -654,9 +673,12 @@ export default defineComponent({
         likesValue.value = !likesValue.value
       }
     }
-    function logDrawer () {
+    function logDrawer (type) {
+      if (type === 'log' && (parentValue.value === 'Created' || parentValue.value === 'Stopped')) return
+      drawerType.value = type
       drawer.value = true
-      drawerName.value = 'Overview'
+      drawerName.value = type === 'detail' ? 'Overview' : '0'
+      if (type === 'log' && logsCont.data && logsCont.data.length > 0) drawerClick()
     }
     onActivated(() => init())
     onBeforeUnmount(() => {
@@ -698,6 +720,7 @@ export default defineComponent({
       noteShow,
       allData,
       drawerName,
+      drawerType,
       dialogCont,
       renewButton,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue, hardRedeploy,
@@ -1215,6 +1238,7 @@ export default defineComponent({
       }
       .el-tabs__header {
         width: 100%;
+        min-height: 45px;
         margin: 0;
         background-color: #fff;
         .el-tabs__nav-wrap {
