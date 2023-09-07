@@ -1234,6 +1234,7 @@ export default defineComponent({
       }
       .el-tabs__header {
         width: 100%;
+        min-height: 45px;
         margin: 0;
         background-color: #fff;
         .el-tabs__nav-wrap {
