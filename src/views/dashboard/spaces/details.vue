@@ -312,7 +312,7 @@
             </el-tab-pane>
           </el-tabs>
           <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick" v-else>
-            <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data" :key="j">
+            <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data&&logsCont.data.length > 0" :key="j">
               <template #label>
                 <span class="custom-tabs-label">
                   <span :class="{'span-cp': dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
@@ -329,6 +329,10 @@
                   <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
                 </el-card>
               </div>
+            </el-tab-pane>
+            <el-tab-pane label="Logs" name="0" v-else>
+              <b> Nothing To Show
+              </b>
             </el-tab-pane>
           </el-tabs>
         </template>
@@ -674,7 +678,7 @@ export default defineComponent({
       drawerType.value = type
       drawer.value = true
       drawerName.value = type === 'detail' ? 'Overview' : '0'
-      if (type === 'log') drawerClick()
+      if (type === 'log' && logsCont.data && logsCont.data.length > 0) drawerClick()
     }
     onActivated(() => init())
     onBeforeUnmount(() => {
