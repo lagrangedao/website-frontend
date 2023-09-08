@@ -470,9 +470,10 @@ export default defineComponent({
       let arr = list || []
       if (arr.length > 0) {
         for (let j = 0; j < arr.length; j++) {
+          let spaceCont = space || {}
           logArr.push({
             job: arr[j],
-            space: space,
+            space: spaceCont,
             buildLog: [],
             containerLog: []
           })
@@ -587,10 +588,10 @@ export default defineComponent({
               else if (index === 2) logsCont.dataLog[n].containerLog.push(event.data)
             }
           }
-          ws.onerror = () => {
-            console.log("Websocket connection error")
-            // if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection error")
-            // else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection error")
+          ws.onerror = (err) => {
+            // console.log("Websocket connection error", err)
+            if (index === 1) logsCont.dataLog[n].buildLog = ["Websocket connection error"]
+            else if (index === 2) logsCont.dataLog[n].containerLog = ["Websocket connection error"]
           }
           ws.onclose = () => {
             console.log("ws connection closed")
