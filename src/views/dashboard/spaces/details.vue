@@ -312,21 +312,21 @@
             </el-tab-pane>
           </el-tabs>
           <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick" v-else>
-            <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data&&logsCont.data.length > 0" :key="j">
+            <el-tab-pane v-for="(dataJob, j) in logsCont.dataLog" v-if="logsCont.dataLog&&logsCont.dataLog.length > 0" :key="j">
               <template #label>
                 <span class="custom-tabs-label">
-                  <span :class="{'span-cp': dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                  <span :class="{'span-cp': dataJob.job && dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
                 </span>
               </template>
               <div class="titleLog">Logs</div>
               <div class="logBody">
                 <h4>build</h4>
                 <el-card class="box-card">
-                  <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
+                  <p v-for="build in dataJob.buildLog" :key="build">{{build}}</p>
                 </el-card>
                 <h4>container</h4>
                 <el-card class="box-card">
-                  <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
+                  <p v-for="container in dataJob.containerLog" :key="container">{{container}}</p>
                 </el-card>
               </div>
             </el-tab-pane>
@@ -417,14 +417,12 @@ export default defineComponent({
     const drawerName = ref('Overview')
     const drawerType = ref('detail')
     const direction = ref('btt')
-    const logsValue = ref('')
     const expireTime = reactive({
       time: NaN,
       unit: 'day'    })
     const logsCont = reactive({
       data: [],
-      buildLog: [],
-      containerLog: []
+      dataLog: []
     })
     const nft = reactive({
       contract_address: null,
@@ -467,17 +465,26 @@ export default defineComponent({
       }
       return arr
     }
-    async function jobWSList (list) {
+    async function jobWSList (list, space) {
       let logArr = []
       let arr = list || []
-      for (let j = 0; j < arr.length; j++) {
-        try {
-          let array = {}
-          array.job = arr[j]
-          logArr.push(array)
-        } catch (err) {
-          console.log('err space job:', err)
-          logArr.push(arr[j])
+      if (arr.length > 0) {
+        for (let j = 0; j < arr.length; j++) {
+          logArr.push({
+            job: arr[j],
+            space: space,
+            buildLog: [],
+            containerLog: []
+          })
+        }
+      } else if (space && space.jobs_status && space.jobs_status.length > 0) {
+        for (let j = 0; j < space.jobs_status.length; j++) {
+          logArr.push({
+            job: {},
+            space: space,
+            buildLog: [],
+            containerLog: []
+          })
         }
       }
       return logArr
@@ -497,16 +504,11 @@ export default defineComponent({
         const expireTimeCont = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         expireTime.time = expireTimeCont.time
         expireTime.unit = expireTimeCont.unit
+        logsCont.dataLog = await jobWSList(listRes.data.job, listRes.data.space)
         if (listRes.data.job) {
           const log = await system.$commonFun.sortBoole(listRes.data.job)
-          logsCont.data = await jobWSList(log)
-          logsValue.value = log
-        } else {
-          logsValue.value = ''
-          logsCont.data = []
-          logsCont.buildLog = []
-          logsCont.containerLog = []
-        }
+          logsCont.data = await jobWSList(log, listRes.data.space)
+        } else logsCont.data = []
       } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
     }
     async function requestNft () {
@@ -554,11 +556,9 @@ export default defineComponent({
       forkLoad.value = false
       noteShow.value = true
       parentValue.value = ''
-      logsValue.value = ''
       expireTime.time = NaN
       logsCont.data = []
-      logsCont.buildLog = []
-      logsCont.containerLog = []
+      logsCont.dataLog = []
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
       requestAll()
@@ -566,12 +566,12 @@ export default defineComponent({
       else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'app' } })
     }
     let ws = null
-    const websocketclose = () => {
+    const websocketclose = async () => {
       if (ws) ws.close()
       ws = null
       console.log("closed")
     }
-    const WebSocketFun = (url, index) => {
+    const WebSocketFun = (url, index, n) => {
       if (typeof (WebSocket) === "undefined") {
         alert("Your browser does not support sockets")
       } else {
@@ -579,29 +579,29 @@ export default defineComponent({
           ws = new WebSocket(url)
           ws.onopen = () => {
             // console.log("ws connection successful")
-            if (index === 1) logsCont.buildLog.push("Websocket connection successful")
-            else if (index === 2) logsCont.containerLog.push("Websocket connection successful")
+            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection successful")
+            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection successful")
           }
           ws.onmessage = (event) => {
             // console.log('ws data:', event.data)
             if (event.data) {
-              if (index === 1) logsCont.buildLog.push(event.data)
-              else if (index === 2) logsCont.containerLog.push(event.data)
+              if (index === 1) logsCont.dataLog[n].buildLog.push(event.data)
+              else if (index === 2) logsCont.dataLog[n].containerLog.push(event.data)
             }
           }
           ws.onerror = () => {
             // console.log("Websocket connection error")
-            if (index === 1) logsCont.buildLog.push("Websocket connection error")
-            else if (index === 2) logsCont.containerLog.push("Websocket connection error")
+            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection error")
+            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection error")
           }
           ws.onclose = () => {
             // console.log("ws connection closed")
-            if (index === 1) logsCont.buildLog.push("Websocket connection closed")
-            else if (index === 2) logsCont.containerLog.push("Websocket connection closed")
+            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection closed")
+            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection closed")
           }
         } catch (err) {
-          if (index === 1) logsCont.buildLog.push(err)
-          else if (index === 2) logsCont.containerLog.push(err)
+          if (index === 1) logsCont.dataLog[n].buildLog = [{ err }]
+          else if (index === 2) logsCont.dataLog[n].containerLog = [{ err }]
         }
       }
     }
@@ -656,26 +656,26 @@ export default defineComponent({
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
     const drawerClick = async (tab, event) => {
-      websocketclose()
-      logsCont.buildLog = []
-      logsCont.containerLog = []
+      await websocketclose()
       if (drawerName.value === 'Overview') return
       let n = Number(drawerName.value)
-      // 请求logsCont.data[n].space.result_uri地址，获取其中的build_log和container_log
-      if (logsCont.data[n].job.job_result_uri && logsCont.data[n].job.job_result_uri !== 'null') {
-        const response = await fetch(logsCont.data[n].job.job_result_uri)
+      logsCont.dataLog[n].buildLog = []
+      logsCont.dataLog[n].containerLog = []
+      // 请求logsCont.dataLog[n].space.result_uri地址，获取其中的build_log和container_log
+      if (logsCont.dataLog[n].job.job_result_uri && logsCont.dataLog[n].job.job_result_uri !== 'null') {
+        const response = await fetch(logsCont.dataLog[n].job.job_result_uri)
         const textUri = await new Promise(async resolve => {
           resolve(response.text())
         })
         const logUri = textUri ? JSON.parse(textUri) : {}
-        if (logUri.build_log) await WebSocketFun(logUri.build_log, 1)
-        if (logUri.container_log) await WebSocketFun(logUri.container_log, 2)
-      } else if (logsCont.data[n].space.jobs_status) {
-        await WebSocketFun(logsCont.data[n].space.jobs_status[n].build_log, 1)
-        await WebSocketFun(logsCont.data[n].space.jobs_status[n].container_log, 2)
-      }else {
-        logsCont.buildLog = []
-        logsCont.containerLog = []
+        if (logUri.build_log) await WebSocketFun(logUri.build_log, 1, n)
+        if (logUri.container_log) await WebSocketFun(logUri.container_log, 2, n)
+      } else if (logsCont.dataLog[n].space.jobs_status) {
+        await WebSocketFun(logsCont.dataLog[n].space.jobs_status[n].build_log, 1, n)
+        await WebSocketFun(logsCont.dataLog[n].space.jobs_status[n].container_log, 2, n)
+      } else {
+        logsCont.dataLog[n].buildLog = []
+        logsCont.dataLog[n].containerLog = []
       }
     }
     function handleHard (val, refresh) {
@@ -692,7 +692,7 @@ export default defineComponent({
       drawerType.value = type
       drawer.value = true
       drawerName.value = type === 'detail' ? 'Overview' : '0'
-      if (type === 'log' && logsCont.data && logsCont.data.length > 0) drawerClick()
+      if (type === 'log' && logsCont.dataLog && logsCont.dataLog.length > 0) drawerClick()
     }
     onActivated(() => init())
     onBeforeUnmount(() => {
@@ -737,7 +737,7 @@ export default defineComponent({
       drawerType,
       dialogCont,
       renewButton,
-      parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue, hardRedeploy,
+      parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, handleValue, hardRedeploy,
       handleCurrentChange, handleSizeChange, handleClick,
       hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
     }
