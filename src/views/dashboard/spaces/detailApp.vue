@@ -147,7 +147,7 @@ export default defineComponent({
         listdata.jobResult = await jobList(listRes.data.job)
         if (listRes.data.space.status === 'Deploying' && listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
         listdata.space = listRes.data.space
-        listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
+        // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
       }
       context.emit('handleValue', false)
       await system.$commonFun.timeout(500)

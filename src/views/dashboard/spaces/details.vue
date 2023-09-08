@@ -321,11 +321,11 @@
               <div class="titleLog">Logs</div>
               <div class="logBody">
                 <h4>build</h4>
-                <el-card class="box-card">
+                <el-card class="box-card mianscroll">
                   <p v-for="build in dataJob.buildLog" :key="build">{{build}}</p>
                 </el-card>
                 <h4>container</h4>
-                <el-card class="box-card">
+                <el-card class="box-card mianscroll">
                   <p v-for="container in dataJob.containerLog" :key="container">{{container}}</p>
                 </el-card>
               </div>
@@ -368,7 +368,7 @@ import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
 import sharePop from '@/components/share.vue'
 import spaceHardware from '@/components/spaceHardware.vue'
-import { defineComponent, computed, onMounted, onUnmounted, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onUnmounted, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import JsonViewer from 'vue-json-viewer'
@@ -470,9 +470,10 @@ export default defineComponent({
       let arr = list || []
       if (arr.length > 0) {
         for (let j = 0; j < arr.length; j++) {
+          let spaceCont = space || {}
           logArr.push({
             job: arr[j],
-            space: space,
+            space: spaceCont,
             buildLog: [],
             containerLog: []
           })
@@ -505,10 +506,7 @@ export default defineComponent({
         expireTime.time = expireTimeCont.time
         expireTime.unit = expireTimeCont.unit
         logsCont.dataLog = await jobWSList(listRes.data.job, listRes.data.space)
-        if (listRes.data.job) {
-          const log = await system.$commonFun.sortBoole(listRes.data.job)
-          logsCont.data = await jobWSList(log, listRes.data.space)
-        } else logsCont.data = []
+        logsCont.data = await jobWSList(listRes.data.job)
       } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
     }
     async function requestNft () {
@@ -578,26 +576,34 @@ export default defineComponent({
         try {
           ws = new WebSocket(url)
           ws.onopen = () => {
-            // console.log("ws connection successful")
-            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection successful")
-            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection successful")
+            console.log("ws connection successful")
+            // if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection successful")
+            // else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection successful")
           }
           ws.onmessage = (event) => {
             // console.log('ws data:', event.data)
             if (event.data) {
-              if (index === 1) logsCont.dataLog[n].buildLog.push(event.data)
+              if (event.data === 'ping' && ws) ws.send('pong')
+              else if (index === 1) logsCont.dataLog[n].buildLog.push(event.data)
               else if (index === 2) logsCont.dataLog[n].containerLog.push(event.data)
+              nextTick(() => {
+                let scrollEl = document.querySelectorAll('.mianscroll')
+                scrollEl.forEach(async el => {
+                  await system.$commonFun.timeout(1000)
+                  el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+                })
+              })
             }
           }
-          ws.onerror = () => {
-            // console.log("Websocket connection error")
-            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection error")
-            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection error")
+          ws.onerror = (err) => {
+            // console.log("Websocket connection error", err)
+            if (index === 1) logsCont.dataLog[n].buildLog = ["Websocket connection error"]
+            else if (index === 2) logsCont.dataLog[n].containerLog = ["Websocket connection error"]
           }
           ws.onclose = () => {
-            // console.log("ws connection closed")
-            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection closed")
-            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection closed")
+            console.log("ws connection closed")
+            // if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection closed")
+            // else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection closed")
           }
         } catch (err) {
           if (index === 1) logsCont.dataLog[n].buildLog = [{ err }]
