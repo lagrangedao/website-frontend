@@ -589,7 +589,7 @@ export default defineComponent({
               nextTick(() => {
                 let scrollEl = document.querySelectorAll('.mianscroll')
                 scrollEl.forEach(async el => {
-                  await system.$commonFun.timeout(2000)
+                  await system.$commonFun.timeout(1000)
                   el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
                 })
               })
