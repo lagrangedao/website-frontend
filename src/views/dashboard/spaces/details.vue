@@ -505,10 +505,7 @@ export default defineComponent({
         expireTime.time = expireTimeCont.time
         expireTime.unit = expireTimeCont.unit
         logsCont.dataLog = await jobWSList(listRes.data.job, listRes.data.space)
-        if (listRes.data.job) {
-          const log = await system.$commonFun.sortBoole(listRes.data.job)
-          logsCont.data = await jobWSList(log, listRes.data.space)
-        } else logsCont.data = []
+        logsCont.data = await jobWSList(listRes.data.job)
       } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
     }
     async function requestNft () {
@@ -578,26 +575,27 @@ export default defineComponent({
         try {
           ws = new WebSocket(url)
           ws.onopen = () => {
-            // console.log("ws connection successful")
-            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection successful")
-            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection successful")
+            console.log("ws connection successful")
+            // if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection successful")
+            // else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection successful")
           }
           ws.onmessage = (event) => {
             // console.log('ws data:', event.data)
             if (event.data) {
-              if (index === 1) logsCont.dataLog[n].buildLog.push(event.data)
+              if (event.data === 'ping' && ws) ws.send('pong')
+              else if (index === 1) logsCont.dataLog[n].buildLog.push(event.data)
               else if (index === 2) logsCont.dataLog[n].containerLog.push(event.data)
             }
           }
           ws.onerror = () => {
-            // console.log("Websocket connection error")
-            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection error")
-            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection error")
+            console.log("Websocket connection error")
+            // if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection error")
+            // else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection error")
           }
           ws.onclose = () => {
-            // console.log("ws connection closed")
-            if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection closed")
-            else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection closed")
+            console.log("ws connection closed")
+            // if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection closed")
+            // else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection closed")
           }
         } catch (err) {
           if (index === 1) logsCont.dataLog[n].buildLog = [{ err }]
