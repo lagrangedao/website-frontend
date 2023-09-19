@@ -261,7 +261,8 @@ async function getUnit(id) {
     case 80001:
       unit = 'MATIC'
       name = 'Mumbai Testnet '
-      url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
+      // url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
+      url = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/address/`
       url_tx = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/tx/`
       break
     case 3141:
