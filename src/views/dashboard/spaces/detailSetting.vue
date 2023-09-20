@@ -37,7 +37,7 @@
         </div>
         <div>
           <div class="tip">
-            Generate a SNFT for this space. Learn more about Space NFT
+            Generate a SNFT for this space.
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
           <div v-if="nftdata.status === 'success' || (nftdata.tokens && nftdata.tokens.length>0)">
@@ -74,7 +74,7 @@
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
-              <el-table-column label="Copy NFT" min-width="110">
+              <el-table-column label="Copy NFT" min-width="110" v-if="false">
                 <template #default="scope">
                   <el-button size="large" class="generateDOI" @click="copyThisNFT(scope.row)">Copy</el-button>
                 </template>
@@ -104,7 +104,7 @@
           <el-button size="large" v-else class="generateDOI" @click="dialogDOIVisible = true">Generate SNFT</el-button>
         </div>
       </div>
-      <div class="fileList" v-loading="doiLoad">
+      <div class="fileList" v-loading="doiLoad" v-if="false">
         <div class="title">
           {{ 'NFT Copy List' }}
         </div>
@@ -694,20 +694,24 @@ export default defineComponent({
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
+      fd.append('is_deleted', 0)
       fd.append('license_id', ruleForm.destinationCont.token_id)
-      fd.append('source_network_id', 80001)
-      fd.append('destination_network_id', 11155111)
+      fd.append('source_id', 80001)
+      fd.append('source_address', process.env.VUE_APP_SOURCEMINTER_ADDRESS)
+      fd.append('destination_id', 11155111)
+      fd.append('destination_address', process.env.VUE_APP_SEPOLIA_ADDRESS)
       fd.append('wallet_address', store.state.metaAddress)
       fd.append('collection_address', ruleForm.destinationCont.contract_address) //ruleForm.destinationCont为tokens数组中，当前copy按钮对应的行数据
 
-      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}copyNFT`, 'post', fd)
+      const copyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}copynft/request`, 'post', fd)
     }
 
     async function checkCopyInfo (row) {
       let fd = new FormData()
       // fd.append('license_id', row.token_id)
       fd.append('wallet_address', store.state.metaAddress)
-      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}checkCopyNFTStatus`, 'post', fd)
+      const checkCopyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}checkCopyNFTStatus`, 'post', fd)
+      requestInitData()
     }
     onMounted(async () => {
       window.scrollTo(0, 0)
