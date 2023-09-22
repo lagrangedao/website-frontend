@@ -334,6 +334,7 @@ export default defineComponent({
     const ruleFormRef = ref(null)
     const listdata = ref({})
     const nftdata = ref({
+      chain_url: '',
       contract_address: null,
       chain_id: null,
       nft: { tokens: [], status: 'not generated' },
@@ -619,6 +620,7 @@ export default defineComponent({
         nftdata.copy_nft = listNftRes.data.copy_nft || []
         nftdata.contract_address = listNftRes.data.contract_address || null
         nftdata.chain_id = listNftRes.data.chain_id || null
+        nftdata.chain_url = listNftRes.data.chain_url || ''
       }
 
       // await system.$commonFun.timeout(500)
