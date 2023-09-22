@@ -238,6 +238,7 @@
                         <i class="icon icon_copy" @click="system.$commonFun.copyContent(allData.space.uuid, 'Copied')"></i>
                       </p>
                     </el-descriptions-item>
+                    <el-descriptions-item label="Last Stop Reason">{{allData.space.last_stop_reason || '-'}}</el-descriptions-item>
                   </el-descriptions>
                 </el-col>
               </el-row>

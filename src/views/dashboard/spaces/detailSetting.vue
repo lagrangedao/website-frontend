@@ -2,7 +2,7 @@
   <section id="space">
     <el-row class="space_body" v-loading="listLoad">
       <space-hardware @handleHard="handleHard" :listdata="listdata" :renewButton="'setting'"></space-hardware>
-      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated'">
+      <div class="fileList" v-loading="renameLoad" v-if="nftdata.nft.status === 'not generated'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -32,15 +32,15 @@
         <div class="title">
           {{ 'Space NFT (SNFT)' }}
 
-          <el-button class="request_btn" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
-          <el-button size="large" class="request_btn generateDOI" v-if="nftdata.status === 'success'" :disabled="!chainIdRes" @click="requestInitData()">Refresh</el-button>
+          <el-button class="request_btn" v-if="nftdata.nft.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
+          <el-button size="large" class="request_btn generateDOI" v-if="nftdata.nft.status === 'success'" :disabled="!chainIdRes" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
           <div class="tip">
-            Generate a SNFT for this space. Learn more about Space NFT
+            Generate a SNFT for this space.
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
-          <div v-if="nftdata.status === 'success' || (nftdata.tokens && nftdata.tokens.length>0)">
+          <div v-if="nftdata.nft.status === 'success' || (nftdata.nft.tokens && nftdata.nft.tokens.length>0)">
             <div class="contract tip">
               <div class="flex-left">Contract Address:
                 <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
@@ -49,7 +49,7 @@
                 <i class="icon icon_star"></i>: Licenses owned by yourself
               </div>
             </div>
-            <el-table :data="nftdata.tokens" stripe style="width: 100%" class="nft_table">
+            <el-table :data="nftdata.nft.tokens" stripe style="width: 100%" class="nft_table">
               <el-table-column prop="chain_id" label="Chain ID">
                 <template #default="scope">
                   <span>{{ scope.row.chain_name}}</span>
@@ -74,9 +74,14 @@
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
+              <el-table-column label="Copy NFT" min-width="110">
+                <template #default="scope">
+                  <el-button size="large" class="generateDOI" @click="copyThisNFT(scope.row)">Copy</el-button>
+                </template>
+              </el-table-column>
             </el-table>
           </div>
-          <div v-else-if="nftdata.status === 'processing'" class="process_style">
+          <div v-else-if="nftdata.nft.status === 'processing'" class="process_style">
             <el-button size="large" class="generateDOI" @click="refreshContract('refresh')">Refresh</el-button>
             <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Waiting for the Transaction hash complete">
               <template #reference>
@@ -86,7 +91,7 @@
               </template>
             </el-popover>
           </div>
-          <div v-else-if="nftdata.status === 'waiting for oracle'" class="process_style">
+          <div v-else-if="nftdata.nft.status === 'waiting for oracle'" class="process_style">
             <el-button size="large" class="generateDOI" @click="refreshContract()">Refresh</el-button>
             <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Still waiting for the data oracle">
               <template #reference>
@@ -98,6 +103,38 @@
           </div>
           <el-button size="large" v-else class="generateDOI" @click="dialogDOIVisible = true">Generate SNFT</el-button>
         </div>
+      </div>
+      <div class="fileList" v-loading="doiLoad" v-if="nftdata.copy_nft && nftdata.copy_nft.length>0">
+        <div class="title">
+          {{ 'NFT Copy List' }}
+        </div>
+        <el-table :data="nftdata.copy_nft" stripe style="width: 100%" class="nft_table">
+          <el-table-column prop="source_address" label="Source Network">
+            <template #default="scope">
+              <span>{{ scope.row.source_address}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="destination_address" label="Destination Network">
+            <template #default="scope">
+              <span>{{ scope.row.destination_address}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="license_id" label="Token ID">
+            <template #default="scope">
+              <span>{{ scope.row.license_id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="last_stop_reason" label="Error Messages" min-width="140">
+            <template #default="scope">
+              <span>{{scope.row.last_stop_reason || '-'}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="copy_nft_status" label="Status" min-width="110">
+            <template #default="scope">
+              <span>{{scope.row.copy_nft_status}}</span>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
       <div class="fileList" v-loading="deleteLoad">
         <div class="title">Delete this space</div>
@@ -120,6 +157,29 @@
       </div>
     </el-row>
 
+    <el-dialog v-model="nftVisible" title="Copy NFT" :show-close="false" :close-on-click-modal="false" custom-class="doi_body" @close="beforeClose">
+      <el-form ref="" status-icon class="copt-nft">
+        <el-form-item style="width:100%">
+          <label class="label" for="dataname">
+            Destination network
+          </label>
+          <div class="flex flex-row">
+            <el-select v-model="ruleForm.destinationValue" disabled placeholder="Select">
+              <el-option v-for="item in ruleForm.destinationOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </div>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer" v-loading="copyLoad">
+          <el-button @click="destinationNFT">
+            Comform
+          </el-button>
+          <el-button @click="nftVisible = false">Cancel</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="dialogDOIVisible" title="SNFT Agreement" :show-close="false" :close-on-click-modal="false" custom-class="doi_body" @close="beforeClose">
       <div v-if="manageDOI">
         <div class="tip">
@@ -132,7 +192,7 @@
           <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
           <a href="mailto:team@filswan.com">team@filswan.com</a>
         </div>
-        <el-form ref="ruleFormRefDelete" status-icon>
+        <el-form ref="ruleFormRefDelete" status-icon @submit.native.prevent>
           <el-form-item prop="agreeDoi" style="width:100%">
             <label class="label" for="dataname">
               Type
@@ -186,6 +246,8 @@ import dataNft from '@/components/dataNFT.vue'
 import spaceHardware from '@/components/spaceHardware.vue'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
+const SourceMinterABI = require('@/utils/abi/SourceMinter.json')
+const tokenLinkABI = require('@/utils/abi/tokenLink.json')
 export default defineComponent({
   name: 'Spaces',
   components: {
@@ -241,7 +303,15 @@ export default defineComponent({
         }
       ],
       pauseSpace: false,
-      displayPrice: false
+      displayPrice: false,
+      destinationCont: {},
+      destinationValue: 'Sepolia',
+      destinationOption: [
+        {
+          value: 'Sepolia',
+          label: "Sepolia",
+        }
+      ]
     })
     const validateInput = (rule, value, callback) => {
       if ((/[^a-zA-Z0-9-]/g).test(value)) {
@@ -263,7 +333,12 @@ export default defineComponent({
     })
     const ruleFormRef = ref(null)
     const listdata = ref({})
-    const nftdata = ref({})
+    const nftdata = ref({
+      contract_address: null,
+      chain_id: null,
+      nft: { tokens: [], status: 'not generated' },
+      copy_nft: []
+    })
     const ruleFormRefDelete = ref(null)
     const renameLoad = ref(false)
     const deleteLoad = ref(false)
@@ -278,6 +353,8 @@ export default defineComponent({
       }
     ])
     const listLoad = ref(false)
+    const nftVisible = ref(false)
+    const copyLoad = ref(false)
     const dialogDOIVisible = ref(false)
     const dataNFTRequest = ref(false)
     const chainIdRes = ref(true)
@@ -291,6 +368,13 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
+    const chainSelector = process.env.VUE_APP_SEPOLIA_CHAIN
+    const gaslimitValue = process.env.VUE_APP_SEPOLIA_GASLIMIT
+    const uintValue = system.$commonFun.web3Init.utils.toWei(process.env.VUE_APP_UINT, 'ether')
+    const tokenAddress = process.env.VUE_APP_LINK_ADDRESS
+    const tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenLinkABI, tokenAddress);
+    const SourceMinterAddress = process.env.VUE_APP_SOURCEMINTER_ADDRESS
+    const sourceMinterContract = new system.$commonFun.web3Init.eth.Contract(SourceMinterABI, SourceMinterAddress)
 
     const submitForm = async (formEl) => {
       if (!formEl) return;
@@ -336,7 +420,6 @@ export default defineComponent({
       });
     }
 
-
     const submitDeleteForm = async (formEl) => {
       if (!formEl) return
       await ruleFormRefDelete.value.validate(async (valid, fields) => {
@@ -360,6 +443,7 @@ export default defineComponent({
         }
       })
     }
+
     async function claimDataNFT () {
       try {
         chainIdRes.value = await system.$commonFun.changeIDLogin()
@@ -414,6 +498,7 @@ export default defineComponent({
       dialogDOIVisible.value = false
       await system.$commonFun.timeout(500)
       manageDOI.value = true
+      ruleForm.destinationCont = {}
       ruleForm.agreeDoi = ''
       eventArgs.owner = ''
       eventArgs.ipfs_url = ''
@@ -485,31 +570,7 @@ export default defineComponent({
       }
       listLoad.value = false
     }
-    async function getTokenURI (nft_contract, contractAddress, chainID) {
-      // create contract obj
-      try {
-        let tokens = []
-        // get total supply
-        let totalSupply = await nft_contract.methods.totalSupply().call()
-        let { name, url } = await system.$commonFun.getUnit(parseInt(chainID), 16)
-        let token = {
-          token_id: 1,
-          contract_address: contractAddress,
-          chain_id: chainID,
-          chain_name: name,
-          chain_url: url,
-          owner_address: await nft_contract.methods.ownerOf(1).call(),
-          ipfs_uri: await nft_contract.methods.tokenURI(1).call(),
-          status: 'Success'
-        }
-        tokens.push(token)
-        return tokens
-      } catch (err) {
-        system.$commonFun.messageTip('error', "Returned values aren't valid error")
-        console.log('err:', err)
-        return []
-      }
-    }
+
     async function ownerAddress (nft_contract, index) {
       try {
         const owner = await nft_contract.methods.ownerOf(index).call().then()
@@ -539,24 +600,25 @@ export default defineComponent({
 
       const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
       if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
-        if (listNftRes.data.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
+        if (listNftRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
         let contract_address = listNftRes.data.contract_address
         const getID = await system.$commonFun.web3Init.eth.net.getId()
         if (listNftRes.data.chain_id && getID.toString() !== listNftRes.data.chain_id) {
           const { name } = await system.$commonFun.getUnit(Number(listNftRes.data.chain_id))
           await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
-          listNftRes.data.tokens = []
+          listNftRes.data.nft.tokens = []
         } else if (contract_address) {
           let { url } = await system.$commonFun.getUnit(parseInt(listNftRes.data.chain_id), 16)
           const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
-          // const tokens_contact = await getTokenURI(nft_contract, contract_address, listNftRes.data.chain_id)
-          const tokens_list = await mapTokens(listNftRes.data.tokens, nft_contract, contract_address)
-          // listNftRes.data.tokens = tokens_contact.concat(tokens_list)
+          const tokens_list = await mapTokens(listNftRes.data.nft.tokens, nft_contract, contract_address)
           listNftRes.data.chain_url = url
-          listNftRes.data.tokens = tokens_list
+          listNftRes.data.nft.tokens = tokens_list
         }
 
-        nftdata.value = listNftRes.data || { contract_address: null, tokens: [], status: 'not generated' }
+        nftdata.nft = listNftRes.data.nft || { tokens: [], status: 'not generated' }
+        nftdata.copy_nft = listNftRes.data.copy_nft || []
+        nftdata.contract_address = listNftRes.data.contract_address || null
+        nftdata.chain_id = listNftRes.data.chain_id || null
       }
 
       // await system.$commonFun.timeout(500)
@@ -581,6 +643,81 @@ export default defineComponent({
         context.emit('handleValue', true, 'setting')
         requestInitData()
       }
+    }
+    function copyThisNFT (row) {
+      ruleForm.destinationCont = row
+      nftVisible.value = true
+    }
+    let copyTransaction
+    async function destinationNFT () {
+      copyLoad.value = true
+      try {
+        chainIdRes.value = await system.$commonFun.changeIDLogin()
+        if (!chainIdRes.value) {
+          copyLoad.value = false
+          return false
+        }
+
+        // const uintValue = await sourceMinterContract.methods.latestMessageFee().call()
+        let approveGasLimit = await tokenContract.methods
+          .approve(SourceMinterAddress, uintValue)
+          .estimateGas({ from: store.state.metaAddress })
+
+        const approve_tx = await tokenContract.methods
+          .approve(SourceMinterAddress, uintValue)
+          .send({ from: store.state.metaAddress, gasLimit: approveGasLimit })
+
+        console.log('copyNFT:', chainSelector, ruleForm.destinationCont.contract_address, ruleForm.destinationCont.token_id, gaslimitValue)
+
+
+        let copyEstimatedGas = await sourceMinterContract.methods
+          .copyNFT(chainSelector, ruleForm.destinationCont.contract_address, ruleForm.destinationCont.token_id, gaslimitValue)
+          .estimateGas({ from: store.state.metaAddress })
+        console.log('estimatedGas', copyEstimatedGas)
+
+        copyTransaction = await sourceMinterContract.methods
+          .copyNFT(chainSelector, ruleForm.destinationCont.contract_address, ruleForm.destinationCont.token_id, gaslimitValue)
+          .send({ from: store.state.metaAddress, gasLimit: copyEstimatedGas })
+          .on('transactionHash', async (transactionHash) => {
+            console.log('copyNFT transactionHash:', transactionHash)
+            await copyInfo(transactionHash)
+            copyLoad.value = false
+            nftVisible.value = false
+            requestInitData()
+          })
+          .on('error', () => copyLoad.value = false)
+
+        console.log('transaction.events:', copyTransaction)
+      } catch (err) {
+        console.log('err', err)
+        if (err && err.message) system.$commonFun.messageTip('error', err.message)
+        copyLoad.value = false
+      }
+    }
+
+    async function copyInfo (tx_hash) {
+      let fd = new FormData()
+      const getID = await system.$commonFun.web3Init.eth.net.getId()
+      fd.append('tx_hash', tx_hash)
+      fd.append('chain_id', getID)
+      fd.append('is_deleted', 0)
+      fd.append('license_id', ruleForm.destinationCont.token_id)
+      fd.append('source_id', 80001)
+      fd.append('source_address', process.env.VUE_APP_SOURCEMINTER_ADDRESS)
+      fd.append('destination_id', 11155111)
+      fd.append('destination_address', process.env.VUE_APP_SEPOLIA_ADDRESS)
+      fd.append('wallet_address', store.state.metaAddress)
+      fd.append('collection_address', ruleForm.destinationCont.contract_address) //ruleForm.destinationCont为tokens数组中，当前copy按钮对应的行数据
+
+      const copyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}copynft/request`, 'post', fd)
+    }
+
+    async function checkCopyInfo (row) {
+      let fd = new FormData()
+      // fd.append('license_id', row.token_id)
+      fd.append('wallet_address', store.state.metaAddress)
+      const checkCopyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}checkCopyNFTStatus`, 'post', fd)
+      requestInitData()
     }
     onMounted(async () => {
       window.scrollTo(0, 0)
@@ -622,7 +759,8 @@ export default defineComponent({
       manageDOI,
       eventArgs,
       chainIdRes,
-      props, submitForm, submitDeleteForm,
+      nftVisible, copyLoad,
+      props, submitForm, submitDeleteForm, copyThisNFT, destinationNFT, checkCopyInfo,
       handleChange, requestInitData, beforeClose, requestNFT, refreshContract, handleHard
     }
   }
@@ -1006,7 +1144,9 @@ export default defineComponent({
 
       .el-form {
         padding: 0 0.25rem;
-
+        &.copt-nft {
+          padding: 0.1rem 0.25rem;
+        }
         .el-form-item {
           .el-form-item__content {
             .label {
