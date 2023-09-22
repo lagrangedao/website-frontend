@@ -134,7 +134,7 @@
           <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
           <a href="mailto:team@filswan.com">team@filswan.com</a>
         </div>
-        <el-form ref="ruleFormRefDelete" status-icon>
+        <el-form ref="ruleFormRefDelete" status-icon @submit.native.prevent>
           <el-form-item prop="agreeDoi" style="width:100%">
             <label class="label" for="dataname">
               Type

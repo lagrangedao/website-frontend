@@ -212,7 +212,7 @@ export default defineComponent({
           }
           generateLoad.value = true
           const additionalInformation = await infoList()
-          const params = {
+          const objectList = {
             "created_at": props.createdAt,
             "updated_at": props.updatedAt,
             "description": dataNFTForm.description,
@@ -220,9 +220,9 @@ export default defineComponent({
             "author": dataNFTForm.author,
             "links": dataNFTForm.links,
             "tags": dataNFTForm.tags,
-            "additionalInformation": additionalInformation,
             "recipient": dataNFTForm.recipient
           }
+          const params = Object.assign({}, additionalInformation, objectList)
           const getID = await system.$commonFun.web3Init.eth.net.getId()
           if (getID.toString() !== props.getNftID) {
             const { name } = await system.$commonFun.getUnit(Number(props.getNftID))
