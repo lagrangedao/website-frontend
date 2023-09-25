@@ -111,12 +111,12 @@
         <el-table :data="nftdata.copy_nft" stripe style="width: 100%" class="nft_table">
           <el-table-column prop="source_address" label="Source Network">
             <template #default="scope">
-              <span>{{ scope.row.source_address}}</span>
+              <span>{{ scope.row.source_address || scope.row.source_id}}</span>
             </template>
           </el-table-column>
           <el-table-column prop="destination_address" label="Destination Network">
             <template #default="scope">
-              <span>{{ scope.row.destination_address}}</span>
+              <span>{{ scope.row.destination_address || scope.row.destination_id}}</span>
             </template>
           </el-table-column>
           <el-table-column prop="license_id" label="Token ID">
@@ -131,7 +131,12 @@
           </el-table-column>
           <el-table-column prop="copy_nft_status" label="Status" min-width="110">
             <template #default="scope">
-              <span>{{scope.row.copy_nft_status}}</span>
+              <span class="transform">{{scope.row.copy_nft_status}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="" label="" min-width="110">
+            <template #default="scope">
+              <el-button size="large" :disabled="scope.row.copy_nft_status.toLowerCase() === 'success'?true:false" @click="checkCopyInfo(scope.row)" class="generateDOI">Refresh</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -616,11 +621,36 @@ export default defineComponent({
           listNftRes.data.nft.tokens = tokens_list
         }
 
-        // nftdata.nft = listNftRes.data.nft || { tokens: [], status: 'not generated' }
-        // nftdata.copy_nft = listNftRes.data.copy_nft || []
-        // nftdata.contract_address = listNftRes.data.contract_address || null
-        // nftdata.chain_id = listNftRes.data.chain_id || null
-        // nftdata.chain_url = listNftRes.data.chain_url || ''
+
+
+
+
+
+
+        listNftRes.data.copy_nft = [{
+
+          "destination_address": null, // 目标链上的地址
+
+          "destination_id": 11155111, // 目标链上的token id
+
+          "last_stop_reason": null,
+
+          "license_cid": null,
+
+          "license_id": 3,
+
+          "source_address": null, // 源链上的地址
+
+          "source_id": null, // 源链上的token id
+
+          "copy_nft_status": 'Success' // success, fail, pending
+
+        }]
+
+
+
+
+
         nftdata.value = listNftRes.data || { contract_address: null, copy_nft: [], chain_id: null, nft: { tokens: [], status: 'not generated' } }
       }
 
@@ -716,10 +746,8 @@ export default defineComponent({
     }
 
     async function checkCopyInfo (row) {
-      let fd = new FormData()
-      // fd.append('license_id', row.token_id)
-      fd.append('wallet_address', store.state.metaAddress)
-      const checkCopyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}checkCopyNFTStatus`, 'post', fd)
+      listLoad.value = true
+      const checkCopyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}copynft/status/${row.license_id}/${route.params.wallet_address}/${row.destination_id}`, 'get')
       requestInitData()
     }
     onMounted(async () => {
@@ -1028,6 +1056,7 @@ export default defineComponent({
               font-family: "FIRACODE-BOLD";
               font-size: 17px;
               color: #000;
+              word-break: break-word;
               @media screen and (max-width: 768px) {
                 font-size: 15px;
               }
@@ -1070,6 +1099,9 @@ export default defineComponent({
               }
               .el-button {
                 margin: 0;
+              }
+              .transform {
+                text-transform: capitalize;
               }
             }
           }
