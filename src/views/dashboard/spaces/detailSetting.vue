@@ -109,27 +109,27 @@
           {{ 'NFT Copy List' }}
         </div>
         <el-table :data="nftdata.copy_nft" stripe style="width: 100%" class="nft_table">
-          <el-table-column prop="source_address" label="Source Network">
+          <el-table-column prop="source_address" label="Source Network" min-width="130">
             <template #default="scope">
               <span>{{ scope.row.source_address || scope.row.source_id}}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="destination_address" label="Destination Network">
+          <el-table-column prop="destination_address" label="Destination Network" min-width="130">
             <template #default="scope">
               <span>{{ scope.row.destination_address || scope.row.destination_id}}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="license_id" label="Token ID">
+          <el-table-column prop="license_id" label="License ID">
             <template #default="scope">
               <span>{{ scope.row.license_id }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="last_stop_reason" label="Error Messages" min-width="140">
+          <!-- <el-table-column prop="last_stop_reason" label="Error Messages" min-width="140">
             <template #default="scope">
               <span>{{scope.row.last_stop_reason || '-'}}</span>
             </template>
-          </el-table-column>
-          <el-table-column prop="copy_nft_status" label="Status" min-width="110">
+          </el-table-column> -->
+          <el-table-column prop="copy_nft_status" label="Status">
             <template #default="scope">
               <span class="transform">{{scope.row.copy_nft_status}}</span>
             </template>
