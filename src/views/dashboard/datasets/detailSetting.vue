@@ -131,7 +131,7 @@
           </el-table-column>
           <el-table-column prop="" label="" min-width="110">
             <template #default="scope">
-              <el-button size="large" :disabled="scope.row.copy_nft_status.toLowerCase() === 'success'?true:false" @click="checkCopyInfo(scope.row)" class="generateDOI">Refresh</el-button>
+              <el-button size="large" disabled class="generateDOI">Refresh</el-button>
             </template>
           </el-table-column>
         </el-table>

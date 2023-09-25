@@ -621,36 +621,6 @@ export default defineComponent({
           listNftRes.data.nft.tokens = tokens_list
         }
 
-
-
-
-
-
-
-        listNftRes.data.copy_nft = [{
-
-          "destination_address": null, // 目标链上的地址
-
-          "destination_id": 11155111, // 目标链上的token id
-
-          "last_stop_reason": null,
-
-          "license_cid": null,
-
-          "license_id": 3,
-
-          "source_address": null, // 源链上的地址
-
-          "source_id": null, // 源链上的token id
-
-          "copy_nft_status": 'Success' // success, fail, pending
-
-        }]
-
-
-
-
-
         nftdata.value = listNftRes.data || { contract_address: null, copy_nft: [], chain_id: null, nft: { tokens: [], status: 'not generated' } }
       }
 
