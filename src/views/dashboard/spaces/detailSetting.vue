@@ -121,7 +121,8 @@
           </el-table-column>
           <el-table-column prop="license_id" label="License ID">
             <template #default="scope">
-              <span>{{ scope.row.license_id }}</span>
+              <a v-if="userGateway" :href="`${userGateway}/ipfs/${scope.row.license_cid}`" target="_blank" class="link">{{ scope.row.license_id }}</a>
+              <span v-else>{{ scope.row.license_id }}</span>
             </template>
           </el-table-column>
           <!-- <el-table-column prop="last_stop_reason" label="Error Messages" min-width="140">
@@ -647,10 +648,25 @@ export default defineComponent({
         requestInitData()
       }
     }
-    function copyThisNFT (row) {
+
+    async function networkEstimate () {
+      let chainID = '80001'
+      const getID = await system.$commonFun.web3Init.eth.net.getId()
+      if (getID.toString() !== chainID) {
+        const { name } = await system.$commonFun.getUnit(Number(chainID))
+        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+        return false
+      }
+      return true
+    }
+
+    async function copyThisNFT (row) {
+      const net = await networkEstimate()
+      if (!net) return
       ruleForm.destinationCont = row
       nftVisible.value = true
     }
+
     let copyTransaction
     async function destinationNFT () {
       copyLoad.value = true
