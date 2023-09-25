@@ -733,7 +733,7 @@ export default defineComponent({
 
     async function checkCopyInfo (row) {
       listLoad.value = true
-      const checkCopyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}copynft/status/${row.license_id}/${route.params.wallet_address}/${row.destination_id}`, 'get')
+      const checkCopyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}copynft/status/${row.license_id}/${route.params.wallet_address}/${row.destination_id}/${row.contract_address}`, 'get')
       requestInitData()
     }
     onMounted(async () => {
