@@ -196,7 +196,7 @@ export default defineComponent({
       }
 
       if (typeLikes) {
-        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify({ sort: 'likes', limit: 8 })}`, 'get')
+        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${qs.stringify({ limit: 8 })}`, 'get')
         if (likesRes) spaceLikesData.value = likesRes.spaces || []
       }
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
