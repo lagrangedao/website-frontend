@@ -111,12 +111,14 @@
         <el-table :data="nftdata.copy_nft" stripe style="width: 100%" class="nft_table">
           <el-table-column prop="source_address" label="Source Network" min-width="130">
             <template #default="scope">
-              <span>{{ scope.row.source_address || scope.row.source_id}}</span>
+              <a v-if="scope.row.source && scope.row.source.url" :href="`${scope.row.source.url}${scope.row.source_address}`" target="_blank" class="link">{{ scope.row.source_address }}</a>
+              <span v-else>{{ scope.row.source_address || scope.row.source_id}}</span>
             </template>
           </el-table-column>
           <el-table-column prop="destination_address" label="Destination Network" min-width="130">
             <template #default="scope">
-              <span>{{ scope.row.destination_address || scope.row.destination_id}}</span>
+              <a v-if="scope.row.destination && scope.row.destination.url" :href="`${scope.row.destination.url}${scope.row.destination_address}`" target="_blank" class="link">{{ scope.row.destination_address }}</a>
+              <span v-else>{{ scope.row.destination_address || scope.row.destination_id}}</span>
             </template>
           </el-table-column>
           <el-table-column prop="license_id" label="License ID">
@@ -598,6 +600,14 @@ export default defineComponent({
       }
       return list
     }
+    async function mapCopyList (list) {
+      const number = list ? list.length : 0
+      for (let token = 0; token < number; token++) {
+        list[token].destination = await system.$commonFun.getUnit(parseInt(list[token].destination_id), 16)
+        list[token].source = await system.$commonFun.getUnit(parseInt(list[token].source_id), 16)
+      }
+      return list
+    }
     async function requestInitData (type) {
       if (route.name !== 'spaceDetail') return
       listLoad.value = true
@@ -622,6 +632,7 @@ export default defineComponent({
           listNftRes.data.nft.tokens = tokens_list
         }
 
+        listNftRes.data.copy_nft = await mapCopyList(listNftRes.data.copy_nft)
         nftdata.value = listNftRes.data || { contract_address: null, copy_nft: [], chain_id: null, nft: { tokens: [], status: 'not generated' } }
       }
 
@@ -733,7 +744,7 @@ export default defineComponent({
 
     async function checkCopyInfo (row) {
       listLoad.value = true
-      const checkCopyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}copynft/status/${row.license_id}/${route.params.wallet_address}/${row.destination_id}/${row.contract_address}`, 'get')
+      const checkCopyRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}copynft/status/${row.license_id}/${route.params.wallet_address}/${row.destination_id}/${nftdata.value.contract_address}`, 'get')
       requestInitData()
     }
     onMounted(async () => {
