@@ -280,15 +280,16 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
+    async function statsInit () {
+      const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${route.params.wallet_address}&&space_name=${route.params.name}`, 'get')
+      if (listStatsRes && listStatsRes.status === 'success') listdata.stats = listStatsRes.data.stats
+    }
     async function init () {
       let gate = false
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.files = []
-
-      const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${route.params.wallet_address}&&space_name=${route.params.name}`, 'get')
-      if (listStatsRes && listStatsRes.status === 'success') listdata.stats = listStatsRes.data.stats
-
+      await statsInit()
       const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listFilesRes && listFilesRes.status === 'success') {
         const fileLi = listFilesRes.data || []
@@ -458,7 +459,10 @@ export default defineComponent({
         if (!urlReadme.value) {
           resetFun()
           init()
-        } else scroll()
+        } else {
+          statsInit()
+          scroll()
+        }
       } else resetFun()
     })
     // watch(() => props.likesValue, () => {
