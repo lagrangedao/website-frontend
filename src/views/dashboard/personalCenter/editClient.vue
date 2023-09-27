@@ -129,7 +129,7 @@
                     <el-table-column prop="qr_code" width="85" label="">
                       <template #default="scope">
                         <div class="revoke">
-                          <el-button type="danger" :disabled="scope.row.status == 'Deleted'?true:false" @click="deleteApiKey(scope.row.apikey)">{{$t('my_profile.apiKey_btn_02')}}</el-button>
+                          <el-button type="danger" :disabled="scope.row.status == 'Deleted'?true:false" @click="deleteApiKey(scope.row.apikey)">Revoke</el-button>
                         </div>
                       </template>
                     </el-table-column>
