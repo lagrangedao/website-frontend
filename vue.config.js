@@ -31,6 +31,10 @@ module.exports = {
     }
   },
 
+  transpileDependencies: [
+    /[/\\]node_modules[/\\](.+?)?@intlify(.*)/
+  ],
+
   configureWebpack: (config) => {
     config.name = globalConfig.baseTitle
     config.entry.app = ['babel-polyfill', './src/main.js'];
