@@ -617,7 +617,7 @@ export default defineComponent({
 
       const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
       if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
-        if (listNftRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
+        if (listNftRes.data.nft && listNftRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
         let contract_address = listNftRes.data.contract_address
         const getID = await system.$commonFun.web3Init.eth.net.getId()
         if (listNftRes.data.chain_id && getID.toString() !== listNftRes.data.chain_id) {
@@ -633,6 +633,7 @@ export default defineComponent({
         }
 
         listNftRes.data.copy_nft = await mapCopyList(listNftRes.data.copy_nft)
+        if (!listNftRes.data.hasOwnProperty('nft')) listNftRes.data.nft = listNftRes.data.nft || { tokens: [], status: 'not generated' }
         nftdata.value = listNftRes.data || { contract_address: null, copy_nft: [], chain_id: null, nft: { tokens: [], status: 'not generated' } }
       }
 

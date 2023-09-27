@@ -6,6 +6,9 @@
           <el-col :xs="24" :sm="12" :md="13" :lg="13" :xl="13" class="left">
             <h1>Data And Computing</h1>
             <h4>Decentralized data science without borders</h4>
+            <h4>To receive product news, sign up for our newsletter
+              <a href="https://mailchi.mp/nbai/mars-lagrange" target="_blank">here</a>
+            </h4>
             <el-button type="primary" @click="getStart">
               Get Started
             </el-button>
@@ -662,12 +665,17 @@ export default defineComponent({
             }
           }
           h4 {
+            margin: 0 0 0.2rem;
             font-size: 0.18rem;
             font-family: "Helvetica-Neue";
             font-weight: normal;
             color: #878c93;
             @media screen and (max-width: 768px) {
               font-size: 14px;
+            }
+            a {
+              color: inherit;
+              text-decoration: underline;
             }
           }
           .el-button {
@@ -678,7 +686,7 @@ export default defineComponent({
             font-weight: normal;
             height: auto;
             padding: 0.15rem 0.25rem;
-            margin: 0.5rem 0 0;
+            margin: 0.1rem 0 0;
             background: #c37af9;
             color: #fff;
             border: 0;
