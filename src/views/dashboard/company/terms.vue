@@ -5,7 +5,7 @@
       <strong>Thanks for using Lagrange and being part of our awesome community! 🤗</strong>
     </p>
     <p>We drafted the following Terms of Service to make your user experience as smooth, private and secure as possible. We are very much open to feedback - contact us at
-      <a href="mailto:team@filswan.com">team@filswan.com</a> with any question or concern!</p>
+      <a :href="`mailto:${email_link}`">{{email_link}}</a> with any question or concern!</p>
     <p>Please
       <strong>read these Terms carefully</strong> as they contain important information about what we do and do not offer, and what you can and cannot do.</p>
     <p>Whenever you want to use or purchase the Services that we provide at
@@ -332,7 +332,8 @@
     </p>
     <p>
       <strong>DMCA Policy.</strong> We comply with the Digital Millennium Copyright Act Policy! If you have any claims that any content on our Website violates or infringes your intellectual property rights, you may
-      <strong>send your complaint</strong> to team@filswan.com with detailed and accurate information supporting your claim. You also represent and warrant that you will not knowingly provide misleading information to support your claim.
+      <strong>send your complaint</strong> to
+      <a :href="`mailto:${email_link}`">{{email_link}}</a> with detailed and accurate information supporting your claim. You also represent and warrant that you will not knowingly provide misleading information to support your claim.
     </p>
     <p>
       <strong>Open Source.</strong> Certain items provided with the Services may be subject to "open source" or "creative commons" or other similar licenses (collectively, "
@@ -510,3 +511,15 @@
     </p>
   </div>
 </template>
+<script>
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+export default defineComponent({
+  name: "Terms",
+  setup () {
+    const email_link = process.env.VUE_APP_BASE_EMAIL
+    return {
+      email_link
+    }
+  },
+});
+</script>

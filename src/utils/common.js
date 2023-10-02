@@ -111,11 +111,11 @@ async function login() {
   }
 
   const time = await throttle()
-  if (!time) return false
-  const signature = await sign()
-  if (!signature) return false
+  if (!time) return [false, '']
+  const [signature, signErr] = await sign()
+  if (!signature) return [false, signErr]
   const token = await performSignin(signature)
-  return !!token
+  return [!!token, '']
 }
 
 async function throttle() {
@@ -133,17 +133,20 @@ async function sign(nonce) {
   const local = process.env.VUE_APP_DOMAINNAME
   const buff = Buffer.from("Signing in to " + local + " at " + sortanow, 'utf-8')
   let signature = null
+  let signErr = ''
   await ethereum.request({
     method: 'personal_sign',
     params: [buff.toString('hex'), store.state.metaAddress]
   }).then(sig => {
+    signErr = ''
     signature = sig
   }).catch(err => {
     console.log(err)
     signature = ''
+    signErr = err && err.code ? String(err.code) : err
     signOutFun()
   })
-  return signature
+  return [signature, signErr]
 }
 
 async function performSignin(sig) {

@@ -132,7 +132,7 @@
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your dataset and your name to
           <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
-          <a href="mailto:team@filswan.com">team@filswan.com</a>
+          <a :href="`mailto:${email_link}`">{{email_link}}</a>
         </div>
         <el-form ref="ruleFormRefDelete" status-icon>
           <el-form-item prop="agreeDoi" style="width:100%">
@@ -262,6 +262,7 @@ export default defineComponent({
     const router = useRouter()
     const refreshExecutable = ref(false)
     const moreLoad = ref(false)
+    const email_link = process.env.VUE_APP_BASE_EMAIL
     const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
     const submitForm = async (formEl) => {
@@ -575,6 +576,7 @@ export default defineComponent({
       router,
       moreLoad,
       chainIdRes,
+      email_link,
       props, submitForm, submitDeleteForm, beforeClose,
       handleChange, requestInitData, requestNFT, refreshContract
     }

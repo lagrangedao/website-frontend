@@ -307,11 +307,23 @@
       <h2 id="👷♀️-intellectual-property-rights-infringement">👷&zwj;♀️ Intellectual property rights infringement</h2>
       <p>If you have any claims that any Content on our website violates or infringes your intellectual property rights, you may
         <strong>send your complaint</strong> to
-        <a href="mailto:team@filswan.com">team@filswan.com</a> with detailed and accurate information supporting your claim, in addition to the possibility of flagging the allegedly infringing Content. You also represent and warrant that you will not knowingly provide misleading
+        <a :href="`mailto:${email_link}`">{{email_link}}</a> with detailed and accurate information supporting your claim, in addition to the possibility of flagging the allegedly infringing Content. You also represent and warrant that you will not knowingly provide misleading
         information to support your claim.</p>
       <h2 id="👋-contact-us">👋 Contact us</h2>
       <p>We are always open to feedback - contact us at
-        <a href="mailto:team@filswan.com">team@filswan.com</a> with any question or concern!</p>
+        <a :href="`mailto:${email_link}`">{{email_link}}</a> with any question or concern!</p>
     </div>
   </div>
 </template>
+<script>
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+export default defineComponent({
+  name: "Content Guidelines",
+  setup () {
+    const email_link = process.env.VUE_APP_BASE_EMAIL
+    return {
+      email_link
+    }
+  },
+});
+</script>
