@@ -45,7 +45,7 @@
         <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
           <div>
             <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
-            <p>If your waiting time is prolonged, you might consider
+            <p v-if="metaAddress && metaAddress === route.params.wallet_address">If your waiting time is prolonged, you might consider
               <el-button plain @click="hardRedeploy">Redeploy</el-button>
               <br /> The tokens you paid will be refunded shortly. You can view and request a refund in
               <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>.</p>
@@ -101,6 +101,7 @@ export default defineComponent({
     const lagLogin = computed(() => {
       return String(store.state.lagLogin) === 'true'
     })
+    const metaAddress = computed(() => (store.state.metaAddress))
     const listLoad = ref(true)
     const listdata = reactive({
       jobResult: [],
@@ -197,6 +198,7 @@ export default defineComponent({
     //   init()
     // })
     return {
+      metaAddress,
       lagLogin,
       listLoad,
       listdata,

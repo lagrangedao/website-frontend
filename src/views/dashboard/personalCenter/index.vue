@@ -245,7 +245,6 @@ import {
   Warning, CopyDocument
 } from '@element-plus/icons-vue'
 import dataNft from '@/components/dataNFT.vue'
-import { clearInterval } from 'timers';
 export default defineComponent({
   name: 'Personal Center',
   components: {
@@ -315,7 +314,17 @@ export default defineComponent({
       data: {}
     })
 
+    let lastTime = 0
+    async function throttle () {
+      // Prevent multiple signatures
+      let now = new Date().valueOf();
+      if (lastTime > 0 && (now - lastTime) <= 2000) return false
+      lastTime = now
+      return true
+    }
     async function isLogin () {
+      const time = await throttle()
+      if (!time) return false
       loadingText.value = ''
       system.$commonFun.Init(async addr => {
         info.address = addr
@@ -347,9 +356,9 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      const lStatus = await system.$commonFun.login()
+      const [lStatus, signErr] = await system.$commonFun.login()
       if (lStatus) getdataList()
-      else signSetIn()
+      else if (signErr !== '4001') signSetIn()
       // else window.location.reload()
       return false
       store.dispatch('setNavLogin', false)

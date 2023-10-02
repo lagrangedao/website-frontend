@@ -198,7 +198,7 @@
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your space and your name to
           <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
-          <a href="mailto:team@filswan.com">team@filswan.com</a>
+          <a :href="`mailto:${email_link}`">{{email_link}}</a>
         </div>
         <el-form ref="ruleFormRefDelete" status-icon @submit.native.prevent>
           <el-form-item prop="agreeDoi" style="width:100%">
@@ -373,6 +373,7 @@ export default defineComponent({
     })
     const settingIndex = ref(0)
     const gutterRow = ref(document.body.clientWidth < 992 ? '0' : '30')
+    const email_link = process.env.VUE_APP_BASE_EMAIL
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -617,7 +618,7 @@ export default defineComponent({
 
       const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
       if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
-        if (listNftRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
+        if (listNftRes.data.nft && listNftRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
         let contract_address = listNftRes.data.contract_address
         const getID = await system.$commonFun.web3Init.eth.net.getId()
         if (listNftRes.data.chain_id && getID.toString() !== listNftRes.data.chain_id) {
@@ -633,6 +634,7 @@ export default defineComponent({
         }
 
         listNftRes.data.copy_nft = await mapCopyList(listNftRes.data.copy_nft)
+        if (!listNftRes.data.hasOwnProperty('nft')) listNftRes.data.nft = listNftRes.data.nft || { tokens: [], status: 'not generated' }
         nftdata.value = listNftRes.data || { contract_address: null, copy_nft: [], chain_id: null, nft: { tokens: [], status: 'not generated' } }
       }
 
@@ -787,7 +789,7 @@ export default defineComponent({
       manageDOI,
       eventArgs,
       chainIdRes,
-      nftVisible, copyLoad,
+      nftVisible, copyLoad, email_link,
       props, submitForm, submitDeleteForm, copyThisNFT, destinationNFT, checkCopyInfo,
       handleChange, requestInitData, beforeClose, requestNFT, refreshContract, handleHard
     }

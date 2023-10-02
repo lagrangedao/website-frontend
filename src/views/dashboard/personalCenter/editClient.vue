@@ -226,7 +226,7 @@
 
     <el-dialog v-model="apiTips" :title="apiCont.accessToken?'API token successfully created':'Important'" :show-close="true" custom-class="add_body">
       <div class="apiTipCont" v-if="apiCont.accessToken">
-        <p>This token is your private secret to access Filswan platform services.</p>
+        <p>This token is your private secret to access Swan platform services.</p>
         <p>The secret key is only displayed once. You’ll need to copy it somewhere safe before continuing.</p>
 
         <p style="margin-top:0.25rem;font-size: 0.15rem;">

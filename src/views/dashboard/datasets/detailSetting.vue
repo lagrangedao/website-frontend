@@ -99,43 +99,6 @@
           <el-button size="large" v-else class="generateDOI" @click="dialogDOIVisible = true">Generate DNFT</el-button>
         </div>
       </div>
-      <div class="fileList fileStyle" v-loading="doiLoad">
-        <div class="title">
-          {{ 'NFT Copy List' }}
-        </div>
-        <el-table v-if="nftdata.copy_nft" :data="nftdata.copy_nft" stripe style="width: 100%" class="nft_table">
-          <el-table-column prop="source_address" label="Source Network">
-            <template #default="scope">
-              <span>{{ scope.row.source_address || scope.row.source_id}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="destination_address" label="Destination Network">
-            <template #default="scope">
-              <span>{{ scope.row.destination_address || scope.row.destination_id}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="license_id" label="Token ID">
-            <template #default="scope">
-              <span>{{ scope.row.license_id }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="last_stop_reason" label="Error Messages" min-width="140">
-            <template #default="scope">
-              <span>{{scope.row.last_stop_reason || '-'}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="copy_nft_status" label="Status" min-width="110">
-            <template #default="scope">
-              <span class="transform">{{scope.row.copy_nft_status}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="" label="" min-width="110">
-            <template #default="scope">
-              <el-button size="large" disabled class="generateDOI">Refresh</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
       <div class="fileList" v-loading="deleteLoad">
         <div class="title">Delete this dataset</div>
         <div class="tip">This action
@@ -169,7 +132,7 @@
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your dataset and your name to
           <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
-          <a href="mailto:team@filswan.com">team@filswan.com</a>
+          <a :href="`mailto:${email_link}`">{{email_link}}</a>
         </div>
         <el-form ref="ruleFormRefDelete" status-icon @submit.native.prevent>
           <el-form-item prop="agreeDoi" style="width:100%">
@@ -299,6 +262,7 @@ export default defineComponent({
     const router = useRouter()
     const refreshExecutable = ref(false)
     const moreLoad = ref(false)
+    const email_link = process.env.VUE_APP_BASE_EMAIL
     const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
     const submitForm = async (formEl) => {
@@ -612,6 +576,7 @@ export default defineComponent({
       router,
       moreLoad,
       chainIdRes,
+      email_link,
       props, submitForm, submitDeleteForm, beforeClose,
       handleChange, requestInitData, requestNFT, refreshContract
     }
@@ -955,72 +920,6 @@ export default defineComponent({
           tr {
             th {
               border-top: 1px solid #ebeef5;
-            }
-          }
-        }
-      }
-    }
-
-    .fileStyle {
-      display: none;
-      .el-table {
-        text-align: left;
-        // border-top: 1px solid #e4e4e4;
-        tr {
-          th {
-            padding: 0.05rem 0.2rem;
-            .cell {
-              padding: 0;
-              font-family: "FIRACODE-BOLD";
-              font-size: 17px;
-              color: #000;
-              word-break: break-word;
-              @media screen and (max-width: 768px) {
-                font-size: 15px;
-              }
-              @media screen and (min-width: 1800px) {
-                font-size: 18px;
-              }
-            }
-          }
-          td {
-            padding: 0;
-            .cell {
-              display: flex;
-              align-items: center;
-              padding: 0.2rem;
-              font-family: "FIRACODE-REGULAR";
-              font-size: 15px;
-              color: #606060;
-              @media screen and (max-width: 768px) {
-                font-size: 14px;
-              }
-              @media screen and (min-width: 1800px) {
-                font-size: 17px;
-              }
-              .current {
-                padding: 0.03rem 0.07rem;
-                background-color: #c37af9;
-                color: #fff;
-                border: 1px solid #8842fe;
-                border-radius: 0.05rem;
-                text-transform: uppercase;
-                font-family: "Helvetica-Neue";
-                font-size: 14px;
-                line-height: 1;
-                @media screen and (max-width: 768px) {
-                  font-size: 13px;
-                }
-                @media screen and (min-width: 1800px) {
-                  font-size: 16px;
-                }
-              }
-              .el-button {
-                margin: 0;
-              }
-              .transform {
-                text-transform: capitalize;
-              }
             }
           }
         }
