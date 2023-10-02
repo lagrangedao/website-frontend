@@ -566,9 +566,13 @@ export default defineComponent({
     }
     let ws = null
     const websocketclose = async () => {
-      if (ws) ws.close()
-      ws = null
-      console.log("closed")
+      try {
+        if (ws) ws.close()
+        ws = null
+        console.log("closed")
+      } catch (err) {
+        ws = null
+      }
     }
     const WebSocketFun = (url, index, n) => {
       if (typeof (WebSocket) === "undefined") {
