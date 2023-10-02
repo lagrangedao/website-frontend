@@ -130,7 +130,7 @@
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your space and your name to
           <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
-          <a href="mailto:team@filswan.com">team@filswan.com</a>
+          <a :href="`mailto:${email_link}`">{{email_link}}</a>
         </div>
         <el-form ref="ruleFormRefDelete" status-icon>
           <el-form-item prop="agreeDoi" style="width:100%">
@@ -287,6 +287,7 @@ export default defineComponent({
     })
     const settingIndex = ref(0)
     const gutterRow = ref(document.body.clientWidth < 992 ? '0' : '30')
+    const email_link = process.env.VUE_APP_BASE_EMAIL
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -622,6 +623,7 @@ export default defineComponent({
       manageDOI,
       eventArgs,
       chainIdRes,
+      email_link,
       props, submitForm, submitDeleteForm,
       handleChange, requestInitData, beforeClose, requestNFT, refreshContract, handleHard
     }

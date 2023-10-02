@@ -147,7 +147,7 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      const lStatus = await system.$commonFun.login()
+      const [lStatus, signErr] = await system.$commonFun.login()
       // if (lStatus) active.value = 2
       if (lStatus) router.push({ path: '/personal_center' })
       return false
