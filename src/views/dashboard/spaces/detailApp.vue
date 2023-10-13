@@ -17,6 +17,7 @@
                 </el-tooltip>
               </span>
             </template>
+            <el-button v-if="job.job_result_uri" class="app-button" @click="system.$commonFun.goLink(`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`)">Click here to display in a new tab</el-button>
             <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
             <div v-else>
               <el-alert :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
@@ -315,11 +316,17 @@ export default defineComponent({
         }
       }
     }
-
     .app-tabs {
+      position: relative;
       width: 98%;
+      padding: 0.6rem 0 0;
       margin: 0.1rem auto 0;
-
+      .app-button {
+        position: absolute;
+        top: calc(-0.7rem - 20px);
+        left: 0;
+        z-index: 99;
+      }
       .el-tabs__header {
         max-width: none !important;
         padding: 0 !important;
