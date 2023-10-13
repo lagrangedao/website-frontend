@@ -391,6 +391,10 @@ async function expireTimeFun(cont) {
   return expireTime
 }
 
+function goLink(link) {
+  window.open(link)
+}
+
 function cmOptions(owner) {
   return {
     mode: 'text/x-markdown', // Language mode
@@ -445,6 +449,7 @@ export default {
   NumFormat,
   calculateDiffTime,
   sizeChange,
+  goLink,
   cmOptions,
   expireTimeFun,
   gatewayGain
