@@ -1,7 +1,7 @@
 <template>
     <div class="footer landing">
-        <el-row class="footer_menu">
-            <el-col :xs="24" :sm="24" :md="11" :lg="11" :xl="11">
+        <el-row class="footer_menu flex-row">
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="flex-row">
                 <a class="text">
                     @Lagrange
                 </a>
@@ -17,13 +17,9 @@
                 <a href="/" target="_blank">
                     Jobs
                 </a>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
                 <a href="" target="_blank">
                     <img :src="logo_small" alt="">
                 </a>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="11" :lg="11" :xl="11">
                 <router-link to="/dataset">
                     Datasets
                 </router-link>
@@ -54,7 +50,7 @@ export default defineComponent({
     name: 'footer_page',
     setup () {
         const store = useStore()
-        const logo_small = require("@/assets/images/icons/logo_small.png")
+        const logo_small = require("@/assets/images/icons/logo_lagrange.png")
         const system = getCurrentInstance().appContext.config.globalProperties
         const route = useRoute()
         const router = useRouter()
@@ -72,10 +68,11 @@ export default defineComponent({
 <style  lang="scss" scoped>
 .footer {
   position: relative;
-  height: 0.8rem;
-  background-color: #180e1a;
+  height: 0.55rem;
+  padding: 0 0 8px;
   font-size: 12px;
-  color: #fff;
+  color: rgb(107, 114, 128);
+  border-top: 1px solid rgb(229, 231, 235);
   @media screen and (min-width: 1800px) {
     font-size: 14px;
   }
@@ -84,26 +81,17 @@ export default defineComponent({
     padding: 15px 0;
   }
   .footer_menu {
-    display: flex;
-    align-items: center;
     justify-content: space-between;
     height: 100%;
     padding: 0 0.16rem;
     margin: auto;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .el-col {
-      display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       @media screen and (max-width: 768px) {
         flex-wrap: wrap;
       }
       a {
-        color: #fff;
+        color: inherit;
         @media screen and (max-width: 768px) {
           width: 100%;
           margin: 10px 0;

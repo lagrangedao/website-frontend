@@ -1,6 +1,6 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <el-row class="dataset_body">
+    <el-row class="dataset_body container-landing flex-row">
       <el-col :xs="24" :sm="8" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
           <div v-loading="false" class="logo_sidebar">
@@ -10,10 +10,10 @@
             <div class="title">
               {{ listdata.user.full_name || '-'}}
             </div>
-            <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
-            <div class="desc">Network: {{info.network||'-'}}</div>
-            <div class="desc">Balance: {{info.balance||'-'}} {{info.unit}}</div>
-            <div class="desc">Wallet Address: {{system.$commonFun.hiddAddress(metaAddress)}}
+            <div class="desc flex-row" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
+            <div class="desc flex-row">Network: {{info.network||'-'}}</div>
+            <div class="desc flex-row">Balance: {{info.balance||'-'}} {{info.unit}}</div>
+            <div class="desc flex-row">Wallet Address: {{system.$commonFun.hiddAddress(metaAddress)}}
               <el-icon v-if="metaAddress" @click="system.$commonFun.copyContent(metaAddress, 'Copied')">
                 <CopyDocument />
               </el-icon>
@@ -21,18 +21,18 @@
             <!-- <el-button type="" text bg @click="editProfile">Settings</el-button> -->
           </div>
           <div class="personal">
-            <div class="top_text">
+            <div class="top_text flex-row">
               <i class="icon icon_interests"></i>
               Research interests
             </div>
-            <div class="desc">None yet</div>
+            <div class="desc flex-row">None yet</div>
           </div>
           <div class="personal">
-            <div class="top_text">
+            <div class="top_text flex-row">
               <i class="icon icon_organizations"></i>
               Organizations
             </div>
-            <div class="desc">None yet</div>
+            <div class="desc flex-row">None yet</div>
           </div>
           <div class="personal">
             <el-button type="" text bg>
@@ -43,7 +43,7 @@
               <router-link :to="{name:'paymentHistory', query: {type: 'provider'}}">Provider Payment History</router-link>
             </el-button>
           </div>
-          <div class="media">
+          <div class="media flex-row">
             <a v-if="listdata.user.homepage" :href="listdata.user.homepage" target="_blank" class="homepage"></a>
             <a v-if="listdata.user.twitter_username" :href="'https://twitter.com/'+listdata.user.twitter_username" target="_blank" class="twitter"></a>
             <a v-if="listdata.user.github_username" :href="'https://github.com/'+listdata.user.github_username" target="_blank" class="github"></a>
@@ -51,11 +51,11 @@
         </div>
       </el-col>
       <el-col :xs="24" :sm="16" :md="16" :lg="18" :xl="18" class="right">
-        <div class="top">
-          <div class="top_text">
+        <div class="top flex-row">
+          <div class="top_text flex-row">
             <!-- <h3>Hello {{info.address}}, <br />Welcome to Filecoin TestNet! </h3> -->
           </div>
-          <div class="top_text">
+          <div class="top_text flex-row">
             <el-input v-model="searchValue" class="w-50 m-2" placeholder="search ..." />
             <el-badge v-if="listdata.outgoing_pending_license_requests.length === 0" class="item l el-dropdown-link">
               <i class="icon icon_cont"></i>
@@ -102,7 +102,7 @@
           </div>
         </div>
         <div class="list">
-          <div class="title">
+          <div class="title flex-row">
             <i class="icon icon_spaces"></i>
             Spaces
             <span>{{spacesIndex}}</span>
@@ -112,7 +112,7 @@
           <el-col :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
             <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<2: true">
               <template #header>
-                <div class="card-warn" v-if="list.expiration_time !== null && ((list.expireTime <=5&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))">
+                <div class="card-warn flex-row" v-if="list.expiration_time !== null && ((list.expireTime <=5&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))">
                   <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime
               < 0.1 ? '3': list.expireTime} ${list.expireTimeUnit}, please click to the details page to renew`" popper-style="word-break: break-word; text-align: left;">
                     <template #reference>
@@ -122,7 +122,7 @@
                     </template>
                   </el-popover>
                 </div>
-                <div class="card-header">
+                <div class="card-header flex-row">
                   <span>{{list.likes}}</span>
                 </div>
                 <h1>{{list.name}}</h1>
@@ -130,14 +130,14 @@
             </el-card>
           </el-col>
         </el-row>
-        <div class="more_style" v-if="listdata.spaces.length>2">
-          <img v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
-          <img v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        <div class="more_style flex-row" v-if="listdata.spaces.length>2">
+          <img class=" flex-row" v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img class=" flex-row" v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
 
         <div class="top">
           <div class="list">
-            <div class="title">
+            <div class="title flex-row">
               <i class="icon icon_datasets"></i>
               Datasets
               <span>{{dataSetIndex}}</span>
@@ -154,28 +154,28 @@
           <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
             <el-card class="box-card is-hover" v-show="!listdata.datasetsIsShow ? l<3: true">
               <template #header>
-                <div class="card-header card-datasets">
-                  <div class="name">
+                <div class="card-header card-datasets flex-row">
+                  <div class="name flex-row">
                     <!-- <div class="img"></div> -->
                     <b>{{list.name}}</b>
                   </div>
                   <span>{{list.likes}}</span>
                 </div>
               </template>
-              <div class="text">
+              <div class="text flex-row">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.license}}</p>
               </div>
-              <div class="text">
+              <div class="text flex-row">
                 <i class="icon icon_wallet"></i>
                 <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
               </div>
-              <div class="text item">
-                <div class="item_body">
+              <div class="text item flex-row">
+                <div class="item_body flex-row">
                   <i class="icon icon_time"></i>
                   <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
-                <!-- <div class="item_body">
+                <!-- <div class="item_body flex-row">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
                 </div> -->
@@ -183,14 +183,14 @@
             </el-card>
           </el-col>
         </el-row>
-        <div class="more_style" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">
-          <img v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
-          <img v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        <div class="more_style flex-row" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">
+          <img class=" flex-row" v-if="!listdata.datasetsIsShow" @click="listdata.datasetsIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img class=" flex-row" v-else @click="listdata.datasetsIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
 
         <div class="top">
           <div class="list">
-            <div class="title">
+            <div class="title flex-row">
               <i class="icon icon_license"></i>
               Received Licenses
               <span>{{licenseIndex}}</span>
@@ -200,23 +200,23 @@
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.licenseIsShow}" v-loading="listLoad">
           <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.received_licenses" :key="l">
             <el-card :class="{'box-card':true,'is-hover': list.cid&&list.cid !== 'undefined','is-disabled': !(list.cid&&list.cid !== 'undefined')}" v-show="!listdata.licenseIsShow ? l<3: true" @click="detailFun(list, 'licenses')">
-              <div class="text">
+              <div class="text flex-row">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.name}}</p>
               </div>
-              <div class="text">
+              <div class="text flex-row">
                 <i class="icon icon_wallet"></i>
                 <p class="ellipsis" v-if="list.type === 'Space License'">{{system.$commonFun.hiddAddress(list.space_owner)}}</p>
                 <p class="ellipsis" v-else>{{system.$commonFun.hiddAddress(list.dataset_owner)}}</p>
               </div>
-              <div class="text item">
-                <div class="item_body">
+              <div class="text item flex-row">
+                <div class="item_body flex-row">
                   <i class="icon icon_type"></i>
                   <span class="small">{{list.type}}</span>
                 </div>
               </div>
-              <div class="text item">
-                <div class="item_body">
+              <div class="text item flex-row">
+                <div class="item_body flex-row">
                   <i class="icon icon_time"></i>
                   <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
@@ -224,9 +224,9 @@
             </el-card>
           </el-col>
         </el-row>
-        <div class="more_style" v-if="listdata.received_licenses.length>3">
-          <img v-if="!listdata.licenseIsShow" @click="listdata.licenseIsShow = true" src="@/assets/images/icons/icon_38.png" />
-          <img v-else @click="listdata.licenseIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        <div class="more_style flex-row" v-if="listdata.received_licenses.length>3">
+          <img class=" flex-row" v-if="!listdata.licenseIsShow" @click="listdata.licenseIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img class=" flex-row" v-else @click="listdata.licenseIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
       </el-col>
     </el-row>
@@ -582,17 +582,9 @@ export default defineComponent({
     }
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0 0.16rem;
     margin: auto;
     font-size: 14px;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     &.opacity {
       opacity: 0;
     }
@@ -658,8 +650,6 @@ export default defineComponent({
             }
           }
           .desc {
-            display: flex;
-            align-items: center;
             flex-wrap: wrap;
             margin: 0.05rem 0 0.1rem;
             font-size: 15px;
@@ -699,8 +689,6 @@ export default defineComponent({
             }
           }
           .top_text {
-            display: flex;
-            align-items: center;
             margin: 0 0 0.2rem;
             color: #fff;
             font-family: "Helvetica-Bold";
@@ -736,8 +724,6 @@ export default defineComponent({
           }
         }
         .media {
-          display: flex;
-          align-items: center;
           a {
             display: block;
             width: 25px;
@@ -766,15 +752,11 @@ export default defineComponent({
       position: relative;
       padding: 0 4% 0.5rem;
       .top {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         margin: 0.35rem 0 0.15rem;
         color: #9ca3b1;
         font-size: 0.19rem;
         .top_text {
-          display: flex;
-          align-items: center;
           h3 {
             color: #7405ff;
             font-family: "Helvetica-Neue";
@@ -893,8 +875,6 @@ export default defineComponent({
         }
       }
       .my_profile {
-        display: flex;
-        align-items: center;
         justify-content: flex-start;
         padding: 0.25rem;
         margin: 0 0 0.25rem;
@@ -951,23 +931,17 @@ export default defineComponent({
             }
           }
           .media {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
             width: 100%;
             li {
-              display: flex;
               justify-content: flex-start;
-              align-items: center;
               margin: 0.1rem 0.25rem 0.1rem 0;
               font-size: 14px;
               @media screen and (min-width: 1800px) {
                 font-size: 15px;
               }
               .iconBody {
-                display: flex;
                 justify-content: center;
-                align-items: center;
                 width: 25px;
                 height: 25px;
                 margin: 0 0.07rem 0 0;
@@ -989,9 +963,7 @@ export default defineComponent({
       .list {
         margin: 0.15rem 0 0;
         .title {
-          display: flex;
           justify-content: flex-start;
-          align-items: center;
           padding: 0;
           font-size: 0.195rem;
           color: #000;
@@ -1058,7 +1030,6 @@ export default defineComponent({
               padding: 0;
               border: 0;
               .card-header {
-                display: flex;
                 justify-content: flex-end;
                 span {
                   height: 0.25rem;
@@ -1074,11 +1045,8 @@ export default defineComponent({
                   }
                 }
                 &.card-datasets {
-                  display: flex;
                   justify-content: space-between;
                   .name {
-                    display: flex;
-                    align-items: center;
                     flex-wrap: wrap;
                     width: 80%;
                     color: #606060;
@@ -1120,9 +1088,7 @@ export default defineComponent({
             .el-card__body {
               padding: 0;
               .text {
-                display: flex;
                 justify-content: flex-start;
-                align-items: center;
                 margin: 0.1rem 0;
                 color: #000;
                 line-height: 1;
@@ -1212,10 +1178,6 @@ export default defineComponent({
               .item {
                 justify-content: space-between;
                 margin: 0.2rem 0 0;
-                .item_body {
-                  display: flex;
-                  align-items: center;
-                }
               }
             }
           }
@@ -1289,13 +1251,10 @@ export default defineComponent({
         overflow: hidden;
       }
       .more_style {
-        display: flex;
         justify-content: center;
         img {
-          display: flex;
           width: 40px;
           height: 40px;
-          align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: all 0.3s;
@@ -1340,8 +1299,6 @@ export default defineComponent({
                 position: absolute;
                 left: 0.33rem;
                 top: 0.1rem;
-                display: flex;
-                align-items: center;
                 @media screen and (max-width: 768px) {
                   left: 0.2rem;
                 }
@@ -1358,8 +1315,6 @@ export default defineComponent({
                 position: absolute;
                 right: 0.33rem;
                 top: 0.1rem;
-                display: flex;
-                align-items: center;
                 @media screen and (max-width: 768px) {
                   right: 0.2rem;
                 }
@@ -1396,19 +1351,12 @@ export default defineComponent({
               padding: 0.1rem 0;
               cursor: pointer;
               .text {
-                display: flex;
                 justify-content: space-between;
-                align-items: center;
                 color: #000;
                 line-height: 1;
                 cursor: pointer;
                 @media screen and (min-width: 1800px) {
                   font-size: 15px;
-                }
-                .text_left {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
                 }
                 .icon {
                   width: 0.25rem;
@@ -1612,7 +1560,6 @@ export default defineComponent({
       }
       .el-pagination {
         margin: 0.1rem auto;
-        display: flex;
         justify-content: center;
         .btn-prev {
           i {

@@ -1,13 +1,15 @@
 <template>
   <div class="headerCont">
-    <el-row class="headerStyle">
-      <el-col :xs="20" :sm="20" :md="20" :lg="8" :xl="8" class="logoImg">
-        <img :src="logo" @click="header_logo" alt='' />
-        <el-divider direction="vertical" />
-        <div class="net">{{info.network||'-'}}</div>
+    <el-row class="headerStyle container-landing flex-row">
+      <el-col :xs="20" :sm="20" :md="20" :lg="4" :xl="4" class="logoImg flex-row">
+        <div @click="header_logo" class="flex-row">
+          <img :src="logo" alt='' /> Lagrange
+        </div>
+        <!-- <el-divider direction="vertical" />
+        <div class="net">{{info.network||'-'}}</div> -->
         <!-- <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." /> -->
       </el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
+      <el-col :xs="4" :sm="4" :md="4" :lg="20" :xl="20" class="header_right flex-row">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
           <el-menu-item index="dataset">
             <i class="icon-style icon_datasets"></i>
@@ -25,15 +27,12 @@
             <i class="icon-style icon_docs"></i>
             Docs
           </el-menu-item>
-          <el-menu-item index="5">
+          <el-menu-item index="pricing">
             <i class="icon-style icon_solutions"></i>
-            Solutions
+            Pricing
           </el-menu-item>
           <el-menu-item index="dashboard">
             Provider
-          </el-menu-item>
-          <el-menu-item index="pricing">
-            Pricing
           </el-menu-item>
           <el-menu-item index="personal_center" v-if="!lagLogin">
             &nbsp;
@@ -42,7 +41,7 @@
           <el-menu-item index="8" v-else>
             <div class="set">
               <el-dropdown split-button @command="handleSelect" :hide-on-click="true" trigger="click">
-                <router-link to="/personal_center" class="loginImg">
+                <router-link to="/personal_center" class="loginImg flex-row">
                   <img :src="accessAvatar||people_img" width="20" height="20" alt=""> {{system.$commonFun.hiddAddress(metaAddress)}}
                 </router-link>
                 <template #dropdown>
@@ -83,7 +82,7 @@ export default defineComponent({
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-    const logo = require("@/assets/images/icons/logo_w.png")
+    const logo = require("@/assets/images/icons/logo_lagrange.png")
     const people_img = require("@/assets/images/dashboard/people_default.png")
     const searchValue = ref('')
     const activeIndex = ref('')
@@ -155,43 +154,32 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .headerCont {
-  min-height: 0.68rem;
+  min-height: 0.65rem;
   overflow: hidden;
   .headerStyle {
-    height: 0.68rem;
-    padding: 0 0.16rem;
+    height: 0.65rem;
     margin: auto;
-    display: flex;
-    align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     flex-direction: row;
     font-size: 14px;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
-    @media screen and (max-width: 441px) {
-      padding: 0 2%;
-    }
     .logoImg {
-      display: flex;
-      align-items: center;
       width: auto;
       height: 0.42rem;
+      font-size: 18px;
+      font-weight: 700;
       cursor: pointer;
-      color: #fff;
+      color: #000;
       @media screen and (max-width: 441px) {
         width: 50%;
         height: auto;
       }
       img {
         display: block;
-        height: 100%;
+        height: 28px;
         width: auto;
         max-width: 100%;
+        margin-right: 8px;
         cursor: pointer;
         @media screen and (max-width: 441px) {
           width: 100%;
@@ -253,11 +241,8 @@ export default defineComponent({
       }
     }
     .header_right {
-      display: flex;
-      align-items: center;
       :deep(.el-menu) {
         width: 100%;
-        background-color: #180e1a;
         border: 0;
         justify-content: flex-end;
         @media screen and (max-width: 441px) {
@@ -268,14 +253,14 @@ export default defineComponent({
           padding: 0 0.15rem;
           background-color: transparent !important;
           border: 0 !important;
-          color: #fff;
+          color: #000;
           @media screen and (min-width: 1800px) {
             font-size: 15px;
           }
           .icon-style {
-            width: 21px;
-            height: 20px;
-            margin: -1px 6px 0 0;
+            width: 20px;
+            height: 19px;
+            margin: -1px 0 0 0;
           }
           svg {
             width: 21px;
@@ -290,40 +275,42 @@ export default defineComponent({
           .icon_datasets {
             background: url(../assets/images/icons/icon_1.png) no-repeat left
               center;
-            background-size: 17px;
+            background-size: 12px;
           }
           .icon_models {
             background: url(../assets/images/icons/icon_2.png) no-repeat left
               center;
-            background-size: 17px;
+            background-size: 12px;
           }
           .icon_spaces {
+            margin: -1px 6px 0 0;
             background: url(../assets/images/icons/icon_3.png) no-repeat left
               center;
-            background-size: 21px;
+            background-size: 19px;
           }
           .icon_docs {
             background: url(../assets/images/icons/icon_4.png) no-repeat left
               center;
-            background-size: 19px;
+            background-size: 13px;
           }
           .icon_solutions {
             background: url(../assets/images/icons/icon_5.png) no-repeat left
               center;
-            background-size: 17px;
+            background-size: 12px;
           }
           .loginBtn {
-            padding: 0.1rem 0.2rem;
+            padding: 0.08rem 0.18rem;
             margin: 0;
-            background-color: #fff;
+            background-color: #7405ff;
             font-weight: normal;
             line-height: 1;
-            color: #7405ff;
-            border-radius: 0.05rem;
+            color: #fff;
+            border: 1px solid #7405ff;
+            border-radius: 0.5rem;
             &:hover {
-              background-color: #7405ff;
-              color: #fff;
-              opacity: 0.9;
+              background-color: #fff;
+              color: #7405ff;
+              opacity: 1;
               cursor: pointer;
             }
           }
@@ -356,8 +343,6 @@ export default defineComponent({
               }
             }
             .loginImg {
-              display: flex;
-              align-items: center;
               cursor: pointer;
               img {
                 width: 23px;
@@ -376,27 +361,27 @@ export default defineComponent({
             .icon_datasets {
               background: url(../assets/images/icons/icon_1_1.png) no-repeat
                 left center;
-              background-size: 17px;
+              background-size: 12px;
             }
             .icon_models {
               background: url(../assets/images/icons/icon_2_1.png) no-repeat
                 left center;
-              background-size: 17px;
+              background-size: 12px;
             }
             .icon_spaces {
               background: url(../assets/images/icons/icon_3_1.png) no-repeat
                 left center;
-              background-size: 21px;
+              background-size: 19px;
             }
             .icon_docs {
               background: url(../assets/images/icons/icon_4_1.png) no-repeat
                 left center;
-              background-size: 19px;
+              background-size: 13px;
             }
             .icon_solutions {
               background: url(../assets/images/icons/icon_5_1.png) no-repeat
                 left center;
-              background-size: 17px;
+              background-size: 12px;
             }
           }
         }
@@ -410,7 +395,6 @@ export default defineComponent({
           border: 0;
           background-color: transparent !important;
           .loginImg {
-            display: flex;
             cursor: pointer;
             img {
               cursor: pointer;
@@ -430,7 +414,6 @@ export default defineComponent({
 </style>
 <style lang="scss">
 .loginImg {
-  display: flex;
   cursor: pointer;
 }
 
@@ -468,8 +451,6 @@ export default defineComponent({
       }
     }
     .loginImg {
-      display: flex;
-      align-items: center;
       cursor: pointer;
       img {
         width: 23px;

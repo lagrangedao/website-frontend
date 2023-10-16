@@ -6,12 +6,12 @@
       </div>
     </div>
 
-    <div class="token_list">
-      <div class="title">
+    <div class="token_list flex-row">
+      <div class="title flex-row">
         <i class="icon icon_join"></i> Join settings
       </div>
       <div class="card">
-        <div class="card_header">
+        <div class="card_header flex-row">
           <el-checkbox-group v-model="radioLink">
             <el-checkbox :label="0">
               <div class="radio_left">
@@ -52,22 +52,22 @@
         </div>
       </div>
     </div>
-    <div class="token_list">
-      <div class="title">
+    <div class="token_list flex-row">
+      <div class="title flex-row">
         <i class="icon icon_user"></i> Organization Members
         <el-button size="large" class="token_button token_manage" @click="addVisible=true">
           <i class="icon icon_add"></i> Add user
         </el-button>
       </div>
       <div class="card card_small">
-        <div class="card_header">
+        <div class="card_header flex-row">
           <div class="card_left">
-            <div class="width_div">
+            <div class="width_div flex-row">
               <div class="logo_sidebar">
                 <img :src="peopleUrl" alt="">
               </div>
               <div class="personal">
-                <div class="title">
+                <div class="title flex-row">
                   Cao
                   <b>·</b>
                   <small>ADMIN</small>
@@ -90,7 +90,7 @@
 
     <el-dialog v-model="addVisible" custom-class="delete_body">
       <template #title>
-        <div class="title">
+        <div class="title flex-row">
           <i class="icon icon_add"></i> Add a user to Magic house
         </div>
       </template>
@@ -125,7 +125,7 @@
 
     <el-dialog v-model="changeVisible" custom-class="delete_body">
       <template #title>
-        <div class="title">
+        <div class="title flex-row">
           <i class="icon icon_change"></i> Change xxxxx's role
         </div>
       </template>
@@ -133,7 +133,7 @@
         <el-form-item prop="role" style="width:100%">
           <label class="label" for="Role "></label>
           <div class="flex flex-row">
-            <div class="change">
+            <div class="change flex-row">
               <el-select v-model="ruleForm.type" placeholder=" " :suffix-icon="CaretTop">
                 <el-option v-for="item in ruleForm.typeOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
@@ -154,7 +154,7 @@
 
     <el-dialog v-model="deleteVisible" :show-close="false" custom-class="delete_body">
       <template #title>
-        <div class="title">
+        <div class="title flex-row">
           <i class="icon icon_delete"></i> Delete this organization
         </div>
       </template>
@@ -405,14 +405,10 @@ export default defineComponent({
     margin-top: 0.15rem;
   }
   :deep(.token_list) {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     margin: 0.35rem 0 0.2rem;
     .title {
-      display: flex;
       justify-content: flex-start;
-      align-items: center;
       flex-wrap: wrap;
       width: 100%;
       padding: 0.1rem 0 0;
@@ -496,8 +492,6 @@ export default defineComponent({
         padding: 0.1rem 0.25rem;
       }
       .card_header {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         font-size: 0.18rem;
         color: #565656;
@@ -518,8 +512,6 @@ export default defineComponent({
           text-align: left;
           color: #606060;
           .width_div {
-            display: flex;
-            align-items: center;
             flex-wrap: wrap;
             width: 90%;
             margin: 0;
@@ -552,8 +544,6 @@ export default defineComponent({
             width: calc(100% - 51px - 0.1rem);
             margin: 0 0 0 0.1rem;
             .title {
-              display: flex;
-              align-items: center;
               padding: 0;
               margin: 0;
               font-size: 0.22rem;
@@ -598,38 +588,6 @@ export default defineComponent({
               font-family: inherit;
               &:hover {
                 opacity: 0.95;
-              }
-            }
-            .top_text {
-              display: flex;
-              align-items: center;
-              margin: 0 0 0.2rem;
-              color: #fff;
-              font-family: "Helvetica-Bold";
-              font-size: 0.2rem;
-              .icon {
-                display: block;
-                width: 25px;
-                height: 25px;
-                margin: -1px 0.07rem 0 0;
-                @media screen and (min-width: 1800px) {
-                  width: 30px;
-                  height: 30px;
-                }
-                @media screen and (max-width: 768px) {
-                  width: 20px;
-                  height: 20px;
-                }
-              }
-              .icon_interests {
-                background: url(../../../assets/images/icons/icon_28_1.png)
-                  no-repeat left 0px;
-                background-size: 100%;
-              }
-              .icon_organizations {
-                background: url(../../../assets/images/icons/icon_35.png)
-                  no-repeat 2px 0px;
-                background-size: auto 100%;
               }
             }
           }
@@ -734,11 +692,6 @@ export default defineComponent({
             border-left: 0;
             border-color: inherit;
           }
-          .action {
-            display: flex;
-            align-items: center;
-            height: 100%;
-          }
           .icon_copy {
             display: inline-block;
             width: 16px;
@@ -830,9 +783,7 @@ export default defineComponent({
         font-size: 18px;
       }
       .title {
-        display: flex;
         justify-content: flex-start;
-        align-items: center;
         flex-wrap: wrap;
         width: 100%;
         padding: 0;
@@ -910,8 +861,6 @@ export default defineComponent({
                 color: #000;
               }
               .change {
-                display: flex;
-                align-items: center;
                 width: 100%;
                 .el-button {
                   width: auto;

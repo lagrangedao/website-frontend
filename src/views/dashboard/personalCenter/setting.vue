@@ -1,9 +1,9 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <el-row class="dataset_body">
+    <el-row class="dataset_body container-landing flex-row">
       <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
-          <div class="width_div">
+          <div class="width_div flex-row">
             <div v-loading="false" class="logo_sidebar">
               <img :src="accessAvatar || peopleUrl" alt="">
             </div>
@@ -274,17 +274,9 @@ export default defineComponent({
     }
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0 0.16rem;
     margin: auto;
     font-size: 14px;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     &.opacity {
       opacity: 0;
     }
@@ -328,8 +320,6 @@ export default defineComponent({
         text-align: left;
         color: #000;
         .width_div {
-          display: flex;
-          align-items: center;
           width: 90%;
           margin: 0 auto;
         }
@@ -390,38 +380,6 @@ export default defineComponent({
               opacity: 0.95;
             }
           }
-          .top_text {
-            display: flex;
-            align-items: center;
-            margin: 0 0 0.2rem;
-            color: #fff;
-            font-family: "Helvetica-Bold";
-            font-size: 0.2rem;
-            .icon {
-              display: block;
-              width: 25px;
-              height: 25px;
-              margin: -1px 0.07rem 0 0;
-              @media screen and (min-width: 1800px) {
-                width: 30px;
-                height: 30px;
-              }
-              @media screen and (max-width: 768px) {
-                width: 20px;
-                height: 20px;
-              }
-            }
-            .icon_interests {
-              background: url(../../../assets/images/icons/icon_28_1.png)
-                no-repeat left 0px;
-              background-size: 100%;
-            }
-            .icon_organizations {
-              background: url(../../../assets/images/icons/icon_35.png)
-                no-repeat 2px 0px;
-              background-size: auto 100%;
-            }
-          }
         }
         ul {
           width: 100%;
@@ -452,86 +410,10 @@ export default defineComponent({
       position: relative;
       padding: 0 4% 0.5rem;
       .top {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         margin: 0.35rem 0 0.15rem;
         color: #9ca3b1;
         font-size: 0.19rem;
-        .top_text {
-          display: flex;
-          align-items: center;
-          h3 {
-            color: #7405ff;
-            font-family: "Helvetica-Neue";
-            font-size: 0.22rem;
-            font-weight: 500;
-            line-height: 1.2;
-            text-align: left;
-          }
-          .el-input {
-            max-width: 2rem;
-            margin: 0 0 0 0.17rem;
-            .el-input__inner {
-              padding-left: 0.35rem;
-              background: url(../../../assets/images/icons/icon_13_1.png)
-                no-repeat 0.1rem center;
-              background-size: 17px;
-              border-radius: 0.1rem;
-              border-color: #cfcfcf;
-              @media screen and (min-width: 1800px) {
-                font-size: 15px;
-              }
-            }
-            .el-input__prefix {
-              padding: 0;
-              .el-icon {
-                svg {
-                  width: 0.22rem;
-                  height: 0.22rem;
-                  color: #9ea5b3;
-                }
-              }
-            }
-            ::-webkit-input-placeholder {
-              color: #9ca3b1;
-            } /* 使用webkit内核的浏览器 */
-            :-moz-placeholder {
-              color: #9ca3b1;
-            } /* Firefox版本4-18 */
-            ::-moz-placeholder {
-              color: #9ca3b1;
-            } /* Firefox版本19+ */
-            :-ms-input-placeholder {
-              color: #9ca3b1;
-            }
-          }
-          .peopleImg {
-            width: 0.55rem;
-            height: 0.55rem;
-            border-radius: 0.65rem;
-            border: 2px solid #4784ea;
-            cursor: pointer;
-          }
-          .icon {
-            display: block;
-            width: 0.25rem;
-            height: 0.25rem;
-          }
-          .icon_cont {
-            background: url(../../../assets/images/icons/icon_17.png) no-repeat
-              left 0px;
-            background-size: auto 100%;
-          }
-          .icon_info {
-            background: url(../../../assets/images/icons/icon_18.png) no-repeat
-              left 0px;
-            background-size: auto 100%;
-          }
-          .l {
-            margin-left: 0.35rem;
-          }
-        }
         .el-select {
           float: right;
           .el-input {
@@ -576,106 +458,10 @@ export default defineComponent({
           }
         }
       }
-      .my_profile {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 0.25rem;
-        margin: 0 0 0.25rem;
-        background-color: #7405ff;
-        border-radius: 0.1rem;
-        .peopleImg {
-          width: 1.1rem;
-          height: 1.1rem;
-          margin: 0 0.3rem 0 0;
-          border-radius: 1.1rem;
-          border: 0.08rem solid #6cb9ff;
-          cursor: pointer;
-        }
-        .cont {
-          margin: 0.1rem 0 0;
-          color: #fff;
-          h5 {
-            padding: 0.1rem 0;
-            font-family: "Helvetica-Neue";
-            font-size: 0.2rem;
-            font-weight: normal;
-            line-height: 1;
-            text-align: left;
-            span {
-              position: relative;
-              padding-left: 0.15rem;
-              margin-left: 0.4rem;
-              font-size: 14px;
-              @media screen and (min-width: 1800px) {
-                font-size: 15px;
-              }
-              &::after {
-                position: absolute;
-                content: "";
-                left: 0;
-                top: 50%;
-                width: 5px;
-                height: 5px;
-                margin-top: -2px;
-                background-color: #fff;
-                border-radius: 100%;
-              }
-            }
-          }
-          h6 {
-            padding: 0.1rem 0;
-            font-family: "Helvetica-Neue";
-            font-size: 0.18rem;
-            font-weight: normal;
-            line-height: 1;
-            text-align: left;
-            @media screen and (min-width: 1800px) {
-              font-size: 15px;
-            }
-          }
-          .media {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            li {
-              display: flex;
-              justify-content: flex-start;
-              align-items: center;
-              margin: 0.1rem 0.25rem 0.1rem 0;
-              font-size: 14px;
-              @media screen and (min-width: 1800px) {
-                font-size: 15px;
-              }
-              .iconBody {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 25px;
-                height: 25px;
-                margin: 0 0.07rem 0 0;
-                border-radius: 100%;
-                @media screen and (min-width: 1800px) {
-                  width: 30px;
-                  height: 30px;
-                }
-                svg {
-                  display: block;
-                  width: 100%;
-                  height: 100%;
-                }
-              }
-            }
-          }
-        }
-      }
       .list {
         margin: 0.35rem 0 0;
         .title {
-          display: flex;
           justify-content: flex-start;
-          align-items: center;
           padding: 0;
           font-size: 0.21rem;
           color: #000;
@@ -729,7 +515,6 @@ export default defineComponent({
               padding: 0;
               border: 0;
               .card-header {
-                display: flex;
                 justify-content: flex-end;
                 span {
                   height: 0.25rem;
@@ -749,9 +534,7 @@ export default defineComponent({
             .el-card__body {
               padding: 0;
               .text {
-                display: flex;
                 justify-content: flex-start;
-                align-items: center;
                 color: #000;
                 line-height: 1;
                 @media screen and (min-width: 1800px) {
@@ -830,10 +613,6 @@ export default defineComponent({
               .item {
                 justify-content: space-between;
                 margin: 0.2rem 0 0;
-                .item_body {
-                  display: flex;
-                  align-items: center;
-                }
               }
             }
           }
@@ -893,209 +672,8 @@ export default defineComponent({
         flex-wrap: nowrap;
         overflow: hidden;
       }
-      .more_style {
-        display: flex;
-        justify-content: center;
-        img {
-          display: flex;
-          width: 40px;
-          height: 40px;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s;
-          border-radius: 100%;
-          box-shadow: 2px 2px 8px rgba(135, 135, 135, 0.5);
-          @media screen and (max-width: 1600px) {
-            width: 35px;
-            height: 35px;
-          }
-          @media screen and (max-width: 768px) {
-            width: 30px;
-            height: 30px;
-          }
-          &:hover {
-            transform: translateY(5px);
-          }
-        }
-      }
-      .list_body_spaces {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        margin: 0.4rem 0 0.3rem;
-        text-align: left;
-        .el-form-item {
-          width: 100%;
-          &.flex_form {
-            width: 50%;
-          }
-          .el-form-item__content {
-            width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: flex-start;
-            justify-content: flex-start;
-            text-align: left;
-            .label {
-              display: flex;
-              align-items: center;
-              width: 100%;
-              font-size: 16px;
-              text-align: left;
-              color: #565656;
-              @media screen and (min-width: 1800px) {
-                font-size: 18px;
-              }
-              .span {
-                margin-left: 0.1rem;
-                color: #aaaaaa;
-              }
-            }
-            .flex-row {
-              display: flex;
-              align-items: center;
-              flex-wrap: wrap;
-              width: 100%;
-              .el-select {
-                width: calc(100% - 30px);
-              }
-              .self-end {
-                width: 30px;
-                text-align: center;
-              }
-              .img {
-                width: 60px;
-                height: 60px;
-                margin: 0.15rem 0 0;
-              }
-              small {
-                display: block;
-                width: 100%;
-                font-size: 12px;
-                color: #afafaf;
-                line-height: 1.3;
-                @media screen and (min-width: 1800px) {
-                  font-size: 14px;
-                }
-              }
-            }
-            .avatar {
-              width: 65px;
-              height: 65px;
-            }
-            .remove {
-              margin: 0.15rem 0 0 0.15rem;
-              cursor: pointer;
-            }
-            .avatar-uploader-icon {
-              padding: 0.15rem 0.2rem;
-              background: linear-gradient(180deg, #fefefe, #f0f0f0);
-              border-radius: 0.07rem;
-              color: #606060;
-              font-family: inherit;
-              @media screen and (min-width: 1800px) {
-                font-size: 16px;
-              }
-              &:hover {
-                opacity: 0.95;
-                border-color: #c37af9;
-              }
-              &.is-disabled {
-                opacity: 0.7;
-              }
-            }
-            .el-radio-group {
-              width: 100%;
-              margin: 0.2rem 0 0;
-              border-top: 1px solid #e0e1e2;
-              border-bottom: 1px solid #e0e1e2;
-              .el-radio {
-                width: 100%;
-                height: auto;
-                margin: 0.2rem 0;
-                .el-radio__label {
-                  h5,
-                  p {
-                    text-align: left;
-                    font-size: 16px;
-                    font-weight: 100;
-                    color: #333;
-                    line-height: 1.5;
-                    word-break: break-word;
-                    white-space: normal;
-                  }
-                  p {
-                    font-size: 14px;
-                    color: #7e7e7e;
-                    line-height: 1.3;
-                  }
-                }
-              }
-            }
-            .el-button {
-              font-family: inherit;
-              cursor: pointer;
-              @media screen and (min-width: 1800px) {
-                font-size: 16px;
-              }
-              span {
-                cursor: pointer;
-              }
-            }
-            .el-input {
-              .el-input__inner {
-                height: auto;
-                padding: 0.03rem 0.1rem;
-                border-radius: 0.07rem;
-                border-color: #f1f1f1;
-                @media screen and (min-width: 1800px) {
-                  font-size: 15px;
-                }
-                &:hover {
-                  border-color: #c37af9;
-                }
-              }
-              .el-input__prefix {
-                padding: 0;
-                .el-icon {
-                  svg {
-                    width: 0.22rem;
-                    height: 0.22rem;
-                    color: #9ea5b3;
-                  }
-                }
-              }
-            }
-            .icon_media {
-              display: inline-block;
-              width: 18px;
-              height: 18px;
-              margin: -1px 0.07rem 0 0;
-              @media screen and (min-width: 1800px) {
-                width: 23px;
-                height: 23px;
-              }
-            }
-            .icon_github {
-              background: url(../../../assets/images/icons/media_8.png)
-                no-repeat left center;
-              background-size: 100%;
-            }
-            .icon_twitter {
-              background: url(../../../assets/images/icons/media_9.png)
-                no-repeat left center;
-              background-size: 100%;
-            }
-          }
-          .el-form-item__label {
-            display: none;
-          }
-        }
-      }
       .el-pagination {
         margin: 0.1rem auto;
-        display: flex;
         justify-content: center;
         .btn-prev {
           i {

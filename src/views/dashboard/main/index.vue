@@ -1,72 +1,17 @@
 <template>
   <section id="step">
-    <div class="step_body">
-      <div class="loginBody width">
-        <el-row>
-          <el-col :xs="24" :sm="12" :md="13" :lg="13" :xl="13" class="left">
-            <h1>Data And Computing</h1>
-            <h4>Decentralized data science without borders</h4>
-            <h4>To receive product news, sign up for our newsletter
-              <a href="https://mailchi.mp/nbai/mars-lagrange" target="_blank">here</a>
-            </h4>
-            <el-button type="primary" @click="getStart">
-              Get Started
-            </el-button>
-          </el-col>
-          <el-col :xs="24" :sm="12" :md="11" :lg="11" :xl="11" class="metamask" v-if="active === 1">
-            <div class="titleCont" v-if="!activeIndex">
-              <p>Connect to MetaMask</p>
-            </div>
-            <div class="titleCont" v-else-if="activeIndex == 'connect'">
-              <div class="address">
-                <div class="address_left">
-                  <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> {{ hiddAddress(metaAddress)}}
-                </div>
-                <div class="address_right">
-                  <div class="flex-shrink-0 w-2 h-2 rounded-full bg-primary"></div>
-                  <div>Connected</div>
-                </div>
-              </div>
-            </div>
-            <div v-loading="loginLoad">
-              <div class="cont_p">Connect your wallet address to create an account</div>
-              <div class="login_footer">
-                <el-button type="primary" @click="signFun">
-                  <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> Connect Wallet
-                </el-button>
-              </div>
-            </div>
-          </el-col>
-
-          <!-- <el-col :xs="24" :sm="12" :md="11" :lg="11" :xl="11" class="metamask" v-else-if="active === 2">
-            <div class="titleCont">
-              <div class="address">
-                <div class="address_left">
-                  <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> {{ hiddAddress(metaAddress)}}
-                </div>
-                <div class="address_right">
-                  <div class="flex-shrink-0 w-2 h-2 rounded-full bg-primary"></div>
-                  <div>Connected</div>
-                </div>
-              </div>
-            </div>
-            <div v-loading="loginLoad" class="demo-ruleForm">
-              <div class="form_title">Enter your email address to verify login</div>
-              <el-form :model="form" status-icon :rules="rules" ref="ruleFormRef">
-                <el-form-item prop="email">
-                  <el-input v-model="form.email" placeholder="you@domain.com"></el-input>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="primary" @click="submitEmail('ruleFormRef')">Submit</el-button>
-                  <p v-if="form.tip" style="color:#f40000">Unable to verify captcha. Please try again</p>
-                </el-form-item>
-              </el-form>
-            </div>
-          </el-col> -->
-        </el-row>
+    <div class="step_body container-landing">
+      <div class="loginBody width flex-row">
+        <div class="left">
+          <h1>Data <br />And<br /> Computing</h1>
+          <h4>Decentralized data science without borders</h4>
+          <h4>To receive product news, sign up for our newsletter
+            <a href="https://mailchi.mp/nbai/mars-lagrange" target="_blank">here</a>
+          </h4>
+        </div>
       </div>
       <footer>
-        <div class="foot_media">
+        <div class="foot_media flex-row">
           <a href="https://t.me/datadao" target="_blank"><img :src="share_telegram" alt=""></a>
           <a href="https://twitter.com/lagrangedao" target="_blank"><img :src="share_twitter" alt=""></a>
           <a href="https://discord.gg/8vaB6rKSAu" target="_blank"><img :src="share_discord" alt=""></a>
@@ -127,11 +72,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
 
-    function getStart () {
-      // if (lagLogin.value) active.value = 2
-      if (lagLogin.value) router.push({ path: '/personal_center' })
-      else active.value = 1
-    }
     async function signFun (params) {
       loadingText.value = ''
       system.$commonFun.Init(async addr => {
@@ -243,7 +183,7 @@ export default defineComponent({
       system,
       route,
       router,
-      signFun, signIn, hiddAddress, getStart, submitEmail
+      signFun, signIn, hiddAddress, submitEmail
     }
   }
 })
@@ -257,11 +197,6 @@ export default defineComponent({
   font-display: block;
 }
 #step {
-  color: #fff;
-  background: #180e1a url(../../../assets/images/dashboard/main/bg.jpg)
-    no-repeat center;
-  // background-size: auto 100%;
-  background-size: cover;
   font-size: 18px;
   text-align: left;
   @media screen and (max-width: 1200px) {
@@ -277,474 +212,89 @@ export default defineComponent({
   }
   .step_body {
     position: relative;
-    min-height: calc(100% - 0.6rem);
-    padding: 0.6rem 0.16rem 0;
-    margin: auto;
+    margin: 0.4rem auto;
     // background: url(../../../assets/images/dashboard/main/bg_small_1.png),
     //   url(../../../assets/images/dashboard/main/bg_small_2.png);
     // background-repeat: no-repeat, no-repeat;
     // background-size: 14%, 10%;
     // background-position: bottom left, top right;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
-    @media screen and (max-width: 600px) {
-      min-height: calc(100% - 0.8rem);
-      padding: 0 0.16rem 0.8rem;
-    }
     .loginBody {
-      height: calc(100% - 0.85rem);
-      padding: 0.6rem 0 0.25rem;
-      display: flex;
+      padding: 0.96rem;
+      color: #fff;
+      background: #180e1a url(../../../assets/images/dashboard/main/bg.jpg)
+        no-repeat center right;
+      // background-size: auto 100%;
+      background-size: auto 100%;
       flex-wrap: wrap;
-      align-items: center;
-      @media screen and (max-width: 600px) {
-        height: calc(100% - 0.5rem);
-        padding: 0.25rem 0;
-      }
-      .el-row {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        .metamask {
-          max-width: 10rem;
-          padding: 0.2rem 5%;
-          margin: auto;
-          background: rgba(4, 20, 23, 0.5);
-          border: 1px solid #4e82ff;
-          border-radius: 0.2rem;
-          .titleCont {
-            padding: 0.2rem 0;
-            font-size: 0.286rem;
-            font-weight: normal;
-            color: #fff;
-            line-height: 1.3;
-            border-bottom: 1px solid #dde0e2;
-            @media screen and (max-width: 1600px) {
-              font-size: 0.26rem;
-            }
-            @media screen and (max-width: 600px) {
-              font-size: 16px;
-            }
-            p {
-              text-align: center;
-            }
-            .address {
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              font-size: 0.223rem;
-              font-weight: normal;
-              color: #fff;
-              line-height: 1.2;
-              @media screen and (max-width: 1600px) {
-                font-size: 0.2rem;
-              }
-              @media screen and (max-width: 600px) {
-                font-size: 13px;
-              }
-              .address_left {
-                display: flex;
-                align-items: center;
-                img {
-                  height: 30px;
-                  margin: 0 0.25rem 0 0;
-                  @media screen and (max-width: 600px) {
-                    height: 24px;
-                  }
-                }
-              }
-              .address_right {
-                position: relative;
-                display: inline-block;
-                padding: 0.1rem 0.2rem 0.1rem 0.32rem;
-                background-color: rgba(85, 128, 233, 0.3);
-                font-size: 0.148rem;
-                border-radius: 0.5rem;
-                @media screen and (max-width: 1600px) {
-                  font-size: 14px;
-                }
-                @media screen and (max-width: 1440px) {
-                  font-size: 13px;
-                }
-                &::before {
-                  position: absolute;
-                  left: 0.16rem;
-                  top: 50%;
-                  content: "";
-                  width: 0.08rem;
-                  height: 0.08rem;
-                  margin-top: -0.04rem;
-                  background-color: #4d73ff;
-                  border-radius: 0.5rem;
-                }
-              }
-            }
+      border-radius: 0.25rem;
+      .left {
+        width: 50%;
+        padding: 0.15rem 5% 0 0;
+        color: #fff;
+        line-height: 1.2;
+        @media screen and (max-width: 992px) {
+          width: 90%;
+          padding: 0.5rem 0;
+          text-align: center;
+        }
+        h1 {
+          padding: 0 0 0.4rem;
+          font-size: 0.6rem;
+          text-transform: capitalize;
+          @media screen and (max-width: 768px) {
+            font-size: 22px;
           }
-          .el-row {
-            border-radius: 0.08rem;
-            margin: 0.25rem 0px;
-            border: 1px solid rgb(229, 232, 235);
-            text-align: center;
-            position: static;
-            transition: all 0.3s ease 0s;
-            overflow: hidden;
-            &:hover {
-              // background: rgba(240, 185, 11, 0.1);
-              // border: 1px solid rgb(240, 185, 11);
-              box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
-            }
-            .el-col {
-              display: flex;
-              -webkit-box-pack: justify;
-              justify-content: flex-start;
-              -webkit-box-align: center;
-              align-items: center;
-              background: #fff;
-              padding: 0.16rem;
-              transition: all 0.3s ease 0s;
-              cursor: pointer;
-              img {
-                display: block;
-                height: 0.3rem;
-                margin: 0 0.15rem 0 0;
-                order: 1;
-                @media screen and (max-width: 600px) {
-                  height: 24px;
-                }
-              }
-              span {
-                order: 2;
-                font-size: 0.18rem;
-                @media screen and (max-width: 600px) {
-                  font-size: 14px;
-                }
-              }
-            }
+        }
+        h3 {
+          font-size: 0.3rem;
+          font-weight: normal;
+          @media screen and (max-width: 768px) {
+            font-size: 16px;
           }
-          .cont_p {
-            padding: 0.4rem 5%;
-            font-size: 0.223rem;
-            font-weight: 100;
-            line-height: 1.5;
-            text-align: center;
-            color: #fff;
-            @media screen and (max-width: 600px) {
-              font-size: 14px;
-            }
-          }
-          .login_footer {
-            padding: 0.25rem 5% 0.1rem;
-            .el-button {
-              display: block;
-              width: 100%;
-              max-width: 4rem;
-              font-family: inherit;
-              font-size: 0.25rem;
-              font-weight: 600;
-              height: calc(30px + 0.3rem);
-              padding: 0.15rem 0.2rem;
-              margin: auto;
-              // background: linear-gradient(45deg, #0353fe, #7cebfe);
-              background: #7405ff;
-              color: #fff;
-              border: 0;
-              border-radius: 0.5rem;
-              line-height: 30px;
-              letter-spacing: 1px;
-              @media screen and (max-width: 1600px) {
-                padding: 0.1rem 0.2rem;
-                height: calc(30px + 0.2rem);
-                font-size: 0.2rem;
-              }
-              @media screen and (max-width: 600px) {
-                height: calc(24px + 0.2rem);
-                font-size: 14px;
-                line-height: 24px;
-              }
-              span {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-              img {
-                height: 30px;
-                margin: 0 0.1rem 0 0;
-                @media screen and (max-width: 600px) {
-                  height: 24px;
-                }
-              }
-              &:hover {
-                background: linear-gradient(45deg, #021cad, #3e70fe);
-              }
-            }
-            .el-button > span {
-              cursor: pointer;
-            }
-            p {
-              font-size: 0.13rem;
-              line-height: 1.5;
-              color: #c37af9;
-              margin: 0.1rem 0 0;
-              text-align: center;
-              @media screen and (max-width: 1600px) {
-                font-size: 14px;
-              }
-              @media screen and (max-width: 600px) {
-                font-size: 12px;
-              }
-            }
-          }
-          .back_home {
-            float: right;
-            color: #fff;
-            text-decoration: underline;
+        }
+        h4 {
+          padding: 0 0.24rem 0 0;
+          font-size: 0.18rem;
+          font-family: "Helvetica-Neue";
+          font-weight: normal;
+          color: rgba(209, 213, 219, 0.8);
+          line-height: 1.6;
+          @media screen and (max-width: 768px) {
             font-size: 14px;
-            @media screen and (max-width: 1600px) {
-              font-size: 12px;
-            }
           }
-          .el-loading-mask {
-            background-color: rgba(46, 77, 91, 0.75);
-          }
-          .demo-ruleForm {
-            padding: 0.3rem 0;
-            .form_title {
-              font-size: 14px;
-              font-weight: normal;
-              color: #fff;
-              line-height: 1.2;
-              @media screen and (max-width: 600px) {
-                font-size: 13px;
-              }
-            }
-            :deep(.el-form) {
-              padding: 0.1rem 0 0;
-              .el-form-item {
-                display: block;
-                height: auto;
-                max-width: 4.5rem;
-                text-align: left;
-                .el-form-item__content {
-                  height: auto;
-                  width: 100%;
-                  font-size: 0.223rem;
-                  font-weight: normal;
-                  color: #fff;
-                  line-height: 1.2;
-                  @media screen and (max-width: 600px) {
-                    font-size: 13px;
-                  }
-                  .el-input {
-                    width: 100%;
-                    .el-input__inner {
-                      height: auto;
-                      padding: 0.1rem 0.15rem;
-                      border-radius: 0.05rem;
-                      border-color: #3d6ddb;
-                      color: #041417;
-                      line-height: 1.2;
-                      font-family: inherit;
-                      font-size: inherit;
-                    }
-                  }
-                  .el-button {
-                    display: block;
-                    width: 80%;
-                    max-width: 4.4rem;
-                    font-family: inherit;
-                    font-size: 0.2rem;
-                    font-weight: normal;
-                    height: auto;
-                    padding: 0.15rem 0.25rem;
-                    margin: 0;
-                    background: #7405ff;
-                    color: #fff;
-                    border: 0;
-                    border-radius: 0.5rem;
-                    line-height: 1.1;
-                    white-space: normal;
-                    @media screen and (max-width: 600px) {
-                      font-size: 14px;
-                    }
-                    span {
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      cursor: pointer;
-                    }
-                    &:hover {
-                      opacity: 0.9;
-                    }
-                  }
-                  .el-button > span {
-                    cursor: pointer;
-                  }
-                }
-              }
-            }
+          a {
+            color: inherit;
+            text-decoration: underline;
           }
         }
-        .checkEmail {
-          padding: 5%;
-          background: rgba(4, 20, 23, 0.5);
-          border: 1px solid #4e7cff;
-          border-radius: 0.2rem;
-          .check_email {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            .check_left {
-              padding-right: 0.1rem;
-              color: #fff;
-              text-align: left;
-              h3 {
-                font-size: 0.298rem;
-                line-height: 1.5;
-                @media screen and (max-width: 1600px) {
-                  font-size: 22px;
-                }
-                @media screen and (max-width: 600px) {
-                  font-size: 16px;
-                }
-              }
-              h4,
-              u {
-                padding: 0.1rem 0;
-                font-size: 0.18rem;
-                font-weight: normal;
-                line-height: 1.5;
-                opacity: 0.9;
-                @media screen and (max-width: 1600px) {
-                  font-size: 16px;
-                }
-                @media screen and (max-width: 600px) {
-                  font-size: 14px;
-                }
-              }
-              u {
-                cursor: pointer;
-              }
-            }
-            .check_right {
-              display: flex;
-              justify-content: flex-end;
-              align-items: center;
-              width: 50%;
-              img {
-                width: 95%;
-                max-width: 1.8rem;
-                margin: auto;
-              }
-            }
-          }
-        }
-        .left {
-          padding: 0.15rem 5% 0 0;
+        .el-button {
+          display: inline-block;
+          max-width: 3.4rem;
+          font-family: inherit;
+          font-size: 0.18rem;
+          font-weight: normal;
+          height: auto;
+          padding: 0.15rem 0.25rem;
+          margin: 0.1rem 0 0;
+          background: #c37af9;
           color: #fff;
-          line-height: 1.2;
-          @media screen and (max-width: 992px) {
-            padding: 0.5rem 0;
-            text-align: center;
+          border: 0;
+          border-radius: 0.5rem;
+          line-height: 1.1;
+          white-space: normal;
+          text-transform: uppercase;
+          @media screen and (max-width: 600px) {
+            font-size: 14px;
           }
-          h1 {
-            font-size: 0.7rem;
-            text-transform: capitalize;
-            @media screen and (max-width: 768px) {
-              font-size: 22px;
-            }
-          }
-          h3 {
-            font-size: 0.3rem;
-            font-weight: normal;
-            @media screen and (max-width: 768px) {
-              font-size: 16px;
-            }
-          }
-          h4 {
-            margin: 0 0 0.2rem;
-            font-size: 0.18rem;
-            font-family: "Helvetica-Neue";
-            font-weight: normal;
-            color: #878c93;
-            @media screen and (max-width: 768px) {
-              font-size: 14px;
-            }
-            a {
-              color: inherit;
-              text-decoration: underline;
-            }
-          }
-          .el-button {
-            display: inline-block;
-            max-width: 3.4rem;
-            font-family: inherit;
-            font-size: 0.18rem;
-            font-weight: normal;
-            height: auto;
-            padding: 0.15rem 0.25rem;
-            margin: 0.1rem 0 0;
-            background: #c37af9;
-            color: #fff;
-            border: 0;
-            border-radius: 0.5rem;
-            line-height: 1.1;
-            white-space: normal;
-            text-transform: uppercase;
-            @media screen and (max-width: 600px) {
-              font-size: 14px;
-            }
-            span {
-              cursor: pointer;
-            }
-            &:hover {
-              opacity: 0.9;
-            }
-          }
-          .el-button > span {
+          span {
             cursor: pointer;
           }
-        }
-      }
-      .collaborators {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        flex-wrap: wrap;
-        width: 96%;
-        margin: auto;
-        @media screen and (max-width: 992px) {
-          margin: 0.5rem auto 0;
-        }
-        .el-col {
-          margin: 0 auto;
-          a {
-            img {
-              display: block;
-              height: 45px;
-              margin: 20px auto;
-              cursor: pointer;
-              @media screen and (max-width: 1600px) {
-                height: 40px;
-              }
-              @media screen and (max-width: 1440px) {
-                margin: 15px auto;
-              }
-            }
-            .height {
-              height: 80px;
-              margin: 10px auto;
-              @media screen and (max-width: 1600px) {
-                height: 65px;
-              }
-              @media screen and (max-width: 1440px) {
-                margin: 5px auto;
-              }
-            }
+          &:hover {
+            opacity: 0.9;
           }
+        }
+        .el-button > span {
+          cursor: pointer;
         }
       }
     }
@@ -756,9 +306,7 @@ export default defineComponent({
       right: 0.16rem;
       min-height: 0.5rem;
       .foot_media {
-        display: flex;
         justify-content: flex-end;
-        align-items: center;
         a {
           display: block;
           width: 35px;

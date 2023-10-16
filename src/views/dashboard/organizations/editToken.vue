@@ -4,12 +4,12 @@
       <div class="title">API Tokens</div>
     </div>
 
-    <div class="token_list">
+    <div class="token_list flex-row">
       <div class="title"></div>
       <div class="desc">Unlike user
         <a @click="settingDetail('tokens')">access tokens</a>, an Organization API token can only be used to provide read access to repos, or for billing access to a compute resource.</div>
       <div class="card" v-if="tokenData.token">
-        <div class="card_header">
+        <div class="card_header flex-row">
           Organization API token
           <el-select v-model="value" class="m-2" @change="deleteToken(tokenData.token)" placeholder="Manage" size="small">
             <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
@@ -18,7 +18,7 @@
         <div class="card_body">
           <el-input v-model="tokenData.token" :type="tokenShow?'text':'password'" readonly placeholder="Access Tokens">
             <template #append>
-              <div class="action">
+              <div class="action flex-row">
                 <i class="icon icon_look" @click="tokenShow=!tokenShow"></i>
                 <i class="icon icon_copy" @click="system.$commonFun.copyContent(tokenData.token, 'Copied')"></i>
               </div>
@@ -142,8 +142,6 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.token_list) {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     margin: 0 0 0.2rem;
     .title {
@@ -195,8 +193,6 @@ export default defineComponent({
       border: 1px solid #ececec;
       border-radius: 0.05rem;
       .card_header {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         margin-bottom: 0.25rem;
         font-size: 0.18rem;
@@ -251,8 +247,6 @@ export default defineComponent({
             border-color: inherit;
           }
           .action {
-            display: flex;
-            align-items: center;
             height: 100%;
           }
           .icon_copy {

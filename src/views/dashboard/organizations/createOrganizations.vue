@@ -1,12 +1,12 @@
 <template>
     <section id="space">
-        <el-row class="space_body" v-loading="loading.createLoad" :element-loading-text="loading.createText">
+        <el-row class="space_body container-landing flex-row" v-loading="loading.createLoad" :element-loading-text="loading.createText">
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <div class="text-center">
                     <h1 class="text-xl md:text-3xl font-semibold">New Organization</h1>
                     <p class="text-lg text-gray-500">Complete your organization profile</p>
                 </div>
-                <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon scroll-to-error>
+                <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm flex-row" status-icon scroll-to-error>
                     <el-form-item prop="name" class="flex_form">
                         <label class="label" for="dataname">
                             Organization Username
@@ -379,17 +379,9 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.space_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0 0.16rem;
     margin: auto;
     font-size: 14px;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .el-col {
       position: relative;
       padding: 1rem 3% 0.5rem 0;
@@ -419,7 +411,6 @@ export default defineComponent({
         }
       }
       .demo-ruleForm {
-        display: flex;
         flex-wrap: wrap;
         width: 95%;
         max-width: 640px;
@@ -494,7 +485,6 @@ export default defineComponent({
               }
             }
             .flex-row {
-              display: flex;
               width: 100%;
               .el-select,
               .el-input,
@@ -566,74 +556,6 @@ export default defineComponent({
                     }
                     @media screen and (max-width: 1024px) {
                       font-size: 12px;
-                    }
-                  }
-                }
-              }
-              &.radio_flex {
-                display: flex;
-                flex-wrap: wrap;
-                .el-radio {
-                  width: 23%;
-                  height: 1.5rem;
-                  margin: 0.05rem 1% 0;
-                  background: linear-gradient(180deg, #fefefe, #f0f0f0);
-                  border-width: 2px;
-                  border-radius: 0.1rem;
-                  border-color: #e1e1e1;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  @media screen and (max-width: 1024px) {
-                    width: 48%;
-                  }
-                  @media screen and (max-width: 320px) {
-                    width: 98%;
-                  }
-                  .el-radio__input {
-                    display: none;
-                  }
-                  .el-radio__label {
-                    padding: 0;
-                    text-align: center;
-                    font-weight: bold;
-                    svg {
-                      display: block;
-                      width: 25px;
-                      height: 25px;
-                      margin: auto;
-                    }
-                    .icon_Bacalhau {
-                      display: block;
-                      height: 17px;
-                      margin: 4px auto;
-                    }
-                  }
-                  &.is-checked {
-                    border-color: #c37af9;
-                    .el-radio__label {
-                      color: inherit;
-                    }
-                  }
-                  &:nth-child(4n + 1) {
-                    .el-radio__label {
-                      color: rgba(59, 130, 246, 1);
-                    }
-                  }
-                  &:nth-child(4n + 2) {
-                    .el-radio__label {
-                      //   color: rgba(249, 115, 22, 1);
-                      color: #000;
-                    }
-                  }
-                  &:nth-child(4n + 3) {
-                    .el-radio__label {
-                      color: rgba(239, 68, 68, 1);
-                    }
-                  }
-                  &:nth-child(4n + 4) {
-                    .el-radio__label {
-                      color: rgba(107, 114, 128, 1);
                     }
                   }
                 }

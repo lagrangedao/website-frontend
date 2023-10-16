@@ -1,10 +1,10 @@
 <template>
   <section id="dataset">
-    <el-row class="dataset_body" v-loading="listLoad">
+    <el-row class="dataset_body container-landing flex-row" v-loading="listLoad">
       <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated'">
         <div class="title">Rename or transfer this dataset</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
-        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
+        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm flex-row" status-icon>
           <el-form-item prop="" class="flex_left">
             <label class="label" for="owner">
               New owner
@@ -41,11 +41,11 @@
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
           <div v-if="nftdata.status === 'success' || (nftdata.tokens && nftdata.tokens.length>0)">
-            <div class="contract tip">
+            <div class="contract flex-row tip">
               <div class="flex-left">Contract Address:
                 <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
               </div>
-              <div class="flex-right">
+              <div class="flex-right flex-row">
                 <i class="icon icon_star"></i>: Licenses owned by yourself
               </div>
             </div>
@@ -76,7 +76,7 @@
               </el-table-column>
             </el-table>
           </div>
-          <div v-else-if="nftdata.status === 'processing'" class="process_style">
+          <div v-else-if="nftdata.status === 'processing'" class="process_style flex-row">
             <el-button size="large" class="generateDOI" @click="refreshContract('refresh')">Refresh</el-button>
             <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Waiting for the Transaction hash complete">
               <template #reference>
@@ -86,7 +86,7 @@
               </template>
             </el-popover>
           </div>
-          <div v-else-if="nftdata.status === 'waiting for oracle'" class="process_style">
+          <div v-else-if="nftdata.status === 'waiting for oracle'" class="process_style flex-row">
             <el-button size="large" class="generateDOI" @click="refreshContract()">Refresh</el-button>
             <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Still waiting for the data oracle">
               <template #reference>
@@ -106,7 +106,7 @@
           <b class="b">{{ route.params.name }}</b> dataset repository and all its files.
         </div>
 
-        <el-form ref="ruleFormRefDelete" :model="ruleForm" :rules="rulesDelete" class="demo-ruleForm" status-icon>
+        <el-form ref="ruleFormRefDelete" :model="ruleForm" :rules="rulesDelete" class="demo-ruleForm flex-row" status-icon>
           <el-form-item prop="delete" style="width:100%">
             <label class="label" for="dataname">
               Please type
@@ -595,22 +595,11 @@ export default defineComponent({
   }
 
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
     padding: 0.4rem 0 0.6rem;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0.4rem 0.16rem;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
-
     .fileList {
       width: 100%;
       margin: 0.15rem 0;
@@ -653,13 +642,7 @@ export default defineComponent({
         color: #666;
         line-height: 1.5;
         &.contract {
-          display: flex;
-          align-items: center;
           justify-content: space-between;
-          .flex-right {
-            display: flex;
-            align-items: center;
-          }
         }
       }
 
@@ -677,7 +660,6 @@ export default defineComponent({
       }
 
       .demo-ruleForm {
-        display: flex;
         flex-wrap: wrap;
         padding: 0 0.2rem;
         margin: 0;
@@ -721,9 +703,7 @@ export default defineComponent({
               }
 
               .flex-row {
-                display: flex;
                 width: 100%;
-
                 .el-select {
                   width: calc(100% - 30px);
                   @media screen and (max-width: 768px) {
@@ -825,8 +805,6 @@ export default defineComponent({
         }
       }
       .process_style {
-        display: flex;
-        align-items: center;
         i {
           margin: 0 0 0.2rem -0.1rem;
           font-size: 18px;

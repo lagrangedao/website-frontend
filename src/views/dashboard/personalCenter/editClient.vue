@@ -3,9 +3,9 @@
     <el-row>
       <el-col :span="24">
         <div class="list">
-          <div class="title">As Client</div>
+          <div class="title flex-row">As Client</div>
         </div>
-        <div class="token_list">
+        <div class="token_list flex-row">
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="Profile" name="profile">
               <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
@@ -84,15 +84,15 @@
             </el-tab-pane>
             <el-tab-pane label="Payment" name="payment">
               <div class="card">
-                <div class="card_header">
-                  <div class="card_left">
+                <div class="card_header flex-row">
+                  <div class="card_left flex-row">
                     <div class="face"></div>
-                    <div class="name">
+                    <div class="name flex-row">
                       User Name
                       <small>No Data</small>
                     </div>
                   </div>
-                  <div class="card_right">
+                  <div class="card_right flex-row">
                     <el-button size="large" class="token_button token_setting" @click="settingShow=true">
                       <el-icon>
                         <Setting />
@@ -140,7 +140,7 @@
             <el-tab-pane label="Payment Method" name="payment_method">
               <div class="rightCont">
                 <h3>NBAI Wallet</h3>
-                <div class="main_second">
+                <div class="main_second flex-row">
                   <el-button type="primary">
                     <el-icon>
                       <CirclePlusFilled />
@@ -160,7 +160,7 @@
                     <el-input v-model="ruleFormSecond.cardNumber" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" autocomplete="off"></el-input>
                   </el-form-item>
                   <el-form-item label="Expiration date*" prop="expiration">
-                    <el-col :span="24" style="display: flex;justify-content: space-between;">
+                    <el-col :span="24" class=" flex-row" style="justify-content: space-between;">
                       <el-select v-model="expiration_month" placeholder="">
                         <el-option v-for="item in expiration_month_options" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
@@ -480,14 +480,10 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.token_list) {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     margin: 0.35rem 0 0.2rem;
     .title {
-      display: flex;
       justify-content: space-between;
-      align-items: center;
       flex-wrap: wrap;
       width: 100%;
       padding: 0.35rem 0 0;
@@ -546,8 +542,6 @@ export default defineComponent({
       border: 1px solid #e1e1e1;
       border-radius: 0.05rem;
       .card_header {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         font-size: 0.18rem;
         color: #565656;
@@ -563,8 +557,6 @@ export default defineComponent({
         }
         .card_left,
         .card_right {
-          display: flex;
-          align-items: center;
           .token_setting {
             padding: 0.12rem;
             font-size: 0.22rem;
@@ -575,8 +567,6 @@ export default defineComponent({
           align-items: stretch;
           color: #606060;
           .name {
-            display: flex;
-            align-items: center;
             flex-wrap: wrap;
             margin-left: 0.1rem;
             color: #565656;
@@ -605,8 +595,6 @@ export default defineComponent({
             border-color: inherit;
           }
           .action {
-            display: flex;
-            align-items: center;
             height: 100%;
           }
           .icon_copy {
@@ -797,9 +785,7 @@ export default defineComponent({
                   font-size: 0.1372rem;
                 }
                 .bot {
-                  display: flex;
                   justify-content: center;
-                  align-items: center;
                   p {
                     font-size: 0.1372rem;
                     padding: 0 0.08rem;
@@ -934,15 +920,12 @@ export default defineComponent({
         color: #212529;
       }
       .main_third {
-        display: flex;
-        align-items: center;
         margin: 0 0 0.2rem;
         h5 {
           margin: 0 0.3rem;
         }
       }
       .main_second {
-        display: flex;
         .el-button {
           margin: 0;
           padding: 0.2rem 0.25rem;
@@ -977,10 +960,6 @@ export default defineComponent({
           font-weight: 500;
           line-height: 1.1;
           color: #565656;
-        }
-        .main_six_cont {
-          display: flex;
-          align-items: center;
         }
       }
       .refer_list {
