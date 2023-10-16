@@ -3,7 +3,7 @@
     <el-row class="headerStyle container-landing flex-row">
       <el-col :xs="20" :sm="20" :md="20" :lg="4" :xl="4" class="logoImg flex-row">
         <div @click="header_logo" class="flex-row">
-          <img :src="logo" alt='' /> Lagrange
+          <img :src="logo" alt='Lagrange' />
         </div>
         <!-- <el-divider direction="vertical" />
         <div class="net">{{info.network||'-'}}</div> -->
@@ -36,7 +36,7 @@
           </el-menu-item>
           <el-menu-item index="personal_center" v-if="!lagLogin">
             &nbsp;
-            <span class="loginBtn">Login</span>
+            <span class="loginBtn">Log In</span>
           </el-menu-item>
           <el-menu-item index="8" v-else>
             <div class="set">
@@ -82,7 +82,7 @@ export default defineComponent({
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-    const logo = require("@/assets/images/icons/logo_lagrange.png")
+    const logo = require("@/assets/images/icons/logo_black.png")
     const people_img = require("@/assets/images/dashboard/people_default.png")
     const searchValue = ref('')
     const activeIndex = ref('')
@@ -173,6 +173,9 @@ export default defineComponent({
       @media screen and (max-width: 441px) {
         width: 50%;
         height: auto;
+      }
+      div {
+        cursor: pointer;
       }
       img {
         display: block;

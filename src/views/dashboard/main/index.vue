@@ -1,7 +1,7 @@
 <template>
   <section id="step">
     <div class="step_body container-landing">
-      <div class="loginBody width flex-row">
+      <div class="login-body width flex-row">
         <div class="left">
           <h1>Data <br />And<br /> Computing</h1>
           <h4>Decentralized data science without borders</h4>
@@ -10,13 +10,42 @@
           </h4>
         </div>
       </div>
-      <footer>
-        <div class="foot_media flex-row">
-          <a href="https://t.me/datadao" target="_blank"><img :src="share_telegram" alt=""></a>
-          <a href="https://twitter.com/lagrangedao" target="_blank"><img :src="share_twitter" alt=""></a>
-          <a href="https://discord.gg/8vaB6rKSAu" target="_blank"><img :src="share_discord" alt=""></a>
-          <a href="https://github.com/lagrangedao" target="_blank"><img :src="share_github" alt=""></a>
+      <div class="space-list">
+        <div class="tit flex-row">
+          <div class="to-white left"></div>
+          <b>
+            Space of this week
+          </b>
+          <div class="to-white right"></div>
         </div>
+        <el-row justify="space-between" class="list_body" v-loading="listLoad">
+          <el-col :xs="24" :sm="12" :md="7" :lg="7" :xl="7" v-for="ls in spaceLikesData" :key="ls">
+            <el-card class="box-card" @click="detailFun(ls, l)">
+              <template #header>
+                <div class="card-header">
+                  <span class="right flex-row">{{ls.likes}}</span>
+                </div>
+                <h1>{{ls.name}}</h1>
+              </template>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
+      <footer>
+        <el-row class="row-bg" justify="space-between">
+          <el-col :xs="24" :sm="12" :md="6" :lg="6" :xl="6" v-for="foot in footData" :key="foot">
+            <div class="content">
+              <div class="tit">{{foot.menu}}</div>
+              <ul>
+                <li v-for="m in foot.list" :key="m">
+                  <p v-if="m.link" @click="system.$commonFun.goLink(m.link)">{{m.name}}</p>
+                  <router-link v-else-if="m.path" :to="{name: m.path}">{{m.name}}</router-link>
+                  <p v-else>{{m.name}}</p>
+                </li>
+              </ul>
+            </div>
+          </el-col>
+        </el-row>
       </footer>
     </div>
   </section>
@@ -26,6 +55,7 @@
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import qs from 'qs'
 export default defineComponent({
   name: 'home',
   setup () {
@@ -34,156 +64,118 @@ export default defineComponent({
     const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
     const metaAddress = computed(() => (store.state.metaAddress))
     const logoUrl = require("@/assets/images/icons/logo_w.png")
-    const learnUrl = require("@/assets/images/icons/icon_6.png")
     const share_telegram = require("@/assets/images/icons/media_4.png")
     const share_twitter = require("@/assets/images/icons/media_5.png")
     const share_discord = require("@/assets/images/icons/media_6.png")
     const share_github = require("@/assets/images/icons/media_7.png")
-
-    const loadingText = ref('')
-    const prevType = ref(true)
-    const activeIndex = ref('')
-    const active = ref(0)
-    const loginLoad = ref(false)
-    const ruleFormRef = ref(null)
-    const form = reactive({
-      email: '',
-      tip: false
-    })
-    const rules = reactive({
-      email: [
-        {
-          required: true,
-          message: 'Please input email address',
-          trigger: 'blur',
-        },
-        {
-          type: 'email',
-          message: 'Please input correct email address',
-          trigger: ['blur', 'change'],
-        },
-      ]
-    })
-    const info = reactive({
-      address: '',
-      balance: ''
-    })
+    const footData = ref([
+      {
+        menu: 'Website',
+        list: [
+          {
+            name: 'Datasets',
+            path: 'datasets',
+            link: ''
+          },
+          {
+            name: 'Spaces',
+            path: 'spaces',
+            link: ''
+          }
+        ]
+      },
+      {
+        menu: 'Company',
+        list: [
+          {
+            name: 'About',
+            path: '',
+            link: ''
+          },
+          {
+            name: 'Terms of service',
+            path: 'termsOfService',
+            link: ''
+          },
+          {
+            name: 'Privacy',
+            path: 'privacy',
+            link: ''
+          }
+        ]
+      },
+      {
+        menu: 'Resources',
+        list: [
+          {
+            name: 'Learn',
+            path: '',
+            link: ''
+          },
+          {
+            name: 'Documentation',
+            path: '',
+            link: 'https://docs.lagrangedao.org/'
+          },
+          {
+            name: 'Blog',
+            path: '',
+            link: ''
+          },
+          {
+            name: 'Service Status',
+            path: '',
+            link: 'https://provider.lagrangedao.org/provider-status'
+          }
+        ]
+      },
+      {
+        menu: 'Social',
+        list: [
+          {
+            name: 'GitHub',
+            link: 'https://github.com/lagrangedao'
+          },
+          {
+            name: 'Twitter',
+            link: 'https://twitter.com/lagrangedao'
+          },
+          {
+            name: 'Telegram',
+            link: 'https://t.me/datadao'
+          },
+          {
+            name: 'Discord',
+            link: 'https://discord.gg/8vaB6rKSAu'
+          }
+        ]
+      }
+    ])
+    const listLoad = ref(true)
+    const spaceLikesData = ref([])
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
-    async function signFun (params) {
-      loadingText.value = ''
-      system.$commonFun.Init(async addr => {
-        info.address = addr
-        system.$commonFun.web3Init.eth.getBalance(addr).then((balance) => {
-          // console.log(balance)
-          const myBalance = balance
-          const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
-          info.balance = Number(balanceAll).toFixed(0)
-        })
-        // await system.$commonFun.timeout(500)
-        // if (lagLogin.value) active.value = 2
-        if (lagLogin.value) router.push({ path: '/personal_center' })
-        else await signIn()
-      })
+    async function init (name) {
+      listLoad.value = true
+      spaceLikesData.value = []
+      const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${qs.stringify({ limit: 6 })}`, 'get')
+      if (likesRes) spaceLikesData.value = likesRes.spaces || []
+      listLoad.value = false
     }
-    async function signIn () {
-      const chainId = await ethereum.request({ method: 'eth_chainId' })
-      const [lStatus, signErr] = await system.$commonFun.login()
-      // if (lStatus) active.value = 2
-      if (lStatus) router.push({ path: '/personal_center' })
-      return false
-      store.dispatch('setNavLogin', false)
-    }
-    function hiddAddress (val) {
-      if (val) {
-        return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
-      } else {
-        return '-'
-      }
-    }
-    function fn () {
-      document.addEventListener('visibilitychange', function () {
-        prevType.value = !document.hidden
-      })
-      // ethereum.on('accountsChanged', function (account) {
-      //   // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
-      //   if (!prevType.value) return false
-      //   loginLoad.value = true
-      //   store.dispatch('setMetaAddress', account[0])
-      //   store.dispatch('setNavLogin', false)
-      //   store.dispatch('setLogin', false)
-      //   store.dispatch('setAccessToken', '') 
-      //   window.location.reload()
-      // })
-      // networkChanged
-      ethereum.on('chainChanged', async function (accounts) {
-        if (!prevType.value) return false
-        signFun()
-      })
-      // 监听metamask网络断开
-      ethereum.on('disconnect', (code, reason) => {
-        // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
-        active.value = 1
-        // loadingText.value = system.$NetworkPrompt
-        system.$commonFun.signOutFun()
-        // window.location.reload()
-      })
-    }
-    const submitEmail = async (formEl) => {
-      if (!formEl) return
-      await ruleFormRef.value.validate(async (valid, fields) => {
-        if (valid) {
-          form.tip = true
-          // renameLoad.value = true
-          // let formData = new FormData()
-          // formData.append('name', route.params.name)
-          // formData.append('is_public', props.listdata) // public:1, private:0
-          // formData.append('new_name', ruleForm.name)
-          // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/update`, 'post', formData)
-          // await system.$commonFun.timeout(500)
-          // if (listRes && listRes.status === 'success') {
-          //   system.$commonFun.messageTip('success', 'Update successfully!')
-          //   router.push({ name: 'datasetDetail', params: { name: ruleForm.name, tabs: 'settings' } })
-          // } else system.$commonFun.messageTip('error', 'Upload failed!')
-          // ruleForm.name = ''
-          // renameLoad.value = false
-        } else {
-          console.log('error submit!', fields)
-          return false
-        }
-      })
-    }
-    onMounted(() => {
-      fn()
-    })
-    watch(navLogin, (newValue, oldValue) => {
-      if (!navLogin.value) active.value = 0
-    })
+    onMounted(() => init())
     return {
       lagLogin,
       logoUrl,
       navLogin,
-      learnUrl,
-      prevType,
-      loginLoad,
-      activeIndex,
       metaAddress,
-      active,
-      info,
-      loadingText,
-      share_telegram,
-      share_twitter,
-      share_discord,
-      share_github,
-      form,
-      ruleFormRef,
-      rules,
+      spaceLikesData,
+      listLoad,
+      footData,
       system,
       route,
-      router,
-      signFun, signIn, hiddAddress, submitEmail
+      router
     }
   }
 })
@@ -202,23 +194,15 @@ export default defineComponent({
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: "TRAJANPRO";
-  }
   .step_body {
     position: relative;
-    margin: 0.4rem auto;
+    margin: 0.4rem auto 0;
     // background: url(../../../assets/images/dashboard/main/bg_small_1.png),
     //   url(../../../assets/images/dashboard/main/bg_small_2.png);
     // background-repeat: no-repeat, no-repeat;
     // background-size: 14%, 10%;
     // background-position: bottom left, top right;
-    .loginBody {
+    .login-body {
       padding: 0.96rem;
       color: #fff;
       background: #180e1a url(../../../assets/images/dashboard/main/bg.jpg)
@@ -239,6 +223,7 @@ export default defineComponent({
         }
         h1 {
           padding: 0 0 0.4rem;
+          font-family: "TRAJANPRO";
           font-size: 0.6rem;
           text-transform: capitalize;
           @media screen and (max-width: 768px) {
@@ -255,7 +240,6 @@ export default defineComponent({
         h4 {
           padding: 0 0.24rem 0 0;
           font-size: 0.18rem;
-          font-family: "Helvetica-Neue";
           font-weight: normal;
           color: rgba(209, 213, 219, 0.8);
           line-height: 1.6;
@@ -298,25 +282,373 @@ export default defineComponent({
         }
       }
     }
+    :deep(.space-list) {
+      padding: 0.8rem 0;
+      .tit {
+        justify-content: center;
+        font-size: 0.2rem;
+        font-weight: 600;
+        color: #000;
+        gap: 0.08rem;
+        .to-white {
+          height: 1px;
+          flex: 1 1 0%;
+          &.left {
+            background-image: linear-gradient(to left, #e5e7eb, #fff);
+          }
+          &.right {
+            background-image: linear-gradient(to right, #e5e7eb, #fff);
+          }
+        }
+      }
+      .list_body {
+        padding: 0.56rem 0 0;
+        .el-col {
+          margin: 0.16rem 0 0;
+          .box-card {
+            background-color: #fff;
+            box-shadow: none;
+            border: 0;
+            border-radius: 0;
+            .el-card__header {
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 0.64rem;
+              padding: 0.16rem;
+              border: 0;
+              border-radius: 0.1rem;
+              font-size: 0.16rem;
+              color: #fff;
+              cursor: pointer;
+              .card-header {
+                span {
+                  position: absolute;
+                  height: 0.25rem;
+                  font-size: 12px;
+                  color: #fff;
+                  line-height: 0.25rem;
+                  @media screen and (min-width: 1800px) {
+                    font-size: 13px;
+                  }
+                  &.left {
+                    left: 0.15rem;
+                    top: 0.1rem;
+                    font-family: "Helvetica-Bold";
+                    opacity: 0.9;
+                  }
+                  &.right {
+                    right: 0.15rem;
+                    top: 0.1rem;
+                    padding-left: 0.25rem;
+                    background: url(../../../assets/images/icons/icon_9_1.png)
+                      no-repeat left 0px;
+                    background-size: 0.18rem;
+                  }
+                  &.bottom {
+                    left: 0.15rem;
+                    bottom: 0.05rem;
+                    opacity: 0.9;
+                    font-size: 12px;
+                    @media screen and (min-width: 1800px) {
+                      font-size: 13px;
+                    }
+                  }
+                }
+              }
+              .card-owner {
+                position: absolute;
+                right: 0.15rem;
+                bottom: 0.05rem;
+                opacity: 0.8;
+                span {
+                  font-size: 13px;
+                  color: #fff;
+                  line-height: 1.2;
+                  @media screen and (min-width: 1800px) {
+                    font-size: 14px;
+                  }
+                }
+              }
+              h1 {
+                // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+                font-size: 0.2rem;
+                font-weight: 900;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                line-height: 1.5;
+                word-break: break-word;
+                @media screen and (max-width: 1440px) {
+                  font-size: 0.25rem;
+                }
+              }
+            }
+            .el-card__body {
+              padding: 0.1rem 0;
+              cursor: pointer;
+              .text {
+                justify-content: space-between;
+                color: #000;
+                line-height: 1;
+                cursor: pointer;
+                @media screen and (min-width: 1800px) {
+                  font-size: 15px;
+                }
+                .text_left {
+                  justify-content: space-between;
+                }
+                .icon,
+                .icon_img {
+                  width: 0.25rem;
+                  height: 0.25rem;
+                  margin: 0 0.1rem 0 0;
+                  border-radius: 0.04rem;
+                }
+                span {
+                  color: #878c93;
+                  font-size: 12px;
+                  cursor: pointer;
+                  @media screen and (min-width: 1440px) {
+                    font-size: 13px;
+                  }
+                  @media screen and (min-width: 1800px) {
+                    font-size: 15px;
+                  }
+                }
+                .small {
+                  font-weight: 500;
+                  color: #000;
+                  &:hover {
+                    text-decoration: underline;
+                  }
+                }
+              }
+            }
+          }
+          &:hover {
+            .box-card {
+              .el-card__header {
+                opacity: 0.8;
+              }
+            }
+          }
+          &:nth-child(9n + 1) {
+            .box-card {
+              .el-card__header {
+                background: #d896f7
+                  url(../../../assets/images/dashboard/spaces/space_b_01.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_01.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+          &:nth-child(9n + 2) {
+            .box-card {
+              .el-card__header {
+                background: #c37af9
+                  url(../../../assets/images/dashboard/spaces/space_b_02.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_02.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+          &:nth-child(9n + 3) {
+            .box-card {
+              .el-card__header {
+                background: #a85cfc
+                  url(../../../assets/images/dashboard/spaces/space_b_03.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_03.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+          &:nth-child(9n + 4) {
+            .box-card {
+              .el-card__header {
+                background: #853fff
+                  url(../../../assets/images/dashboard/spaces/space_b_04.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_04.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+          &:nth-child(9n + 5) {
+            .box-card {
+              .el-card__header {
+                background: #7405ff
+                  url(../../../assets/images/dashboard/spaces/space_b_05.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_05.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+          &:nth-child(9n + 6) {
+            .box-card {
+              .el-card__header {
+                background: #7220b4
+                  url(../../../assets/images/dashboard/spaces/space_b_06.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_06.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+          &:nth-child(9n + 7) {
+            .box-card {
+              .el-card__header {
+                background: #562683
+                  url(../../../assets/images/dashboard/spaces/space_b_07.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_07.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+          &:nth-child(9n + 8) {
+            .box-card {
+              .el-card__header {
+                background: #47187d
+                  url(../../../assets/images/dashboard/spaces/space_b_08.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_08.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+          &:nth-child(9n + 9) {
+            .box-card {
+              .el-card__header {
+                background: #2d165a
+                  url(../../../assets/images/dashboard/spaces/space_b_09.png)
+                  no-repeat center;
+                background-size: auto 61%;
+              }
+              .el-card__body {
+                .text {
+                  .icon {
+                    background: url(../../../assets/images/dashboard/spaces/space_w_09.png)
+                      no-repeat center;
+                    background-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .background {
+      padding-top: 0.96rem;
+      background-image: linear-gradient(
+        to bottom,
+        rgba(243, 244, 246, 0.6),
+        #fff
+      );
+    }
     footer {
-      position: absolute;
-      width: auto;
-      max-width: 100%;
-      bottom: 0.3rem;
-      right: 0.16rem;
+      width: 100%;
       min-height: 0.5rem;
-      .foot_media {
-        justify-content: flex-end;
-        a {
-          display: block;
-          width: 35px;
-          margin: 0 0 0 0.2rem;
-          img {
-            display: block;
-            width: 100%;
-            cursor: pointer;
-            &:hover {
-              opacity: 0.9;
+      padding-top: 0.4rem;
+      padding-bottom: 1rem;
+      border-top: 1px solid rgba(229, 231, 235, 0.7);
+      .el-row {
+        .el-col {
+          line-height: 1.5;
+          .tit {
+            padding: 0 0 0.08rem;
+            font-size: 0.18rem;
+            font-weight: 600;
+            color: #000;
+          }
+          ul {
+            li {
+              padding: 0.08rem 0 0;
+              font-size: 0.16rem;
+              color: rgb(75, 85, 99);
+              a,
+              p {
+                display: inline-block;
+                color: inherit;
+                cursor: pointer;
+                &:hover {
+                  text-decoration: underline;
+                }
+              }
             }
           }
         }
