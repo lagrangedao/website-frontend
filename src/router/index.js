@@ -40,6 +40,8 @@ const paymentHistory = () =>
     import ("@/components/paymentHistory");
 const pricing = () =>
     import ("@/views/dashboard/pricing/index");
+const Infrastructure = () =>
+    import ("@/views/dashboard/Infrastructure/index");
 
 const routes = [{
         path: '/',
@@ -224,6 +226,15 @@ const routes = [{
                 path: '/pricing',
                 name: 'pricing',
                 component: pricing,
+                meta: {
+                    keepAlive: true,
+                    title: ''
+                }
+            },
+            {
+                path: '/Infrastructure',
+                name: 'Infrastructure',
+                component: Infrastructure,
                 meta: {
                     keepAlive: true,
                     title: ''

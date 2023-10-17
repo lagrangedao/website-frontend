@@ -247,5 +247,10 @@ export default defineComponent({
     }
   }
 }
+
+.flex-row {
+  display: flex;
+  align-items: center;
+}
 </style>
 

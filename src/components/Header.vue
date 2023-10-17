@@ -1,13 +1,13 @@
 <template>
   <div class="headerCont">
     <el-row class="headerStyle">
-      <el-col :xs="20" :sm="20" :md="20" :lg="8" :xl="8" class="logoImg">
+      <el-col :xs="20" :sm="20" :md="20" :lg="5" :xl="5" class="logoImg">
         <img :src="logo" @click="header_logo" alt='' />
         <el-divider direction="vertical" />
         <div class="net">{{info.network||'-'}}</div>
         <!-- <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." /> -->
       </el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
+      <el-col :xs="4" :sm="4" :md="4" :lg="19" :xl="19" class="header_right">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
           <el-menu-item index="dataset">
             <i class="icon-style icon_datasets"></i>
@@ -21,19 +21,20 @@
             <i class="icon-style icon_spaces"></i>
             Spaces
           </el-menu-item>
+          <el-menu-item index="Infrastructure">
+            <i class="icon-style icon_Infrastructure"></i>
+            Infrastructure
+          </el-menu-item>
           <el-menu-item index="4">
             <i class="icon-style icon_docs"></i>
             Docs
           </el-menu-item>
-          <el-menu-item index="5">
+          <el-menu-item index="pricing">
             <i class="icon-style icon_solutions"></i>
-            Solutions
+            Pricing
           </el-menu-item>
           <el-menu-item index="dashboard">
             Provider
-          </el-menu-item>
-          <el-menu-item index="pricing">
-            Pricing
           </el-menu-item>
           <el-menu-item index="personal_center" v-if="!lagLogin">
             &nbsp;
@@ -107,6 +108,7 @@ export default defineComponent({
       else if (key === 'dataset') router.push({ path: '/dataset' })
       else if (key === 'models') router.push({ path: '/models' })
       else if (key === 'spaces') router.push({ path: '/spaces' })
+      else if (key === 'Infrastructure') router.push({ path: '/Infrastructure' })
       else if (key === 'create_space') router.push({ path: '/create_space' })
       else if (key === 'create_dataset') router.push({ path: '/create_dataset' })
       else if (key === 'create_organizations') router.push({ path: '/create_organizations' })
@@ -125,6 +127,7 @@ export default defineComponent({
       if (nameMenu.indexOf('dataset') > -1) activeIndex.value = 'dataset'
       else if (nameMenu.indexOf('model') > -1) activeIndex.value = 'models'
       else if (nameMenu.indexOf('space') > -1) activeIndex.value = 'spaces'
+      else if (nameMenu.indexOf('Infrastructure') > -1) activeIndex.value = 'Infrastructure'
       else if (nameMenu.indexOf('pricing') > -1) activeIndex.value = 'pricing'
       else activeIndex.value = nameMenu
 
@@ -273,9 +276,9 @@ export default defineComponent({
             font-size: 15px;
           }
           .icon-style {
-            width: 21px;
-            height: 20px;
-            margin: -1px 6px 0 0;
+            width: 19px;
+            height: 18px;
+            margin: -1px 4px 0 0;
           }
           svg {
             width: 21px;
@@ -290,27 +293,32 @@ export default defineComponent({
           .icon_datasets {
             background: url(../assets/images/icons/icon_1.png) no-repeat left
               center;
-            background-size: 17px;
+            background-size: 15px;
           }
           .icon_models {
             background: url(../assets/images/icons/icon_2.png) no-repeat left
               center;
-            background-size: 17px;
+            background-size: 15px;
           }
           .icon_spaces {
             background: url(../assets/images/icons/icon_3.png) no-repeat left
               center;
-            background-size: 21px;
+            background-size: 19px;
+          }
+          .icon_Infrastructure {
+            background: url(../assets/images/icons/icon_Infrastructure.png)
+              no-repeat left center;
+            background-size: 15px;
           }
           .icon_docs {
             background: url(../assets/images/icons/icon_4.png) no-repeat left
               center;
-            background-size: 19px;
+            background-size: 17px;
           }
           .icon_solutions {
             background: url(../assets/images/icons/icon_5.png) no-repeat left
               center;
-            background-size: 17px;
+            background-size: 15px;
           }
           .loginBtn {
             padding: 0.1rem 0.2rem;
@@ -376,27 +384,32 @@ export default defineComponent({
             .icon_datasets {
               background: url(../assets/images/icons/icon_1_1.png) no-repeat
                 left center;
-              background-size: 17px;
+              background-size: 15px;
             }
             .icon_models {
               background: url(../assets/images/icons/icon_2_1.png) no-repeat
                 left center;
-              background-size: 17px;
+              background-size: 15px;
             }
             .icon_spaces {
               background: url(../assets/images/icons/icon_3_1.png) no-repeat
                 left center;
-              background-size: 21px;
+              background-size: 19px;
+            }
+            .icon_Infrastructure {
+              background: url(../assets/images/icons/icon_Infrastructure_1.png)
+                no-repeat left center;
+              background-size: 15px;
             }
             .icon_docs {
               background: url(../assets/images/icons/icon_4_1.png) no-repeat
                 left center;
-              background-size: 19px;
+              background-size: 17px;
             }
             .icon_solutions {
               background: url(../assets/images/icons/icon_5_1.png) no-repeat
                 left center;
-              background-size: 17px;
+              background-size: 15px;
             }
           }
         }
