@@ -30,8 +30,8 @@
                   <li class="wide">
                     <div class="tit">RPC URL</div>
                     <div class="border flex-row">
-                      <span>{{chain.rpc}}</span>
-                      <i class="icon icon_copy" @click="system.$commonFun.copyContent(chain.rpc, 'Copied')"></i>
+                      <span>{{chain.url}}</span>
+                      <i class="icon icon_copy" @click="system.$commonFun.copyContent(chain.url, 'Copied')"></i>
                     </div>
                   </li>
                   <li>
@@ -40,7 +40,7 @@
                   </li>
                   <li>
                     <div class="tit">Native Token</div>
-                    <div class="desc">{{chain.token}}</div>
+                    <div class="desc">{{chain.currency}}</div>
                   </li>
                 </ul>
               </div>
@@ -68,6 +68,7 @@ import {
   Setting
 } from '@element-plus/icons-vue'
 import addNetwork from '@/components/addNetwork.vue'
+import qs from 'qs'
 export default defineComponent({
   name: 'Spaces',
   components: {
@@ -77,6 +78,11 @@ export default defineComponent({
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
     const rpcLoad = ref(false)
+    const pagin = reactive({
+      pageSize: 12,
+      pageNo: 1,
+      total: 0
+    })
     const searchValue = ref('')
     const describeData = ref([
       {
@@ -96,53 +102,40 @@ export default defineComponent({
         chain: 'Ethereum Mainnet',
         chain_id: 1,
         net: '',
-        token: "ETH",
-        rpc: 'ethereum.rpc.thirdweb.com'
+        currency: "ETH",
+        url: 'ethereum.rpc.thirdweb.com'
       },
-      {
-        icon: require("@/assets/images/icons/rpc-01.png"),
-        chain: 'Ethereum Mainnet',
-        chain_id: 1,
-        net: '',
-        token: "ETH",
-        rpc: 'ethereum.rpc.thirdweb.com'
-      },
-      {
-        icon: require("@/assets/images/icons/rpc-01.png"),
-        chain: 'Ethereum Mainnet',
-        chain_id: 1,
-        net: '',
-        token: "ETH",
-        rpc: 'ethereum.rpc.thirdweb.com'
-      },
-      {
-        icon: require("@/assets/images/icons/rpc-01.png"),
-        chain: 'Ethereum Mainnet',
-        chain_id: 1,
-        net: '',
-        token: "ETH",
-        rpc: 'ethereum.rpc.thirdweb.com'
-      },
-      {
-        icon: require("@/assets/images/icons/rpc-01.png"),
-        chain: 'Ethereum Mainnet',
-        chain_id: 1,
-        net: '',
-        token: "ETH",
-        rpc: 'ethereum.rpc.thirdweb.com'
-      }
     ])
     const dataShow = ref(false)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
-    async function init (params) { }
+    async function init () {
+      rpcLoad.value = true
+      chainsData.value = []
+      const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
+      const params = {
+        page_size: pagin.pageSize,
+        page_no: page * pagin.pageSize,
+        chain: searchValue.value
+      }
+      const rpcRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}chains?${qs.stringify(params)}`, 'get')
+      if (rpcRes && String(rpcRes.code) === '0') {
+        chainsData.value = rpcRes.list || []
+        pagin.total = rpcRes.total || 0
+      } else if (rpcRes.msg) system.$commonFun.messageTip('error', rpcRes.msg)
+      rpcLoad.value = false
+    }
     async function addData (params) {
 
       dataShow.value = false
+      init()
     }
-    async function searchChange (val) { }
+    async function searchChange (val) {
+      pagin.pageNo = 1
+      init()
+    }
     function handleChange (val, refresh) {
       if (refresh) {
         addData()
@@ -152,6 +145,7 @@ export default defineComponent({
     return {
       metaAddress,
       rpcLoad,
+      pagin,
       searchValue,
       describeData,
       chainsData,

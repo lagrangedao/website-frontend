@@ -123,14 +123,40 @@ export default defineComponent({
     const disabled = ref(false)
     const fileList = ref([])
 
+    async function uploadFun () {
+      let fd = new FormData()
+      fileList.value.forEach(file => {
+        let namepath = file.name || file.raw.name
+        let fileNew = new File([file.raw], namepath)
+        fd.append('file', fileNew, namepath)
+      })
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}files`, 'post', fd)
+      if (uploadRes && String(uploadRes.code) === '0') {
+        const url = uploadRes.url || ''
+        return url
+      } else if (uploadRes.msg) system.$commonFun.messageTip('error', uploadRes.msg)
+      return ''
+    }
     async function submitAdd (formEl) {
       if (!formEl) return
       await dataAddRef.value.validate(async (valid, fields) => {
         if (valid) {
           addLoad.value = true
-
-
-
+          const fileIcon = fileList.value.length > 0 ? await uploadFun() : ''
+          const params = {
+            "name": dataAddForm.name,
+            "chain": dataAddForm.ethereum,
+            "chain_id": dataAddForm.chain_id,
+            "currency": dataAddForm.currency,
+            "network": dataAddForm.type,
+            "url": dataAddForm.rpc,
+            "icon": fileIcon
+          }
+          const addNetRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}nodes`, 'post', params)
+          if (addNetRes && String(addNetRes.code) === '0') {
+            context.emit('handleChange', false, true)
+            return false
+          } else if (addNetRes.msg) system.$commonFun.messageTip('error', addNetRes.msg)
           addLoad.value = false
         } else {
           console.log('error submit!', fields)
