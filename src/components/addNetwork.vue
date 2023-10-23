@@ -1,6 +1,6 @@
 <template>
   <div class="dataAdd-pop">
-    <el-dialog v-model="dataAddShow" title="Add Custom Network" :close-on-click-modal="false" :show-close="false" custom-class="doi_body" @close="beforeClose">
+    <el-dialog v-model="dataAddShow" title="Add Custom Network" :close-on-click-modal="false" :show-close="true" custom-class="doi_body" @close="beforeClose">
       <div>
         <el-form ref="dataAddRef" class="flex-row" :model="dataAddForm" label-position="top" :rules="rulesData" status-icon>
           <el-form-item prop="name" label="Network name *">

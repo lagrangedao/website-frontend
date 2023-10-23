@@ -449,6 +449,19 @@ export default defineComponent({
     .el-dialog__header {
       padding: 0.45rem 0.6rem 0.2rem;
       font-size: 0.2rem;
+      .el-dialog__headerbtn {
+        right: 0.3rem;
+        font-size: 0.28rem;
+        font-weight: 600;
+        color: #000;
+        cursor: pointer;
+        i,
+        svg,
+        path {
+          color: inherit;
+          cursor: inherit;
+        }
+      }
     }
 
     .el-dialog__body {
