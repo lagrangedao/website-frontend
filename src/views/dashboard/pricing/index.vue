@@ -197,7 +197,7 @@ export default defineComponent({
   width: 100%;
   // max-width: 1440px;
   min-width: 300px;
-  margin: 0.1rem auto;
+  margin: 0 auto 0.1rem;
   padding: 0.8rem 0;
   background-color: #fff;
   font-family: "Helvetica-light";
@@ -206,6 +206,7 @@ export default defineComponent({
   color: #010102;
   line-height: 1.3;
   text-align: left;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 992px) {
     padding: 0.8rem 0 0.25rem;
   }

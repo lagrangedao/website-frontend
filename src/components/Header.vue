@@ -701,6 +701,9 @@ export default defineComponent({
         margin: 0 0 5px;
         border-bottom: 1px solid #e7e7e7;
         cursor: pointer;
+        * {
+          cursor: pointer;
+        }
         .tit {
           font-size: 12px;
           color: #989898;

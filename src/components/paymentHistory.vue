@@ -148,6 +148,7 @@ export default defineComponent({
 <style  lang="scss" scoped>
 #payment {
   width: 100%;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   .payment-history {
     height: calc(100% - 1.2rem);
     padding: 0.6rem 0;

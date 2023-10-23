@@ -762,6 +762,7 @@ export default defineComponent({
   background: #fff;
   color: #333;
   font-size: 18px;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
