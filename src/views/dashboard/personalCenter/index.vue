@@ -10,9 +10,9 @@
             <div class="title">
               {{ listdata.user.full_name || '-'}}
             </div>
-            <div class="desc flex-row" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
+            <!-- <div class="desc flex-row" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
             <div class="desc flex-row">Network: {{info.network||'-'}}</div>
-            <div class="desc flex-row">Balance: {{info.balance||'-'}} {{info.unit}}</div>
+            <div class="desc flex-row">Balance: {{info.balance||'-'}} {{info.unit}}</div> -->
             <div class="desc flex-row">Wallet Address: {{system.$commonFun.hiddAddress(metaAddress)}}
               <el-icon v-if="metaAddress" @click="system.$commonFun.copyContent(metaAddress, 'Copied')">
                 <CopyDocument />
@@ -34,7 +34,7 @@
             </div>
             <div class="desc flex-row">None yet</div>
           </div>
-          <div class="personal">
+          <!-- <div class="personal">
             <el-button type="" text bg>
               <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
             </el-button>
@@ -42,7 +42,7 @@
             <el-button type="" text bg>
               <router-link :to="{name:'paymentHistory', query: {type: 'provider'}}">Provider Payment History</router-link>
             </el-button>
-          </div>
+          </div> -->
           <div class="media flex-row">
             <a v-if="listdata.user.homepage" :href="listdata.user.homepage" target="_blank" class="homepage"></a>
             <a v-if="listdata.user.twitter_username" :href="'https://twitter.com/'+listdata.user.twitter_username" target="_blank" class="twitter"></a>
@@ -528,8 +528,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 #dataset {
   position: relative;
+  background: linear-gradient(90deg, #fbfbfc, #fff, #fff, #fff);
   color: #333;
   font-size: 18px;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
@@ -591,37 +593,33 @@ export default defineComponent({
     .left {
       position: relative;
       padding: 0;
-      background-color: #7405ff;
+      background-color: #fbfbfc;
+      border-right: 1px solid rgba(229, 231, 235, 0.7);
       .left_body {
         width: 90%;
         max-width: 280px;
         padding: 0.25rem 0;
-        margin: 0 auto;
+        margin: 0;
         border: 0;
         text-align: left;
-        color: #fff;
         .logo_sidebar {
           position: relative;
           display: block;
-          width: 100px;
-          height: 100px;
-          margin: 0.55rem 0 0;
+          width: 190px;
+          height: 190px;
+          margin: 0;
           background-color: #fff;
           border: 0.07rem solid #fff;
           border-radius: 50%;
           overflow: hidden;
-          @media screen and (min-width: 1800px) {
+          @media screen and (max-width: 992px) {
             width: 120px;
             height: 120px;
             border: 0.1rem solid #fff;
           }
-          @media screen and (max-width: 768px) {
-            width: 80px;
-            height: 80px;
-          }
           @media screen and (max-width: 600px) {
-            width: 60px;
-            height: 60px;
+            width: 100px;
+            height: 100px;
           }
           img {
             display: block;
@@ -665,7 +663,6 @@ export default defineComponent({
             .el-icon {
               margin: 0 0 0 0.05rem;
               font-size: 16px;
-              color: #fff;
               cursor: pointer;
               svg,
               path {
@@ -689,8 +686,7 @@ export default defineComponent({
             }
           }
           .top_text {
-            margin: 0 0 0.2rem;
-            color: #fff;
+            margin: 0 0 0.1rem;
             font-family: "Helvetica-Bold";
             font-size: 0.18rem;
             font-weight: bold;
@@ -699,16 +695,16 @@ export default defineComponent({
             }
             .icon {
               display: block;
-              width: 25px;
-              height: 25px;
-              margin: -1px 0.07rem 0 0;
+              width: 16px;
+              height: 16px;
+              margin: 0 0.07rem 0 0;
               @media screen and (min-width: 1800px) {
-                width: 30px;
-                height: 30px;
+                width: 21px;
+                height: 21px;
               }
               @media screen and (max-width: 768px) {
-                width: 20px;
-                height: 20px;
+                width: 14px;
+                height: 14px;
               }
             }
             .icon_interests {
@@ -1276,6 +1272,7 @@ export default defineComponent({
       .list_body_spaces {
         padding: 0.16rem 0;
         min-height: 80px;
+        flex-wrap: wrap;
         .el-col {
           margin: 0.16rem 0;
           .box-card {
@@ -1570,15 +1567,15 @@ export default defineComponent({
           }
         }
       }
-      &::after {
-        position: absolute;
-        content: "";
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background-color: #c6c6c6;
-      }
+      // &::after {
+      //   position: absolute;
+      //   content: "";
+      //   right: 0;
+      //   top: 0;
+      //   bottom: 0;
+      //   width: 1px;
+      //   background-color: #c6c6c6;
+      // }
     }
   }
   :deep(.el-loading-mask) {

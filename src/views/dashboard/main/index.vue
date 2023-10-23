@@ -196,7 +196,7 @@ export default defineComponent({
   }
   .step_body {
     position: relative;
-    margin: 0.4rem auto 0;
+    margin: 0.3rem auto 0;
     // background: url(../../../assets/images/dashboard/main/bg_small_1.png),
     //   url(../../../assets/images/dashboard/main/bg_small_2.png);
     // background-repeat: no-repeat, no-repeat;
@@ -300,6 +300,9 @@ export default defineComponent({
             background-image: linear-gradient(to right, #e5e7eb, #fff);
           }
         }
+        b {
+          padding: 0 0.05rem;
+        }
       }
       .list_body {
         padding: 0.56rem 0 0;
@@ -315,7 +318,7 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: center;
-              height: 0.64rem;
+              height: 0.68rem;
               padding: 0.16rem;
               border: 0;
               border-radius: 0.1rem;
@@ -325,10 +328,10 @@ export default defineComponent({
               .card-header {
                 span {
                   position: absolute;
-                  height: 0.25rem;
+                  height: 18px;
                   font-size: 12px;
                   color: #fff;
-                  line-height: 0.25rem;
+                  line-height: 18px;
                   @media screen and (min-width: 1800px) {
                     font-size: 13px;
                   }
@@ -341,10 +344,10 @@ export default defineComponent({
                   &.right {
                     right: 0.15rem;
                     top: 0.1rem;
-                    padding-left: 0.25rem;
+                    padding-left: 19px;
                     background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 0px;
-                    background-size: 0.18rem;
+                      no-repeat left 1px;
+                    background-size: 13px;
                   }
                   &.bottom {
                     left: 0.15rem;
@@ -374,7 +377,7 @@ export default defineComponent({
               h1 {
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
                 cursor: pointer;
-                font-size: 0.2rem;
+                font-size: 0.16rem;
                 font-weight: 900;
                 overflow: hidden;
                 text-overflow: ellipsis;

@@ -1,12 +1,12 @@
 <template>
   <section class="profile_body" v-loading="loading" :element-loading-text="loadingText">
     <div class="list">
-      <div class="title">
+      <div class="title flex-row">
         Profile Settings
       </div>
     </div>
 
-    <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" v-loading="listLoad" class="demo-ruleForm list_body_spaces" status-icon>
+    <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" v-loading="listLoad" class="demo-ruleForm list_body_spaces flex-row" status-icon>
       <el-form-item prop="name">
         <label class="label" for="dataname">
           Full name
