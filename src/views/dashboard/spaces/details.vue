@@ -1,14 +1,14 @@
 <template>
   <section id="space" v-loading="forkLoad" element-loading-text="Please wait...">
-    <div class="space_head">
-      <div class="content">
-        <div class="backTo" @click="back">
+    <div class="space_head container-landing">
+      <div class="content flex-row">
+        <div class="backTo flex-row" @click="back">
           <el-icon>
             <ArrowLeft />
           </el-icon>
           <span>Go Back</span>
         </div>
-        <div class="name">
+        <div class="name flex-row">
           <i class="icon icon_spaces"></i>
           Space:
           <b>{{route.params.name}}</b>
@@ -35,7 +35,7 @@
                   &nbsp;Expired</el-button>
                 <el-button type="warning" plain @click="hardwareOperate('renew')">Renew</el-button>
           </el-button-group>
-          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+          <div :class="{'logs_style flex-row': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
               <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
                 p-id="2675" fill="#878c93"></path>
@@ -43,30 +43,30 @@
                 p-id="2676" fill="#878c93"></path>
             </svg> Request License
           </div>
-          <div class="logs_style" @click="logDrawer('detail')">
+          <div class="logs_style flex-row" @click="logDrawer('detail')">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Space Detail
           </div>
-          <div :class="{'logs_style': true, 'is-disabled': parentValue === 'Created' || parentValue === 'Stopped' }" @click="logDrawer('log')">
+          <div :class="{'logs_style flex-row': true, 'is-disabled': parentValue === 'Created' || parentValue === 'Stopped' }" @click="logDrawer('log')">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
           </div>
-          <!-- <div class="logs_style" @click="rebootFun" v-if="metaAddress === route.params.wallet_address && allData.space.status === 'Running'">
+          <!-- <div class="logs_style flex-row" @click="rebootFun" v-if="metaAddress === route.params.wallet_address && allData.space.status === 'Running'">
             <svg t="1690181902015" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2037" width="200" height="200">
               <path d="M992.627337 593.536l-42.304 0 0-529.536-661.376 0c-16.64 0-26.112 18.944-15.872 32 42.496 54.464 124.288 159.36 124.672 160l360.576 0 0 337.536-42.24 0c-26.176 0-40.832 30.08-24.704 50.688l138.24 177.28c12.544 16.128 36.928 16.128 49.536 0l138.304-177.28c15.936-20.608 1.216-50.688-24.832-50.688zM626.355337 768l-360.576 0 0-337.536 42.24 0c26.176 0 40.832-30.08 24.704-50.688l-138.24-177.28c-12.544-16.128-36.928-16.128-49.536 0l-138.304 177.28c-16 20.608-1.28 50.688 24.768 50.688l42.304 0 0 529.536 661.44 0c16.64 0 26.112-18.944 15.872-32-42.496-54.464-124.288-159.36-124.672-160z"
                 fill="#878c93" p-id="2038"></path>
             </svg> Redeploy
           </div> -->
-          <div class="logs_style" @click="hardwareOperate('fork')" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+          <div class="logs_style flex-row" @click="hardwareOperate('fork')" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
               <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
             </svg> Fork
           </div>
           <share-pop></share-pop>
         </div>
-        <div class="remain" v-if="expireTime.time>=0">
+        <div class="remain flex-row" v-if="expireTime.time>=0">
           <el-icon>
             <svg t="1691549660950" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4361" width="200" height="200">
               <path d="M696.301 511.83H514.257V329.784c0-21.845-14.564-36.409-36.41-36.409s-36.408 14.564-36.408 36.409v218.453c0 21.846 14.563 36.41 36.409 36.41H696.3c21.845 0 36.409-14.564 36.409-36.41S718.146 511.83 696.3 511.83z" p-id="4362" fill="#333333"></path>
@@ -76,7 +76,7 @@
           </el-icon>
           Remaining Time： {{expireTime.time
           < 0.1 ? '&lt; 3': expireTime.time}} {{expireTime.unit}} </div>
-            <div class="remain" v-if="allData.space.status === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config">
+            <div class="remain flex-row" v-if="allData.space.status === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config">
               <el-icon>
                 <svg t="1691549579889" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3276" width="200" height="200">
                   <path d="M950.856571 1023.999c-7.313993 0-14.627986-3.656996-21.942978-7.313993L757.029761 881.369139H73.143429c-21.942979 0-36.571964-14.627986-36.571965-36.570964V36.570964C36.571464 14.629986 51.20045 0 73.143429 0h877.713142C972.79955 0 987.429536 14.628986 987.429536 36.570964V987.429036c0 14.627986-7.314993 25.599975-21.942979 32.913968-3.656996 3.656996-10.971989 3.656996-14.628986 3.656996zM109.714393 808.228211H767.99975c7.313993 0 14.628986 3.656996 21.942979 7.313993l124.342878 98.742903V73.142929H109.714393v735.085282z"
@@ -90,7 +90,7 @@
         <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
           <el-tab-pane name="app">
             <template #label>
-              <span class="custom-tabs-label">
+              <span class="custom-tabs-label flex-row">
                 <i class="icon icon_spaces"></i>
                 <span>App</span>
               </span>
@@ -99,7 +99,7 @@
           </el-tab-pane>
           <el-tab-pane name="card">
             <template #label>
-              <span class="custom-tabs-label">
+              <span class="custom-tabs-label flex-row">
                 <i class="icon icon_spaces"></i>
                 <span>Space card</span>
               </span>
@@ -108,7 +108,7 @@
           </el-tab-pane>
           <el-tab-pane name="files">
             <template #label>
-              <span class="custom-tabs-label">
+              <span class="custom-tabs-label flex-row">
                 <i class="icon"></i>
                 <span>Files and versions</span>
               </span>
@@ -117,7 +117,7 @@
           </el-tab-pane>
           <el-tab-pane name="community">
             <template #label>
-              <span class="custom-tabs-label">
+              <span class="custom-tabs-label flex-row">
                 <i class="icon"></i>
                 <span>Community</span>
                 <!-- <b>3</b> -->
@@ -127,7 +127,7 @@
           </el-tab-pane>
           <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
             <template #label>
-              <span class="custom-tabs-label">
+              <span class="custom-tabs-label flex-row">
                 <!-- <i class="icon icon_spaces"></i> -->
                 <el-icon class="icon">
                   <Setting />
@@ -142,7 +142,7 @@
 
       <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70% '" :destroy-on-close="true" custom-class="drawer_style">
         <template #default>
-          <div class="close" @click="drawer=false">
+          <div class="close flex-row" @click="drawer=false">
             <el-icon>
               <CloseBold />
             </el-icon>
@@ -261,7 +261,7 @@
             </el-tab-pane>
             <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data" :key="j">
               <template #label>
-                <span class="custom-tabs-label">
+                <span class="custom-tabs-label flex-row">
                   <span :class="{'span-cp': dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
                 </span>
               </template>
@@ -297,14 +297,14 @@
             </el-tab-pane>
             <el-tab-pane label="Build" name="Build" v-if="false">
               <div class="uploadBody">
-                <div class="top_title">
-                  <div class="left">
+                <div class="top_title flex-row">
+                  <div class="left flex-row">
                     <i class="icon"></i>
                     Computing provider
                   </div>
                 </div>
                 <ul>
-                  <li v-for="n in 20" :key="n">
+                  <li v-for="n in 20" :key="n" class="flex-row">
                     <div class="type">name</div>
                     <div>= db.Column(db.String)</div>
                   </li>
@@ -315,7 +315,7 @@
           <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick" v-else>
             <el-tab-pane v-for="(dataJob, j) in logsCont.dataLog" v-if="logsCont.dataLog&&logsCont.dataLog.length > 0" :key="j">
               <template #label>
-                <span class="custom-tabs-label">
+                <span class="custom-tabs-label flex-row">
                   <span :class="{'span-cp': dataJob.job && dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
                 </span>
               </template>
@@ -340,7 +340,7 @@
       </el-drawer>
 
       <div class="note" v-if="noteShow && !forkLoad && !dialogCont.spaceHardDia && !(allData.files.length>0 && allData.space.status !== allData.paymentStatus)">
-        <div class="close" @click="noteShow=false">
+        <div class="close flex-row" @click="noteShow=false">
           <el-icon>
             <Close />
           </el-icon>
@@ -762,29 +762,20 @@ export default defineComponent({
   background: #fff;
   color: #333;
   font-size: 18px;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
   .space_head {
-    padding: 0.3rem 0 0;
+    padding-top: 0.3rem;
     background-color: #fbfbfc;
     border-bottom: 1px solid #f1f1f1;
     .content {
-      display: flex;
       align-items: stretch;
       flex-wrap: wrap;
-      padding: 0 0.16rem;
       margin: 0 auto 0.25rem;
       font-size: 14px;
-      @media screen and (min-width: 1280px) {
-        max-width: 1280px;
-      }
-      @media screen and (min-width: 1536px) {
-        max-width: 1536px;
-      }
       .backTo {
-        display: flex;
-        align-items: center;
         flex-wrap: wrap;
         padding: 0 0 0.25rem;
         font-size: 0.2rem;
@@ -801,8 +792,6 @@ export default defineComponent({
         }
       }
       .name {
-        display: flex;
-        align-items: center;
         font-family: "Helvetica-Bold";
         width: 100%;
         font-size: 0.21rem;
@@ -931,8 +920,6 @@ export default defineComponent({
         }
         .logs_style {
           position: relative;
-          display: flex;
-          align-items: center;
           padding: 0.05rem 0.05rem;
           margin: 0 0 0 0.07rem;
           background-color: transparent;
@@ -976,8 +963,6 @@ export default defineComponent({
       line-height: 0.3rem;
       font-size: 0.18rem;
       a {
-        display: flex;
-        align-items: center;
         padding: 0;
         margin: 0 0 0 0.1rem;
         background-color: transparent;
@@ -1032,8 +1017,6 @@ export default defineComponent({
       }
     }
     .remain {
-      display: flex;
-      align-items: center;
       width: 100%;
       padding: 0.03rem 0;
       font-weight: bold;
@@ -1051,15 +1034,8 @@ export default defineComponent({
       .el-tabs__header {
         display: flex;
         align-items: stretch;
-        padding: 0 0.16rem;
         margin: 0 auto;
         font-size: 14px;
-        @media screen and (min-width: 1280px) {
-          max-width: 1280px;
-        }
-        @media screen and (min-width: 1536px) {
-          max-width: 1536px;
-        }
       }
       .el-tabs__content {
         border-top: 1px solid #f1f1f1;
@@ -1078,8 +1054,6 @@ export default defineComponent({
           font-size: 14px;
         }
         .custom-tabs-label {
-          display: flex;
-          align-items: center;
           padding: 0 0.2rem;
           .icon {
             height: 16px;
@@ -1225,8 +1199,6 @@ export default defineComponent({
   font-size: 14px;
   line-height: 1.5;
   .close {
-    display: flex;
-    align-items: center;
     width: 20px;
     height: 20px;
     position: absolute;
@@ -1382,8 +1354,6 @@ export default defineComponent({
           color: #606060;
           overflow: hidden;
           .top_title {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
             padding: 0.12rem 0.25rem;
             font-size: 18px;
@@ -1398,8 +1368,6 @@ export default defineComponent({
               font-size: 15px;
             }
             .left {
-              display: flex;
-              align-items: center;
               font-size: 16px;
               text-transform: capitalize;
               @media screen and (max-width: 1600px) {
@@ -1425,8 +1393,6 @@ export default defineComponent({
             border-top: 1px solid #dfdee5;
             overflow: scroll;
             li {
-              display: flex;
-              align-items: center;
               justify-content: flex-start;
               background-color: #fafafa;
               font-size: 14px;
@@ -1469,8 +1435,6 @@ export default defineComponent({
           font-size: 14px;
         }
         .custom-tabs-label {
-          display: flex;
-          align-items: center;
           line-height: 1;
           i {
             margin: 0 5px 0 0;

@@ -1,14 +1,14 @@
 <template>
   <section id="dataset" v-loading="ntfLoad">
-    <div class="dataset_head">
-      <div class="content">
-        <div class="backTo" @click="back">
+    <div class="dataset_head container-landing">
+      <div class="content flex-row">
+        <div class="backTo flex-row" @click="back">
           <el-icon>
             <ArrowLeft />
           </el-icon>
           <span>Go Back</span>
         </div>
-        <div class="name">
+        <div class="name flex-row">
           <i class="icon icon_datasets"></i>
           Datasets:
           <b>{{route.params.name}}</b>
@@ -20,7 +20,7 @@
               <i class="icon icon_like"></i>Like</el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
-          <div :class="{'logs_style': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 || !nft.ipfs_uri}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+          <div :class="{'logs_style flex-row': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 || !nft.ipfs_uri}" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
               <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
                 p-id="2675" fill="#878c93"></path>
@@ -31,23 +31,23 @@
           <share-pop></share-pop>
         </div>
       </div>
-      <div class="tag content">
+      <div class="tag content flex-row">
         Tasks: &nbsp;
-        <router-link to="">
+        <router-link to="" class="flex-row">
           <i class="icon"></i>
           <span class="a_text">Text Classification</span>
         </router-link>
       </div>
-      <div class="tag tag_sub content">
+      <div class="tag tag_sub content flex-row">
         Sub-Tasks: &nbsp;
-        <router-link to="">
+        <router-link to="" class="flex-row">
           <span class="a_text">language-modeling</span>
         </router-link>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
         <el-tab-pane name="card">
           <template #label>
-            <span class="custom-tabs-label">
+            <span class="custom-tabs-label flex-row">
               <i class="icon icon_datasets"></i>
               <span>Dataset card</span>
             </span>
@@ -56,7 +56,7 @@
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
-            <span class="custom-tabs-label">
+            <span class="custom-tabs-label flex-row">
               <i class="icon"></i>
               <span>Files and versions</span>
             </span>
@@ -65,7 +65,7 @@
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
-            <span class="custom-tabs-label">
+            <span class="custom-tabs-label flex-row">
               <i class="icon"></i>
               <span>Community</span>
               <!-- <b>3</b> -->
@@ -75,7 +75,7 @@
         </el-tab-pane>
         <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
           <template #label>
-            <span class="custom-tabs-label">
+            <span class="custom-tabs-label flex-row">
               <!-- <i class="icon icon_datasets"></i> -->
               <el-icon class="icon">
                 <Setting />
@@ -289,29 +289,20 @@ export default defineComponent({
   background: #fff;
   color: #333;
   font-size: 18px;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
   .dataset_head {
-    padding: 0.3rem 0 0;
+    padding-top: 0.3rem;
     background-color: #fbfbfc;
     border-bottom: 1px solid #f1f1f1;
     .content {
-      display: flex;
       align-items: stretch;
       flex-wrap: wrap;
-      padding: 0 0.16rem;
       margin: 0 auto 0.25rem;
       font-size: 14px;
-      @media screen and (min-width: 1280px) {
-        max-width: 1280px;
-      }
-      @media screen and (min-width: 1536px) {
-        max-width: 1536px;
-      }
       .backTo {
-        display: flex;
-        align-items: center;
         padding: 0 0 0.25rem;
         font-size: 0.2rem;
         text-align: left;
@@ -327,8 +318,6 @@ export default defineComponent({
         }
       }
       .name {
-        display: flex;
-        align-items: center;
         font-family: "Helvetica-Bold";
         width: 100%;
         font-size: 0.21rem;
@@ -405,8 +394,6 @@ export default defineComponent({
         }
         .logs_style {
           position: relative;
-          display: flex;
-          align-items: center;
           padding: 0.05rem 0.05rem;
           margin: 0 0 0 0.07rem;
           background-color: transparent;
@@ -450,8 +437,6 @@ export default defineComponent({
       line-height: 0.3rem;
       font-size: 0.18rem;
       a {
-        display: flex;
-        align-items: center;
         padding: 0;
         margin: 0 0 0 0.1rem;
         background-color: transparent;
@@ -512,15 +497,8 @@ export default defineComponent({
       .el-tabs__header {
         display: flex;
         align-items: stretch;
-        padding: 0 0.16rem;
         margin: 0 auto;
         font-size: 14px;
-        @media screen and (min-width: 1280px) {
-          max-width: 1280px;
-        }
-        @media screen and (min-width: 1536px) {
-          max-width: 1536px;
-        }
       }
       .el-tabs__content {
         border-top: 1px solid #f1f1f1;
@@ -539,8 +517,6 @@ export default defineComponent({
           font-size: 14px;
         }
         .custom-tabs-label {
-          display: flex;
-          align-items: center;
           padding: 0 0.2rem;
           .icon {
             height: 16px;

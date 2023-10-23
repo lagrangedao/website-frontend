@@ -1,14 +1,14 @@
 <template>
   <section id="dataset" v-loading="loading" :element-loading-text="loadingText">
-    <el-row class="dataset_body">
+    <el-row class="dataset_body container-landing flex-row">
       <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6" class="left">
         <div class="left_body">
-          <div class="width_div">
+          <div class="width_div flex-row">
             <div v-loading="false" class="logo_sidebar">
               <img :src="accessAvatar || peopleUrl" alt="">
             </div>
             <div class="personal">
-              <div class="title">
+              <div class="title flex-row">
                 {{ accessName || '-'}}
               </div>
               <div class="desc">Decentralized data science without borders</div>
@@ -219,9 +219,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 #dataset {
   position: relative;
-  padding: 0.15rem 0 0;
+  padding: 0.15rem 0;
   color: #333;
   font-size: 18px;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
@@ -274,17 +275,9 @@ export default defineComponent({
     }
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0 0.16rem;
     margin: auto;
     font-size: 14px;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     &.opacity {
       opacity: 0;
     }
@@ -328,8 +321,6 @@ export default defineComponent({
         text-align: left;
         color: #000;
         .width_div {
-          display: flex;
-          align-items: center;
           width: 90%;
           margin: 0 auto;
         }
@@ -391,8 +382,6 @@ export default defineComponent({
             }
           }
           .top_text {
-            display: flex;
-            align-items: center;
             margin: 0 0 0.2rem;
             color: #fff;
             font-family: "Helvetica-Bold";
@@ -452,15 +441,11 @@ export default defineComponent({
       position: relative;
       padding: 0 4% 0.5rem;
       .top {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         margin: 0.35rem 0 0.15rem;
         color: #9ca3b1;
         font-size: 0.19rem;
         .top_text {
-          display: flex;
-          align-items: center;
           h3 {
             color: #7405ff;
             font-family: "Helvetica-Neue";
@@ -577,8 +562,6 @@ export default defineComponent({
         }
       }
       .my_profile {
-        display: flex;
-        align-items: center;
         justify-content: flex-start;
         padding: 0.25rem;
         margin: 0 0 0.25rem;
@@ -635,23 +618,17 @@ export default defineComponent({
             }
           }
           .media {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
             width: 100%;
             li {
-              display: flex;
               justify-content: flex-start;
-              align-items: center;
               margin: 0.1rem 0.25rem 0.1rem 0;
               font-size: 14px;
               @media screen and (min-width: 1800px) {
                 font-size: 15px;
               }
               .iconBody {
-                display: flex;
                 justify-content: center;
-                align-items: center;
                 width: 25px;
                 height: 25px;
                 margin: 0 0.07rem 0 0;
@@ -673,9 +650,7 @@ export default defineComponent({
       .list {
         margin: 0.35rem 0 0;
         .title {
-          display: flex;
           justify-content: flex-start;
-          align-items: center;
           padding: 0;
           font-size: 0.21rem;
           color: #000;
@@ -729,7 +704,6 @@ export default defineComponent({
               padding: 0;
               border: 0;
               .card-header {
-                display: flex;
                 justify-content: flex-end;
                 span {
                   height: 0.25rem;
@@ -749,9 +723,7 @@ export default defineComponent({
             .el-card__body {
               padding: 0;
               .text {
-                display: flex;
                 justify-content: flex-start;
-                align-items: center;
                 color: #000;
                 line-height: 1;
                 @media screen and (min-width: 1800px) {
@@ -830,10 +802,6 @@ export default defineComponent({
               .item {
                 justify-content: space-between;
                 margin: 0.2rem 0 0;
-                .item_body {
-                  display: flex;
-                  align-items: center;
-                }
               }
             }
           }
@@ -894,13 +862,10 @@ export default defineComponent({
         overflow: hidden;
       }
       .more_style {
-        display: flex;
         justify-content: center;
         img {
-          display: flex;
           width: 40px;
           height: 40px;
-          align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: all 0.3s;
@@ -920,7 +885,6 @@ export default defineComponent({
         }
       }
       .list_body_spaces {
-        display: flex;
         flex-wrap: wrap;
         width: 100%;
         margin: 0.4rem 0 0.3rem;
@@ -953,8 +917,6 @@ export default defineComponent({
               }
             }
             .flex-row {
-              display: flex;
-              align-items: center;
               flex-wrap: wrap;
               width: 100%;
               .el-select {
@@ -1095,7 +1057,6 @@ export default defineComponent({
       }
       .el-pagination {
         margin: 0.1rem auto;
-        display: flex;
         justify-content: center;
         .btn-prev {
           i {

@@ -1,9 +1,9 @@
 <template>
   <section id="dataset" ref="spaceCardRef">
     <div id="datasetBody">
-      <el-row class="dataset_body" v-loading="listLoad">
+      <el-row class="dataset_body container-landing flex-row" v-loading="listLoad">
         <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
-          <div class="readme_body" v-if="!createLoad">
+          <div class="readme_body flex-row" v-if="!createLoad">
             <div class="desc">
               <b>No space card yet</b>
               <p v-if="metaAddress === route.params.wallet_address">
@@ -17,7 +17,7 @@
               </el-col>
               <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <el-card class="box-card" shadow="hover" @click="cardAdd('docker')">
-                  <div class="text item">Create a hello-world docker container</div>
+                  <div class="text item flex-row">Create a hello-world docker container</div>
                 </el-card>
               </el-col>
             </el-row>
@@ -56,19 +56,19 @@
         </el-col>
         <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="left left_light">
           <div class="list">
-            <div class="title">
+            <div class="title flex-row">
               Space Total Views
               <b>{{system.$commonFun.NumFormat(listdata.stats.views) || 0}}</b>
             </div>
-            <div class="title">
+            <div class="title flex-row">
               Space Total Forked
               <b>{{system.$commonFun.NumFormat(listdata.stats.forks) || 0}}</b>
             </div>
             <div class="cont">
               <el-row :gutter="12" v-if="urlReadme && userGateway">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
-                  <a>
-                    <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
+                  <a class=" flex-row">
+                    <span class="a_button flex-row" v-if="urlReadme && isPreview" @click="editFun">
                       <el-icon>
                         <EditPen />
                       </el-icon>
@@ -77,8 +77,8 @@
                   </a>
                 </el-col>
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
-                  <a>
-                    <span class="a_button" @click="isPreview=true">
+                  <a class=" flex-row">
+                    <span class="a_button flex-row" @click="isPreview=true">
                       <el-icon>
                         <CircleClose />
                       </el-icon>
@@ -87,8 +87,8 @@
                   </a>
                 </el-col>
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="!isPreview">
-                  <a>
-                    <span class="a_button" @click="editCommitFun">
+                  <a class=" flex-row">
+                    <span class="a_button flex-row" @click="editCommitFun">
                       <el-icon>
                         <Edit />
                       </el-icon>
@@ -99,13 +99,13 @@
               </el-row>
               <el-row :gutter="12" v-if="false">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="">
+                  <router-link to="" class=" flex-row">
                     <i class="icon icon_01"></i>
                     <span class="a_text">Image Classification</span>
                   </router-link>
                 </el-col>
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="">
+                  <router-link to="" class=" flex-row">
                     <i class="icon icon_02"></i>
                     <span class="a_text">Translation</span>
                   </router-link>
@@ -114,7 +114,7 @@
             </div>
           </div>
           <div class="labelModel" v-if="false">
-            <ul>
+            <ul class=" flex-row">
               <li>
                 <p>Homepage:</p>
                 <b>github.com</b>
@@ -134,7 +134,7 @@
             </ul>
           </div>
           <div class="list" v-if="false">
-            <div class="title">
+            <div class="title flex-row">
               <p :title="'Models trained or fine-tuned on '+route.params.name">
                 <i class="icon icon_datasets"></i>
                 Models trained or fine-tuned on
@@ -146,8 +146,8 @@
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata.files" :key="l">
               <el-card class="box-card" @click="detailFun(list, l)">
                 <template #header>
-                  <div class="card-header">
-                    <div class="name">
+                  <div class="card-header flex-row">
+                    <div class="name flex-row">
                       <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
                       <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
                       <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
@@ -156,11 +156,11 @@
                     <span>27</span>
                   </div>
                 </template>
-                <div class="text">
+                <div class="text flex-row">
                   <i class="icon icon_image"></i>
                   <p class="ellipsis">argilla/news-summary</p>
                 </div>
-                <!-- <div class="text">
+                <!-- <div class="text flex-row">
                                   <el-row :gutter="6">
                                       <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
                                           <router-link to="" class="ellipsis">
@@ -169,12 +169,12 @@
                                       </el-col>
                                   </el-row>
                               </div> -->
-                <div class="text item">
-                  <div class="item_body">
+                <div class="text item flex-row">
+                  <div class="item_body flex-row">
                     <i class="icon icon_time"></i>
                     <span class="small">5 Sept 2022 - 5 Oct 2022</span>
                   </div>
-                  <!-- <div class="item_body">
+                  <!-- <div class="item_body flex-row">
                     <i class="icon icon_up"></i>
                     <span class="small">5.15M</span>
                   </div> -->
@@ -508,7 +508,6 @@ export default defineComponent({
     font-size: 16px;
   }
   .mark {
-    display: flex;
     flex-wrap: wrap;
     .left,
     .right {
@@ -516,21 +515,10 @@ export default defineComponent({
     }
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0 0.16rem;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .readme_text {
       position: relative;
       padding: 0.5rem 0.3rem 0.3rem 0;
@@ -538,9 +526,7 @@ export default defineComponent({
         padding: 0.3rem 0;
       }
       .readme_body {
-        display: flex;
         justify-content: center;
-        align-items: center;
         flex-wrap: wrap;
         min-height: 230px;
         padding: 0.5rem 0;
@@ -760,9 +746,7 @@ export default defineComponent({
       .list {
         margin: 0.2rem 0.16rem 0;
         .title {
-          display: flex;
           justify-content: space-between;
-          align-items: center;
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
           font-family: "Helvetica-Neue";
@@ -837,7 +821,6 @@ export default defineComponent({
               width: auto;
               flex: auto;
               a {
-                display: flex;
                 padding: 0;
                 margin: 0.03rem auto;
                 background-color: transparent;
@@ -858,8 +841,6 @@ export default defineComponent({
                   padding: 0.03rem 0.07rem;
                 }
                 .a_button {
-                  display: flex;
-                  align-items: center;
                   width: 100%;
                   padding: 0.05rem 0.15rem;
                   background: linear-gradient(180deg, #fefefe, #f0f0f0);
@@ -937,8 +918,6 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
                   &:hover {
                     background-color: #eee;
                   }
@@ -1076,8 +1055,6 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
                   &:hover {
                     background-color: #eee;
                   }
@@ -1093,7 +1070,6 @@ export default defineComponent({
         border-bottom: 1px solid #f1f1f1;
         text-align: left;
         ul {
-          display: flex;
           flex-wrap: wrap;
           li {
             width: auto;
@@ -1140,11 +1116,8 @@ export default defineComponent({
               padding: 0;
               border: 0;
               .card-header {
-                display: flex;
                 justify-content: space-between;
                 .name {
-                  display: flex;
-                  align-items: center;
                   flex-wrap: wrap;
                   width: 80%;
                   color: #606060;
@@ -1196,9 +1169,7 @@ export default defineComponent({
             .el-card__body {
               padding: 0.05rem 0 0;
               .text {
-                display: flex;
                 justify-content: flex-start;
-                align-items: center;
                 flex-wrap: wrap;
                 color: #000;
                 line-height: 1;
@@ -1287,10 +1258,6 @@ export default defineComponent({
               .item {
                 justify-content: space-between;
                 margin: 0.2rem 0 0;
-                .item_body {
-                  display: flex;
-                  align-items: center;
-                }
               }
             }
           }
@@ -1358,9 +1325,7 @@ export default defineComponent({
           }
         }
         .list_nodata {
-          display: flex;
           justify-content: center;
-          align-items: center;
           width: 100%;
           height: 200px;
           font-size: 18px;
@@ -1383,15 +1348,11 @@ export default defineComponent({
         color: #606060;
         overflow: hidden;
         .top {
-          display: flex;
-          align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
           padding: 0.1rem 4%;
           font-size: 0.19rem;
           .top_text {
-            display: flex;
-            align-items: center;
             flex-wrap: wrap;
             font-size: 0.2rem;
             color: #000000;

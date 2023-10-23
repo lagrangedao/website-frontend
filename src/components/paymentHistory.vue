@@ -1,6 +1,6 @@
 <template>
   <div id="payment">
-    <div class="payment-history">
+    <div class="payment-history container-landing">
       <div class="title">{{paymentType.toLowerCase() === 'provider'?'provider Payment history':'user Payment history'}}</div>
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%">
         <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
@@ -148,11 +148,10 @@ export default defineComponent({
 <style  lang="scss" scoped>
 #payment {
   width: 100%;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   .payment-history {
-    width: 96%;
     height: calc(100% - 1.2rem);
-    padding: 0.6rem 0.16rem;
-    max-width: 768px;
+    padding: 0.6rem 0;
     margin: 0 auto;
     box-sizing: border-box;
     word-break: break-word;
@@ -160,15 +159,6 @@ export default defineComponent({
     color: #606060;
     font-size: 14px;
     text-align: left;
-    @media screen and (min-width: 1024px) {
-      max-width: 1024px;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .title {
       margin: 0 0 0.4rem;
       font-weight: bold;

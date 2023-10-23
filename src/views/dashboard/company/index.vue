@@ -1,6 +1,6 @@
 <template>
   <section id="terms">
-    <div class="terms_body">
+    <div class="terms_body container-landing">
       <div class="tabs">
         <router-link to="/terms_of_service" :class="{'is-active': route.name==='termsOfService'}">
           Terms of Service
@@ -70,26 +70,10 @@ export default defineComponent({
   }
   :deep(.terms_body) {
     width: 90%;
-    padding: 1rem 0;
-    max-width: 768px;
+    padding: 1rem 5%;
     margin: 0 auto;
     box-sizing: border-box;
     word-break: break-word;
-    @media screen and (min-width: 1800px) {
-      max-width: 1024px;
-    }
-    // @media screen and (min-width: 1024px) {
-    //   max-width: 1024px;
-    // }
-    // @media screen and (min-width: 1280px) {
-    //   max-width: 1280px;
-    // }
-    // @media screen and (min-width: 1536px) {
-    //   max-width: 1536px;
-    // }
-    // @media screen and (min-width: 1800px) {
-    //   max-width: 1440px;
-    // }
     .title {
       margin: 0.2rem 0 0.4rem;
       font-weight: bold;

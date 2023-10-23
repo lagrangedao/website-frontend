@@ -1,15 +1,15 @@
 <template>
   <section id="dataset">
-    <el-row class="dataset_body">
-      <header>
-        <div class="title">
+    <el-row class="dataset_body container-landing flex-row">
+      <header class=" flex-row">
+        <div class="title flex-row">
           <a @click="getListFolderMain('')">{{route.params.name}}</a>
           {{labelTab === 'upload'||fileRow.fileTitle?'/':''}}
           <span class="main" v-for="(item, index) in fileRow.fileTitle" :key="index">
             {{index>0?'/':''}}
             <a href="javascript:;" style="word-break: break-word;" @click="getListFolderMain(item, true, index)">{{item.title}}</a>
           </span>
-          <span v-if="labelTab === 'edit'" class="about">
+          <span v-if="labelTab === 'edit'" class="about flex-row">
             {{fileRow.fileTitle.length>0?'/':''}}
             <el-input v-if="fileTextShow" v-model="fileBody.title" placeholder=" " v-loading="uploadLoad" />
             <p v-else>{{fileBody.title}}</p>
@@ -37,13 +37,13 @@
         <el-table v-if="labelTab === 'list'" :data="fileRow.filedata" :table-layout="tableLayout" v-loading="listLoad" style="width: 100%">
           <el-table-column label="name" min-width="120">
             <template #default="scope">
-              <div class="dir_parent" v-if="scope.row.isDir" @click="folderDetails(scope.row)">
+              <div class="dir_parent flex-row" v-if="scope.row.isDir" @click="folderDetails(scope.row)">
                 <div class="i icon_fold">
                   <img src="@/assets/images/icons/icon_40.png" alt="" />
                 </div>
                 <span class="is_file is_dir" :title="scope.row.title">{{scope.row.title}}</span>
               </div>
-              <div class="dir_parent" v-else @click="fileEdit(scope.row)">
+              <div class="dir_parent flex-row" v-else @click="fileEdit(scope.row)">
                 <div class="i icon_file">
                   <img src="@/assets/images/icons/icon_41.png" alt="" />
                 </div>
@@ -73,7 +73,7 @@
           </el-table-column>
           <el-table-column label="Actions" align="center" width="110" v-if="metaAddress === route.params.wallet_address">
             <template #default="scope">
-              <div class="hot-cold-box" v-if="!scope.row.isDir">
+              <div class="hot-cold-box flex-row" v-if="!scope.row.isDir">
                 <svg @click="fileEdit(scope.row)" class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                   <path d="M2 26h28v2H2z" fill="currentColor"></path>
                   <path d="M25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10l3.6 3.6l-10 10H6z" fill="currentColor"></path>
@@ -91,8 +91,8 @@
           </el-table-column>
         </el-table>
         <div v-else-if="labelTab === 'edit'" class="uploadBody">
-          <div class="top_title">
-            <div class="left">
+          <div class="top_title flex-row">
+            <div class="left flex-row">
               <img :src="people_img" class="people" width="30" height="30" alt=""> {{metaAddress === route.params.wallet_address?accessName:'-'}}
             </div>
             <div class="right" :title="system.$commonFun.momentFun(fileBody._originPath.created_at)">
@@ -100,10 +100,10 @@
             </div>
           </div>
           <div v-if="!fileTextShow" v-loading="uploadLoad">
-            <div class="worktop" style="justify-content: space-between;">
-              <ul>
+            <div class="worktop flex-row" style="justify-content: space-between;">
+              <ul class=" flex-row">
                 <li v-if="fileTextType !== 'binary'">
-                  <a :href="userGateway?`${userGateway}/ipfs/${fileBody._originPath.cid}`:''" target="_blank" :title="fileBody.title">
+                  <a class=" flex-row" :href="userGateway?`${userGateway}/ipfs/${fileBody._originPath.cid}`:''" target="_blank" :title="fileBody.title">
                     <svg class="mr-raw" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" style="transform: rotate(360deg);">
                       <path d="M31 16l-7 7l-1.41-1.41L28.17 16l-5.58-5.59L24 9l7 7z" fill="currentColor"></path>
                       <path d="M1 16l7-7l1.41 1.41L3.83 16l5.58 5.59L8 23l-7-7z" fill="currentColor"></path>
@@ -113,7 +113,7 @@
                   </a>
                 </li>
                 <li v-else>
-                  <a @click="downFile">
+                  <a class=" flex-row" @click="downFile">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" viewBox="0 0 32 32" style="transform: rotate(360deg);">
                       <path d="M24.59 16.59L17 24.17V4h-2v20.17l-7.59-7.58L6 18l10 10l10-10l-1.41-1.41z" fill="currentColor"></path>
                     </svg>
@@ -121,7 +121,7 @@
                   </a>
                 </li>
                 <li>
-                  <a @click="deleteFile()" :class="{'disable': metaAddress !== route.params.wallet_address}">
+                  <a @click="deleteFile()" :class="{'disable': metaAddress !== route.params.wallet_address,'flex-row':true}">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                       <path d="M12 12h2v12h-2z" fill="currentColor"></path>
                       <path d="M18 12h2v12h-2z" fill="currentColor"></path>
@@ -141,7 +141,7 @@
                 <Codemirror v-model:value="fileTextEditor" :options="system.$commonFun.cmOptions(metaAddress === route.params.wallet_address)" border placeholder="" />
               </div>
               <!-- <v-md-editor v-model="fileTextEditor" height="450px"></v-md-editor> -->
-              <el-button-group class="ml-4 worktop">
+              <el-button-group class="ml-4 worktop flex-row">
                 <el-button @click="commitEditFun('edit')" v-if="metaAddress === route.params.wallet_address" :disabled="!fileBody.title">Commit changes</el-button>
                 <el-button @click="cancelFun">Cancel</el-button>
               </el-button-group>
@@ -835,31 +835,20 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
     padding: 0.4rem 0;
     margin: auto;
     font-size: 14px;
     text-align: left;
     @media screen and (max-width: 1600px) {
-      padding: 0.4rem 0.16rem 0.9rem;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
+      padding: 0.4rem 0 0.9rem;
     }
     header {
-      display: flex;
-      align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       width: 100%;
       .title {
-        display: flex;
         flex-wrap: wrap;
-        align-items: center;
         gap: 5px;
         padding: 3px 0;
         font-size: 16px;
@@ -882,8 +871,6 @@ export default defineComponent({
           }
         }
         .about {
-          display: flex;
-          align-items: center;
           gap: 5px;
         }
       }
@@ -959,11 +946,6 @@ export default defineComponent({
                   text-decoration: underline;
                 }
               }
-              .dir_parent {
-                display: flex;
-                align-items: center;
-                // flex-wrap: wrap;
-              }
               .is_file {
                 word-break: break-all;
                 overflow: hidden;
@@ -984,8 +966,6 @@ export default defineComponent({
               }
               .hot-cold-box {
                 position: relative;
-                display: flex;
-                align-items: center;
                 justify-content: center;
                 flex-wrap: wrap;
                 i,
@@ -1022,8 +1002,6 @@ export default defineComponent({
       .uploadBody {
         width: 100%;
         .top_title {
-          display: flex;
-          align-items: center;
           justify-content: space-between;
           padding: 0.1rem 0.15rem;
           font-size: 18px;
@@ -1038,8 +1016,6 @@ export default defineComponent({
             font-size: 15px;
           }
           .left {
-            display: flex;
-            align-items: center;
             .people {
               width: 30px;
               height: 30px;
@@ -1051,8 +1027,6 @@ export default defineComponent({
           }
         }
         .worktop {
-          display: flex;
-          align-items: center;
           padding: 0.15rem 0.15rem;
           font-family: "Helvetica-light";
           font-size: 15px;
@@ -1068,15 +1042,11 @@ export default defineComponent({
             font-size: 12px;
           }
           ul {
-            display: flex;
-            align-items: center;
             text-transform: lowercase;
           }
           li {
             margin-right: 0.25rem;
             a {
-              display: flex;
-              align-items: center;
               cursor: pointer;
               line-height: 1;
               i,

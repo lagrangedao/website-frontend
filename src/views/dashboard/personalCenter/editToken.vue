@@ -1,20 +1,20 @@
 <template>
   <section id="access_token" v-loading="listLoad">
     <div class="list">
-      <div class="title">Access Tokens</div>
+      <div class="title flex-row">Access Tokens</div>
     </div>
 
-    <div class="token_list">
-      <div class="title">User Access Tokens</div>
+    <div class="token_list flex-row">
+      <div class="title flex-row">User Access Tokens</div>
       <div class="desc">Access tokens programmatically authenticate your identity to the Lagrange DAO, allowing applications to perform specific actions specified by the scope of permissions (read, write, or admin) granted. Visit the documentation to discover
         how to use them.</div>
       <el-button size="large" class="token_button" @click="createToken">New token</el-button>
 
-      <div class="title">Organizations API Tokens </div>
+      <div class="title flex-row">Organizations API Tokens </div>
       <div class="desc">Unlike user access tokens, an Organization API token can only be used to provide read access to repos, or for billing access to a compute resource.</div>
       <div class="card" v-if="tokenData.token">
-        <div class="card_header">
-          <div class="card_left">
+        <div class="card_header flex-row">
+          <div class="card_left flex-row">
             <div class="face"></div>
             Organization API token
           </div>
@@ -25,7 +25,7 @@
         <div class="card_body">
           <el-input v-model="tokenData.token" :type="tokenShow?'text':'password'" readonly placeholder="Access Tokens">
             <template #append>
-              <div class="action">
+              <div class="action flex-row">
                 <i class="icon icon_look" @click="tokenShow=!tokenShow"></i>
                 <i class="icon icon_copy" @click="system.$commonFun.copyContent(tokenData.token, 'Copied')"></i>
               </div>
@@ -146,8 +146,6 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.token_list) {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     margin: 0 0 0.2rem;
     .title {
@@ -196,18 +194,12 @@ export default defineComponent({
       border: 1px solid #ececec;
       border-radius: 0.05rem;
       .card_header {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         margin-bottom: 0.25rem;
         font-size: 0.18rem;
         color: #565656;
         @media screen and (min-width: 1800px) {
           font-size: 0.2rem;
-        }
-        .card_left {
-          display: flex;
-          align-items: center;
         }
         .face {
           width: 0.3rem;
@@ -256,8 +248,6 @@ export default defineComponent({
             border-color: inherit;
           }
           .action {
-            display: flex;
-            align-items: center;
             height: 100%;
           }
           .icon_copy {

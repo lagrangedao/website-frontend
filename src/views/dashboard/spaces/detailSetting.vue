@@ -1,15 +1,15 @@
 <template>
   <section id="space">
-    <el-row class="space_body" v-loading="listLoad">
+    <el-row class="space_body container-landing flex-row" v-loading="listLoad">
       <space-hardware @handleHard="handleHard" :listdata="listdata" :renewButton="'setting'"></space-hardware>
       <div class="fileList" v-loading="renameLoad" v-if="nftdata.nft.status === 'not generated'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
-        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
+        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm flex-row" status-icon>
           <el-form-item prop="" class="flex_left">
             <label class="label" for="owner">
               New owner
-              <div class="flex flex-row">
+              <div class="flex-row">
                 <el-select v-model="metaAddress" placeholder="">
                   <el-option :label="metaAddress" :value="metaAddress" />
                 </el-select>
@@ -20,7 +20,7 @@
           <el-form-item prop="name" class="flex_right">
             <label class="label" for="dataname">
               New name
-              <div class="flex flex-row">
+              <div class="flex-row">
                 <el-input v-model="ruleForm.name" placeholder="New space name" />
               </div>
             </label>
@@ -41,11 +41,11 @@
             <br/> This action cannot be undone. It will no longer be possible to delete, rename, transfer, or change the visibility to private.
           </div>
           <div v-if="nftdata.nft.status === 'success' || (nftdata.nft.tokens && nftdata.nft.tokens.length>0)">
-            <div class="contract tip">
+            <div class="contract tip flex-row">
               <div class="flex-left">Contract Address:
                 <a :href="`${nftdata.chain_url}${nftdata.contract_address}`" target="_blank" class="link">{{ nftdata.contract_address }}</a>
               </div>
-              <div class="flex-right">
+              <div class="flex-right flex-row">
                 <i class="icon icon_star"></i>: Licenses owned by yourself
               </div>
             </div>
@@ -81,7 +81,7 @@
               </el-table-column>
             </el-table>
           </div>
-          <div v-else-if="nftdata.nft.status === 'processing'" class="process_style">
+          <div v-else-if="nftdata.nft.status === 'processing'" class="process_style flex-row">
             <el-button size="large" class="generateDOI" @click="refreshContract('refresh')">Refresh</el-button>
             <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Waiting for the Transaction hash complete">
               <template #reference>
@@ -91,7 +91,7 @@
               </template>
             </el-popover>
           </div>
-          <div v-else-if="nftdata.nft.status === 'waiting for oracle'" class="process_style">
+          <div v-else-if="nftdata.nft.status === 'waiting for oracle'" class="process_style flex-row">
             <el-button size="large" class="generateDOI" @click="refreshContract()">Refresh</el-button>
             <el-popover placement="top-start" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" content="Still waiting for the data oracle">
               <template #reference>
@@ -150,12 +150,12 @@
           <b>cannot</b> be undone. This will permanently delete the
           <b class="b">{{route.params.name}}</b> space repository and all its files.</div>
 
-        <el-form ref="ruleFormRefDelete" :model="ruleForm" :rules="rulesDelete" class="demo-ruleForm" status-icon>
+        <el-form ref="ruleFormRefDelete" :model="ruleForm" :rules="rulesDelete" class="demo-ruleForm flex-row" status-icon>
           <el-form-item prop="delete" style="width:100%">
             <label class="label" for="dataname">
               Please type
               <b class="b">{{route.params.name}}</b> to confirm.
-              <div class="flex flex-row">
+              <div class="flex-row">
                 <el-input v-model="ruleForm.delete" placeholder=" " />
               </div>
             </label>
@@ -171,7 +171,7 @@
           <label class="label" for="dataname">
             Destination network
           </label>
-          <div class="flex flex-row">
+          <div class="flex-row">
             <el-select v-model="ruleForm.destinationValue" disabled placeholder="Select">
               <el-option v-for="item in ruleForm.destinationOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
@@ -206,7 +206,7 @@
               Type
               <b class="b">agree</b> to confirm
             </label>
-            <div class="flex flex-row">
+            <div class="flex-row">
               <el-input v-model="ruleForm.agreeDoi" placeholder=" " />
             </div>
           </el-form-item>
@@ -806,26 +806,13 @@ export default defineComponent({
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
-  .flex {
-    display: flex;
-    align-items: center;
-  }
   :deep(.space_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0.4rem 0 0.6rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0.4rem 0.16rem;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .fileList {
       width: 100%;
       margin: 0.15rem 0;
@@ -866,13 +853,7 @@ export default defineComponent({
         color: #666;
         line-height: 1.5;
         &.contract {
-          display: flex;
-          align-items: center;
           justify-content: space-between;
-          .flex-right {
-            display: flex;
-            align-items: center;
-          }
         }
       }
       .tip_new {
@@ -887,7 +868,6 @@ export default defineComponent({
         font-weight: bold;
       }
       .demo-ruleForm {
-        display: flex;
         flex-wrap: wrap;
         padding: 0 0.2rem;
         margin: 0;
@@ -925,7 +905,6 @@ export default defineComponent({
                 font-size: 17px;
               }
               .flex-row {
-                display: flex;
                 width: 100%;
                 .el-select {
                   width: calc(100% - 30px);
@@ -1022,8 +1001,6 @@ export default defineComponent({
         }
       }
       .process_style {
-        display: flex;
-        align-items: center;
         i {
           margin: 0 0 0.2rem -0.1rem;
           font-size: 18px;

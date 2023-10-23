@@ -1,17 +1,17 @@
 <template>
   <section id="access_token" v-loading="listLoad">
     <div class="list">
-      <div class="title">Organizations Settings</div>
+      <div class="title flex-row">Organizations Settings</div>
     </div>
 
-    <div class="token_list">
+    <div class="token_list flex-row">
       <div class="card">
-        <div class="card_header">
-          <div class="card_left">
+        <div class="card_header flex-row">
+          <div class="card_left flex-row">
             <div class="face"></div>
             <small>Non-Profit</small>
           </div>
-          <div class="card_right">
+          <div class="card_right flex-row">
             <el-button size="large" class="token_button token_setting" @click="detailSetting">
               <el-icon>
                 <Setting />
@@ -91,8 +91,6 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.token_list) {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     margin: 0 0 0.2rem;
     .title {
@@ -143,8 +141,6 @@ export default defineComponent({
       border: 1px solid #e1e1e1;
       border-radius: 0.05rem;
       .card_header {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         font-size: 0.18rem;
         color: #565656;
@@ -164,8 +160,6 @@ export default defineComponent({
         }
         .card_left,
         .card_right {
-          display: flex;
-          align-items: center;
           .token_setting {
             padding: 0.12rem;
             font-size: 0.22rem;
@@ -195,8 +189,6 @@ export default defineComponent({
             border-color: inherit;
           }
           .action {
-            display: flex;
-            align-items: center;
             height: 100%;
           }
           .icon_copy {

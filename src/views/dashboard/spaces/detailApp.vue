@@ -1,11 +1,11 @@
 <template>
   <section id="space">
     <div id="spaceBody">
-      <el-row class="space_body" v-loading="listLoad">
+      <el-row class="space_body container-landing flex-row" v-loading="listLoad">
         <el-tabs class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0">
           <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
             <template #label>
-              <span class="custom-tabs-label">
+              <span class="custom-tabs-label flex-row">
                 <el-tooltip placement="top">
                   <template #content>
                     <small>
@@ -29,7 +29,7 @@
           <el-table :data="listdata.jobs_status" border style="width: 100%">
             <el-table-column prop="node_id" label="CP Node ID">
               <template #default="scope">
-                <div class="flex">{{ system.$commonFun.hiddAddress(scope.row.node_id) }}
+                <div class=" flex-row">{{ system.$commonFun.hiddAddress(scope.row.node_id) }}
                   <i class="icon icon_copy" @click="system.$commonFun.copyContent(scope.row.node_id, 'Copied')"></i>
                 </div>
               </template>
@@ -223,9 +223,7 @@ export default defineComponent({
   }
 
   .mark {
-    display: flex;
     flex-wrap: wrap;
-
     .left,
     .right {
       width: 50%;
@@ -233,19 +231,12 @@ export default defineComponent({
   }
 
   :deep(.space_body) {
-    display: flex;
     align-items: stretch;
     min-height: 80px;
     padding: 0;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
 
     .deployment {
       width: 98%;
@@ -264,10 +255,7 @@ export default defineComponent({
             background-color: #f5f7fa;
           }
 
-          .flex {
-            display: flex;
-            align-items: center;
-
+          .flex-row {
             .icon_copy {
               width: 14px;
               height: 14px;
@@ -334,8 +322,6 @@ export default defineComponent({
 
       .el-tabs__item {
         .custom-tabs-label {
-          display: flex;
-          align-items: center;
           line-height: 1;
 
           i {
@@ -422,9 +408,7 @@ export default defineComponent({
       }
 
       .readme_body {
-        display: flex;
         justify-content: center;
-        align-items: center;
         flex-wrap: wrap;
         min-height: 300px;
         background-color: #fbfbfc;
@@ -538,9 +522,7 @@ export default defineComponent({
         margin: 0.2rem 0.16rem 0;
 
         .title {
-          display: flex;
           justify-content: space-between;
-          align-items: center;
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
           font-family: "Helvetica-Neue";
@@ -626,7 +608,6 @@ export default defineComponent({
               flex: auto;
 
               a {
-                display: flex;
                 padding: 0;
                 margin: 0.03rem auto;
                 background-color: transparent;
@@ -647,19 +628,6 @@ export default defineComponent({
 
                 .a_text {
                   padding: 0.03rem 0.07rem;
-                }
-
-                .a_button {
-                  display: flex;
-                  align-items: center;
-                  width: 100%;
-                  padding: 0.05rem 0.15rem;
-                  background: linear-gradient(180deg, #fefefe, #f0f0f0);
-
-                  i {
-                    margin-right: 3px;
-                    font-size: 15px;
-                  }
                 }
 
                 .icon {
@@ -738,9 +706,6 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
-
                   &:hover {
                     background-color: #eee;
                   }
@@ -882,50 +847,10 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
-
                   &:hover {
                     background-color: #eee;
                   }
                 }
-              }
-            }
-          }
-        }
-      }
-
-      .labelModel {
-        padding: 0.2rem 0.16rem;
-        border-top: 1px solid #f1f1f1;
-        border-bottom: 1px solid #f1f1f1;
-        text-align: left;
-
-        ul {
-          display: flex;
-          flex-wrap: wrap;
-
-          li {
-            width: auto;
-            padding: 0.07rem;
-            margin: 0.03rem 0.08rem 0.03rem 0;
-            border: 1px solid #f1f1f1;
-            border-radius: 0.07rem;
-
-            p {
-              color: #878c93;
-              font-size: 12px;
-              @media screen and (min-width: 1800px) {
-                font-size: 14px;
-              }
-            }
-
-            b,
-            a {
-              color: #606060;
-              font-size: 13px;
-              @media screen and (min-width: 1800px) {
-                font-size: 15px;
               }
             }
           }
@@ -956,73 +881,13 @@ export default defineComponent({
             .el-card__header {
               padding: 0;
               border: 0;
-
-              .card-header {
-                display: flex;
-                justify-content: space-between;
-
-                .name {
-                  display: flex;
-                  align-items: center;
-                  flex-wrap: wrap;
-                  width: 80%;
-                  color: #606060;
-                  @media screen and (min-width: 441px) {
-                  }
-
-                  b {
-                    width: calc(100% - 0.6rem);
-                    padding: 0;
-                    font-size: 16px;
-                    font-weight: normal;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    word-spacing: normal;
-                    text-align: left;
-                    line-height: 1.2;
-                    color: inherit;
-                    @media screen and (max-width: 1440px) {
-                      font-size: 15px;
-                    }
-                    @media screen and (max-width: 768px) {
-                      font-size: 14px;
-                    }
-                    @media screen and (max-width: 441px) {
-                      font-size: 13px;
-                    }
-                  }
-                }
-
-                img {
-                  width: 0.4rem;
-                  margin: 0.05rem 0.1rem 0 0;
-                  border-radius: 100%;
-                  border: 2px solid #7405ff;
-                }
-
-                span {
-                  height: 0.25rem;
-                  padding-left: 0.23rem;
-                  background: url(../../../assets/images/icons/icon_9.png)
-                    no-repeat left 2px;
-                  background-size: 0.17rem;
-                  font-size: 13px;
-                  color: #000;
-                  line-height: 0.25rem;
-                  @media screen and (min-width: 1800px) {
-                    font-size: 15px;
-                  }
-                }
-              }
             }
 
             .el-card__body {
               padding: 0.05rem 0 0;
 
               .text {
-                display: flex;
                 justify-content: flex-start;
-                align-items: center;
                 flex-wrap: wrap;
                 color: #000;
                 line-height: 1;
@@ -1124,11 +989,6 @@ export default defineComponent({
               .item {
                 justify-content: space-between;
                 margin: 0.2rem 0 0;
-
-                .item_body {
-                  display: flex;
-                  align-items: center;
-                }
               }
             }
           }
@@ -1138,22 +998,6 @@ export default defineComponent({
               background-color: #7405ff;
 
               .el-card__header {
-                .card-header {
-                  .name {
-                    color: #fff;
-                  }
-
-                  img {
-                    border: 2px solid #fff;
-                  }
-
-                  span {
-                    background: url(../../../assets/images/icons/icon_9_1.png)
-                      no-repeat left 2px;
-                    background-size: 0.17rem;
-                    color: #fff;
-                  }
-                }
               }
 
               .el-card__body {
@@ -1207,15 +1051,6 @@ export default defineComponent({
             }
           }
         }
-
-        .list_nodata {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          width: 100%;
-          height: 200px;
-          font-size: 18px;
-        }
       }
     }
 
@@ -1238,16 +1073,12 @@ export default defineComponent({
         overflow: hidden;
 
         .top {
-          display: flex;
-          align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
           padding: 0.1rem 4%;
           font-size: 0.19rem;
 
           .top_text {
-            display: flex;
-            align-items: center;
             flex-wrap: wrap;
             font-size: 0.2rem;
             color: #000000;

@@ -3,12 +3,12 @@
     <el-row>
       <el-col :span="24">
         <div class="list">
-          <div class="title">Billing</div>
+          <div class="title flex-row">Billing</div>
         </div>
-        <div class="token_list">
+        <div class="token_list flex-row">
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="Overview" name="overview">
-              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
                 <el-form-item prop="email">
                   <label class="label" for="dataname">
                     Email
@@ -28,7 +28,7 @@
               </el-form>
             </el-tab-pane>
             <el-tab-pane label="Payment information" name="payment_information">
-              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
                 <el-form-item prop="email">
                   <label class="label" for="dataname">
                     Email
@@ -47,7 +47,7 @@
                 </el-form-item>
                 <el-form-item prop="">
                   <div class="card">
-                    <div class="card_header">
+                    <div class="card_header flex-row">
                       <h4>Payment method </h4>
                       <h5>There is no payment method for this account. </h5>
                     </div>
@@ -344,14 +344,10 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.token_list) {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     margin: 0.35rem 0 0.2rem;
     .title {
-      display: flex;
       justify-content: space-between;
-      align-items: center;
       flex-wrap: wrap;
       width: 100%;
       padding: 0.35rem 0 0;
@@ -410,8 +406,6 @@ export default defineComponent({
       border: 1px solid #e1e1e1;
       border-radius: 0.05rem;
       .card_header {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
         font-size: 0.18rem;
@@ -456,11 +450,6 @@ export default defineComponent({
             background-color: #fff;
             border-left: 0;
             border-color: inherit;
-          }
-          .action {
-            display: flex;
-            align-items: center;
-            height: 100%;
           }
           .icon_copy {
             display: inline-block;
@@ -650,9 +639,7 @@ export default defineComponent({
                   font-size: 0.1372rem;
                 }
                 .bot {
-                  display: flex;
                   justify-content: center;
-                  align-items: center;
                   p {
                     font-size: 0.1372rem;
                     padding: 0 0.08rem;
@@ -790,15 +777,12 @@ export default defineComponent({
         color: #212529;
       }
       .main_third {
-        display: flex;
-        align-items: center;
         margin: 0 0 0.2rem;
         h5 {
           margin: 0 0.3rem;
         }
       }
       .main_second {
-        display: flex;
         .el-button {
           margin: 0;
           padding: 0.2rem 0.25rem;
@@ -833,10 +817,6 @@ export default defineComponent({
           font-weight: 500;
           line-height: 1.1;
           color: #565656;
-        }
-        .main_six_cont {
-          display: flex;
-          align-items: center;
         }
       }
       .refer_list {
