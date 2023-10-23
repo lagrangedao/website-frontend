@@ -219,9 +219,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 #dataset {
   position: relative;
-  padding: 0.15rem 0 0;
+  padding: 0.15rem 0;
   color: #333;
   font-size: 18px;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
