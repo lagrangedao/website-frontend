@@ -39,47 +39,92 @@
             <span class="loginBtn">Log In</span>
           </el-menu-item>
           <el-menu-item index="8" v-else>
-            <div class="set">
-              <el-dropdown split-button @command="handleSelect" :hide-on-click="true" trigger="click">
-                <router-link to="/personal_center" class="loginImg flex-row">
-                  <img :src="accessAvatar||people_img" width="20" height="20" alt=""> {{system.$commonFun.hiddAddress(metaAddress)}}
-                </router-link>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item command="create_dataset">
-                      + New Dataset
-                    </el-dropdown-item>
-                    <el-dropdown-item command="create_space">
-                      + New Space
-                    </el-dropdown-item>
-                    <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
-                    <el-dropdown-item command="settings">
-                      Settings
-                    </el-dropdown-item>
-                    <el-dropdown-item command="sign_out">
-                      Sign Out
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+            <div class="set flex-row">
+              <div class="info-style flex-row">
+                <div class="address" @click="wrongVisible = true">
+                  {{system.$commonFun.hiddAddress(metaAddress)}}
+                </div>
+                <el-dropdown @command="handleSelect" trigger="click" placement="bottom-end" popper-class="menu-style">
+                  <span class="el-dropdown-link loginImg flex-row">
+                    <el-icon>
+                      <Setting />
+                    </el-icon>
+                  </span>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="personal_center">
+                        <div class="profile">
+                          <div class="tit">Profile</div>
+                          <div class="flex-row">
+                            <img :src="accessAvatar||people_img" width="15" height="15" alt="">
+                            <span class="link">{{accessName}}</span>
+                          </div>
+                        </div>
+                      </el-dropdown-item>
+                      <el-dropdown-item command="create_dataset">
+                        <span class="link">+ New Dataset</span>
+                      </el-dropdown-item>
+                      <el-dropdown-item command="create_space">
+                        <span class="link">+ New Space</span>
+                      </el-dropdown-item>
+                      <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
+                      <el-dropdown-item command="settings">
+                        <span class="link">Settings</span>
+                      </el-dropdown-item>
+                      <el-dropdown-item command="sign_out">
+                        <span class="link">Sign Out</span>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
             </div>
           </el-menu-item>
         </el-menu>
       </el-col>
     </el-row>
+
+    <el-dialog title="Account" v-model="wrongVisible" :append-to-body="false" :width="bodyWidth" custom-class="wrongNet">
+      <label>Connected with MetaMask</label>
+      <div class="address">{{system.$commonFun.hiddAddress(metaAddress)}}</div>
+      <div class="share flex-row">
+        <el-button @click="system.$commonFun.goLink(`${info.url}${metaAddress}`)">
+          <svg t="1669800457857" class="icon icon_big" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6207" width="64" height="64">
+            <path d="M923.648 1015.442H100.206a91.648 91.648 0 0 1-91.721-91.72V101.01a91.502 91.502 0 0 1 91.72-91.501H649.29a30.72 30.72 0 0 1 0 61.44H130.487a60.855 60.855 0 0 0-60.928 60.854v762.003a60.855 60.855 0 0 0 60.928 60.928h762.441a60.855 60.855 0 0 0 60.928-60.928V345.088a30.72 30.72 0 1 1 61.44 0v579.291a91.21 91.21 0 0 1-91.648 91.063z m-497.81-403.675a30.574 30.574 0 1 1-43.228-43.228L930.816 17.92a30.574 30.574 0 1 1 43.154 43.3L425.91 611.768z"
+              p-id="6208" fill="#7405ff"></path>
+            <path d="M923.648 1023.854H100.206A100.206 100.206 0 0 1 0.073 923.72v-822.71C0.22 45.86 44.91 1.096 100.206 1.096h549.083a39.131 39.131 0 1 1 0 78.263H130.414a52.443 52.443 0 0 0-52.444 52.443v762.003c0 28.964 23.48 52.443 52.517 52.516H893a52.368 52.368 0 0 0 37.084-15.36 52.81 52.81 0 0 0 15.36-37.156V345.088a39.131 39.131 0 0 1 78.262 0v579.291a99.913 99.913 0 0 1-100.059 99.475zM100.059 17.92c-45.787 0-82.944 37.23-83.017 83.09v822.784c0.073 46.007 37.303 83.237 83.31 83.31h823.37a83.09 83.09 0 0 0 83.163-82.798V345.015a22.309 22.309 0 0 0-44.544 0v548.864c0 18.359-7.315 35.986-20.188 49.006a68.754 68.754 0 0 1-49.079 20.333H130.487a69.486 69.486 0 0 1-69.34-69.34V131.804a69.266 69.266 0 0 1 69.267-69.339h518.948a22.309 22.309 0 1 0-0.146-44.544h-549.01z m304.202 611.328a39.058 39.058 0 0 1-27.575-66.706L924.818 11.995a38.985 38.985 0 1 1 55.077 55.223l-548.06 550.473c-7.314 7.315-17.261 11.484-27.574 11.557zM952.32 17.335a22.162 22.162 0 0 0-15.58 6.583L388.536 574.39a22.162 22.162 0 1 0 31.378 31.451L968.046 55.296a21.943 21.943 0 0 0 6.583-15.726 22.382 22.382 0 0 0-22.236-22.235z"
+              p-id="6209" fill="#7405ff"></path>
+          </svg>
+          View on explorer
+        </el-button>
+
+        <el-button @click="system.$commonFun.copyContent(metaAddress, 'Copied')">
+          <svg t="1640938541398" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4760" width="32" height="32">
+            <path d="M746.932 698.108" p-id="4761" fill="#7405ff"></path>
+            <path d="M925.731 288.698c-1.261-1.18-3.607-3.272-6.902-6.343-5.486-5.112-11.615-10.758-18.236-16.891-18.921-17.526-38.003-35.028-56.046-51.397-2.038-1.848-2.038-1.835-4.077-3.682-24.075-21.795-44.156-39.556-58.996-52.076-8.682-7.325-15.517-12.807-20.539-16.426-3.333-2.402-6.043-4.13-8.715-5.396-3.365-1.595-6.48-2.566-10.905-2.483C729.478 134.227 720 143.77 720 155.734l0 42.475 0 42.475 0 84.95L720 347l21.205 0L890 347l0 595L358.689 942C323.429 942 295 913.132 295 877.922L295 177l361.205 0c11.736 0 21.25-9.771 21.25-21.5s-9.514-21.5-21.25-21.5l-382.5 0L252 134l0 21.734L252 813l-52.421 0C166.646 813 140 786.928 140 754.678L140 72l566.286 0C739.29 72 766 98.154 766 130.404L766 134l40 0 0-3.596C806 76.596 761.271 33 706.286 33L119.958 33 100 33l0 19.506 0 702.172C100 808.463 144.642 852 199.579 852L252 852l0 25.922C252 936.612 299.979 984 358.689 984l552.515 0L932 984l0-21.237L932 325.635 932 304l0.433 0C932.432 299 930.196 292.878 925.731 288.698zM762 304l0-63.315L762 198.21l0-0.273c14 11.479 30.3 26.369 49.711 43.942 2.022 1.832 2.136 1.832 4.157 3.665 17.923 16.259 36.957 33.492 55.779 50.926 2.878 2.666 5.713 5.531 8.391 7.531L762 304.001z"
+              p-id="4762" fill="#7405ff"></path>
+            <path d="M816.936 436 407.295 436c-10.996 0-19.91 8.727-19.91 19.5 0 10.77 8.914 19.5 19.91 19.5l409.641 0c11 0 19.914-8.73 19.914-19.5C836.85 444.727 827.936 436 816.936 436z" p-id="4763" fill="#7405ff"></path>
+            <path d="M816.936 553 407.295 553c-10.996 0-19.91 8.727-19.91 19.5 0 10.774 8.914 19.5 19.91 19.5l409.641 0c11 0 19.914-8.726 19.914-19.5C836.85 561.727 827.936 553 816.936 553z" p-id="4764" fill="#7405ff"></path>
+            <path d="M816.936 689 407.295 689c-10.996 0-19.91 8.729-19.91 19.503 0 10.769 8.914 19.497 19.91 19.497l409.641 0c11 0 19.914-8.729 19.914-19.497C836.85 697.729 827.936 689 816.936 689z" p-id="4765" fill="#7405ff"></path>
+          </svg>
+          Copy Wallet Address
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, Setting } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'header_page',
-  components: { ArrowDown },
+  components: { ArrowDown, Setting },
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const accessName = computed(() => (store.state.accessName))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const logo = require("@/assets/images/icons/logo_black.png")
@@ -87,15 +132,18 @@ export default defineComponent({
     const searchValue = ref('')
     const activeIndex = ref('')
     const info = reactive({
-      network: ''
+      network: '',
+      url: ''
     })
-    const bodyWidth = ref(document.body.clientWidth < 992)
+    const wrongVisible = ref(false)
+    const bodyWidth = ref(document.body.clientWidth > 600 ? '450px' : '95%')
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
     async function header_logo () {
-      router.push({ name: 'main' })
+      if (metaAddress.value) router.push({ path: '/personal_center' })
+      else router.push({ name: 'main' })
     }
     async function handleSelect (key, keyPath) {
       // console.log(key) //  
@@ -114,7 +162,7 @@ export default defineComponent({
       else if (key === 'settings') router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
       else if (key === 'sign_out') {
         await system.$commonFun.signOutFun()
-        await system.$commonFun.timeout(200)
+        // await system.$commonFun.timeout(50)
         window.location.reload()
       }
       else store.dispatch('setNavLogin', false)
@@ -128,8 +176,9 @@ export default defineComponent({
       else activeIndex.value = nameMenu
 
       const chainId = await system.$commonFun.web3Init.eth.net.getId()
-      const { name } = await system.$commonFun.getUnit(chainId)
+      const { name, url } = await system.$commonFun.getUnit(chainId)
       info.network = name || `Chain ID: ${chainId}`
+      info.url = url || ''
     }
     onMounted(() => activeMenu())
     watch(route, (to, from) => {
@@ -138,6 +187,7 @@ export default defineComponent({
     })
     return {
       metaAddress,
+      accessName,
       accessAvatar,
       lagLogin,
       logo,
@@ -145,6 +195,7 @@ export default defineComponent({
       searchValue,
       activeIndex,
       info,
+      wrongVisible,
       bodyWidth,
       system,
       header_logo, handleSelect
@@ -248,6 +299,7 @@ export default defineComponent({
         width: 100%;
         border: 0;
         justify-content: flex-end;
+        align-items: center;
         @media screen and (max-width: 441px) {
           width: 90%;
           margin-left: 10%;
@@ -318,9 +370,26 @@ export default defineComponent({
             }
           }
           .set {
+            align-items: center;
             vertical-align: middle;
             * {
               vertical-align: middle;
+            }
+            .info-style {
+              background-color: #7405ff;
+              color: #fff;
+              border: 1px solid #7405ff;
+              cursor: text;
+              border-radius: 0.1rem;
+              .address {
+                padding: 0.05rem 0.1rem;
+                line-height: 25px;
+                cursor: pointer;
+              }
+              .el-dropdown {
+                padding: 0.05rem 0.07rem 0.05rem 0.05rem;
+                border-left: 1px solid #9f5ff0;
+              }
             }
             .el-button-group > .el-button {
               border-radius: 7px;
@@ -337,6 +406,7 @@ export default defineComponent({
             .el-icon {
               margin: auto;
               cursor: pointer;
+              color: #fff;
               svg {
                 width: 1em;
                 cursor: pointer;
@@ -350,7 +420,7 @@ export default defineComponent({
               img {
                 width: 23px;
                 height: 23px;
-                margin: 0 5px 0 0;
+                margin: 0 0 0 5px;
                 cursor: pointer;
                 background-color: #fff;
                 border: 1px solid #b9b9b9;
@@ -411,11 +481,243 @@ export default defineComponent({
     }
   }
 }
-
+:deep(.el-overlay-dialog) {
+  display: flex;
+  align-items: center;
+  .wrongNet {
+    margin: auto !important;
+    box-shadow: 0 0 13px rgba(128, 128, 128, 0.8);
+    border-radius: 0.2rem;
+    text-align: left;
+    .el-dialog__header {
+      padding: 0.2rem 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #dfdfdf;
+      color: #000;
+      font-size: 0.2rem;
+      font-weight: 500;
+      line-height: 1;
+      text-transform: capitalize;
+      @media screen and (max-width: 479px) {
+        padding: 0.3rem 0.2rem;
+      }
+      .el-dialog__headerbtn {
+        position: relative;
+        top: auto;
+        right: auto;
+        font-size: inherit;
+        i {
+          font-size: inherit;
+          * {
+            cursor: pointer;
+          }
+          &:hover {
+            color: #7405ff;
+          }
+        }
+      }
+      .el-dialog__title {
+        font-size: inherit;
+      }
+    }
+    .el-dialog__body {
+      position: relative;
+      padding: 0.3rem 0.4rem 0.4rem;
+      font-size: 0.16rem;
+      @media screen and (max-width: 540px) {
+        padding: 0.2rem;
+      }
+      label {
+        word-break: break-word;
+        line-height: 1;
+        color: #666;
+        font-size: inherit;
+      }
+      .address {
+        background: rgba(233, 233, 233, 1);
+        padding: 8px;
+        margin: 10px 0 22px;
+        border-radius: 8px;
+        font-size: inherit;
+      }
+      .address_email {
+        margin: 0 0 10px;
+        .address_body {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 10px 0 0;
+          .address {
+            width: 80%;
+            margin: 0;
+          }
+          .address_right {
+            position: relative;
+            display: inline-block;
+            padding: 0.05rem 0.2rem 0.05rem 0.32rem;
+            margin: 0 5px;
+            background-color: rgba(85, 128, 233, 0.15);
+            font-size: 14px;
+            border-radius: 0.5rem;
+            white-space: nowrap;
+            @media screen and (max-width: 1600px) {
+              font-size: 13px;
+            }
+            @media screen and (max-width: 600px) {
+              font-size: 12px;
+            }
+            &::before {
+              position: absolute;
+              left: 0.16rem;
+              top: 50%;
+              content: "";
+              width: 0.08rem;
+              height: 0.08rem;
+              margin-top: -0.04rem;
+              background-color: #606266;
+              border-radius: 0.5rem;
+            }
+          }
+          .bg-primary {
+            &::before {
+              background-color: #4d73ff;
+            }
+          }
+        }
+        .share {
+          .el-button {
+            width: 100%;
+            margin: 3px 0 0;
+            font-size: 13px;
+            @media screen and (min-width: 1800px) {
+              font-size: 14px;
+            }
+            @media screen and (max-width: 600px) {
+              font-size: 12px;
+            }
+          }
+        }
+        .el-loading-mask {
+          .el-loading-spinner {
+            top: 50%;
+          }
+        }
+      }
+      .share {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        font-size: inherit;
+        .el-button {
+          justify-content: flex-start;
+          min-width: 50%;
+          padding: 0;
+          margin: 8px 0 0;
+          background: transparent !important;
+          border: 0;
+          color: #7405ff;
+          font-size: inherit;
+          font-weight: normal;
+          font-family: inherit;
+          opacity: 0.8;
+          span {
+            display: flex;
+            align-items: center;
+            svg {
+              width: 15px;
+              height: 15px;
+              margin: 0 3px 0 0;
+            }
+            .icon_big {
+              width: 13px;
+              height: 13px;
+            }
+          }
+          &:hover {
+            background: transparent;
+            opacity: 1;
+          }
+        }
+      }
+      .loadStyle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2000;
+        background: rgba(255, 255, 255, 1);
+        border-radius: 0.2rem;
+      }
+      .apiTipCont {
+        p {
+          display: flex;
+          align-items: center;
+          text-indent: 0.1rem;
+          margin: 0.1rem;
+          color: #7e7e7e;
+          font-size: 0.18rem;
+          .el-icon-document-copy {
+            display: block;
+            font-size: 17px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+}
 @media screen and (max-width: 1024px) {
 }
 </style>
 <style lang="scss">
+.menu-style {
+  border-radius: 0.1rem;
+  border-top-right-radius: 0.05rem;
+  .el-dropdown-menu {
+    border-radius: 0.1rem;
+    border-top-right-radius: 0.05rem;
+    .el-dropdown-menu__item {
+      min-width: 170px;
+      padding: 0 12px;
+      &:hover,
+      &:focus {
+        background-color: #fbfbfc;
+        color: #000;
+        // background-color: rgba(116, 5, 255, 0.1);
+        // color: rgba(116, 5, 255, 1);
+        .link {
+          text-decoration: underline;
+        }
+      }
+      .link {
+        padding: 5px 0;
+        cursor: pointer;
+      }
+      .profile {
+        width: 100%;
+        padding: 5px 0 8px;
+        margin: 0 0 5px;
+        border-bottom: 1px solid #e7e7e7;
+        cursor: pointer;
+        .tit {
+          font-size: 12px;
+          color: #989898;
+        }
+        .flex-row {
+          img {
+            margin-right: 7px;
+            border-radius: 100%;
+          }
+          .link {
+            padding: 0;
+          }
+        }
+      }
+    }
+  }
+}
 .loginImg {
   cursor: pointer;
 }

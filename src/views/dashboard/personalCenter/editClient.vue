@@ -8,7 +8,7 @@
         <div class="token_list flex-row">
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="Profile" name="profile">
-              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
                 <el-form-item prop="name">
                   <label class="label" for="dataname">
                     Username
@@ -48,7 +48,7 @@
               </el-form>
             </el-tab-pane>
             <el-tab-pane label="Password" name="password">
-              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
                 <el-form-item prop="name">
                   <label class="label" for="password">
                     Current Password

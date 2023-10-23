@@ -1,11 +1,11 @@
 <template>
   <section id="access_token" v-loading="listLoad">
     <div class="list">
-      <div class="title">API Tokens</div>
+      <div class="title flex-row">API Tokens</div>
     </div>
 
     <div class="token_list flex-row">
-      <div class="title"></div>
+      <div class="title flex-row"></div>
       <div class="desc">Unlike user
         <a @click="settingDetail('tokens')">access tokens</a>, an Organization API token can only be used to provide read access to repos, or for billing access to a compute resource.</div>
       <div class="card" v-if="tokenData.token">

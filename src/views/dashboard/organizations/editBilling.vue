@@ -3,12 +3,12 @@
     <el-row>
       <el-col :span="24">
         <div class="list">
-          <div class="title">Billing</div>
+          <div class="title flex-row">Billing</div>
         </div>
         <div class="token_list flex-row">
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="Overview" name="overview">
-              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
                 <el-form-item prop="email">
                   <label class="label" for="dataname">
                     Email
@@ -28,7 +28,7 @@
               </el-form>
             </el-tab-pane>
             <el-tab-pane label="Payment information" name="payment_information">
-              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
                 <el-form-item prop="email">
                   <label class="label" for="dataname">
                     Email

@@ -18,7 +18,10 @@
                 <CopyDocument />
               </el-icon>
             </div>
-            <!-- <el-button type="" text bg @click="editProfile">Settings</el-button> -->
+            <div class="flex-row">
+              <el-button type="" text bg @click="editProfile('profile')">Edit profile</el-button>
+              <el-button type="" text bg @click="editProfile('account')">Settings</el-button>
+            </div>
           </div>
           <div class="personal">
             <div class="top_text flex-row">
@@ -440,9 +443,8 @@ export default defineComponent({
       else if (type === 'model') router.push({ name: 'modelsDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
       else if (type === 'licenses') if (row.cid && row.cid !== 'undefined' && store.state.gateway) window.open(`${store.state.gateway}/ipfs/${row.cid}`)
     }
-    function editProfile (row, index) {
-      // console.log(row, index)
-      router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
+    function editProfile (row) {
+      router.push({ name: 'personalCenterProfile', params: { menu: row } })
     }
     const handleCommand = (command) => {
       // console.log(`click on item ${command}`)
@@ -529,7 +531,7 @@ export default defineComponent({
 #dataset {
   position: relative;
   background: linear-gradient(90deg, #fbfbfc, #fff, #fff, #fff);
-  color: #333;
+  color: #000;
   font-size: 18px;
   border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
@@ -638,7 +640,7 @@ export default defineComponent({
           margin: 0.2rem 0 0.45rem;
           .title {
             font-family: "Helvetica-Bold";
-            font-size: 0.28rem;
+            font-size: 0.22rem;
             font-weight: bold;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -649,16 +651,19 @@ export default defineComponent({
           }
           .desc {
             flex-wrap: wrap;
-            margin: 0.05rem 0 0.1rem;
+            margin: 0.1rem 0 0.2rem;
             font-size: 15px;
             @media screen and (min-width: 1800px) {
-              font-size: 17px;
+              font-size: 16px;
             }
-            @media screen and (max-width: 1440px) {
+            @media screen and (max-width: 1680px) {
               font-size: 14px;
             }
-            @media screen and (max-width: 768px) {
+            @media screen and (max-width: 992px) {
               font-size: 13px;
+            }
+            @media screen and (max-width: 540px) {
+              font-size: 12px;
             }
             .el-icon {
               margin: 0 0 0 0.05rem;
@@ -674,24 +679,25 @@ export default defineComponent({
             }
           }
           .el-button {
-            width: 200px;
             max-width: 100%;
-            padding: 0.15rem 0.2rem;
-            background: lighten($color: #f0f0f0, $amount: 0);
-            border-radius: 0.07rem;
-            color: #606060;
+            padding: 0.1rem 0.12rem;
+            background: linear-gradient(180deg, #fefefe, #f0f0f0);
             font-family: inherit;
+            border-color: #e1e1e1;
+            border-radius: 0.09rem;
+            color: #606060;
+            text-decoration: none;
             &:hover {
-              opacity: 0.95;
+              box-shadow: inset 0 0 0.1rem rgba(0, 0, 0, 0.05);
             }
           }
           .top_text {
             margin: 0 0 0.1rem;
             font-family: "Helvetica-Bold";
-            font-size: 0.18rem;
+            font-size: 0.17rem;
             font-weight: bold;
             @media screen and (min-width: 1800px) {
-              font-size: 0.2rem;
+              font-size: 0.18rem;
             }
             .icon {
               display: block;
@@ -807,8 +813,8 @@ export default defineComponent({
           }
           .icon {
             display: block;
-            width: 0.25rem;
-            height: 0.25rem;
+            width: 0.2rem;
+            height: 0.2rem;
           }
           .icon_cont {
             background: url(../../../assets/images/icons/icon_17.png) no-repeat
@@ -823,7 +829,7 @@ export default defineComponent({
             cursor: pointer;
           }
           .l {
-            margin: 0 0.18rem;
+            margin: 0 0.1rem;
           }
         }
         .el-select {
@@ -961,12 +967,12 @@ export default defineComponent({
         .title {
           justify-content: flex-start;
           padding: 0;
-          font-size: 0.195rem;
+          font-size: 0.18rem;
           color: #000;
           border-radius: 0.08rem;
           .icon {
-            width: 0.23rem;
-            height: 0.23rem;
+            width: 0.2rem;
+            height: 0.2rem;
             margin: -1px 0.07rem 0 0;
           }
           .icon_myProfile {
@@ -1274,7 +1280,7 @@ export default defineComponent({
         min-height: 80px;
         flex-wrap: wrap;
         .el-col {
-          margin: 0.16rem 0;
+          margin: 0;
           .box-card {
             background-color: #fff;
             box-shadow: none;

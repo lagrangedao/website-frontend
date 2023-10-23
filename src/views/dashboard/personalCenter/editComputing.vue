@@ -3,7 +3,7 @@
     <el-row>
       <el-col :span="24" v-if="!settingShow">
         <div class="list">
-          <div class="title">Computing Provider</div>
+          <div class="title flex-row">Computing Provider</div>
         </div>
         <div class="token_list flex-row" v-if="false">
           <div class="title flex-row">Computing Provider</div>
@@ -67,12 +67,12 @@
       </el-col>
       <el-col :span="24" v-else>
         <div class="list">
-          <div class="title">
+          <div class="title flex-row">
             Setting
           </div>
         </div>
 
-        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
           <el-form-item prop="name">
             <label class="label" for="dataname">
               Username

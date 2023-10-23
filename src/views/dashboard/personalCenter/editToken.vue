@@ -1,16 +1,16 @@
 <template>
   <section id="access_token" v-loading="listLoad">
     <div class="list">
-      <div class="title">Access Tokens</div>
+      <div class="title flex-row">Access Tokens</div>
     </div>
 
     <div class="token_list flex-row">
-      <div class="title">User Access Tokens</div>
+      <div class="title flex-row">User Access Tokens</div>
       <div class="desc">Access tokens programmatically authenticate your identity to the Lagrange DAO, allowing applications to perform specific actions specified by the scope of permissions (read, write, or admin) granted. Visit the documentation to discover
         how to use them.</div>
       <el-button size="large" class="token_button" @click="createToken">New token</el-button>
 
-      <div class="title">Organizations API Tokens </div>
+      <div class="title flex-row">Organizations API Tokens </div>
       <div class="desc">Unlike user access tokens, an Organization API token can only be used to provide read access to repos, or for billing access to a compute resource.</div>
       <div class="card" v-if="tokenData.token">
         <div class="card_header flex-row">

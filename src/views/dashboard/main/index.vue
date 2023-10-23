@@ -164,6 +164,10 @@ export default defineComponent({
       if (likesRes) spaceLikesData.value = likesRes.spaces || []
       listLoad.value = false
     }
+    function detailFun (row, index) {
+      // console.log(row, index)
+      router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'app' } })
+    }
     onMounted(() => init())
     return {
       lagLogin,
@@ -175,7 +179,8 @@ export default defineComponent({
       footData,
       system,
       route,
-      router
+      router,
+      detailFun
     }
   }
 })

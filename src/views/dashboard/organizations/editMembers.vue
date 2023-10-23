@@ -1,7 +1,7 @@
 <template>
   <section class="profile_body" v-loading="loading" :element-loading-text="loadingText">
     <div class="list">
-      <div class="title">
+      <div class="title flex-row">
         Members
       </div>
     </div>
@@ -15,7 +15,7 @@
           <el-checkbox-group v-model="radioLink">
             <el-checkbox :label="0">
               <div class="radio_left">
-                <div class="title">Enable inviting users by sharing a link</div>
+                <div class="title flex-row">Enable inviting users by sharing a link</div>
                 <div class="tipText">
                   Anyone with the link will be able to join your org - Toggling off and on will regenerate the link.
                 </div>
@@ -24,7 +24,7 @@
             </el-checkbox>
             <el-checkbox :label="1">
               <div class="radio_left">
-                <div class="title">Allow requests to join from the organization page</div>
+                <div class="title flex-row">Allow requests to join from the organization page</div>
                 <div class="tipText">
                   A button will be visible on your org page allowing anyone to request to join.
                 </div>
@@ -32,7 +32,7 @@
             </el-checkbox>
             <el-checkbox :label="2" class="margin">
               <div class="radio_left">
-                <div class="title">Automatically approve join requests</div>
+                <div class="title flex-row">Automatically approve join requests</div>
                 <div class="tipText">
                   For open organizations: anyone will be able to join your org without any approval.
                 </div>
@@ -41,7 +41,7 @@
           </el-checkbox-group>
         </div>
         <div class="card_body">
-          <div class="title">Default role for new members </div>
+          <div class="title flex-row">Default role for new members </div>
           <el-select v-model="ruleForm.type" placeholder=" " :suffix-icon="CaretTop">
             <el-option v-for="item in ruleForm.typeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>

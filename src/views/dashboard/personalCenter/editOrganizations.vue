@@ -1,7 +1,7 @@
 <template>
   <section id="access_token" v-loading="listLoad">
     <div class="list">
-      <div class="title">Organizations Settings</div>
+      <div class="title flex-row">Organizations Settings</div>
     </div>
 
     <div class="token_list flex-row">
