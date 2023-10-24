@@ -99,16 +99,7 @@ export default defineComponent({
         desc: 'Description: Free users can enjoy up to 25 requests/s.'
       }
     ])
-    const chainsData = ref([
-      {
-        icon: require("@/assets/images/icons/rpc-01.png"),
-        chain: 'Ethereum Mainnet',
-        chain_id: 1,
-        net: '',
-        currency: "ETH",
-        url: 'ethereum.rpc.thirdweb.com'
-      },
-    ])
+    const chainsData = ref([])
     const small = ref(false)
     const background = ref(false)
     const dataShow = ref(false)
@@ -153,6 +144,7 @@ export default defineComponent({
       init()
     }
     async function clear () {
+      chainsData.value = []
       searchValue.value = ''
       pagin.pageNo = 1
       pagin.total = 0
