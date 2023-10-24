@@ -1,7 +1,7 @@
 <template>
   <div class="dataAdd-pop">
     <el-dialog v-model="dataAddShow" title="Add Custom Network" :close-on-click-modal="false" :show-close="true" custom-class="doi_body" @close="beforeClose">
-      <div>
+      <div v-loading="addLoad">
         <el-form ref="dataAddRef" class="flex-row" :model="dataAddForm" label-position="top" :rules="rulesData" status-icon>
           <el-form-item prop="name" label="Network name *">
             <div class="flex-row">
@@ -31,7 +31,7 @@
               </el-radio-group>
             </div>
           </el-form-item>
-          <el-form-item prop="icon" label="Icon" class="item-half">
+          <el-form-item prop="icon" label="Icon *" class="item-half">
             <div class="flex-row">
               <el-upload action="customize" v-model:file-list="fileList" :http-request="uploadFileRequest" :on-change="handlePictureCardChange" :on-remove="handleRemove" list-type="picture-card" :auto-upload="false">
                 <el-button>Upload Icon</el-button>
@@ -62,8 +62,8 @@
         </el-form>
       </div>
       <template #footer>
-        <span class="dialog-footer flex-row" v-loading="addLoad">
-          <el-button @click="submitAdd('dataAddRef')">
+        <span class="dialog-footer flex-row">
+          <el-button @click="submitAdd('dataAddRef')" :disabled="addLoad">
             Add Network
           </el-button>
         </span>
@@ -87,6 +87,7 @@ export default defineComponent({
   setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => store.state.metaAddress)
+    const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -103,6 +104,13 @@ export default defineComponent({
       icon: '',
       rpc: ''
     })
+    const validateUrl = (rule, value, callback) => {
+      if (!IsURL(value)) {
+        callback(new Error("Incorrect format"));
+      } else {
+        callback();
+      }
+    }
     const rulesData = reactive({
       name: [
         { required: true, message: ' ', trigger: 'blur' }
@@ -117,7 +125,8 @@ export default defineComponent({
         { required: true, message: ' ', trigger: 'blur' }
       ],
       rpc: [
-        { required: true, message: ' ', trigger: 'blur' }
+        { required: true, message: ' ', trigger: 'blur' },
+        // { validator: validateUrl, trigger: "blur" }
       ]
     })
     const disabled = ref(false)
@@ -132,17 +141,30 @@ export default defineComponent({
       })
       const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}files`, 'post', fd)
       if (uploadRes && String(uploadRes.code) === '0') {
-        const url = uploadRes.url || ''
+        const url = uploadRes.data.url || ''
         return url
       } else if (uploadRes.msg) system.$commonFun.messageTip('error', uploadRes.msg)
       return ''
     }
     async function submitAdd (formEl) {
+      if (!lagLogin.value) {
+        router.push({ path: '/personal_center' })
+        store.dispatch('setNavLogin', true)
+        return
+      }
       if (!formEl) return
       await dataAddRef.value.validate(async (valid, fields) => {
         if (valid) {
+          if (fileList.value.length === 0) {
+            system.$commonFun.messageTip('error', 'Icon cannot be empty')
+            return
+          }
           addLoad.value = true
-          const fileIcon = fileList.value.length > 0 ? await uploadFun() : ''
+          const fileIcon = await uploadFun()
+          if (!fileIcon) {
+            addLoad.value = false
+            return
+          }
           const params = {
             "name": dataAddForm.name,
             "chain": dataAddForm.ethereum,
@@ -168,13 +190,27 @@ export default defineComponent({
       fileList.value = []
     }
     async function uploadFileRequest (params) {
-      console.log('params', params)
+      // console.log('params', params)
     }
     async function handlePictureCardChange (uploadFile) {
       fileList.value = [].concat(uploadFile)
     }
     function beforeClose () {
       context.emit('handleChange', false)
+    }
+    function IsURL (str_url) {
+      var strRegex = '^((https|http|ftp|rtsp|mms)?://)'
+        + '?(([0-9a-z_!~*\'().&=+$%-]+: )?[0-9a-z_!~*\'().&=+$%-]+@)?'
+        + '(([0-9]{1,3}.){3}[0-9]{1,3}'
+        + '|'
+        + '([0-9a-z_!~*\'()-]+.)*'
+        + '([0-9a-z][0-9a-z-]{0,61})?[0-9a-z].'
+        + '[a-z]{2,6})'
+        + '(:[0-9]{1,4})?'
+        + '((/?)|'
+        + '(/[0-9a-zA-Z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
+      var re = new RegExp(strRegex);
+      return re.test(str_url);
     }
     onMounted(() => { })
     return {

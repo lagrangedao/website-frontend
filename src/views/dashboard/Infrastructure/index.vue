@@ -6,7 +6,7 @@
           <div class="title flex-row">
             <h2>RPC</h2>
             <div class="top_input flex-row">
-              <el-input v-model="searchValue" clearable @input="searchChange()" class="search_name w-50 m-2" placeholder="Chain name or chain id" />
+              <el-input v-model="searchValue" clearable @change="searchChange()" class="search_name w-50 m-2" placeholder="Chain name or chain id" />
             </div>
           </div>
           <p>This list show all your configured chains and all the RPC endpoints that thirdweb supports.</p>
@@ -18,9 +18,9 @@
       </div>
     </header>
     <el-row class="rpc-body" justify="space-between">
-      <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18" class="rpc-left">
-        <el-row class="rpc-list" :gutter="32">
-          <el-col v-loading="rpcLoad" :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="chain in chainsData" :key="chain">
+      <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18" class="rpc-left" v-loading="rpcLoad">
+        <el-row class="rpc-list" :gutter="32" v-if="chainsData.length > 0">
+          <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="chain in chainsData" :key="chain">
             <el-card class="box-card">
               <div class="grid-content">
                 <div class="flex-row head">
@@ -47,8 +47,11 @@
             </el-card>
           </el-col>
         </el-row>
+        <el-empty :image-size="200" v-else />
+        <el-pagination hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        />
       </el-col>
-      <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="rpc-right">
+      <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" class="rpc-right">
         <div class="content" v-for="d in describeData" :key="d">
           <div class="title">{{d.title}}</div>
           <div class="sub_title color">{{d.subTitle}}</div>
@@ -106,6 +109,8 @@ export default defineComponent({
         url: 'ethereum.rpc.thirdweb.com'
       },
     ])
+    const small = ref(false)
+    const background = ref(false)
     const dataShow = ref(false)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -122,13 +127,13 @@ export default defineComponent({
       }
       const rpcRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}chains?${qs.stringify(params)}`, 'get')
       if (rpcRes && String(rpcRes.code) === '0') {
-        chainsData.value = rpcRes.list || []
-        pagin.total = rpcRes.total || 0
+        chainsData.value = rpcRes.data.list || []
+        pagin.total = rpcRes.data.total || 0
       } else if (rpcRes.msg) system.$commonFun.messageTip('error', rpcRes.msg)
       rpcLoad.value = false
     }
     async function addData (params) {
-
+      clear()
       dataShow.value = false
       init()
     }
@@ -141,11 +146,27 @@ export default defineComponent({
         addData()
       } else dataShow.value = val
     }
-    onActivated(() => init())
+    function handleSizeChange (val) { }
+    async function handleCurrentChange (currentPage) {
+      // console.log('handleCurrentChange:', currentPage)
+      pagin.pageNo = currentPage
+      init()
+    }
+    async function clear () {
+      searchValue.value = ''
+      pagin.pageNo = 1
+      pagin.total = 0
+    }
+    onActivated(() => {
+      clear()
+      init()
+    })
     return {
       metaAddress,
       rpcLoad,
       pagin,
+      small,
+      background,
       searchValue,
       describeData,
       chainsData,
@@ -153,7 +174,7 @@ export default defineComponent({
       system,
       route,
       router,
-      searchChange, handleChange
+      searchChange, handleChange, handleSizeChange, handleCurrentChange
     }
   }
 })
@@ -304,6 +325,9 @@ export default defineComponent({
     .rpc-left {
       position: relative;
       padding: 0.4rem 0.3rem 0.4rem 0;
+      @media screen and (max-width: 992px) {
+        padding: 0.4rem 0 0.1rem;
+      }
       &::before {
         position: absolute;
         content: "";
@@ -361,7 +385,7 @@ export default defineComponent({
                       width: calc(100% - 0.12rem - 16px);
                       overflow: hidden;
                       text-overflow: ellipsis;
-                      white-space: normal;
+                      white-space: nowrap;
                       -webkit-line-clamp: 1;
                     }
                     .icon {
@@ -383,6 +407,19 @@ export default defineComponent({
                   }
                 }
               }
+            }
+          }
+        }
+      }
+      .el-pagination {
+        margin: 0.1rem auto;
+        display: flex;
+        justify-content: center;
+        .btn-prev {
+          i {
+            font-size: 14px;
+            @media screen and (min-width: 1800px) {
+              font-size: 16px;
             }
           }
         }
@@ -475,6 +512,15 @@ export default defineComponent({
           font-weight: 500;
           &.item-half {
             width: 48%;
+          }
+          &.is-error {
+            .el-form-item__content {
+              .el-input {
+                .el-input__inner {
+                  border-color: #f56c6c;
+                }
+              }
+            }
           }
           .el-form-item__label {
             margin: 0 0 0.1rem;
