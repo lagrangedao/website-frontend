@@ -47,7 +47,7 @@
               </div>
             </div>
           </el-menu-item>
-          <el-sub-menu index="personal" class="setting-style">
+          <el-sub-menu index="personal" class="setting-style" v-if="lagLogin">
             <template #title>
               <div class="flex-row">
                 <el-icon>
