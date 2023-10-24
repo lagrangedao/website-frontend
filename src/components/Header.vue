@@ -10,7 +10,7 @@
         <!-- <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." /> -->
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="20" :xl="20" class="header_right flex-row">
-        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+        <el-menu :default-active="activeIndex" class="el-menu-demo" menu-trigger="click" mode="horizontal" @select="handleSelect">
           <el-menu-item index="dataset">
             <i class="icon-style icon_datasets"></i>
             Datasets
@@ -38,48 +38,46 @@
             &nbsp;
             <span class="loginBtn">Log In</span>
           </el-menu-item>
-          <el-menu-item index="8" v-else>
+          <el-menu-item index="8" class="address-style" v-else>
             <div class="set flex-row">
               <div class="info-style flex-row">
                 <div class="address" @click="wrongVisible = true">
                   {{system.$commonFun.hiddAddress(metaAddress)}}
                 </div>
-                <el-dropdown @command="handleSelect" trigger="click" placement="bottom-end" popper-class="menu-style">
-                  <span class="el-dropdown-link loginImg flex-row">
-                    <el-icon>
-                      <Setting />
-                    </el-icon>
-                  </span>
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item command="personal_center">
-                        <div class="profile">
-                          <div class="tit">Profile</div>
-                          <div class="flex-row">
-                            <img :src="accessAvatar||people_img" width="15" height="15" alt="">
-                            <span class="link">{{accessName}}</span>
-                          </div>
-                        </div>
-                      </el-dropdown-item>
-                      <el-dropdown-item command="create_dataset">
-                        <span class="link">+ New Dataset</span>
-                      </el-dropdown-item>
-                      <el-dropdown-item command="create_space">
-                        <span class="link">+ New Space</span>
-                      </el-dropdown-item>
-                      <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
-                      <el-dropdown-item command="settings">
-                        <span class="link">Settings</span>
-                      </el-dropdown-item>
-                      <el-dropdown-item command="sign_out">
-                        <span class="link">Sign Out</span>
-                      </el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
               </div>
             </div>
           </el-menu-item>
+          <el-sub-menu index="personal" class="setting-style">
+            <template #title>
+              <div class="flex-row">
+                <el-icon>
+                  <Setting />
+                </el-icon>
+              </div>
+            </template>
+            <el-menu-item index="personal_center">
+              <div class="profile">
+                <div class="tit">Profile</div>
+                <div class="flex-row">
+                  <img :src="accessAvatar||people_img" width="15" height="15" alt="">
+                  <span class="link">{{accessName}}</span>
+                </div>
+              </div>
+            </el-menu-item>
+            <el-menu-item index="create_dataset">
+              <span class="link">+ New Dataset</span>
+            </el-menu-item>
+            <el-menu-item index="create_space">
+              <span class="link">+ New Space</span>
+            </el-menu-item>
+            <!--<el-menu-item index="create_organizations"> Create Organizations</el-menu-item> -->
+            <el-menu-item index="settings">
+              <span class="link">Settings</span>
+            </el-menu-item>
+            <el-menu-item index="sign_out">
+              <span class="link">Sign Out</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-col>
     </el-row>
@@ -304,11 +302,37 @@ export default defineComponent({
           width: 90%;
           margin-left: 10%;
         }
-        .el-menu-item {
+        .el-menu-item,
+        .el-sub-menu {
           padding: 0 0.15rem;
           background-color: transparent !important;
           border: 0 !important;
           color: #000;
+          &.address-style {
+            padding-right: 0;
+          }
+          &.setting-style {
+            height: 25px;
+            padding: 5px 1px 5px 5px;
+            background-color: #7405ff !important;
+            border: 1px solid #7405ff !important;
+            border-left-color: #9f5ff0 !important;
+            cursor: text;
+            border-top-right-radius: 0.1rem;
+            border-bottom-right-radius: 0.1rem;
+            i,
+            svg,
+            path {
+              color: #fff;
+              cursor: pointer;
+            }
+            .el-sub-menu__icon-arrow {
+              display: none;
+            }
+            .el-sub-menu__title {
+              padding: 0;
+            }
+          }
           @media screen and (min-width: 1800px) {
             font-size: 15px;
           }
@@ -380,9 +404,10 @@ export default defineComponent({
               color: #fff;
               border: 1px solid #7405ff;
               cursor: text;
-              border-radius: 0.1rem;
+              border-top-left-radius: 0.1rem;
+              border-bottom-left-radius: 0.1rem;
               .address {
-                padding: 0.05rem 0.1rem;
+                padding: 5px 0.1rem;
                 line-height: 25px;
                 cursor: pointer;
               }
@@ -459,9 +484,9 @@ export default defineComponent({
           }
         }
         .el-sub-menu {
-          color: #fff;
+          color: #000;
           .el-sub-menu__title {
-            color: #fff;
+            color: #000;
           }
         }
         .el-sub-menu__title {
@@ -725,49 +750,91 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.el-menu--horizontal .el-menu .el-menu-item,
-.el-menu--horizontal .el-menu .el-sub-menu__title {
-  height: auto;
-  padding: 10px;
-  line-height: 1.2;
-  .set {
-    vertical-align: middle;
-    * {
-      vertical-align: middle;
-    }
-    .el-button-group > .el-button {
-      border-radius: 7px;
-      &:first-child {
-        padding-left: 10px;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-      }
-      &:last-child {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-      }
-    }
-    .el-icon {
-      margin: auto;
-      cursor: pointer;
-      svg {
-        width: 1em;
-        cursor: pointer;
-        path {
-          cursor: pointer;
+.el-popper {
+  border-radius: 0.1rem;
+  .el-menu {
+    border-radius: 0.1rem;
+    .el-menu-item,
+    .el-sub-menu__title,
+    .el-menu-item-group {
+      height: auto;
+      padding: 10px;
+      line-height: 1.2;
+      text-align: left;
+      &:hover,
+      &:focus {
+        background-color: #fbfbfc;
+        color: #000;
+        // background-color: rgba(116, 5, 255, 0.1);
+        // color: rgba(116, 5, 255, 1);
+        .link {
+          text-decoration: underline;
         }
       }
-    }
-    .loginImg {
-      cursor: pointer;
-      img {
-        width: 23px;
-        height: 23px;
-        margin: 0 5px 0 0;
+      .link {
+        padding: 0;
         cursor: pointer;
-        background-color: #fff;
-        border: 1px solid #b9b9b9;
-        border-radius: 50%;
+      }
+      .profile {
+        width: 100%;
+        padding: 0 0 8px;
+        border-bottom: 1px solid #e7e7e7;
+        cursor: pointer;
+        * {
+          cursor: pointer;
+        }
+        .tit {
+          font-size: 12px;
+          color: #989898;
+          line-height: 1.5;
+        }
+        .flex-row {
+          img {
+            margin-right: 7px;
+            border-radius: 100%;
+          }
+        }
+      }
+      .set {
+        vertical-align: middle;
+        * {
+          vertical-align: middle;
+        }
+        .el-button-group > .el-button {
+          border-radius: 7px;
+          &:first-child {
+            padding-left: 10px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+          &:last-child {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+          }
+        }
+        .el-icon {
+          margin: auto;
+          cursor: pointer;
+          svg {
+            width: 1em;
+            cursor: pointer;
+            path {
+              cursor: pointer;
+            }
+          }
+        }
+        .loginImg {
+          cursor: pointer;
+          img {
+            width: 23px;
+            height: 23px;
+            margin: 0 5px 0 0;
+            cursor: pointer;
+            background-color: #fff;
+            border: 1px solid #b9b9b9;
+            border-radius: 50%;
+          }
+        }
       }
     }
   }

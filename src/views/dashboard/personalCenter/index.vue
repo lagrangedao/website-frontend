@@ -59,7 +59,7 @@
             <!-- <h3>Hello {{info.address}}, <br />Welcome to Filecoin TestNet! </h3> -->
           </div>
           <div class="top_text flex-row">
-            <el-input v-model="searchValue" class="w-50 m-2" placeholder="search ..." />
+            <el-input v-model="searchValue" class="w-50 m-2" placeholder="Search ..." />
             <el-badge v-if="listdata.outgoing_pending_license_requests.length === 0" class="item l el-dropdown-link">
               <i class="icon icon_cont"></i>
             </el-badge>
