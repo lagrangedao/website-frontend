@@ -33,7 +33,7 @@
       </div>
       <footer>
         <el-row class="row-bg" justify="space-between">
-          <el-col :xs="24" :sm="12" :md="6" :lg="6" :xl="6" v-for="foot in footData" :key="foot">
+          <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" v-for="foot in footData" :key="foot">
             <div class="content">
               <div class="tit">{{foot.menu}}</div>
               <ul>
@@ -216,15 +216,21 @@ export default defineComponent({
       background-size: auto 100%;
       flex-wrap: wrap;
       border-radius: 0.25rem;
+      @media screen and (max-width: 992px) {
+        padding: 0.6rem 0.16rem 0.96rem;
+      }
+      @media screen and (max-width: 600px) {
+        padding: 0.6rem 0.16rem;
+        background-size: 0;
+      }
       .left {
         width: 50%;
         padding: 0.15rem 5% 0 0;
         color: #fff;
         line-height: 1.2;
         @media screen and (max-width: 992px) {
-          width: 90%;
-          padding: 0.5rem 0;
-          text-align: center;
+          width: 100%;
+          padding: 0;
         }
         h1 {
           padding: 0 0 0.4rem;
@@ -233,6 +239,9 @@ export default defineComponent({
           text-transform: capitalize;
           @media screen and (max-width: 768px) {
             font-size: 22px;
+          }
+          @media screen and (max-width: 540px) {
+            padding: 0 0 0.2rem;
           }
         }
         h3 {
@@ -311,9 +320,14 @@ export default defineComponent({
       }
       .list_body {
         padding: 0.56rem 0 0;
+        @media screen and (max-width: 600px) {
+          padding: 0.4rem 0 0;
+        }
         .el-col {
           margin: 0.16rem 0 0;
           .box-card {
+            max-width: 350px;
+            margin: auto;
             background-color: #fff;
             box-shadow: none;
             border: 0;
@@ -323,8 +337,8 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: center;
-              height: 0.68rem;
-              padding: 0.16rem;
+              min-height: 0.68rem;
+              padding: 0.4rem 0.16rem;
               border: 0;
               border-radius: 0.1rem;
               font-size: 0.16rem;
@@ -393,12 +407,15 @@ export default defineComponent({
                 line-height: 1.5;
                 word-break: break-word;
                 @media screen and (max-width: 1440px) {
-                  font-size: 0.25rem;
+                  font-size: 16px;
+                }
+                @media screen and (max-width: 768px) {
+                  font-size: 14px;
                 }
               }
             }
             .el-card__body {
-              padding: 0.1rem 0;
+              padding: 0;
               cursor: pointer;
               .text {
                 justify-content: space-between;
@@ -631,11 +648,12 @@ export default defineComponent({
     footer {
       width: 100%;
       min-height: 0.5rem;
-      padding-top: 0.4rem;
+      padding-top: 0.2rem;
       padding-bottom: 1rem;
       border-top: 1px solid rgba(229, 231, 235, 0.7);
       .el-row {
         .el-col {
+          padding-top: 0.2rem;
           line-height: 1.5;
           .tit {
             padding: 0 0 0.08rem;
