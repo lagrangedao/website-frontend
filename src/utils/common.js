@@ -395,6 +395,12 @@ function goLink(link) {
   window.open(link)
 }
 
+function strToHexCharCode(str) {
+  if (str === "") return "";
+  const code = Number(str)
+  return `0x${code.toString(16)}`
+}
+
 function cmOptions(owner) {
   return {
     mode: 'text/x-markdown', // Language mode
@@ -450,6 +456,7 @@ export default {
   calculateDiffTime,
   sizeChange,
   goLink,
+  strToHexCharCode,
   cmOptions,
   expireTimeFun,
   gatewayGain
