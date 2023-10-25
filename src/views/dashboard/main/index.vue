@@ -90,7 +90,7 @@ export default defineComponent({
           {
             name: 'About',
             path: '',
-            link: ''
+            link: 'https://www.swanchain.io/product/lagrange_web'
           },
           {
             name: 'Terms of service',
@@ -110,7 +110,7 @@ export default defineComponent({
           {
             name: 'Learn',
             path: '',
-            link: ''
+            link: 'https://docs.lagrangedao.org/lagrange-dao/spaces/create-space'
           },
           {
             name: 'Documentation',
@@ -120,7 +120,7 @@ export default defineComponent({
           {
             name: 'Blog',
             path: '',
-            link: ''
+            link: 'https://swanchain.medium.com/ '
           },
           {
             name: 'Service Status',
@@ -297,7 +297,7 @@ export default defineComponent({
       }
     }
     :deep(.space-list) {
-      padding: 0.8rem 0;
+      padding: 0.8rem 0 0.25rem;
       .tit {
         justify-content: center;
         font-size: 0.2rem;
@@ -319,9 +319,10 @@ export default defineComponent({
         }
       }
       .list_body {
-        padding: 0.56rem 0 0;
+        padding: 0.55rem 0;
+        min-height: 80px;
         @media screen and (max-width: 600px) {
-          padding: 0.4rem 0 0;
+          padding: 0.4rem 0;
         }
         .el-col {
           margin: 0.16rem 0 0;
@@ -651,6 +652,7 @@ export default defineComponent({
       padding-top: 0.2rem;
       padding-bottom: 1rem;
       border-top: 1px solid rgba(229, 231, 235, 0.7);
+      text-align: center;
       .el-row {
         .el-col {
           padding-top: 0.2rem;

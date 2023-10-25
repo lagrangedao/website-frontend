@@ -113,7 +113,7 @@
         </div>
         <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
           <el-col :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
-            <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<2: true">
+            <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<4: true">
               <template #header>
                 <div class="card-warn flex-row" v-if="list.expiration_time !== null && ((list.expireTime <=5&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))">
                   <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime
@@ -133,7 +133,7 @@
             </el-card>
           </el-col>
         </el-row>
-        <div class="more_style flex-row" v-if="listdata.spaces.length>2">
+        <div class="more_style flex-row" v-if="listdata.spaces.length>4">
           <img class=" flex-row" v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img class=" flex-row" v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>
@@ -1291,7 +1291,7 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: center;
-              height: 1.6rem;
+              height: 1.47rem;
               padding: 0;
               border: 0;
               border-radius: 0.1rem;
@@ -1323,10 +1323,10 @@ export default defineComponent({
                 }
                 span {
                   height: 0.25rem;
-                  padding-left: 0.3rem;
+                  padding-left: 25px;
                   background: url(../../../assets/images/icons/icon_9_1.png)
-                    no-repeat left 0px;
-                  background-size: 0.2rem;
+                    no-repeat left 2px;
+                  background-size: 16px;
                   font-size: 12px;
                   color: #fff;
                   line-height: 0.25rem;
@@ -1339,7 +1339,7 @@ export default defineComponent({
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
                 // text-transform: capitalize;
                 cursor: pointer;
-                font-size: 0.2rem;
+                font-size: 0.18rem;
                 letter-spacing: 1px;
                 overflow: hidden;
                 text-overflow: ellipsis;

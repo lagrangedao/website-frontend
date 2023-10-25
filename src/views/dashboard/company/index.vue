@@ -58,6 +58,7 @@ export default defineComponent({
   font-size: 18px;
   text-align: left;
   line-height: 1.8;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
@@ -70,7 +71,7 @@ export default defineComponent({
   }
   :deep(.terms_body) {
     width: 90%;
-    padding: 1rem 5%;
+    padding: 0.7rem 5% 1rem;
     margin: 0 auto;
     box-sizing: border-box;
     word-break: break-word;
