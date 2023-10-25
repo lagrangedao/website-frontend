@@ -267,7 +267,7 @@ export default defineComponent({
     const forkLoad = ref(false)
     const sleepSelect = ref({})
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
-    const tokenAddress = process.env.VUE_APP_LLL_ADDRESS
+    const tokenAddress = process.env.VUE_APP_MUMBAI_USDC_TOKEN
     const tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
     const paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
     const paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
