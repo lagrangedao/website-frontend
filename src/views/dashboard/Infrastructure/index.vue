@@ -54,7 +54,7 @@
       <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" class="rpc-right">
         <div class="content" v-for="d in describeData" :key="d">
           <div class="title">{{d.title}}</div>
-          <div class="sub_title color">{{d.subTitle}}</div>
+          <div :class="{'sub_title color':true, 'u': d.nav}" @click="goToken(d.nav)">{{d.subTitle}}</div>
           <div class="sub_title">{{d.desc}}</div>
         </div>
       </el-col>
@@ -79,6 +79,7 @@ export default defineComponent({
   },
   setup () {
     const store = useStore()
+    const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const metaAddress = computed(() => (store.state.metaAddress))
     const rpcLoad = ref(false)
     const pagin = reactive({
@@ -90,12 +91,14 @@ export default defineComponent({
     const describeData = ref([
       {
         title: 'RPC Usage Guide',
-        subTitle: ' - Generate API key',
-        desc: 'To utilize the RPC service, you first need to generate an API-key.'
+        subTitle: ' - Generate Token',
+        nav: 'tokens',
+        desc: 'To utilize the RPC service, you first need to generate an Token.'
       },
       {
         title: 'Upgrade Account ',
         subTitle: '- Free User Limitations ',
+        nav: '',
         desc: 'Description: Free users can enjoy up to 25 requests/s.'
       }
     ])
@@ -116,7 +119,7 @@ export default defineComponent({
         page_no: page * pagin.pageSize,
         chain: searchValue.value
       }
-      const rpcRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}chains?${qs.stringify(params)}`, 'get')
+      const rpcRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}chains?${qs.stringify(params)}`, 'get')
       if (rpcRes && String(rpcRes.code) === '0') {
         chainsData.value = rpcRes.data.list || []
         pagin.total = rpcRes.data.total || 0
@@ -149,6 +152,14 @@ export default defineComponent({
       pagin.pageNo = 1
       pagin.total = 0
     }
+    async function goToken (nav) {
+      if (!nav) return
+      if (!lagLogin.value) {
+        router.push({ path: '/personal_center' })
+        store.dispatch('setNavLogin', true)
+        return
+      } else router.push({ name: 'personalCenterProfile', params: { menu: nav } })
+    }
     onActivated(() => {
       clear()
       init()
@@ -166,7 +177,7 @@ export default defineComponent({
       system,
       route,
       router,
-      searchChange, handleChange, handleSizeChange, handleCurrentChange
+      searchChange, handleChange, handleSizeChange, handleCurrentChange, goToken
     }
   }
 })
@@ -455,6 +466,12 @@ export default defineComponent({
             font-weight: 500;
             color: #c27af8;
             text-transform: capitalize;
+          }
+          &.u {
+            cursor: pointer;
+            &:hover {
+              text-decoration: underline;
+            }
           }
           @media screen and (max-width: 1600px) {
             font-size: 16px;

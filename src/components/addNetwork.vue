@@ -139,7 +139,7 @@ export default defineComponent({
         let fileNew = new File([file.raw], namepath)
         fd.append('file', fileNew, namepath)
       })
-      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}files`, 'post', fd)
+      const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}files`, 'post', fd)
       if (uploadRes && String(uploadRes.code) === '0') {
         const url = uploadRes.data.url || ''
         return url
@@ -174,7 +174,7 @@ export default defineComponent({
             "url": dataAddForm.rpc,
             "icon": fileIcon
           }
-          const addNetRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}nodes`, 'post', params)
+          const addNetRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}nodes`, 'post', params)
           if (addNetRes && String(addNetRes.code) === '0') {
             context.emit('handleChange', false, true)
             return false
