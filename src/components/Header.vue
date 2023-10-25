@@ -23,6 +23,10 @@
             <i class="icon-style icon_spaces"></i>
             Spaces
           </el-menu-item>
+          <el-menu-item index="Infrastructure">
+            <i class="icon-style icon_Infrastructure"></i>
+            Infrastructure
+          </el-menu-item>
           <el-menu-item index="4">
             <i class="icon-style icon_docs"></i>
             Docs
@@ -85,6 +89,16 @@
     <el-dialog title="Account" v-model="wrongVisible" :append-to-body="false" :width="bodyWidth" custom-class="wrongNet">
       <label>Connected with MetaMask</label>
       <div class="address">{{system.$commonFun.hiddAddress(metaAddress)}}</div>
+      <div class="area flex-row">
+        <div class="fast">
+          <label>Network</label>
+          <div class="address">{{info.network}}</div>
+        </div>
+        <div class="fast">
+          <label>Balance</label>
+          <div class="address">{{info.balance||'-'}} {{info.unit}}</div>
+        </div>
+      </div>
       <div class="share flex-row">
         <el-button @click="system.$commonFun.goLink(`${info.url}${metaAddress}`)">
           <svg t="1669800457857" class="icon icon_big" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6207" width="64" height="64">
@@ -131,7 +145,9 @@ export default defineComponent({
     const activeIndex = ref('')
     const info = reactive({
       network: '',
-      url: ''
+      url: '',
+      balance: '',
+      unit: ''
     })
     const wrongVisible = ref(false)
     const bodyWidth = ref(document.body.clientWidth > 600 ? '450px' : '95%')
@@ -152,6 +168,7 @@ export default defineComponent({
       else if (key === 'dataset') router.push({ path: '/dataset' })
       else if (key === 'models') router.push({ path: '/models' })
       else if (key === 'spaces') router.push({ path: '/spaces' })
+      else if (key === 'Infrastructure') router.push({ path: '/Infrastructure' })
       else if (key === 'create_space') router.push({ path: '/create_space' })
       else if (key === 'create_dataset') router.push({ path: '/create_dataset' })
       else if (key === 'create_organizations') router.push({ path: '/create_organizations' })
@@ -170,18 +187,30 @@ export default defineComponent({
       if (nameMenu.indexOf('dataset') > -1) activeIndex.value = 'dataset'
       else if (nameMenu.indexOf('model') > -1) activeIndex.value = 'models'
       else if (nameMenu.indexOf('space') > -1) activeIndex.value = 'spaces'
+      else if (nameMenu.indexOf('Infrastructure') > -1) activeIndex.value = 'Infrastructure'
       else if (nameMenu.indexOf('pricing') > -1) activeIndex.value = 'pricing'
       else activeIndex.value = nameMenu
 
       const chainId = await system.$commonFun.web3Init.eth.net.getId()
-      const { name, url } = await system.$commonFun.getUnit(chainId)
+      const { unit, name, url } = await system.$commonFun.getUnit(chainId)
       info.network = name || `Chain ID: ${chainId}`
+      info.unit = unit
       info.url = url || ''
     }
     onMounted(() => activeMenu())
     watch(route, (to, from) => {
       activeMenu(to.path)
       window.scrollTo(0, 0)
+    })
+    watch(metaAddress, (to, from) => {
+      if (metaAddress.value) {
+        system.$commonFun.web3Init.eth.getBalance(metaAddress.value).then((balance) => {
+          // console.log(balance)
+          const myBalance = balance
+          const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
+          info.balance = Number(balanceAll).toFixed(4)
+        })
+      }
     })
     return {
       metaAddress,
@@ -367,6 +396,12 @@ export default defineComponent({
               center;
             background-size: 19px;
           }
+          .icon_Infrastructure {
+            margin: 0;
+            background: url(../assets/images/icons/icon_Infrastructure.png)
+              no-repeat left center;
+            background-size: 12px;
+          }
           .icon_docs {
             background: url(../assets/images/icons/icon_4.png) no-repeat left
               center;
@@ -471,6 +506,11 @@ export default defineComponent({
                 left center;
               background-size: 19px;
             }
+            .icon_Infrastructure {
+              background: url(../assets/images/icons/icon_Infrastructure_1.png)
+                no-repeat left center;
+              background-size: 12px;
+            }
             .icon_docs {
               background: url(../assets/images/icons/icon_4_1.png) no-repeat
                 left center;
@@ -563,7 +603,7 @@ export default defineComponent({
       .address {
         background: rgba(233, 233, 233, 1);
         padding: 8px;
-        margin: 10px 0 22px;
+        margin: 10px 0 12px;
         border-radius: 8px;
         font-size: inherit;
       }
@@ -627,6 +667,17 @@ export default defineComponent({
         .el-loading-mask {
           .el-loading-spinner {
             top: 50%;
+          }
+        }
+      }
+      .area {
+        justify-content: space-between;
+        .fast {
+          width: 48%;
+          .address {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
       }
