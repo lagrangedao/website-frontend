@@ -147,11 +147,6 @@ export default defineComponent({
       return ''
     }
     async function submitAdd (formEl) {
-      if (!lagLogin.value) {
-        router.push({ path: '/personal_center' })
-        store.dispatch('setNavLogin', true)
-        return
-      }
       if (!formEl) return
       await dataAddRef.value.validate(async (valid, fields) => {
         if (valid) {

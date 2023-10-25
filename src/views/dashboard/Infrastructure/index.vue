@@ -12,7 +12,7 @@
                     <p>This list show all your configured chains and all the RPC endpoints that thirdweb supports.</p>
                 </div>
                 <div class="top_button">
-                    <div class="add-network flex-row" @click="dataShow = true">
+                    <div class="add-network flex-row" @click="addValidate">
                         <i class="icon icon_setting"></i> Add Network</div>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                         <el-card class="box-card">
                             <div class="grid-content">
                                 <div class="flex-row head">
-                                    <img :src="chain.icon" width="37" height="37" :alt="`${chain.chain}`"> {{chain.chain}}
+                                    <img :src="chain.icon" width="37" height="37" :alt="`${chain.chain}`"> {{chain.chain}} - {{chain.network}}
                                 </div>
                                 <ul class="flex-row">
                                     <li class="wide">
@@ -36,7 +36,7 @@
                                     </li>
                                     <li>
                                         <div class="tit">Chain ID</div>
-                                        <div class="desc">{{chain.chain_id}}</div>
+                                        <div class="desc">{{chain.chain_id}} ({{system.$commonFun.strToHexCharCode(chain.chain_id)}})</div>
                                     </li>
                                     <li>
                                         <div class="tit">Native Token</div>
@@ -154,11 +154,17 @@ export default defineComponent({
         }
         async function goToken (nav) {
             if (!nav) return
-            if (!lagLogin.value) {
-                router.push({ path: '/personal_center' })
-                store.dispatch('setNavLogin', true)
-                return
-            } else router.push({ name: 'personalCenterProfile', params: { menu: nav } })
+            if (!lagLogin.value) loginValidate()
+            else router.push({ name: 'personalCenterProfile', params: { menu: nav } })
+        }
+        async function loginValidate () {
+            router.push({ path: '/personal_center' })
+            store.dispatch('setNavLogin', true)
+            return
+        }
+        async function addValidate () {
+            if (!lagLogin.value) loginValidate()
+            else dataShow.value = true
         }
         onActivated(() => {
             clear()
@@ -177,7 +183,7 @@ export default defineComponent({
             system,
             route,
             router,
-            searchChange, handleChange, handleSizeChange, handleCurrentChange, goToken
+            searchChange, handleChange, handleSizeChange, handleCurrentChange, goToken, addValidate
         }
     }
 })
