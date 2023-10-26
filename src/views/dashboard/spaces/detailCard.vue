@@ -1336,6 +1336,11 @@ export default defineComponent({
     .readme_text {
       font-family: "FIRACODE-LIGHT";
     }
+    .left_light {
+      @media screen and (max-width: 992px) {
+        border-top: 1px solid #f1f1f1;
+      }
+    }
     .right {
       position: relative;
       padding: 0.4rem 0.2rem;

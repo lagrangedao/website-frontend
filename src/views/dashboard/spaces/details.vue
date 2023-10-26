@@ -1034,6 +1034,7 @@ export default defineComponent({
         display: flex;
         align-items: stretch;
         height: 100%;
+        min-height: 35px;
         margin: 0 auto;
         font-size: 14px;
         .el-tabs__nav-scroll,

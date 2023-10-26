@@ -1,7 +1,7 @@
 <template>
   <div class="headerCont">
     <el-row class="headerStyle container-landing flex-row">
-      <el-col :xs="20" :sm="20" :md="20" :lg="4" :xl="4" class="logoImg flex-row">
+      <el-col :xs="14" :sm="12" :md="4" :lg="4" :xl="4" class="logoImg flex-row">
         <div @click="header_logo" class="flex-row">
           <img :src="logo" alt='Lagrange' />
         </div>
@@ -9,8 +9,8 @@
         <div class="net">{{info.network||'-'}}</div> -->
         <!-- <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." /> -->
       </el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="20" :xl="20" class="header_right flex-row">
-        <el-menu :default-active="activeIndex" class="el-menu-demo" menu-trigger="click" mode="horizontal" @select="handleSelect">
+      <el-col :xs="10" :sm="12" :md="20" :lg="20" :xl="20" class="header_right flex-row">
+        <el-menu :default-active="activeIndex" class="el-menu-demo" menu-trigger="click" mode="horizontal" :teleported="true" :ellipsis="true" @select="handleSelect">
           <el-menu-item index="dataset">
             <i class="icon-style icon_datasets"></i>
             Datasets
@@ -322,6 +322,7 @@ export default defineComponent({
       }
     }
     .header_right {
+      flex-wrap: nowrap;
       :deep(.el-menu) {
         width: 100%;
         border: 0;
@@ -524,8 +525,10 @@ export default defineComponent({
           }
         }
         .el-sub-menu {
+          padding: 0;
           color: #000;
           .el-sub-menu__title {
+            padding: 0;
             color: #000;
           }
         }
