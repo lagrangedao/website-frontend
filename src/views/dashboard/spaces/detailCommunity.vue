@@ -1,6 +1,6 @@
 <template>
   <section id="space">
-    <el-row class="space_body container-landing flex-row">
+    <el-row class="space_body flex-row">
       <div class="fileList">
         No Data
       </div>

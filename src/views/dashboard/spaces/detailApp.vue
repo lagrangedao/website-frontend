@@ -1,7 +1,7 @@
 <template>
   <section id="space">
     <div id="spaceBody">
-      <el-row class="space_body container-landing flex-row" v-loading="listLoad">
+      <el-row class="space_body flex-row" v-loading="listLoad">
         <el-tabs class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0">
           <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
             <template #label>
@@ -306,10 +306,11 @@ export default defineComponent({
     }
     .app-tabs {
       position: relative;
-      width: 98%;
-      padding: 0.6rem 0 0;
-      margin: 0.1rem auto 0;
+      width: 100%;
+      padding: 0;
+      margin: 0;
       .app-button {
+        display: none;
         position: absolute;
         top: calc(-0.7rem - 20px);
         left: 0;
@@ -318,12 +319,14 @@ export default defineComponent({
       .el-tabs__header {
         max-width: none !important;
         padding: 0 !important;
+        margin: 0;
       }
 
       .el-tabs__item {
+        height: auto;
         .custom-tabs-label {
+          padding: 0.15rem 0;
           line-height: 1;
-
           i {
             margin: 0 5px 0 0;
             font-size: 16px;
