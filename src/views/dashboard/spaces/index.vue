@@ -266,9 +266,12 @@ export default defineComponent({
         padding-top: 0.4rem;
         padding-bottom: 0.13rem;
         border-bottom: 1px solid rgba(229, 231, 235, 0.7);
+        @media screen and (max-width: 768px) {
+          padding-top: 0.2rem;
+        }
       }
       @media screen and (max-width: 768px) {
-        padding: 0.45rem 0;
+        padding: 0.45rem 16px;
       }
       .top {
         justify-content: space-between;
@@ -276,6 +279,7 @@ export default defineComponent({
         color: #9ca3b1;
         font-size: 0.19rem;
         .top_text {
+          text-align: left;
           h2 {
             display: block;
             padding: 0 0 0 0.6rem;
@@ -330,13 +334,15 @@ export default defineComponent({
         }
         .top_input {
           justify-content: space-between;
+          flex-wrap: wrap;
           width: 100%;
-          margin: 0.32rem 0;
+          margin: 0.32rem 0 0.16rem;
           .search_name {
             max-width: 3.4rem;
             margin: 0;
             .el-input__inner {
               padding-left: 0.35rem;
+              margin: 0 0 0.16rem;
               background: url(../../../assets/images/icons/icon_13_1.png)
                 no-repeat 0.1rem center;
               background-size: 15px;

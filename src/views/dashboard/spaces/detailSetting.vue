@@ -1,6 +1,6 @@
 <template>
   <section id="space">
-    <el-row class="space_body container-landing flex-row" v-loading="listLoad">
+    <el-row class="space_body flex-row" v-loading="listLoad">
       <space-hardware @handleHard="handleHard" :listdata="listdata" :renewButton="'setting'"></space-hardware>
       <div class="fileList" v-loading="renameLoad" v-if="nftdata.nft.status === 'not generated'">
         <div class="title">Rename or transfer this space</div>

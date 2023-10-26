@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper" id="wrapper" ref="area">
     <el-container :class="{'container_height':true}">
-      <el-header>
+      <el-header v-if="!(route.name === 'spaceDetail' && route.params.tabs === 'app')">
         <v-head></v-head>
       </el-header>
       <el-main>
@@ -224,6 +224,7 @@ export default defineComponent({
 .container-landing {
   padding: 0 16px;
   margin: auto;
+  box-sizing: border-box;
   @media screen and (min-width: 640px) {
     max-width: 640px;
   }

@@ -1,6 +1,6 @@
 <template>
   <section id="space">
-    <el-row class="space_body container-landing flex-row">
+    <el-row class="space_body flex-row">
       <header class=" flex-row">
         <div class="title flex-row">
           <a @click="getListFolderMain('')">{{route.params.name}}</a>

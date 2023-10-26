@@ -1,6 +1,6 @@
 <template>
     <div class="footer landing">
-        <el-row class="footer_menu flex-row">
+        <el-row class="footer_menu container-landing flex-row">
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="flex-row">
                 <a class="text">
                     @Lagrange
