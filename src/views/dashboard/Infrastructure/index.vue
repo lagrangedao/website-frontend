@@ -1,191 +1,191 @@
 <template>
-    <section id="rpc-container">
-        <header>
-            <div class="area-content flex-row">
-                <div class="top_text">
-                    <div class="title flex-row">
-                        <h2>RPC</h2>
-                        <div class="top_input flex-row">
-                            <el-input v-model="searchValue" clearable @change="searchChange()" class="search_name w-50 m-2" placeholder="Chain name or chain id" />
-                        </div>
-                    </div>
-                    <p>This list show all your configured chains and all the RPC endpoints that thirdweb supports.</p>
-                </div>
-                <div class="top_button">
-                    <div class="add-network flex-row" @click="addValidate">
-                        <i class="icon icon_setting"></i> Add Network</div>
-                </div>
+  <section id="rpc-container" class="container-landing">
+    <header>
+      <div class="area-content flex-row">
+        <div class="top_text">
+          <div class="title flex-row">
+            <h2>RPC</h2>
+            <div class="top_input flex-row">
+              <el-input v-model="searchValue" clearable @change="searchChange()" class="search_name w-50 m-2" placeholder="Chain name or chain id" />
             </div>
-        </header>
-        <el-row class="rpc-body" justify="space-between">
-            <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18" class="rpc-left" v-loading="rpcLoad">
-                <el-row class="rpc-list" :gutter="32" v-if="chainsData.length > 0">
-                    <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="chain in chainsData" :key="chain">
-                        <el-card class="box-card">
-                            <div class="grid-content">
-                                <div class="flex-row head">
-                                    <img :src="chain.icon" width="37" height="37" :alt="`${chain.chain}`"> {{chain.chain}} - {{chain.network}}
-                                </div>
-                                <ul class="flex-row">
-                                    <li class="wide">
-                                        <div class="tit">RPC URL</div>
-                                        <div class="border flex-row">
-                                            <span>{{chain.url}}</span>
-                                            <i class="icon icon_copy" @click="system.$commonFun.copyContent(chain.url, 'Copied')"></i>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="tit">Chain ID</div>
-                                        <div class="desc">{{chain.chain_id}} ({{system.$commonFun.strToHexCharCode(chain.chain_id)}})</div>
-                                    </li>
-                                    <li>
-                                        <div class="tit">Native Token</div>
-                                        <div class="desc">{{chain.currency}}</div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </el-card>
-                    </el-col>
-                </el-row>
-                <el-empty :image-size="200" v-else />
-                <el-pagination hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-                />
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" class="rpc-right">
-                <div class="content" v-for="d in describeData" :key="d">
-                    <div class="title">{{d.title}}</div>
-                    <div :class="{'sub_title color':true, 'u': d.nav}" @click="goToken(d.nav)">{{d.subTitle}}</div>
-                    <div class="sub_title">{{d.desc}}</div>
+          </div>
+          <p>This list show all your configured chains and all the RPC endpoints that thirdweb supports.</p>
+        </div>
+        <div class="top_button">
+          <div class="add-network flex-row" @click="addValidate">
+            <i class="icon icon_setting"></i> Add Network</div>
+        </div>
+      </div>
+    </header>
+    <el-row class="rpc-body" justify="space-between">
+      <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18" class="rpc-left" v-loading="rpcLoad">
+        <el-row class="rpc-list" :gutter="32" v-if="chainsData.length > 0">
+          <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="chain in chainsData" :key="chain">
+            <el-card class="box-card">
+              <div class="grid-content">
+                <div class="flex-row head">
+                  <img :src="chain.icon" width="37" height="37" :alt="`${chain.chain}`"> {{chain.chain}} - {{chain.network}}
                 </div>
-            </el-col>
+                <ul class="flex-row">
+                  <li class="wide">
+                    <div class="tit">RPC URL</div>
+                    <div class="border flex-row">
+                      <span>{{chain.url}}</span>
+                      <i class="icon icon_copy" @click="system.$commonFun.copyContent(chain.url, 'Copied')"></i>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="tit">Chain ID</div>
+                    <div class="desc">{{chain.chain_id}} ({{system.$commonFun.strToHexCharCode(chain.chain_id)}})</div>
+                  </li>
+                  <li>
+                    <div class="tit">Native Token</div>
+                    <div class="desc">{{chain.currency}}</div>
+                  </li>
+                </ul>
+              </div>
+            </el-card>
+          </el-col>
         </el-row>
+        <el-empty :image-size="200" v-else />
+        <el-pagination hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        />
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" class="rpc-right">
+        <div class="content" v-for="d in describeData" :key="d">
+          <div class="title">{{d.title}}</div>
+          <div :class="{'sub_title color':true, 'u': d.nav}" @click="goToken(d.nav)">{{d.subTitle}}</div>
+          <div class="sub_title">{{d.desc}}</div>
+        </div>
+      </el-col>
+    </el-row>
 
-        <add-network v-if="dataShow" @handleChange="handleChange" :dataShow="dataShow"></add-network>
-    </section>
+    <add-network v-if="dataShow" @handleChange="handleChange" :dataShow="dataShow"></add-network>
+  </section>
 </template>
 <script>
 import { defineComponent, computed, onMounted, onUnmounted, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-    Setting
+  Setting
 } from '@element-plus/icons-vue'
 import addNetwork from '@/components/addNetwork.vue'
 import qs from 'qs'
 export default defineComponent({
-    name: 'Spaces',
-    components: {
-        Setting, addNetwork
-    },
-    setup () {
-        const store = useStore()
-        const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
-        const metaAddress = computed(() => (store.state.metaAddress))
-        const rpcLoad = ref(false)
-        const pagin = reactive({
-            pageSize: 12,
-            pageNo: 1,
-            total: 0
-        })
-        const searchValue = ref('')
-        const describeData = ref([
-            {
-                title: 'RPC Usage Guide',
-                subTitle: ' - Generate Token',
-                nav: 'tokens',
-                desc: 'To utilize the RPC service, you first need to generate an Token.'
-            },
-            {
-                title: 'Upgrade Account ',
-                subTitle: '- Free User Limitations ',
-                nav: '',
-                desc: 'Description: Free users can enjoy up to 25 requests/s.'
-            }
-        ])
-        const chainsData = ref([])
-        const small = ref(false)
-        const background = ref(false)
-        const dataShow = ref(false)
-        const system = getCurrentInstance().appContext.config.globalProperties
-        const route = useRoute()
-        const router = useRouter()
+  name: 'Spaces',
+  components: {
+    Setting, addNetwork
+  },
+  setup () {
+    const store = useStore()
+    const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
+    const metaAddress = computed(() => (store.state.metaAddress))
+    const rpcLoad = ref(false)
+    const pagin = reactive({
+      pageSize: 12,
+      pageNo: 1,
+      total: 0
+    })
+    const searchValue = ref('')
+    const describeData = ref([
+      {
+        title: 'RPC Usage Guide',
+        subTitle: ' - Generate Token',
+        nav: 'tokens',
+        desc: 'To utilize the RPC service, you first need to generate an Token.'
+      },
+      {
+        title: 'Upgrade Account ',
+        subTitle: '- Free User Limitations ',
+        nav: '',
+        desc: 'Description: Free users can enjoy up to 25 requests/s.'
+      }
+    ])
+    const chainsData = ref([])
+    const small = ref(false)
+    const background = ref(false)
+    const dataShow = ref(false)
+    const system = getCurrentInstance().appContext.config.globalProperties
+    const route = useRoute()
+    const router = useRouter()
 
-        async function init () {
-            rpcLoad.value = true
-            chainsData.value = []
-            const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
-            const params = {
-                page_size: pagin.pageSize,
-                page_no: page * pagin.pageSize,
-                chain: searchValue.value
-            }
-            const rpcRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}v1/chains?${qs.stringify(params)}`, 'get')
-            if (rpcRes && String(rpcRes.code) === '0') {
-                chainsData.value = rpcRes.data.list || []
-                pagin.total = rpcRes.data.total || 0
-            } else if (rpcRes.msg) system.$commonFun.messageTip('error', rpcRes.msg)
-            rpcLoad.value = false
-        }
-        async function addData (params) {
-            clear()
-            dataShow.value = false
-            init()
-        }
-        async function searchChange (val) {
-            pagin.pageNo = 1
-            init()
-        }
-        function handleChange (val, refresh) {
-            if (refresh) {
-                addData()
-            } else dataShow.value = val
-        }
-        function handleSizeChange (val) { }
-        async function handleCurrentChange (currentPage) {
-            // console.log('handleCurrentChange:', currentPage)
-            pagin.pageNo = currentPage
-            init()
-        }
-        async function clear () {
-            chainsData.value = []
-            searchValue.value = ''
-            pagin.pageNo = 1
-            pagin.total = 0
-        }
-        async function goToken (nav) {
-            if (!nav) return
-            if (!lagLogin.value) loginValidate()
-            else router.push({ name: 'personalCenterProfile', params: { menu: nav } })
-        }
-        async function loginValidate () {
-            router.push({ path: '/personal_center' })
-            store.dispatch('setNavLogin', true)
-            return
-        }
-        async function addValidate () {
-            if (!lagLogin.value) loginValidate()
-            else dataShow.value = true
-        }
-        onActivated(() => {
-            clear()
-            init()
-        })
-        return {
-            metaAddress,
-            rpcLoad,
-            pagin,
-            small,
-            background,
-            searchValue,
-            describeData,
-            chainsData,
-            dataShow,
-            system,
-            route,
-            router,
-            searchChange, handleChange, handleSizeChange, handleCurrentChange, goToken, addValidate
-        }
+    async function init () {
+      rpcLoad.value = true
+      chainsData.value = []
+      const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
+      const params = {
+        page_size: pagin.pageSize,
+        page_no: page * pagin.pageSize,
+        chain: searchValue.value
+      }
+      const rpcRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}v1/chains?${qs.stringify(params)}`, 'get')
+      if (rpcRes && String(rpcRes.code) === '0') {
+        chainsData.value = rpcRes.data.list || []
+        pagin.total = rpcRes.data.total || 0
+      } else if (rpcRes.msg) system.$commonFun.messageTip('error', rpcRes.msg)
+      rpcLoad.value = false
     }
+    async function addData (params) {
+      clear()
+      dataShow.value = false
+      init()
+    }
+    async function searchChange (val) {
+      pagin.pageNo = 1
+      init()
+    }
+    function handleChange (val, refresh) {
+      if (refresh) {
+        addData()
+      } else dataShow.value = val
+    }
+    function handleSizeChange (val) { }
+    async function handleCurrentChange (currentPage) {
+      // console.log('handleCurrentChange:', currentPage)
+      pagin.pageNo = currentPage
+      init()
+    }
+    async function clear () {
+      chainsData.value = []
+      searchValue.value = ''
+      pagin.pageNo = 1
+      pagin.total = 0
+    }
+    async function goToken (nav) {
+      if (!nav) return
+      if (!lagLogin.value) loginValidate()
+      else router.push({ name: 'personalCenterProfile', params: { menu: nav } })
+    }
+    async function loginValidate () {
+      router.push({ path: '/personal_center' })
+      store.dispatch('setNavLogin', true)
+      return
+    }
+    async function addValidate () {
+      if (!lagLogin.value) loginValidate()
+      else dataShow.value = true
+    }
+    onActivated(() => {
+      clear()
+      init()
+    })
+    return {
+      metaAddress,
+      rpcLoad,
+      pagin,
+      small,
+      background,
+      searchValue,
+      describeData,
+      chainsData,
+      dataShow,
+      system,
+      route,
+      router,
+      searchChange, handleChange, handleSizeChange, handleCurrentChange, goToken, addValidate
+    }
+  }
 })
 </script>
 
@@ -193,23 +193,18 @@ export default defineComponent({
 #rpc-container {
   width: 100%;
   font-size: 18px;
+  border-top: 1px solid #f1f1f1;
   header {
-    background-color: #fbfbfc;
+    // background-color: #fbfbfc;
     border-bottom: 1px solid #f1f1f1;
     overflow: hidden;
+    text-align: left;
     :deep(.area-content) {
       justify-content: space-between;
       flex-wrap: wrap;
-      padding: 0 0.16rem;
-      margin: 0.8rem auto 0.1rem;
+      margin: 0.4rem auto 0.1rem;
       color: #9ca3b1;
       font-size: 0.19rem;
-      @media screen and (min-width: 1280px) {
-        max-width: 1280px;
-      }
-      @media screen and (min-width: 1536px) {
-        max-width: 1536px;
-      }
       .top_text {
         h2 {
           display: block;
@@ -318,19 +313,9 @@ export default defineComponent({
   }
   :deep(.rpc-body) {
     align-items: stretch;
-    padding: 0;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0 0.16rem;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .rpc-left {
       position: relative;
       padding: 0.4rem 0.3rem 0.4rem 0;
@@ -343,7 +328,7 @@ export default defineComponent({
         right: 0;
         top: 0;
         bottom: 0;
-        width: 1px;
+        width: 0.5px;
         background-color: #f4f4f4;
         @media screen and (max-width: 992px) {
           width: 0px;
@@ -443,7 +428,7 @@ export default defineComponent({
         left: 0;
         top: 0;
         bottom: 0;
-        width: 1px;
+        width: 0.5px;
         background-color: #f4f4f4;
         @media screen and (max-width: 992px) {
           width: 0px;
