@@ -31,10 +31,6 @@ module.exports = {
     }
   },
 
-  transpileDependencies: [
-    /[/\\]node_modules[/\\](.+?)?@intlify(.*)/
-  ],
-
   configureWebpack: (config) => {
     config.name = globalConfig.baseTitle
     config.entry.app = ['babel-polyfill', './src/main.js'];
@@ -60,6 +56,9 @@ module.exports = {
         threshold: 10240,
         minRatio: 0.8,
         deleteOriginalAssets: false
+      }),
+      new webpack.DefinePlugin({
+        __INTLIFY_PROD_DEVTOOLS__: JSON.stringify(false)
       })
     ];
     if (NOT_DEV) {

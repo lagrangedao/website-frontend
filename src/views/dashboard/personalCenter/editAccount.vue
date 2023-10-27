@@ -95,7 +95,6 @@
   </section>
 </template>
 <script>
-const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
