@@ -155,7 +155,6 @@
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
-import qs from 'qs'
 export default defineComponent({
   name: 'Models',
   components: {},
@@ -261,7 +260,7 @@ export default defineComponent({
         sort: pagin.sort, // alphabetical， updated
         name: searchValue.value
       }
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets?${qs.stringify(params)}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets?${Qs.stringify(params)}`, 'get')
       if (listRes) {
         listdataAll.value = listRes.datasets || []
         listdata.value = listRes.datasets || []
@@ -946,10 +945,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

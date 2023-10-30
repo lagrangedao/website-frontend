@@ -143,7 +143,7 @@ export default defineComponent({
       if (uploadRes && String(uploadRes.code) === '0') {
         const url = uploadRes.data.url || ''
         return url
-      } else if (uploadRes.msg) system.$commonFun.messageTip('error', uploadRes.msg)
+      }
       return ''
     }
     async function submitAdd (formEl) {
@@ -173,7 +173,7 @@ export default defineComponent({
           if (addNetRes && String(addNetRes.code) === '0') {
             context.emit('handleChange', false, true)
             return false
-          } else if (addNetRes.msg) system.$commonFun.messageTip('error', addNetRes.msg)
+          }
           addLoad.value = false
         } else {
           console.log('error submit!', fields)

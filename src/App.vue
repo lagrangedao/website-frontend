@@ -4,9 +4,7 @@
     </div>
 </template>
 <script setup>
-import * as echarts from "echarts";
-import { provide } from "vue";
-provide("echarts", echarts);
+import { provide } from "vue"
 </script>
 <style>
 @import "./assets/css/style.css";

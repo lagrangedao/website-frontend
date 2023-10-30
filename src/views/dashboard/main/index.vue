@@ -55,7 +55,6 @@
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
-import qs from 'qs'
 export default defineComponent({
   name: 'home',
   setup () {
@@ -160,7 +159,7 @@ export default defineComponent({
     async function init (name) {
       listLoad.value = true
       spaceLikesData.value = []
-      const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${qs.stringify({ limit: 6 })}`, 'get')
+      const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${Qs.stringify({ limit: 6 })}`, 'get')
       if (likesRes) spaceLikesData.value = likesRes.spaces || []
       listLoad.value = false
     }
@@ -686,10 +685,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

@@ -197,9 +197,3 @@ export default defineComponent({
 </style>
 
 
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>
