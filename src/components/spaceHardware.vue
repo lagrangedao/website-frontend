@@ -285,15 +285,15 @@ export default defineComponent({
           }
         }
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
-        const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'ether')
+        const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
         const approveAmount = pricePerHour * ruleForm.usageTime
 
         let approveGasLimit = await tokenContract.methods
-          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether'))
+          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
           .estimateGas({ from: store.state.metaAddress })
 
         const approve_tx = await tokenContract.methods
-          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether'))
+          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
           .send({
             from: store.state.metaAddress, gasLimit: approveGasLimit
           })
