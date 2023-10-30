@@ -217,7 +217,7 @@ export default defineComponent({
   }
   .pricing-cont {
     padding: 0 0 0.5rem;
-    background: url(../../../assets/images/dashboard/bg-pricing.png) no-repeat;
+    background: url(../../../assets/images/dashboard/bg-pricing.jpg) no-repeat;
     background-size: cover;
     background-position: 50%;
     border-bottom: 1px solid rgb(243, 244, 246);

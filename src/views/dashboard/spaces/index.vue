@@ -68,6 +68,8 @@
               All running spaces, recently uploaded first
             </div>
           </div>
+        </div>
+        <div class="week">
           <el-row :gutter="32" class="list_body" v-loading="listLoad">
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="list in spaceData" :key="list">
               <el-card class="box-card" @click="detailFun(list, l)">
@@ -104,7 +106,6 @@
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
-import qs from 'qs'
 export default defineComponent({
   name: 'Spaces',
   components: {},
@@ -196,10 +197,10 @@ export default defineComponent({
       }
 
       if (typeLikes) {
-        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${qs.stringify({ limit: 8 })}`, 'get')
+        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${Qs.stringify({ limit: 8 })}`, 'get')
         if (likesRes) spaceLikesData.value = likesRes.spaces || []
       }
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${Qs.stringify(params)}`, 'get')
       if (listRes) {
         spaceData.value = listRes.spaces || []
         spaceDataAll.value = listRes.spaces || []
@@ -778,10 +779,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

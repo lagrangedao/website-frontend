@@ -38,9 +38,6 @@
               Downloads last month
               <b>30,701,057</b>
             </div>
-            <div class="echarts flex-row">
-              <div id="maychar"></div>
-            </div>
           </div>
           <div class="list list_border">
             <div class="title flex-row">
@@ -347,60 +344,6 @@ export default defineComponent({
         })
       }
     }
-    let echarts = inject("echarts")
-    const changetype = () => {
-      const machart = echarts.init(document.getElementById("maychar"));
-      const option = {
-        grid: {
-          top: '0',
-          left: '0',
-          right: '0',
-          bottom: '0',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          show: false,
-          data: [820, 1100, 1080, 982, 951, 934, 900, 930, 920]
-        },
-        yAxis: {
-          type: 'value',
-          show: false,
-          scale: true,
-          splitNumber: 5,
-          alignTicks: true
-        },
-        series: [
-          {
-            data: [920, 1500, 780, 982, 851, 934, 900, 1030, 920],
-            type: 'line',
-            // smooth:true,
-            symbolSize: 0,
-            areaStyle: {},
-            itemStyle: {
-              color: '#5d2eff'
-            },
-            areaStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                {
-                  offset: 0,
-                  color: '#cdb8ff'
-                },
-                {
-                  offset: 1,
-                  color: '#f3ecff'
-                }
-              ])
-            },
-          }
-        ]
-      }
-      machart.setOption(option);
-      window.addEventListener("resize", function () {
-        machart.resize();
-      })
-    }
     onActivated(() => { })
     onMounted(() => {
       textEditor.value = ''
@@ -408,7 +351,6 @@ export default defineComponent({
       urlReadme.value = ''
       window.scrollTo(0, 0)
       init()
-      changetype();
     })
     onDeactivated(() => { })
     watch(() => props.urlChange, (newValue, oldValue) => {
@@ -633,13 +575,6 @@ export default defineComponent({
               display: block;
               float: left;
             }
-          }
-        }
-        .echarts {
-          margin-top: 0.2rem;
-          #maychar {
-            width: 150px;
-            height: 50px;
           }
         }
         .cont {
@@ -1444,11 +1379,3 @@ export default defineComponent({
   }
 }
 </style>
-
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

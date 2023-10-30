@@ -417,8 +417,7 @@ export default defineComponent({
               system.$commonFun.messageTip('error', listRes.data.message);
             }
           } else {
-            const errorMessage = listRes ?.message || 'Upload failed!';
-            system.$commonFun.messageTip('error', errorMessage);
+            system.$commonFun.messageTip('error', listRes ? listRes.message : 'Upload failed!');
           }
 
         } catch (error) {
@@ -1226,10 +1225,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

@@ -54,7 +54,7 @@
       <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" class="rpc-right">
         <div class="content" v-for="d in describeData" :key="d">
           <div class="title">{{d.title}}</div>
-          <div :class="{'sub_title color':true, 'u': d.nav}" @click="goToken(d.nav)">{{d.subTitle}}</div>
+          <div :class="{'sub_title color':true, 'u': d.nav}" @click="goToken(d.nav, d.tabs)">{{d.subTitle}}</div>
           <div class="sub_title">{{d.desc}}</div>
         </div>
       </el-col>
@@ -71,7 +71,6 @@ import {
   Setting
 } from '@element-plus/icons-vue'
 import addNetwork from '@/components/addNetwork.vue'
-import qs from 'qs'
 export default defineComponent({
   name: 'Spaces',
   components: {
@@ -92,13 +91,15 @@ export default defineComponent({
       {
         title: 'RPC Usage Guide',
         subTitle: ' - Generate Token',
-        nav: 'tokens',
+        nav: 'client',
+        tabs: 'developer_setting',
         desc: 'To utilize the RPC service, you first need to generate an Token.'
       },
       {
         title: 'Upgrade Account ',
         subTitle: '- Free User Limitations ',
         nav: '',
+        tabs: '',
         desc: 'Description: Free users can enjoy up to 25 requests/s.'
       }
     ])
@@ -119,11 +120,11 @@ export default defineComponent({
         page_no: page * pagin.pageSize,
         chain: searchValue.value
       }
-      const rpcRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}v1/chains?${qs.stringify(params)}`, 'get')
+      const rpcRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}v1/chains?${Qs.stringify(params)}`, 'get')
       if (rpcRes && String(rpcRes.code) === '0') {
         chainsData.value = rpcRes.data.list || []
         pagin.total = rpcRes.data.total || 0
-      } else if (rpcRes.msg) system.$commonFun.messageTip('error', rpcRes.msg)
+      }
       rpcLoad.value = false
     }
     async function addData (params) {
@@ -152,10 +153,10 @@ export default defineComponent({
       pagin.pageNo = 1
       pagin.total = 0
     }
-    async function goToken (nav) {
+    async function goToken (nav, tabs) {
       if (!nav) return
       if (!lagLogin.value) loginValidate()
-      else router.push({ name: 'personalCenterProfile', params: { menu: nav } })
+      else router.push({ name: 'personalCenterProfile', params: { menu: nav }, query: { tabs: tabs } })
     }
     async function loginValidate () {
       router.push({ path: '/personal_center' })

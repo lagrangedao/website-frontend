@@ -1,6 +1,4 @@
 import store from '../store'
-import axios from 'axios'
-import moment from 'moment'
 import {
   ElMessage
 } from 'element-plus'
@@ -32,7 +30,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
   } catch (err) {
     console.error(err, err.response)
     const time = await throttle()
-    if (time) messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    if (time) messageTip('error', err.response ? err.response.statusText || err.response.data.msg || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
     } else if (err.response && err.response.status === 404) {
@@ -357,6 +355,11 @@ function calculateDiffTime(startTime) {
   else return '-'
 }
 
+function expiredTime(validDays) {
+  if (String(validDays) === '0') return 'Forever'
+  else return momentFun(validDays)
+}
+
 function sizeChange(bytes) {
   if (bytes === 0) return '0 B'
   if (!bytes) return '-'
@@ -416,7 +419,7 @@ function cmOptions(owner) {
   }
 }
 
-const Web3 = require('web3');
+// const Web3 = require('web3');
 let web3Init
 if (typeof window.ethereum === 'undefined') {
   window.open('https://metamask.io/download.html')
@@ -454,6 +457,7 @@ export default {
   hiddAddress,
   NumFormat,
   calculateDiffTime,
+  expiredTime,
   sizeChange,
   goLink,
   strToHexCharCode,
