@@ -100,7 +100,7 @@
         </div>
       </div>
       <div class="share flex-row">
-        <el-button @click="system.$commonFun.goLink(`${info.url}${metaAddress}`)">
+        <el-button :disabled="info.url?false:true" @click="system.$commonFun.goLink(`${info.url}${metaAddress}`)">
           <svg t="1669800457857" class="icon icon_big" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6207" width="64" height="64">
             <path d="M923.648 1015.442H100.206a91.648 91.648 0 0 1-91.721-91.72V101.01a91.502 91.502 0 0 1 91.72-91.501H649.29a30.72 30.72 0 0 1 0 61.44H130.487a60.855 60.855 0 0 0-60.928 60.854v762.003a60.855 60.855 0 0 0 60.928 60.928h762.441a60.855 60.855 0 0 0 60.928-60.928V345.088a30.72 30.72 0 1 1 61.44 0v579.291a91.21 91.21 0 0 1-91.648 91.063z m-497.81-403.675a30.574 30.574 0 1 1-43.228-43.228L930.816 17.92a30.574 30.574 0 1 1 43.154 43.3L425.91 611.768z"
               p-id="6208" fill="#7405ff"></path>
@@ -197,20 +197,25 @@ export default defineComponent({
       info.unit = unit
       info.url = url || ''
     }
-    onMounted(() => activeMenu())
+    function balanceMethod () {
+      if (!metaAddress.value) return
+      system.$commonFun.web3Init.eth.getBalance(metaAddress.value).then((balance) => {
+        // console.log(balance)
+        const myBalance = balance
+        const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
+        info.balance = Number(balanceAll).toFixed(4)
+      })
+    }
+    onMounted(() => {
+      activeMenu()
+      balanceMethod()
+    })
     watch(route, (to, from) => {
       activeMenu(to.path)
       window.scrollTo(0, 0)
     })
     watch(metaAddress, (to, from) => {
-      if (metaAddress.value) {
-        system.$commonFun.web3Init.eth.getBalance(metaAddress.value).then((balance) => {
-          // console.log(balance)
-          const myBalance = balance
-          const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
-          info.balance = Number(balanceAll).toFixed(4)
-        })
-      }
+      balanceMethod()
     })
     return {
       metaAddress,
@@ -716,6 +721,9 @@ export default defineComponent({
           &:hover {
             background: transparent;
             opacity: 1;
+          }
+          &.is-disabled {
+            opacity: 0.4;
           }
         }
       }

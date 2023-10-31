@@ -748,6 +748,7 @@ export default defineComponent({
     // padding: 0;
     // background-color: #fbfbfc;
     // border-bottom: 1px solid #f1f1f1;
+    border-top: 1px solid rgba(229, 231, 235, 0.7);
     .content {
       align-items: stretch;
       justify-content: space-between;
@@ -789,18 +790,19 @@ export default defineComponent({
         }
         b {
           font-family: "FIRACODE-BOLD";
-          padding: 0 0.07rem 0 0;
+          padding: 0.03rem 0.07rem 0 0;
           color: #000;
         }
         .icon {
-          width: 0.23rem;
-          height: 0.23rem;
+          width: 0.2rem;
+          height: 0.2rem;
           margin: -1px 0.07rem 0 0;
         }
         .logo_lagrange {
           background: url(../../../assets/images/icons/logo_lagrange.png)
             no-repeat left center;
           background-size: auto 100%;
+          cursor: pointer;
         }
         .icon_spaces {
           background: url(../../../assets/images/icons/icon_2_2.png) no-repeat

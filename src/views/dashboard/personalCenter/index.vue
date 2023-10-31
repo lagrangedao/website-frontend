@@ -112,8 +112,8 @@
           </div>
         </div>
         <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
-          <el-col :xs="24" :sm="24" :md="spacesIndex>1?12:24" :lg="spacesIndex>1?12:24" :xl="spacesIndex>1?12:24" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
-            <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<4: true">
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
+            <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<9: true">
               <template #header>
                 <div class="card-warn flex-row" v-if="list.expiration_time !== null && ((list.expireTime <=5&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))">
                   <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime
@@ -133,7 +133,7 @@
             </el-card>
           </el-col>
         </el-row>
-        <div class="more_style flex-row" v-if="listdata.spaces.length>4">
+        <div class="more_style flex-row" v-if="listdata.spaces.length>9">
           <img class=" flex-row" v-if="!listdata.spacesIsShow" @click="listdata.spacesIsShow = true" src="@/assets/images/icons/icon_38.png" />
           <img class=" flex-row" v-else @click="listdata.spacesIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
         </div>

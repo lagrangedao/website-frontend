@@ -296,7 +296,7 @@ export default defineComponent({
     font-size: 14px;
     .left {
       position: relative;
-      padding: 1rem 1% 0.5rem 0;
+      padding: 0.18rem 1% 0.5rem 0;
       background-color: #fbfbfc;
       @media screen and (max-width: 768px) {
         padding: 0 1% 0.2rem;
@@ -305,7 +305,7 @@ export default defineComponent({
         margin: 0.2rem 0 0;
         .title {
           justify-content: flex-start;
-          padding: 0.11rem;
+          padding: 0.1rem;
           font-size: 0.19rem;
           color: #000;
           border-radius: 0.08rem;
@@ -569,7 +569,7 @@ export default defineComponent({
             padding: 0.08rem 0.25rem;
             margin: 0 0.17rem 0 0;
             background-color: #7405ff;
-            font-size: 0.215rem;
+            font-size: 0.19rem;
             font-weight: normal;
             line-height: 1;
             color: #fff;
@@ -591,12 +591,14 @@ export default defineComponent({
             max-width: 3.45rem;
             margin: 0 0 0 0.17rem;
             .el-input__inner {
+              height: 30px;
               padding-left: 0.35rem;
               background: url(../../../assets/images/icons/icon_10_2.png)
                 no-repeat 0.1rem center;
               background-size: 17px;
               border-radius: 0.2rem;
               border-color: #cccccc;
+              line-height: 30px;
               @media screen and (min-width: 1800px) {
                 font-size: 15px;
               }
@@ -618,8 +620,9 @@ export default defineComponent({
           .el-input {
             cursor: pointer;
             .el-input__inner {
-              width: 195px;
-              padding: 0 12px 0 40px !important;
+              max-width: 175px;
+              height: 30px;
+              padding: 0 8px 0 32px !important;
               background: linear-gradient(180deg, #fefefe, #f0f0f0);
               border-color: #e1e1e1;
               font-size: 14px;
@@ -632,8 +635,8 @@ export default defineComponent({
             .el-input__prefix {
               color: #9ca3b1;
               .el-icon-select {
-                width: 21px;
-                height: 21px;
+                width: 14px;
+                height: 14px;
                 background: url(../../../assets/images/icons/icon_12.png)
                   no-repeat left center;
                 background-size: 100%;
