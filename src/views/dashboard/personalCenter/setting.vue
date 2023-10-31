@@ -154,6 +154,7 @@ export default defineComponent({
       document.addEventListener('visibilitychange', function () {
         prevType.value = !document.hidden
       })
+      if (typeof window.ethereum === 'undefined') return
       // ethereum.on('accountsChanged', function (account) {
       //   // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
       //   if (!prevType.value) return false
