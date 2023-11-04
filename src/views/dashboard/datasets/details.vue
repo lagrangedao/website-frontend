@@ -2,15 +2,17 @@
   <section id="dataset" v-loading="ntfLoad">
     <div class="dataset_head container-landing">
       <div class="content flex-row">
-        <div class="backTo flex-row" @click="back">
+        <!-- <div class="backTo flex-row" @click="back">
           <el-icon>
             <ArrowLeft />
           </el-icon>
           <span>Go Back</span>
-        </div>
+        </div> -->
         <div class="name flex-row">
-          <i class="icon icon_datasets"></i>
-          Datasets:
+          <div class="back-logo flex-row" @click="back">
+            <i class="icon icon_datasets"></i>
+            Datasets:
+          </div>
           <b>{{route.params.name}}</b>
           <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
           <el-button-group class="ml-4">
@@ -295,12 +297,12 @@ export default defineComponent({
   }
   .dataset_head {
     padding-top: 0.3rem;
-    background-color: #fbfbfc;
+    // background-color: #fbfbfc;
     border-bottom: 1px solid #f1f1f1;
     .content {
       align-items: stretch;
       flex-wrap: wrap;
-      margin: 0 auto 0.25rem;
+      margin: 0 auto 0.1rem;
       font-size: 14px;
       .backTo {
         padding: 0 0 0.25rem;
@@ -320,20 +322,26 @@ export default defineComponent({
       .name {
         font-family: "Helvetica-Bold";
         width: 100%;
-        font-size: 0.21rem;
+        font-size: 18px;
         color: #878c93;
         line-height: 1;
         @media screen and (max-width: 992px) {
           flex-wrap: wrap;
         }
+        .back-logo {
+          cursor: pointer;
+          &:hover {
+            color: #6d6d6d;
+          }
+        }
         b {
           font-family: "FIRACODE-BOLD";
-          padding: 0 0.07rem 0 0.1rem;
+          padding: 0.03rem 0.07rem 0 0.1rem;
           color: #000;
         }
         .icon {
-          width: 0.23rem;
-          height: 0.23rem;
+          width: 0.2rem;
+          height: 0.2rem;
           margin: -1px 0.07rem 0 0;
         }
         .icon_datasets {
@@ -435,7 +443,7 @@ export default defineComponent({
     .tag {
       margin: 0 auto;
       line-height: 0.3rem;
-      font-size: 0.18rem;
+      font-size: 0.15rem;
       a {
         padding: 0;
         margin: 0 0 0 0.1rem;
@@ -484,7 +492,7 @@ export default defineComponent({
       }
     }
     .tag_sub {
-      margin: 0.1rem auto 0.4rem;
+      margin: 0.1rem auto 0.16rem;
       a {
         color: #562683;
         background-color: #f3f1ff;

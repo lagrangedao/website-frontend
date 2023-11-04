@@ -276,6 +276,10 @@ async function getUnit(id) {
       url = `${process.env.VUE_APP_SEPOLIABLOCKURL}/address/`
       url_tx = `${process.env.VUE_APP_SEPOLIABLOCKURL}/tx/`
       break
+    default:
+      unit = '-'
+      name = `Chain ${id}`
+      break
   }
   return ({
     unit,

@@ -482,7 +482,7 @@ export default defineComponent({
     text-align: left;
     .readme_text {
       position: relative;
-      padding: 0.5rem 0.3rem 0.3rem 0;
+      padding: 0.3rem 0.3rem 0.3rem 0;
       @media screen and (max-width: 992px) {
         padding: 0.3rem 0;
       }
