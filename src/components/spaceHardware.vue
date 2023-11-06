@@ -286,7 +286,7 @@ export default defineComponent({
         }
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
         const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
-        const approveAmount = pricePerHour * ruleForm.usageTime
+        const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6); // usdc is 6 decimal, ensure the amount will not be more than 6
 
         let approveGasLimit = await tokenContract.methods
           .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
