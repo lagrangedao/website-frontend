@@ -293,9 +293,9 @@ async function changeIDLogin(type) {
   const chainId = await ethereum.request({
     method: 'eth_chainId'
   })
-  const list = [137, 80001, 97]
+  const list = [80001]
   const getPast = await list.some(t => t === parseInt(chainId, 16))
-  if (type) {} else if (!getPast) messageTip('error', 'Switch to Polygon Mainnet, Mumbai Testnet or Binance Smart Chain Testnet!')
+  if (type) {} else if (!getPast) messageTip('error', 'Switch to Mumbai Testnet!')
   return getPast
 }
 
