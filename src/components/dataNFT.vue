@@ -293,12 +293,16 @@ export default defineComponent({
       const spaceName = route.params.name ? route.params.name : props.personalCenter.name;
       if (route.name === 'datasetDetail') {
         const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)
+        // add 2s time out
+        await system.$commonFun.sleep(2000)
         const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/create_license`, 'post', fd)
       } else if (route.name === 'spaceDetail') {
         const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)
+        await system.$commonFun.sleep(2000)
         const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/create_license`, 'post', fd)
       } else if (route.name === 'personalCenter') {
         const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${props.personalCenter.source_type === 'Dataset' ? 'datasets' : 'spaces'}/${store.state.metaAddress}/${spaceName}/license/mint_hash`, 'post', fd)
+        await system.$commonFun.sleep(2000)
         const createRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${props.personalCenter.source_type === 'Dataset' ? 'datasets' : 'spaces'}/create_license`, 'post', fd)
       }
     }
