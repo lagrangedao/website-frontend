@@ -133,6 +133,9 @@ export default defineComponent({
     }
     onMounted(() => { })
     onActivated(() => { init() })
+    watch(route, (to, from) => {
+      if (to.name === "paymentHistory") init()
+    })
     return {
       paymentData,
       paymentLoad,
@@ -151,7 +154,8 @@ export default defineComponent({
   border-top: 1px solid rgba(229, 231, 235, 0.7);
   .payment-history {
     height: calc(100% - 1.2rem);
-    padding: 0.6rem 0;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
     margin: 0 auto;
     box-sizing: border-box;
     word-break: break-word;
