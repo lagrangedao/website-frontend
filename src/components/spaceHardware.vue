@@ -342,14 +342,14 @@ export default defineComponent({
     }
 
     async function networkEstimate () {
-      let chainID = '80001'
       const getID = await system.$commonFun.web3Init.eth.net.getId()
-      if (getID.toString() !== chainID) {
-        const { name } = await system.$commonFun.getUnit(Number(chainID))
-        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+      const list = [80001, 5]
+      const getPast = await list.some(t => t === getID)
+      if (getPast) return true
+      else {
+        await system.$commonFun.messageTip('error', 'Please switch to the network: Mumbai Testnet, Goerli')
         return false
       }
-      return true
     }
 
     async function hardwareHash (tx_hash, approveAmount) {

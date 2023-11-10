@@ -68,6 +68,12 @@
                 </div>
               </div>
             </el-menu-item>
+            <el-menu-item index="asProvider">
+              <div class="profile router-link">- As Provider</div>
+            </el-menu-item>
+            <el-menu-item index="asUser">
+              <div class="profile router-link b">- As Space Builder</div>
+            </el-menu-item>
             <el-menu-item index="create_dataset">
               <span class="link">+ New Dataset</span>
             </el-menu-item>
@@ -160,11 +166,13 @@ export default defineComponent({
       else router.push({ name: 'main' })
     }
     async function handleSelect (key, keyPath) {
-      // console.log(key) //  
+      // console.log(key, keyPath) //  
       if (key === 'personal_center') {
         router.push({ path: '/personal_center' })
         store.dispatch('setNavLogin', true)
       } else if (key === '4') window.open('https://docs.lagrangedao.org')
+      else if (key === 'asProvider') router.push({ name: 'paymentHistory', query: { type: 'provider' } })
+      else if (key === 'asUser') router.push({ name: 'paymentHistory', query: { type: 'user' } })
       else if (key === 'dataset') router.push({ path: '/dataset' })
       else if (key === 'models') router.push({ path: '/models' })
       else if (key === 'spaces') router.push({ path: '/spaces' })
@@ -840,7 +848,21 @@ export default defineComponent({
       .profile {
         width: 100%;
         padding: 0 0 8px;
-        border-bottom: 1px solid #e7e7e7;
+        &.router-link {
+          display: block;
+          width: 100%;
+          height: auto;
+          padding: 3px 3px 3px 22px;
+          margin-top: -25px;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+        &.b {
+          margin-top: -20px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #e7e7e7;
+        }
         cursor: pointer;
         * {
           cursor: pointer;

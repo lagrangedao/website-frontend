@@ -241,6 +241,10 @@ async function getUnit(id) {
       unit = 'ETH'
       name = 'Ethereum Mainnet '
       break
+    case 5:
+      unit = 'ETH'
+      name = 'Goerli '
+      break
     case 56:
       unit = 'BNB'
       name = 'Binance Smart Chain Mainnet '

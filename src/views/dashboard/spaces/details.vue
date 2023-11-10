@@ -693,6 +693,7 @@ export default defineComponent({
     })
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
+      if (!metaAddress.value) activeName.value = 'app'
       requestDetail()
       if (to.params.tabs === 'card') {
         window.scrollTo(0, 0)
