@@ -347,7 +347,8 @@ export default defineComponent({
       const getPast = await list.some(t => t === getID)
       if (getPast) return true
       else {
-        await system.$commonFun.messageTip('error', 'Please switch to the network: Mumbai Testnet, OpSwan')
+        context.emit('handleHard', false, false, true)
+        // await system.$commonFun.messageTip('error', 'Please switch to the network: Mumbai Testnet, OpSwan')
         return false
       }
     }
@@ -382,6 +383,8 @@ export default defineComponent({
         close()
         return
       } else if (row.hardware_status.toLowerCase() !== 'available' || (props.listdata.activeOrder && (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))) return false
+      const net = await networkEstimate()
+      if (!net) return
       ruleForm.usageTime = 24
       sleepSelect.value = row
       sleepSelect.value.regionOption = await regionList(row.region)

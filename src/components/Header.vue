@@ -51,44 +51,50 @@
               </div>
             </div>
           </el-menu-item>
-          <el-sub-menu index="personal" class="setting-style" v-if="lagLogin">
-            <template #title>
-              <div class="flex-row">
-                <el-icon>
-                  <Setting />
-                </el-icon>
-              </div>
-            </template>
-            <el-menu-item index="personal_center">
-              <div class="profile">
-                <div class="tit">Profile</div>
-                <div class="flex-row">
-                  <img :src="accessAvatar||people_img" width="15" height="15" alt="">
-                  <span class="link">{{accessName}}</span>
-                </div>
-              </div>
-            </el-menu-item>
-            <el-menu-item index="asProvider">
-              <div class="profile router-link">- As Provider</div>
-            </el-menu-item>
-            <el-menu-item index="asUser">
-              <div class="profile router-link b">- As Space Builder</div>
-            </el-menu-item>
-            <el-menu-item index="create_dataset">
-              <span class="link">+ New Dataset</span>
-            </el-menu-item>
-            <el-menu-item index="create_space">
-              <span class="link">+ New Space</span>
-            </el-menu-item>
-            <!--<el-menu-item index="create_organizations"> Create Organizations</el-menu-item> -->
-            <el-menu-item index="settings">
-              <span class="link">Settings</span>
-            </el-menu-item>
-            <el-menu-item index="sign_out">
-              <span class="link">Sign Out</span>
-            </el-menu-item>
-          </el-sub-menu>
         </el-menu>
+        <div class="set">
+          <el-dropdown popper-class="menu-style" v-if="lagLogin" @command="handleSelect" :hide-on-click="false">
+            <router-link to="/personal_center" class="el-dropdown-link setting-style loginImg flex-row">
+              <el-icon>
+                <Avatar />
+              </el-icon>
+            </router-link>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="personal_center">
+                  <div class="profile">
+                    <div class="tit">Profile</div>
+                    <div class="flex-row">
+                      <img :src="accessAvatar||people_img" width="15" height="15" alt="">
+                      <span class="link">{{accessName}}</span>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item command="asProvider">
+                  <div class="profile router-link">- As Provider</div>
+                </el-dropdown-item>
+                <el-dropdown-item command="asUser">
+                  <div class="profile router-link b">- As Space Builder</div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+              <el-dropdown-menu>
+                <el-dropdown-item command="create_dataset">
+                  <span class="link">+ New Dataset</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="create_space">
+                  <span class="link">+ New Space</span>
+                </el-dropdown-item>
+                <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
+                <el-dropdown-item command="settings">
+                  <span class="link">Settings</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="sign_out">
+                  <span class="link">Sign Out</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </el-col>
     </el-row>
 
@@ -135,10 +141,10 @@
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowDown, Setting } from '@element-plus/icons-vue'
+import { ArrowDown, Setting, Avatar } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'header_page',
-  components: { ArrowDown, Setting },
+  components: { ArrowDown, Setting, Avatar },
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
@@ -338,6 +344,7 @@ export default defineComponent({
       flex-wrap: nowrap;
       :deep(.el-menu) {
         width: 100%;
+        padding-right: 0.15rem;
         border: 0;
         justify-content: flex-end;
         align-items: center;
@@ -353,28 +360,6 @@ export default defineComponent({
           color: #000;
           &.address-style {
             padding-right: 0;
-          }
-          &.setting-style {
-            height: 25px;
-            padding: 5px 1px 5px 5px;
-            background-color: #7405ff !important;
-            border: 1px solid #7405ff !important;
-            border-left-color: #9f5ff0 !important;
-            cursor: text;
-            border-top-right-radius: 0.1rem;
-            border-bottom-right-radius: 0.1rem;
-            i,
-            svg,
-            path {
-              color: #fff;
-              cursor: pointer;
-            }
-            .el-sub-menu__icon-arrow {
-              display: none;
-            }
-            .el-sub-menu__title {
-              padding: 0;
-            }
           }
           @media screen and (min-width: 1800px) {
             font-size: 15px;
@@ -449,12 +434,14 @@ export default defineComponent({
               vertical-align: middle;
             }
             .info-style {
-              background-color: #7405ff;
-              color: #fff;
-              border: 1px solid #7405ff;
+              background-color: rgba(116, 5, 255, 0.2);
+              color: #333;
+              border: 1px solid rgba(116, 5, 255, 0.2);
               cursor: text;
-              border-top-left-radius: 0.1rem;
-              border-bottom-left-radius: 0.1rem;
+              border-radius: 0.1rem;
+              &:hover {
+                background-color: rgba(116, 5, 255, 0.3) !important;
+              }
               .address {
                 padding: 5px 0.1rem;
                 line-height: 25px;
@@ -557,6 +544,35 @@ export default defineComponent({
               border-radius: 50%;
             }
           }
+        }
+      }
+      .setting-style {
+        width: 35px;
+        height: 35px;
+        padding: 0;
+        background-color: rgba(116, 5, 255, 0.2) !important;
+        border: 1px solid rgba(116, 5, 255, 0.2) !important;
+        cursor: pointer;
+        border-radius: 0.1rem;
+        &:hover {
+          background-color: rgba(116, 5, 255, 0.3) !important;
+        }
+        * {
+          cursor: pointer;
+        }
+        i,
+        svg,
+        path {
+          width: 18px;
+          height: 18px;
+          margin: 0 auto;
+          color: #333;
+        }
+        .el-sub-menu__icon-arrow {
+          display: none;
+        }
+        .el-sub-menu__title {
+          padding: 0;
         }
       }
     }
@@ -771,8 +787,20 @@ export default defineComponent({
   border-radius: 0.1rem;
   border-top-right-radius: 0.05rem;
   .el-dropdown-menu {
+    position: relative;
     border-radius: 0.1rem;
     border-top-right-radius: 0.05rem;
+    &:first-child {
+      &:before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 12px;
+        right: 12px;
+        height: 1px;
+        background-color: #e7e7e7;
+      }
+    }
     .el-dropdown-menu__item {
       min-width: 170px;
       padding: 0 12px;
@@ -792,76 +820,18 @@ export default defineComponent({
       }
       .profile {
         width: 100%;
-        padding: 5px 0 8px;
-        margin: 0 0 5px;
-        border-bottom: 1px solid #e7e7e7;
-        cursor: pointer;
-        * {
-          cursor: pointer;
-        }
-        .tit {
-          font-size: 12px;
-          color: #989898;
-        }
-        .flex-row {
-          img {
-            margin-right: 7px;
-            border-radius: 100%;
-          }
-          .link {
-            padding: 0;
-          }
-        }
-      }
-    }
-  }
-}
-.loginImg {
-  cursor: pointer;
-}
-
-.el-popper {
-  border-radius: 0.1rem;
-  .el-menu {
-    border-radius: 0.1rem;
-    .el-menu-item,
-    .el-sub-menu__title,
-    .el-menu-item-group {
-      height: auto;
-      padding: 10px;
-      line-height: 1.2;
-      text-align: left;
-      &:hover,
-      &:focus {
-        background-color: #fbfbfc;
-        color: #000;
-        // background-color: rgba(116, 5, 255, 0.1);
-        // color: rgba(116, 5, 255, 1);
-        .link {
-          text-decoration: underline;
-        }
-      }
-      .link {
-        padding: 0;
-        cursor: pointer;
-      }
-      .profile {
-        width: 100%;
-        padding: 0 0 8px;
+        padding: 5px 0 0;
+        margin: 0;
         &.router-link {
           display: block;
           width: 100%;
           height: auto;
           padding: 3px 3px 3px 22px;
-          margin-top: -25px;
           &:hover {
             text-decoration: underline;
           }
         }
         &.b {
-          margin-top: -20px;
-          padding-bottom: 10px;
-          border-bottom: 1px solid #e7e7e7;
         }
         cursor: pointer;
         * {
@@ -876,6 +846,9 @@ export default defineComponent({
           img {
             margin-right: 7px;
             border-radius: 100%;
+          }
+          .link {
+            padding: 2px 0;
           }
         }
       }
@@ -923,5 +896,112 @@ export default defineComponent({
     }
   }
 }
+.loginImg {
+  cursor: pointer;
+}
+
+// .el-popper {
+//   border-radius: 0.1rem;
+//   .el-menu {
+//     border-radius: 0.1rem;
+//     .el-menu-item,
+//     .el-sub-menu__title,
+//     .el-menu-item-group {
+//       height: auto;
+//       padding: 10px;
+//       line-height: 1.2;
+//       text-align: left;
+//       &:hover,
+//       &:focus {
+//         background-color: #fbfbfc;
+//         color: #000;
+//         // background-color: rgba(116, 5, 255, 0.1);
+//         // color: rgba(116, 5, 255, 1);
+//         .link {
+//           text-decoration: underline;
+//         }
+//       }
+//       .link {
+//         padding: 0;
+//         cursor: pointer;
+//       }
+//       .profile {
+//         width: 100%;
+//         padding: 0 0 8px;
+//         &.router-link {
+//           display: block;
+//           width: 100%;
+//           height: auto;
+//           padding: 3px 3px 3px 22px;
+//           margin-top: -25px;
+//           &:hover {
+//             text-decoration: underline;
+//           }
+//         }
+//         &.b {
+//           margin-top: -20px;
+//           padding-bottom: 10px;
+//           border-bottom: 1px solid #e7e7e7;
+//         }
+//         cursor: pointer;
+//         * {
+//           cursor: pointer;
+//         }
+//         .tit {
+//           font-size: 12px;
+//           color: #989898;
+//           line-height: 1.5;
+//         }
+//         .flex-row {
+//           img {
+//             margin-right: 7px;
+//             border-radius: 100%;
+//           }
+//         }
+//       }
+//       .set {
+//         vertical-align: middle;
+//         * {
+//           vertical-align: middle;
+//         }
+//         .el-button-group > .el-button {
+//           border-radius: 7px;
+//           &:first-child {
+//             padding-left: 10px;
+//             border-top-right-radius: 0;
+//             border-bottom-right-radius: 0;
+//           }
+//           &:last-child {
+//             border-top-left-radius: 0;
+//             border-bottom-left-radius: 0;
+//           }
+//         }
+//         .el-icon {
+//           margin: auto;
+//           cursor: pointer;
+//           svg {
+//             width: 1em;
+//             cursor: pointer;
+//             path {
+//               cursor: pointer;
+//             }
+//           }
+//         }
+//         .loginImg {
+//           cursor: pointer;
+//           img {
+//             width: 23px;
+//             height: 23px;
+//             margin: 0 5px 0 0;
+//             cursor: pointer;
+//             background-color: #fff;
+//             border: 1px solid #b9b9b9;
+//             border-radius: 50%;
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>
 
