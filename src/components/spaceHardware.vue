@@ -343,11 +343,11 @@ export default defineComponent({
 
     async function networkEstimate () {
       const getID = await system.$commonFun.web3Init.eth.net.getId()
-      const list = [80001, 5]
+      const list = [80001, 8598668088]
       const getPast = await list.some(t => t === getID)
       if (getPast) return true
       else {
-        await system.$commonFun.messageTip('error', 'Please switch to the network: Mumbai Testnet, Goerli')
+        await system.$commonFun.messageTip('error', 'Please switch to the network: Mumbai Testnet, OpSwan')
         return false
       }
     }
