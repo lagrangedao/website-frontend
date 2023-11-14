@@ -300,13 +300,12 @@ export default defineComponent({
             from: store.state.metaAddress, gasLimit: approveGasLimit
           })
 
-
         let payMethod = getnetID === 80001 ? paymentContract.methods
           .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
           paymentContract.methods
             .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
-        let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
 
+        let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
         const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
