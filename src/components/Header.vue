@@ -45,7 +45,7 @@
           <el-menu-item index="8" class="address-style" v-else>
             <div class="set flex-row">
               <div class="info-style flex-row">
-                <div class="address" @click="wrongVisible = true">
+                <div class="address" @click="wrongMethod">
                   {{system.$commonFun.hiddAddress(metaAddress)}}
                 </div>
               </div>
@@ -212,13 +212,19 @@ export default defineComponent({
       info.url = url || ''
     }
     function balanceMethod () {
-      if (!metaAddress.value) return
+      if (!metaAddress.value) return false
       system.$commonFun.web3Init.eth.getBalance(metaAddress.value).then((balance) => {
         // console.log(balance)
         const myBalance = balance
         const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
         info.balance = Number(balanceAll).toFixed(4)
+        return true
       })
+    }
+    async function wrongMethod () {
+      activeMenu()
+      const info = await balanceMethod()
+      wrongVisible.value = true
     }
     onMounted(() => {
       activeMenu()
@@ -244,7 +250,7 @@ export default defineComponent({
       wrongVisible,
       bodyWidth,
       system,
-      header_logo, handleSelect
+      header_logo, handleSelect, wrongMethod
     }
   }
 })

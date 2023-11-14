@@ -299,11 +299,11 @@ async function walletChain(chainId) {
       text = {
         chainId: web3Init.utils.numberToHex(8598668088),
         chainName: 'OpSwan',
-        nativeCurrency: {
-          name: 'SwanETH',
-          symbol: 'SwanETH', // 2-6 characters long
-          decimals: 18
-        },
+        // nativeCurrency: {
+        //   name: 'SwanETH',
+        //   symbol: 'SwanETH', // 2-6 characters long
+        //   decimals: 18
+        // },
         rpcUrls: [process.env.VUE_APP_OPSWANRPCURL],
         blockExplorerUrls: [process.env.VUE_APP_OPSWANURL]
       }
