@@ -32,7 +32,7 @@
         <div class="title">
           {{ 'Space NFT (SNFT)' }}
 
-          <el-button class="request_btn" v-if="nftdata.nft.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
+          <el-button class="request_btn" v-if="nftdata.nft.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true" :title="nftdata.chain_tip">Create new License</el-button>
           <el-button size="large" class="request_btn generateDOI" v-if="nftdata.nft.status === 'success'" :disabled="!chainIdRes" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
@@ -345,6 +345,7 @@ export default defineComponent({
     const listdata = ref({})
     const nftdata = ref({
       chain_url: '',
+      chain_tip: '',
       contract_address: null,
       chain_id: null,
       nft: { tokens: [], status: 'not generated' },
@@ -601,6 +602,7 @@ export default defineComponent({
         list[token].chain_name = name
         list[token].chain_url = url
         list[token].ipfs_url = userGateway.value ? `${userGateway.value}/ipfs/${list[token].cid}` : ''
+        list[token].chain_tip = ''
       }
       return list
     }
@@ -624,12 +626,14 @@ export default defineComponent({
         if (listNftRes.data.nft && listNftRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
         let contract_address = listNftRes.data.contract_address
         const getID = await system.$commonFun.web3Init.eth.net.getId()
-        // if (listNftRes.data.chain_id && getID.toString() !== listNftRes.data.chain_id) {
-        //   const { name } = await system.$commonFun.getUnit(Number(listNftRes.data.chain_id))
-        //   await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
-        //   listNftRes.data.nft.tokens = []
-        // } else 
-        if (contract_address) {
+        if (listNftRes.data.chain_id && getID.toString() !== listNftRes.data.chain_id) {
+          // const { name } = await system.$commonFun.getUnit(Number(listNftRes.data.chain_id))
+          //   await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+          let { url, name } = await system.$commonFun.getUnit(parseInt(listNftRes.data.chain_id), 16)
+          listNftRes.data.chain_tip = 'Please switch to the network: ' + name
+          listNftRes.data.chain_url = url
+          listNftRes.data.nft.tokens = []
+        } else if (contract_address) {
           let { url } = await system.$commonFun.getUnit(parseInt(listNftRes.data.chain_id), 16)
           const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
           const tokens_list = await mapTokens(listNftRes.data.nft.tokens, nft_contract, contract_address)
@@ -641,7 +645,6 @@ export default defineComponent({
         if (!listNftRes.data.hasOwnProperty('nft')) listNftRes.data.nft = listNftRes.data.nft || { tokens: [], status: 'not generated' }
         nftdata.value = listNftRes.data || { contract_address: null, copy_nft: [], chain_id: null, nft: { tokens: [], status: 'not generated' } }
       }
-
       // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
