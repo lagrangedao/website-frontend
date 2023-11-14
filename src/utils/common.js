@@ -107,7 +107,6 @@ async function login() {
     })
     store.dispatch('setMetaAddress', accounts[0])
   }
-
   const time = await throttle()
   if (!time) return [false, '']
   const [signature, signErr] = await sign()
@@ -293,6 +292,76 @@ async function getUnit(id) {
   })
 }
 
+async function walletChain(chainId) {
+  let text = {}
+  switch (chainId) {
+    case 8598668088:
+      text = {
+        chainId: web3Init.utils.numberToHex(8598668088),
+        chainName: 'OpSwan',
+        nativeCurrency: {
+          name: 'SwanETH',
+          symbol: 'SwanETH', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: [process.env.VUE_APP_OPSWANRPCURL],
+        blockExplorerUrls: [process.env.VUE_APP_OPSWANURL]
+      }
+      break
+    case 80001:
+      text = {
+        chainId: web3Init.utils.numberToHex(80001),
+        chainName: 'Mumbai Testnet',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: [process.env.VUE_APP_MUMBAIRPCURL],
+        blockExplorerUrls: [process.env.VUE_APP_MUMBAIPAYMENTURL]
+      }
+      break
+    case 97:
+      text = {
+        chainId: web3Init.utils.numberToHex(97),
+        chainName: 'BSC TestNet',
+        nativeCurrency: {
+          name: 'tBNB',
+          symbol: 'tBNB', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
+        blockExplorerUrls: [process.env.VUE_APP_BSCTESTNETBLOCKURL]
+      }
+      break
+    case 137:
+      text = {
+        chainId: web3Init.utils.numberToHex(137),
+        chainName: 'Polygon Mainnet',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: ['https://polygon-rpc.com'],
+        blockExplorerUrls: [process.env.VUE_APP_POLYGONBLOCKURL]
+      }
+      break
+  }
+  try {
+    await ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [
+        text
+      ]
+    })
+    // const [lStatus, signErr] = await login()
+    // if (lStatus) getdataList()
+  } catch (err) {
+    if (err.message) messageTip('error', err.message)
+  }
+}
+
 async function changeIDLogin(type) {
   const chainId = await ethereum.request({
     method: 'eth_chainId'
@@ -461,6 +530,7 @@ export default {
   popupwindow,
   copyContent,
   getUnit,
+  walletChain,
   changeIDLogin,
   hiddAddress,
   NumFormat,

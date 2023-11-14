@@ -32,7 +32,7 @@
         <div class="title">
           {{ 'Space NFT (SNFT)' }}
 
-          <el-button class="request_btn" v-if="nftdata.nft.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true">Create new License</el-button>
+          <el-button class="request_btn" v-if="nftdata.nft.status === 'success'" :disabled="!chainIdRes" @click="dataNFTRequest = true" :title="nftdata.chain_tip">Create new License</el-button>
           <el-button size="large" class="request_btn generateDOI" v-if="nftdata.nft.status === 'success'" :disabled="!chainIdRes" @click="requestInitData()">Refresh</el-button>
         </div>
         <div>
@@ -101,7 +101,7 @@
               </template>
             </el-popover>
           </div>
-          <el-button size="large" v-else class="generateDOI" @click="dialogDOIVisible = true">Generate SNFT</el-button>
+          <el-button size="large" v-else class="generateDOI" @click="generateThisNFT">Generate SNFT</el-button>
         </div>
       </div>
       <div class="fileList" v-loading="doiLoad" v-if="nftdata.copy_nft && nftdata.copy_nft.length>0">
@@ -241,6 +241,7 @@
     </el-dialog>
 
     <data-nft v-if="dataNFTRequest" @handleChange="handleChange" :dataNFTRequest="dataNFTRequest" :createdAt="listdata.created_at" :updatedAt="listdata.updated_at" :contractAddress="nftdata.contract_address" :getNftID="nftdata.chain_id"></data-nft>
+    <network-change v-if="networkC" :networkC="networkC" :netEnv="netEnv" @netChange="netChange"></network-change>
   </section>
 </template>
 <script>
@@ -252,6 +253,7 @@ import {
 } from '@element-plus/icons-vue'
 import dataNft from '@/components/dataNFT.vue'
 import spaceHardware from '@/components/spaceHardware.vue'
+import networkChange from '@/components/networkChange'
 const FACTORY_ABI = require('@/utils/abi/DataNFTFactory.json')
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 const SourceMinterABI = require('@/utils/abi/SourceMinter.json')
@@ -259,7 +261,7 @@ const tokenLinkABI = require('@/utils/abi/tokenLink.json')
 export default defineComponent({
   name: 'Spaces',
   components: {
-    CaretBottom, Warning, DocumentCopy, dataNft, spaceHardware
+    CaretBottom, Warning, DocumentCopy, dataNft, spaceHardware, networkChange
   },
   props: {
     // listdata: { type: Number, default: 1 },
@@ -343,6 +345,7 @@ export default defineComponent({
     const listdata = ref({})
     const nftdata = ref({
       chain_url: '',
+      chain_tip: '',
       contract_address: null,
       chain_id: null,
       nft: { tokens: [], status: 'not generated' },
@@ -374,6 +377,8 @@ export default defineComponent({
     const settingIndex = ref(0)
     const gutterRow = ref(document.body.clientWidth < 992 ? '0' : '30')
     const email_link = process.env.VUE_APP_BASE_EMAIL
+    const networkC = ref(false)
+    const netEnv = ref([])
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
@@ -597,6 +602,7 @@ export default defineComponent({
         list[token].chain_name = name
         list[token].chain_url = url
         list[token].ipfs_url = userGateway.value ? `${userGateway.value}/ipfs/${list[token].cid}` : ''
+        list[token].chain_tip = ''
       }
       return list
     }
@@ -621,8 +627,11 @@ export default defineComponent({
         let contract_address = listNftRes.data.contract_address
         const getID = await system.$commonFun.web3Init.eth.net.getId()
         if (listNftRes.data.chain_id && getID.toString() !== listNftRes.data.chain_id) {
-          const { name } = await system.$commonFun.getUnit(Number(listNftRes.data.chain_id))
-          await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+          // const { name } = await system.$commonFun.getUnit(Number(listNftRes.data.chain_id))
+          //   await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+          let { url, name } = await system.$commonFun.getUnit(parseInt(listNftRes.data.chain_id), 16)
+          listNftRes.data.chain_tip = 'Please switch to the network: ' + name
+          listNftRes.data.chain_url = url
           listNftRes.data.nft.tokens = []
         } else if (contract_address) {
           let { url } = await system.$commonFun.getUnit(parseInt(listNftRes.data.chain_id), 16)
@@ -630,13 +639,12 @@ export default defineComponent({
           const tokens_list = await mapTokens(listNftRes.data.nft.tokens, nft_contract, contract_address)
           listNftRes.data.chain_url = url
           listNftRes.data.nft.tokens = tokens_list
-        }
+        } else listNftRes.data.nft.tokens = []
 
         listNftRes.data.copy_nft = await mapCopyList(listNftRes.data.copy_nft)
         if (!listNftRes.data.hasOwnProperty('nft')) listNftRes.data.nft = listNftRes.data.nft || { tokens: [], status: 'not generated' }
         nftdata.value = listNftRes.data || { contract_address: null, copy_nft: [], chain_id: null, nft: { tokens: [], status: 'not generated' } }
       }
-
       // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
@@ -654,8 +662,18 @@ export default defineComponent({
         requestInitData()
       }
     }
-    function handleHard (val, refresh) {
-      if (refresh) {
+    function handleHard (val, refresh, net) {
+      if (net) {
+        netEnv.value = [{
+          name: 'OpSwan',
+          id: 8598668088
+        },
+        {
+          name: 'Mumbai Testnet',
+          id: 80001
+        }]
+        networkC.value = true
+      } else if (refresh) {
         context.emit('handleValue', true, 'setting')
         requestInitData()
       }
@@ -665,8 +683,13 @@ export default defineComponent({
       let chainID = '80001'
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       if (getID.toString() !== chainID) {
-        const { name } = await system.$commonFun.getUnit(Number(chainID))
-        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+        // const { name } = await system.$commonFun.getUnit(Number(chainID))
+        // await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+        netEnv.value = [{
+          name: 'Mumbai Testnet',
+          id: 80001
+        }]
+        networkC.value = true
         return false
       }
       return true
@@ -677,6 +700,17 @@ export default defineComponent({
       if (!net) return
       ruleForm.destinationCont = row
       nftVisible.value = true
+    }
+
+    async function generateThisNFT () {
+      const net = await networkEstimate()
+      if (!net) return
+      dialogDOIVisible.value = true
+    }
+
+    async function netChange (dialog, rows) {
+      networkC.value = dialog
+      if (rows) system.$commonFun.walletChain(rows)
     }
 
     let copyTransaction
@@ -780,6 +814,8 @@ export default defineComponent({
       nftdata,
       dataNFTRequest,
       dialogDOIVisible,
+      networkC,
+      netEnv,
       system,
       gutterRow,
       route,
@@ -790,7 +826,7 @@ export default defineComponent({
       chainIdRes,
       nftVisible, copyLoad, email_link,
       props, submitForm, submitDeleteForm, copyThisNFT, destinationNFT, checkCopyInfo,
-      handleChange, requestInitData, beforeClose, requestNFT, refreshContract, handleHard
+      handleChange, requestInitData, beforeClose, requestNFT, refreshContract, handleHard, generateThisNFT, netChange
     }
   }
 })
@@ -1215,6 +1251,71 @@ export default defineComponent({
           }
         }
 
+        &.is-disabled {
+          opacity: 0.5;
+          border-color: #e3e6eb;
+        }
+      }
+    }
+  }
+  :deep(.net_body) {
+    width: 570px;
+    margin: auto;
+    border-radius: 0.23rem;
+    text-align: left;
+    color: #000;
+    word-break: break-word;
+    @media screen and (max-width: 600px) {
+      width: 94%;
+    }
+    .el-dialog__header {
+      padding: 0.25rem 0.6rem 0.1rem;
+      font-size: 0.2rem;
+      .el-dialog__headerbtn {
+        right: 0.3rem;
+        top: 0.28rem;
+        font-size: 0.2rem;
+        font-weight: 600;
+        color: #000;
+        cursor: pointer;
+        i,
+        svg,
+        path {
+          color: inherit;
+          cursor: inherit;
+        }
+      }
+    }
+
+    .el-dialog__body {
+      padding: 0 0 0.15rem;
+    }
+
+    .el-dialog__footer {
+      padding: 0 0.6rem 0.5rem;
+      text-align: left;
+      .dialog-footer {
+        justify-content: center;
+      }
+      .el-button {
+        width: 60%;
+        max-width: 204px;
+        height: auto;
+        background: linear-gradient(180deg, #fefefe, #f0f0f0);
+        font-family: inherit;
+        font-size: 16px;
+        line-height: 1;
+        color: #000;
+        border-radius: 0.07rem;
+        @media screen and (max-width: 1600px) {
+          font-size: 14px;
+        }
+        &:hover {
+          opacity: 0.9;
+          span {
+            cursor: inherit;
+          }
+        }
         &.is-disabled {
           opacity: 0.5;
           border-color: #e3e6eb;

@@ -535,6 +535,9 @@ export default defineComponent({
   color: #000;
   font-size: 18px;
   border-top: 1px solid rgba(229, 231, 235, 0.7);
+  @media screen and (max-width: 768px) {
+    background: transparent;
+  }
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
@@ -598,6 +601,10 @@ export default defineComponent({
       padding: 0;
       background-color: #fbfbfc;
       border-right: 1px solid rgba(229, 231, 235, 0.7);
+      @media screen and (max-width: 768px) {
+        background: transparent;
+        border: 0;
+      }
       .left_body {
         width: 90%;
         max-width: 280px;
