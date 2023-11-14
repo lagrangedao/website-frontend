@@ -185,7 +185,9 @@ import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
 import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
+import SpaceTokenABI from '@/utils/abi/SpacePaymentV5.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
+import tokenUSDCABI from '@/utils/abi/USDC.json'
 import {
   InfoFilled
 } from '@element-plus/icons-vue'
@@ -267,10 +269,10 @@ export default defineComponent({
     const forkLoad = ref(false)
     const sleepSelect = ref({})
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
-    const tokenAddress = process.env.VUE_APP_MUMBAI_USDC_ADDRESS
-    const tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
-    const paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
-    const paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
+    let tokenAddress = process.env.VUE_APP_MUMBAI_USDC_ADDRESS
+    let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
+    let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
+    let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
 
     async function hardwareFun () {
       const net = await networkEstimate()
@@ -286,7 +288,7 @@ export default defineComponent({
         }
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
         const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
-        const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6); // usdc is 6 decimal, ensure the amount will not be more than 6
+        const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6) // usdc is 6 decimal, ensure the amount will not be more than 6
 
         let approveGasLimit = await tokenContract.methods
           .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
@@ -298,14 +300,13 @@ export default defineComponent({
             from: store.state.metaAddress, gasLimit: approveGasLimit
           })
 
+        let payMethod = getnetID === 80001 ? paymentContract.methods
+          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
+          paymentContract.methods
+            .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
 
-        let gasLimit = await paymentContract.methods
-          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
-          .estimateGas({ from: store.state.metaAddress })
-
-        const tx = await paymentContract.methods
-          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
-          .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+        let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
+        const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
             await hardwareHash(transactionHash, approveAmount)
@@ -434,7 +435,14 @@ export default defineComponent({
       return arr;
     }
 
-
+    async function paymentEnv () {
+      if (getnetID !== 80001) {
+        tokenAddress = process.env.VUE_APP_OPSWAN_USDC_ADDRESS
+        tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenUSDCABI, tokenAddress);
+        paymentContractAddress = process.env.VUE_APP_OPSWAN_ADDRESS
+        paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
+      }
+    }
     async function init (params) {
       machinesLoad.value = true
       const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
@@ -452,7 +460,10 @@ export default defineComponent({
       machinesLoad.value = false
     }
 
-    onMounted(() => {
+    let getnetID = NaN
+    onMounted(async () => {
+      getnetID = await system.$commonFun.web3Init.eth.net.getId()
+      paymentEnv()
       init()
     })
     return {
