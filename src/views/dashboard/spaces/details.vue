@@ -464,16 +464,17 @@ export default defineComponent({
             containerLog: []
           })
         }
-      } else if (space && space.jobs_status && space.jobs_status.length > 0) {
-        for (let j = 0; j < space.jobs_status.length; j++) {
-          logArr.push({
-            job: {},
-            space: space,
-            buildLog: [],
-            containerLog: []
-          })
-        }
       }
+      //  else if (space && space.jobs_status && space.jobs_status.length > 0) {
+      //   for (let j = 0; j < space.jobs_status.length; j++) {
+      //     logArr.push({
+      //       job: {},
+      //       space: space,
+      //       buildLog: [],
+      //       containerLog: []
+      //     })
+      //   }
+      // }
       return logArr
     }
     const hardRedeploy = (dialog) => {
