@@ -184,7 +184,7 @@ import { defineComponent, computed, onMounted, watch, ref, reactive, nextTick, g
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
-import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
+import SpaceHardwareABI from '@/utils/abi/SpacePaymentV6.json'
 import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
 import tokenUSDCABI from '@/utils/abi/USDC.json'
