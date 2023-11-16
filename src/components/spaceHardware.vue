@@ -184,8 +184,8 @@ import { defineComponent, computed, onMounted, watch, ref, reactive, nextTick, g
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
-import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
-import SpaceTokenABI from '@/utils/abi/SpacePaymentV5.json'
+import SpaceHardwareABI from '@/utils/abi/SpacePaymentV6.json'
+import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
 import tokenUSDCABI from '@/utils/abi/USDC.json'
 import {
@@ -301,7 +301,7 @@ export default defineComponent({
           })
 
         let payMethod = getnetID === 80001 ? paymentContract.methods
-          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
+          .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
           paymentContract.methods
             .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
 
