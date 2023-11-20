@@ -104,7 +104,6 @@ export default defineComponent({
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref({})
     const filedata = ref([])
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -112,91 +111,21 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const activeName = ref('card')
-    const tableData = ref([
-      {
-        sentence1: '"The cat sat on the mat."',
-        sentence2: '"The cat did not sit on the mat."',
-        idx: '0',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"The cat did not sit on the mat."',
-        sentence2: '"The cat sat on the mat."',
-        idx: '1',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"When you\'ve got no snow,  it\'s really hard to...',
-        sentence2: '"When you\'ve got snow, it\'s really hard to learn a snowy...',
-        idx: '2',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '3',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya doesn\'t support media...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '4',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouya supports Twitch.tv...',
-        sentence2: '"Out of the box, Ouya supports media apps such as Twitch...',
-        idx: '5',
-        label: '1   (not_entailment)'
-      },
-      {
-        sentence1: '"Out of the box, Ouy supports media apps...',
-        sentence2: '"Out of the box, Ouya supports Twitch.tv and XBMC media player."',
-        idx: '6',
-        label: '1   (not_entailment)'
-      }
-    ])
 
     function handleClick (tab, event) {
       router.push({ name: 'modelsDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     async function init () {
       if (route.name !== 'modelsDetail') return
       listLoad.value = true
-      listdata.value = {}
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
-        filedata.value = listRes.data.files || []
-        listdata.value = listRes.data.dataset || { name: route.params.name }
+        filedata.value = listRes.data || []
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
-
-      // listdata.value = [
-      //   {
-      //     is_public: "1",
-      //     name: "Frigg"
-      //   },
-      //   {
-      //     is_public: "1",
-      //     name: "Travis"
-      //   },
-      //   {
-      //     is_public: "1",
-      //     name: "Tyree"
-      //   }
-      // ]
     }
     function detailFun (row, index) {
       console.log(row, index)
@@ -246,15 +175,13 @@ export default defineComponent({
       background,
       listLoad,
       filedata,
-      listdata,
       total,
       activeName,
       bodyWidth,
       system,
       route,
       router,
-      tableData,
-      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList, copyName, back
+      init, handleCurrentChange, handleSizeChange, detailFun, handleClick, getDatasetList, copyName, back
     }
   }
 })

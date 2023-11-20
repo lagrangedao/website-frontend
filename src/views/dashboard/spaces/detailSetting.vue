@@ -2,7 +2,7 @@
   <section id="space">
     <el-row class="space_body" v-loading="listLoad">
       <space-hardware @handleHard="handleHard" :listdata="listdata" :renewButton="'setting'"></space-hardware>
-      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated' && listdata.status === 'Created'">
+      <div class="fileList" v-loading="renameLoad" v-if="nftdata.status === 'not generated'">
         <div class="title">Rename or transfer this space</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
@@ -57,7 +57,8 @@
               </el-table-column>
               <el-table-column prop="token_id" label="Token ID">
                 <template #default="scope">
-                  <a :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
+                  <a v-if="userGateway" :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
+                  <span v-else>{{ scope.row.token_id }}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="owner_address" label="Owner Address" min-width="140">
@@ -69,7 +70,7 @@
               <el-table-column prop="status" label="Status" />
               <el-table-column label="Share License Info" min-width="110">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined'?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Get shared link</el-button>
+                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined' && userGateway?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Get shared link</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
@@ -129,7 +130,7 @@
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your space and your name to
           <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
-          <a href="mailto:team@filswan.com">team@filswan.com</a>
+          <a :href="`mailto:${email_link}`">{{email_link}}</a>
         </div>
         <el-form ref="ruleFormRefDelete" status-icon>
           <el-form-item prop="agreeDoi" style="width:100%">
@@ -202,6 +203,7 @@ export default defineComponent({
       return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
     })
     const metaAddressFull = computed(() => (store.state.metaAddress))
+    const userGateway = computed(() => (store.state.gateway))
     const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
     const ruleForm = reactive({
       name: '',
@@ -285,42 +287,57 @@ export default defineComponent({
     })
     const settingIndex = ref(0)
     const gutterRow = ref(document.body.clientWidth < 992 ? '0' : '30')
+    const email_link = process.env.VUE_APP_BASE_EMAIL
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
     const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
 
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     const submitForm = async (formEl) => {
-      if (!formEl) return
-      await ruleFormRef.value.validate(async (valid, fields) => {
-        if (valid) {
-          renameLoad.value = true
-          let formData = new FormData()
-          formData.append('name', route.params.name)
-          formData.append('is_public', listdata.value.is_public) // public:1, private:0
-          formData.append('new_name', ruleForm.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/update`, 'post', formData)
-          await system.$commonFun.timeout(500)
+      if (!formEl) return;
+
+      ruleFormRef.value.validate(async (valid, fields) => {
+        if (!valid) {
+          system.$commonFun.messageTip('error', 'Validation failed!');
+          console.log('Validation errors:', fields);
+          return;
+        }
+
+        renameLoad.value = true;
+
+        try {
+          const formData = new FormData();
+          formData.append('name', route.params.name);
+          formData.append('is_public', listdata.value.is_public); // public:1, private:0
+          formData.append('new_name', ruleForm.name);
+
+          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/update`, 'post', formData);
+          await system.$commonFun.timeout(500);
+
           if (listRes && listRes.status === 'success') {
             if (listRes.data.space) {
-              accessSpace.value.splice(settingIndex.value, 1, ruleForm.name)
-              store.dispatch('setAccessSpace', JSON.stringify(accessSpace.value))
-              system.$commonFun.messageTip('success', 'Update successfully!')
-              router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings' } })
+              accessSpace.value.splice(settingIndex.value, 1, ruleForm.name);
+              store.dispatch('setAccessSpace', JSON.stringify(accessSpace.value));
+              system.$commonFun.messageTip('success', 'Update successfully!');
+              router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: ruleForm.name, tabs: 'settings' } });
+            } else {
+              system.$commonFun.messageTip('error', listRes.data.message);
             }
-            else system.$commonFun.messageTip('error', listRes.data.message)
-          } else system.$commonFun.messageTip('error', 'Upload failed!')
-          ruleForm.name = ''
-          renameLoad.value = false
-        } else {
-          console.log('error submit!', fields)
-          return false
+          } else {
+            const errorMessage = listRes ?.message || 'Upload failed!';
+            system.$commonFun.messageTip('error', errorMessage);
+          }
+
+        } catch (error) {
+          system.$commonFun.messageTip('error', error.message || 'An unexpected error occurred!');
+        } finally {
+          ruleForm.name = '';
+          renameLoad.value = false;
         }
-      })
+      });
     }
+
+
     const submitDeleteForm = async (formEl) => {
       if (!formEl) return
       await ruleFormRefDelete.value.validate(async (valid, fields) => {
@@ -372,6 +389,7 @@ export default defineComponent({
             await generateMintHash(transactionHash)
             generateLoad.value = false
             dialogDOIVisible.value = false
+            context.emit('handleValue', true, 'setting')
             requestInitData()
           })
           .on('error', () => generateLoad.value = false)
@@ -425,6 +443,7 @@ export default defineComponent({
             await requestDataInfo(transactionHash)
             generateLoad.value = false
             dialogDOIVisible.value = false
+            context.emit('handleValue', true, 'setting')
             requestInitData()
           })
           .on('error', () => generateLoad.value = false)
@@ -448,6 +467,7 @@ export default defineComponent({
     async function refreshContract (type) {
       listLoad.value = true
       if (type) {
+        context.emit('handleValue', true, 'setting')
         requestInitData(type)
         return
       }
@@ -499,7 +519,7 @@ export default defineComponent({
         return ''
       }
     }
-    async function mapTokens (list, nft_contract, contract_address, gateway) {
+    async function mapTokens (list, nft_contract, contract_address) {
       const number = list ? list.length : 0
       for (let token = 0; token < number; token++) {
         let { name, url } = await system.$commonFun.getUnit(parseInt(list[token].chain_id), 16)
@@ -507,7 +527,7 @@ export default defineComponent({
         list[token].owner_address = list[token].token_id && list[token].token_id !== null ? await ownerAddress(nft_contract, list[token].token_id) : ''
         list[token].chain_name = name
         list[token].chain_url = url
-        list[token].ipfs_url = `${gateway}/ipfs/${list[token].cid}`
+        list[token].ipfs_url = userGateway.value ? `${userGateway.value}/ipfs/${list[token].cid}` : ''
       }
       return list
     }
@@ -516,30 +536,30 @@ export default defineComponent({
       listLoad.value = true
       listdata.value = {}
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
-        if (listRes.data.nft) {
-          if (listRes.data.nft.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
-          let contract_address = listRes.data.nft.contract_address
-          const getID = await system.$commonFun.web3Init.eth.net.getId()
-          if (listRes.data.nft.chain_id && getID.toString() !== listRes.data.nft.chain_id) {
-            const { name } = await system.$commonFun.getUnit(Number(listRes.data.nft.chain_id))
-            await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
-            listRes.data.nft.tokens = []
-          } else if (contract_address) {
-            let { url } = await system.$commonFun.getUnit(parseInt(listRes.data.nft.chain_id), 16)
-            const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
-            // const tokens_contact = await getTokenURI(nft_contract, contract_address, listRes.data.nft.chain_id)
-            const tokens_list = await mapTokens(listRes.data.nft.tokens, nft_contract, contract_address, listRes.data.space.gateway)
-            // listRes.data.nft.tokens = tokens_contact.concat(tokens_list)
-            listRes.data.nft.chain_url = url
-            listRes.data.nft.tokens = tokens_list
-          }
+      if (listRes && listRes.status === 'success') listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
+
+      const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
+      if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
+        if (listNftRes.data.status === 'processing' && type) system.$commonFun.messageTip('warning', 'Waiting for the Transaction hash complete')
+        let contract_address = listNftRes.data.contract_address
+        const getID = await system.$commonFun.web3Init.eth.net.getId()
+        if (listNftRes.data.chain_id && getID.toString() !== listNftRes.data.chain_id) {
+          const { name } = await system.$commonFun.getUnit(Number(listNftRes.data.chain_id))
+          await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+          listNftRes.data.tokens = []
+        } else if (contract_address) {
+          let { url } = await system.$commonFun.getUnit(parseInt(listNftRes.data.chain_id), 16)
+          const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
+          // const tokens_contact = await getTokenURI(nft_contract, contract_address, listNftRes.data.chain_id)
+          const tokens_list = await mapTokens(listNftRes.data.tokens, nft_contract, contract_address)
+          // listNftRes.data.tokens = tokens_contact.concat(tokens_list)
+          listNftRes.data.chain_url = url
+          listNftRes.data.tokens = tokens_list
         }
-        nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
+
+        nftdata.value = listNftRes.data || { contract_address: null, tokens: [], status: 'not generated' }
       }
+
       // await system.$commonFun.timeout(500)
       listLoad.value = false
     }
@@ -552,10 +572,16 @@ export default defineComponent({
     }
     function handleChange (val, refresh) {
       dataNFTRequest.value = val
-      if (refresh) requestInitData()
+      if (refresh) {
+        context.emit('handleValue', true, 'setting')
+        requestInitData()
+      }
     }
     function handleHard (val, refresh) {
-      if (refresh) requestInitData()
+      if (refresh) {
+        context.emit('handleValue', true, 'setting')
+        requestInitData()
+      }
     }
     onMounted(async () => {
       window.scrollTo(0, 0)
@@ -567,12 +593,13 @@ export default defineComponent({
       ruleForm.name = ''
       ruleForm.delete = ''
     })
-    watch(() => props.likesValue, () => {
-      requestInitData()
-    })
+    // watch(() => props.likesValue, () => {
+    //   requestInitData()
+    // })
     return {
       lagLogin,
       metaAddress,
+      userGateway,
       renameLoad,
       deleteLoad,
       doiLoad,
@@ -596,7 +623,8 @@ export default defineComponent({
       manageDOI,
       eventArgs,
       chainIdRes,
-      props, submitForm, submitDeleteForm, momentFilter,
+      email_link,
+      props, submitForm, submitDeleteForm,
       handleChange, requestInitData, beforeClose, requestNFT, refreshContract, handleHard
     }
   }

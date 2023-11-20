@@ -31,9 +31,14 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
     }
   } catch (err) {
     console.error(err, err.response)
-    messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    const time = await throttle()
+    if (time) messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
+    } else if (err.response && err.response.status === 404) {
+      router.push({
+        name: 'main'
+      })
     } else if (err.response) {
       // The request has been sent, but the status code of the server response is not within the range of 2xx
       // console.log(err.response.data)
@@ -106,11 +111,11 @@ async function login() {
   }
 
   const time = await throttle()
-  if (!time) return false
-  const signature = await sign()
-  if (!signature) return false
+  if (!time) return [false, '']
+  const [signature, signErr] = await sign()
+  if (!signature) return [false, signErr]
   const token = await performSignin(signature)
-  return !!token
+  return [!!token, '']
 }
 
 async function throttle() {
@@ -128,17 +133,20 @@ async function sign(nonce) {
   const local = process.env.VUE_APP_DOMAINNAME
   const buff = Buffer.from("Signing in to " + local + " at " + sortanow, 'utf-8')
   let signature = null
+  let signErr = ''
   await ethereum.request({
     method: 'personal_sign',
     params: [buff.toString('hex'), store.state.metaAddress]
   }).then(sig => {
+    signErr = ''
     signature = sig
   }).catch(err => {
     console.log(err)
     signature = ''
+    signErr = err && err.code ? String(err.code) : err
     signOutFun()
   })
-  return signature
+  return [signature, signErr]
 }
 
 async function performSignin(sig) {
@@ -156,6 +164,17 @@ async function performSignin(sig) {
     console.log('login err:', err)
     messageTip('error', 'Fail')
     return null
+  }
+}
+
+async function gatewayGain() {
+  if (store.state.gateway) return
+  try {
+    const response = await sendRequest(`${process.env.VUE_APP_BASEAPI}gateway`, 'get')
+    if (response && response.data.gateway) store.dispatch('setGateway', response.data.gateway)
+  } catch (err) {
+    // console.log('login err:', err)
+    messageTip('error', 'Gateway not found')
   }
 }
 
@@ -220,6 +239,10 @@ async function getUnit(id) {
   let url = ''
   let url_tx = ''
   switch (id) {
+    case 1:
+      unit = 'ETH'
+      name = 'Ethereum Mainnet '
+      break
     case 56:
       unit = 'BNB'
       name = 'Binance Smart Chain Mainnet '
@@ -241,7 +264,8 @@ async function getUnit(id) {
     case 80001:
       unit = 'MATIC'
       name = 'Mumbai Testnet '
-      url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
+      // url = `${process.env.VUE_APP_MUMBAIBLOCKURL}/address/`
+      url = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/address/`
       url_tx = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/tx/`
       break
     case 3141:
@@ -305,6 +329,45 @@ function hiddAddress(val) {
   else return '-'
 }
 
+function NumFormat(value) {
+  if (String(value) === '0') return '0'
+  else if (!value) return '-'
+  var intPartArr = String(value).split('.')
+  var intPartFormat = intPartArr[0]
+    .toString()
+    .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
+  return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
+}
+
+function calculateDiffTime(startTime) {
+  var endTime = Math.round(new Date() / 1000)
+  var timeDiff = endTime - startTime
+  var year = timeDiff > (86400 * 365) ? parseInt(timeDiff / 86400 / 365) : 0
+  var month = timeDiff > (86400 * 30) ? parseInt(timeDiff / 86400 / 30) : 0
+  var day = parseInt(timeDiff / 86400)
+  var hour = parseInt((timeDiff % 86400) / 3600)
+  var minute = parseInt((timeDiff % 3600) / 60)
+  var m = parseInt((timeDiff % 60))
+  if (year > 0) return `about ${year}${year > 1 ? ' years' : ' year'} ago`
+  if (month > 0) return `${month} ${month > 1 ? ' months' : ' month'} ago`
+  if (day > 0) return `${day} ${day > 1 ? ' days' : ' day'} ago`
+  else if (hour > 0) return `${hour} ${hour > 1 ? ' hours' : ' hour'} ago`
+  else if (minute > 0) return `${minute} ${minute > 1 ? ' minutes' : ' minute'} ago`
+  else if (m > 0) return `${m} ${m > 1 ? ' seconds' : ' second'} ago`
+  else return '-'
+}
+
+function sizeChange(bytes) {
+  if (bytes === 0) return '0 B'
+  if (!bytes) return '-'
+  var k = 1024 // or 1000
+  var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  var i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
 async function expireTimeFun(cont) {
   const current = Math.floor(Date.now() / 1000)
   let expireTime = {
@@ -326,6 +389,10 @@ async function expireTimeFun(cont) {
   }
 
   return expireTime
+}
+
+function goLink(link) {
+  window.open(link)
 }
 
 function cmOptions(owner) {
@@ -379,6 +446,11 @@ export default {
   getUnit,
   changeIDLogin,
   hiddAddress,
+  NumFormat,
+  calculateDiffTime,
+  sizeChange,
+  goLink,
   cmOptions,
-  expireTimeFun
+  expireTimeFun,
+  gatewayGain
 }

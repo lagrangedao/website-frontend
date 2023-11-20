@@ -14,8 +14,17 @@ RUN apk add --update \
 # make the 'app' folder the current working directory
 WORKDIR /app
 
-# copy both 'package.json' and 'package-lock.json' (if available)
-COPY package*.json ./
+# copy both 'package.json'
+COPY package.json ./
+
+# remove node_modules if exists
+RUN rm -rf node_modules
+
+# remove package-lock.json if exists
+RUN rm -rf package-lock.json
+
+# clean npm cache
+RUN npm cache clean --force
 
 # install project dependencies
 RUN npm install

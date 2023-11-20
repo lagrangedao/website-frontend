@@ -265,33 +265,19 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     async function init () {
       if (route.params.tabs !== 'card') return
       listLoad.value = true
       listdata.value = []
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        // listdata.value = listRes.data.files || []
-        const fileLi = listRes.data.files || []
+        const fileLi = listRes.data || []
         fileLi.forEach((element, i) => {
-          let el = element.name.split('/')
-          el.shift()
-          el.shift()
-          el.shift()
-          // console.log(el.join('/').toLowerCase())
+          let el = element.name.split('/').slice(3)
           if (el.join('/').toLowerCase() === 'readme.md') {
-            urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
+            urlReadme.value = `${store.state.gateway}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
-            getTitle(urlReadme.value)
+            if (store.state.gateway) getTitle(urlReadme.value)
           }
         })
       }
@@ -324,26 +310,31 @@ export default defineComponent({
     };
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
-      var response = await fetch(urlReadme.value)
-      textEditor.value = await new Promise(async resolve => {
-        resolve(response.text())
-      })
-      nextTick(() => {
-        const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-        titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-        if (!titles.value.length) {
-          titles.value = [];
-          return;
-        }
+      try {
+        var response = await fetch(urlReadme.value)
+        textEditor.value = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        nextTick(() => {
+          const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+          titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+          if (!titles.value.length) {
+            titles.value = [];
+            return;
+          }
 
-        const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-        titles.value = titles.value.map(el => ({
-          title: el.innerText,
-          lineIndex: el.getAttribute('data-v-md-line'),
-          indent: hTags.indexOf(el.tagName)
-        }));
-      });
-    };
+          const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+          titles.value = titles.value.map(el => ({
+            title: el.innerText,
+            lineIndex: el.getAttribute('data-v-md-line'),
+            indent: hTags.indexOf(el.tagName)
+          }));
+        })
+      } catch (err) {
+        console.log('err model card:', err)
+        system.$commonFun.messageTip('error', err)
+      }
+    }
     function handleAnchorClick (anchor) {
       const { lineIndex } = anchor
       const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
@@ -412,6 +403,8 @@ export default defineComponent({
     }
     onActivated(() => { })
     onMounted(() => {
+      textEditor.value = ''
+      titles.value = ''
       urlReadme.value = ''
       window.scrollTo(0, 0)
       init()
@@ -427,6 +420,8 @@ export default defineComponent({
     watch(route, (to, from) => {
       if (to.name !== 'modelsDetail') return
       if (to.params.tabs === 'card') {
+        textEditor.value = ''
+        titles.value = ''
         urlReadme.value = ''
         window.scrollTo(0, 0)
         init()
@@ -453,7 +448,7 @@ export default defineComponent({
       isPreview,
       formInline,
       textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, getData, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick
+      init, getData, handleCurrentChange, handleSizeChange, detailFun, handleClick
     }
   }
 })

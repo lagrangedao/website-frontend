@@ -57,7 +57,8 @@
               </el-table-column>
               <el-table-column prop="token_id" label="Token ID">
                 <template #default="scope">
-                  <a :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
+                  <a v-if="userGateway" :href="scope.row.ipfs_url" target="_blank" class="link">{{ scope.row.token_id }}</a>
+                  <span v-else>{{scope.row.token_id}}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="owner_address" label="Owner Address" min-width="140">
@@ -69,7 +70,7 @@
               <el-table-column prop="status" label="Status" />
               <el-table-column label="Share License Info" min-width="110">
                 <template #default="scope">
-                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined'?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Get shared link</el-button>
+                  <el-button size="large" class="generateDOI" :disabled="scope.row.cid && scope.row.cid !== 'undefined' && userGateway?false:true" @click="system.$commonFun.copyContent(scope.row.ipfs_url, 'Copied')">Get shared link</el-button>
                   <!-- <a :href="scope.row.ipfs_uri" target="_blank" class="link">{{ scope.row.ipfs_uri }}</a> -->
                 </template>
               </el-table-column>
@@ -131,7 +132,7 @@
         <div class="tip_black">
           By using this feature, you agree to transfer metadata about your dataset and your name to
           <a href="https://www.multichain.storage" target="_blank">multichain.storage</a> For more information please contact
-          <a href="mailto:team@filswan.com">team@filswan.com</a>
+          <a :href="`mailto:${email_link}`">{{email_link}}</a>
         </div>
         <el-form ref="ruleFormRefDelete" status-icon>
           <el-form-item prop="agreeDoi" style="width:100%">
@@ -214,6 +215,7 @@ export default defineComponent({
       let val = store.state.metaAddress || ''
       return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
     })
+    const userGateway = computed(() => (store.state.gateway))
     const accessDataset = computed(() => (store.state.accessDataset ? JSON.parse(store.state.accessDataset) : []))
     const ruleForm = reactive({
       name: '',
@@ -260,11 +262,8 @@ export default defineComponent({
     const router = useRouter()
     const refreshExecutable = ref(false)
     const moreLoad = ref(false)
+    const email_link = process.env.VUE_APP_BASE_EMAIL
     const factory = new system.$commonFun.web3Init.eth.Contract(FACTORY_ABI, process.env.VUE_APP_DATANFT_ADDRESS)
-
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
 
     const submitForm = async (formEl) => {
       if (!formEl) return
@@ -348,6 +347,7 @@ export default defineComponent({
             await generateMintHash(transactionHash)
             generateLoad.value = false
             dialogDOIVisible.value = false
+            context.emit('handleValue', true, 'setting')
             requestInitData()
           })
           .on('error', () => generateLoad.value = false)
@@ -366,7 +366,7 @@ export default defineComponent({
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       fd.append('tx_hash', tx_hash)
       fd.append('chain_id', getID)
-      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${store.state.metaAddress}/${route.params.name}/mint_hash`, 'post', fd)
+      const minthashRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}/mint_hash`, 'post', fd)
     }
 
     async function beforeClose () {
@@ -401,6 +401,7 @@ export default defineComponent({
             await requestDataInfo(transactionHash)
             generateLoad.value = false
             dialogDOIVisible.value = false
+            context.emit('handleValue', true, 'setting')
             requestInitData()
           })
           .on('error', () => generateLoad.value = false)
@@ -424,6 +425,7 @@ export default defineComponent({
     async function refreshContract (type) {
       listLoad.value = true
       if (type) {
+        context.emit('handleValue', true, 'setting')
         requestInitData(type)
         return
       }
@@ -477,7 +479,7 @@ export default defineComponent({
         return ''
       }
     }
-    async function mapTokens (list, nft_contract, contract_address, gateway) {
+    async function mapTokens (list, nft_contract, contract_address) {
       const number = list ? list.length : 0
       for (let token = 0; token < number; token++) {
         let { name, url } = await system.$commonFun.getUnit(parseInt(list[token].chain_id), 16)
@@ -485,7 +487,7 @@ export default defineComponent({
         list[token].owner_address = list[token].token_id && list[token].token_id !== null ? await ownerAddress(nft_contract, list[token].token_id) : ''
         list[token].chain_name = name
         list[token].chain_url = url
-        list[token].ipfs_url = `${gateway}/ipfs/${list[token].cid}`
+        list[token].ipfs_url = userGateway.value ? `${userGateway.value}/ipfs/${list[token].cid}` : ''
       }
       return list
     }
@@ -508,14 +510,13 @@ export default defineComponent({
             let { url } = await system.$commonFun.getUnit(parseInt(listRes.data.nft.chain_id), 16)
             const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, contract_address)
             // const tokens_contact = await getTokenURI(nft_contract, contract_address, listRes.data.nft.chain_id)
-            const tokens_list = await mapTokens(listRes.data.nft.tokens, nft_contract, contract_address, listRes.data.dataset.gateway)
+            const tokens_list = await mapTokens(listRes.data.nft.tokens, nft_contract, contract_address)
             // listRes.data.nft.tokens = tokens_contact.concat(tokens_list)
             listRes.data.nft.chain_url = url
             listRes.data.nft.tokens = tokens_list
           }
         }
         nftdata.value = listRes.data.nft || { contract_address: null, tokens: [], status: 'not generated' }
-        context.emit('handleValue', listRes.data.dataset, listRes.data.nft)
       }
       listLoad.value = false
     }
@@ -530,7 +531,10 @@ export default defineComponent({
 
     function handleChange (val, refresh) {
       dataNFTRequest.value = val
-      if (refresh) requestInitData()
+      if (refresh) {
+        context.emit('handleValue', true, 'setting')
+        requestInitData()
+      }
     }
     onMounted(async () => {
       window.scrollTo(0, 0)
@@ -542,12 +546,13 @@ export default defineComponent({
       ruleForm.name = ''
       ruleForm.delete = ''
     })
-    watch(() => props.likesValue, () => {
-      requestInitData()
-    })
+    // watch(() => props.likesValue, () => {
+    //   requestInitData()
+    // })
     return {
       lagLogin,
       metaAddress,
+      userGateway,
       renameLoad,
       deleteLoad,
       generateLoad,
@@ -571,7 +576,8 @@ export default defineComponent({
       router,
       moreLoad,
       chainIdRes,
-      props, submitForm, submitDeleteForm, momentFilter, beforeClose,
+      email_link,
+      props, submitForm, submitDeleteForm, beforeClose,
       handleChange, requestInitData, requestNFT, refreshContract
     }
   }

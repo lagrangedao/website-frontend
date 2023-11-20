@@ -11,8 +11,9 @@
               {{ listdata.user.full_name || '-'}}
             </div>
             <div class="desc" style="margin-bottom:0.1rem">Decentralized data science without borders</div>
+            <div class="desc">Network: {{info.network||'-'}}</div>
             <div class="desc">Balance: {{info.balance||'-'}} {{info.unit}}</div>
-            <div class="desc">Wallet Address: {{hiddAddress(metaAddress)}}
+            <div class="desc">Wallet Address: {{system.$commonFun.hiddAddress(metaAddress)}}
               <el-icon v-if="metaAddress" @click="system.$commonFun.copyContent(metaAddress, 'Copied')">
                 <CopyDocument />
               </el-icon>
@@ -88,7 +89,7 @@
                 <el-dropdown-menu>
                   <el-dropdown-item :command="c" v-for="(child, c) in listdata.license_requests_notifications" :key="c">
                     <div class="drop_body">
-                      <p>{{ child.recipient_address? hiddAddress(child.recipient_address):'Someone else' }} is requesting your {{child.source_type ? (child.source_type):''}} license:
+                      <p>{{ child.recipient_address? system.$commonFun.hiddAddress(child.recipient_address):'Someone else' }} is requesting your {{child.source_type ? (child.source_type):''}} license:
                         <b>{{child.name}}</b>
                       </p>
                       <el-button @click="licenseMetaData(child)" type="primary" size="small">Approve</el-button>
@@ -167,12 +168,12 @@
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{hiddAddress(list.wallet_address)}}</p>
+                <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
               </div>
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                  <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
                 <!-- <div class="item_body">
                   <i class="icon icon_up"></i>
@@ -205,8 +206,8 @@
               </div>
               <div class="text">
                 <i class="icon icon_wallet"></i>
-                <p class="ellipsis" v-if="list.type === 'Space License'">{{hiddAddress(list.space_owner)}}</p>
-                <p class="ellipsis" v-else>{{hiddAddress(list.dataset_owner)}}</p>
+                <p class="ellipsis" v-if="list.type === 'Space License'">{{system.$commonFun.hiddAddress(list.space_owner)}}</p>
+                <p class="ellipsis" v-else>{{system.$commonFun.hiddAddress(list.dataset_owner)}}</p>
               </div>
               <div class="text item">
                 <div class="item_body">
@@ -217,7 +218,7 @@
               <div class="text item">
                 <div class="item_body">
                   <i class="icon icon_time"></i>
-                  <span class="small">{{momentFilter(list.created_at)}}</span>
+                  <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
               </div>
             </el-card>
@@ -260,7 +261,8 @@ export default defineComponent({
     const info = reactive({
       address: '',
       balance: '',
-      unit: ''
+      unit: '',
+      network: ''
     })
     const options = ref([
       // {
@@ -311,8 +313,18 @@ export default defineComponent({
     const dataNFTRow = reactive({
       data: {}
     })
+    let lastTime = 0
+    async function throttle () {
+      // Prevent multiple signatures
+      let now = new Date().valueOf();
+      if (lastTime > 0 && (now - lastTime) <= 2000) return false
+      lastTime = now
+      return true
+    }
 
     async function isLogin () {
+      const time = await throttle()
+      if (!time) return false
       loadingText.value = ''
       system.$commonFun.Init(async addr => {
         info.address = addr
@@ -323,17 +335,30 @@ export default defineComponent({
           info.balance = Number(balanceAll).toFixed(4)
         })
         const chainId = await system.$commonFun.web3Init.eth.net.getId()
-        const { unit } = await system.$commonFun.getUnit(chainId)
+        const { unit, name } = await system.$commonFun.getUnit(chainId)
         info.unit = unit
+        info.network = name || chainId
         // await system.$commonFun.timeout(500)
         if (lagLogin.value) getdataList()
         else await signIn()
       })
     }
+    async function signSetIn (t) {
+      let time = t || 0
+      let timer = null
+      timer = setInterval(() => {
+        if (time > 3) {
+          clearInterval(timer)
+          if (store.state.accessToken) getdataList()
+          else signIn()
+        } else time += 1
+      }, 1000)
+    }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      const lStatus = await system.$commonFun.login()
+      const [lStatus, signErr] = await system.$commonFun.login()
       if (lStatus) getdataList()
+      else if (signErr !== '4001') signSetIn()
       // else window.location.reload()
       return false
       store.dispatch('setNavLogin', false)
@@ -352,7 +377,7 @@ export default defineComponent({
         licenseIndex.value = listRes.data.received_licenses.length
         dataSetIndex.value = listRes.data.dataset.length
         spacesIndex.value = listRes.data.space.length
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar ? `${listRes.data.gateway}/ipfs/${listRes.data.user.avatar}` : '')
+        store.dispatch('setAccessAvatar', listRes.data.user.avatar && store.state.gateway ? `${store.state.gateway}/ipfs/${listRes.data.user.avatar}` : '')
         store.dispatch('setAccessName', listRes.data.user.full_name)
         let spaceList = []
         let datasetList = []
@@ -392,7 +417,7 @@ export default defineComponent({
       //   store.dispatch('setMetaAddress', account[0])
       //   store.dispatch('setNavLogin', false)
       //   store.dispatch('setLogin', false)
-      //   store.dispatch('setAccessToken', '')
+      //   store.dispatch('setAccessToken', '') 
       //   window.location.reload()
       // })
       // networkChanged
@@ -409,18 +434,11 @@ export default defineComponent({
         // window.location.reload()
       })
     }
-    function hiddAddress (val) {
-      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
-      else return '-'
-    }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     function detailFun (row, type) {
       if (type === 'dataset') router.push({ name: 'datasetDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
-      else if (type === 'space') router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
+      else if (type === 'space') router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'app' } })
       else if (type === 'model') router.push({ name: 'modelsDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
-      else if (type === 'licenses') if (row.cid && row.cid !== 'undefined') window.open(`${row.gateway}/ipfs/${row.cid}`)
+      else if (type === 'licenses') if (row.cid && row.cid !== 'undefined' && store.state.gateway) window.open(`${store.state.gateway}/ipfs/${row.cid}`)
     }
     function editProfile (row, index) {
       // console.log(row, index)
@@ -439,7 +457,6 @@ export default defineComponent({
     }
     async function licenseFun (row, type) {
       listLoad.value = true
-      console.log(row.source_type)
       const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${row.source_type === "Space" ? 'spaces' : 'datasets'}/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
       // const approveRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/license/${type === 'approve' ? 'approve' : 'reject'}/${row.request_uuid}`, 'post')
       if (approveRes && approveRes.status === 'success') system.$commonFun.messageTip('success', approveRes.message ? approveRes.message : 'Request successful.')
@@ -501,7 +518,7 @@ export default defineComponent({
       bodyWidth,
       dataNFTRequest,
       dataNFTRow,
-      isLogin, signIn, getdataList, fn, momentFilter, detailFun, editProfile, hiddAddress,
+      isLogin, signIn, getdataList, fn, detailFun, editProfile,
       handleCommand, licenseFun, licenseMetaData, handleChange
     }
   }
@@ -1049,11 +1066,11 @@ export default defineComponent({
                   background: url(../../../assets/images/icons/icon_9.png)
                     no-repeat left 0px;
                   background-size: 0.2rem;
-                  font-size: 14px;
+                  font-size: 12px;
                   color: #000;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
-                    font-size: 15px;
+                    font-size: 13px;
                   }
                 }
                 &.card-datasets {
@@ -1312,7 +1329,7 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: center;
-              height: 1.85rem;
+              height: 1.6rem;
               padding: 0;
               border: 0;
               border-radius: 0.1rem;
@@ -1352,11 +1369,11 @@ export default defineComponent({
                   background: url(../../../assets/images/icons/icon_9_1.png)
                     no-repeat left 0px;
                   background-size: 0.2rem;
-                  font-size: 14px;
+                  font-size: 12px;
                   color: #fff;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
-                    font-size: 15px;
+                    font-size: 13px;
                   }
                 }
               }
@@ -1364,7 +1381,7 @@ export default defineComponent({
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
                 // text-transform: capitalize;
                 cursor: pointer;
-                font-size: 0.3rem;
+                font-size: 0.2rem;
                 letter-spacing: 1px;
                 overflow: hidden;
                 text-overflow: ellipsis;

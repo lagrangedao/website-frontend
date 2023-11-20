@@ -15,6 +15,9 @@ const addOptions = {
 }
 
 module.exports = {
+  transpileDependencies: [
+    /[/\\]node_modules[/\\](.+?)?@intlify(.*)/
+  ],
   publicPath: '/',
 
   outputDir: process.env.VUE_APP_OUTPUTDIR,

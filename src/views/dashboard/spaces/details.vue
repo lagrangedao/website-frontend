@@ -21,7 +21,7 @@
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
+          <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
             <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
               <el-icon>
                 <WarningFilled />
@@ -43,7 +43,12 @@
                 p-id="2676" fill="#878c93"></path>
             </svg> Request License
           </div>
-          <div class="logs_style" v-if="logsValue" @click="logDrawer">
+          <div class="logs_style" @click="logDrawer('detail')">
+            <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+              <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+            </svg> Space Detail
+          </div>
+          <div :class="{'logs_style': true, 'is-disabled': parentValue === 'Created' || parentValue === 'Stopped' }" @click="logDrawer('log')">
             <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
               <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
             </svg> Logs
@@ -83,6 +88,15 @@
               Running as {{allData.space.activeOrder.config.description}} </div>
         </div>
         <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
+          <el-tab-pane name="app">
+            <template #label>
+              <span class="custom-tabs-label">
+                <i class="icon icon_spaces"></i>
+                <span>App</span>
+              </span>
+            </template>
+            <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'app'"></detail-app>
+          </el-tab-pane>
           <el-tab-pane name="card">
             <template #label>
               <span class="custom-tabs-label">
@@ -91,15 +105,6 @@
               </span>
             </template>
             <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName"></detail-card>
-          </el-tab-pane>
-          <el-tab-pane name="app">
-            <template #label>
-              <span class="custom-tabs-label">
-                <i class="icon icon_spaces"></i>
-                <span>App</span>
-              </span>
-            </template>
-            <detail-app @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'app'"></detail-app>
           </el-tab-pane>
           <el-tab-pane name="files">
             <template #label>
@@ -120,7 +125,7 @@
             </template>
             <detail-community @handleValue="handleValue" :likesValue="likesValue" v-if="activeName === 'community'"></detail-community>
           </el-tab-pane>
-          <el-tab-pane name="settings" v-if="metaAddress === route.params.wallet_address">
+          <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
             <template #label>
               <span class="custom-tabs-label">
                 <!-- <i class="icon icon_spaces"></i> -->
@@ -142,7 +147,7 @@
               <CloseBold />
             </el-icon>
           </div>
-          <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick">
+          <el-tabs v-model="drawerName" class="demo-tabs" v-if="drawerType === 'detail'">
             <el-tab-pane label="Overview" name="Overview">
               <div class="el-steps el-steps--simple">
                 <div class="el-step is-simple is-flex">
@@ -221,6 +226,22 @@
                   </div>
                 </div>
               </div>
+              <el-row class="logRow" :gutter="30">
+                <el-col :span="24">
+                  <el-descriptions title="Space Info:" direction="vertical" :column="bodyWidth" border>
+                    <el-descriptions-item label="Visibility">{{allData.space.is_public?'Public':'Private'}}</el-descriptions-item>
+                    <el-descriptions-item label="License Type">{{allData.space.license}}</el-descriptions-item>
+                    <el-descriptions-item label="SDK Type">{{allData.space.sdk}}</el-descriptions-item>
+                    <el-descriptions-item label="Space UUID">
+                      <p>
+                        {{allData.space.uuid}}
+                        <i class="icon icon_copy" @click="system.$commonFun.copyContent(allData.space.uuid, 'Copied')"></i>
+                      </p>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Last Stop Reason">{{allData.space.last_stop_reason || '-'}}</el-descriptions-item>
+                  </el-descriptions>
+                </el-col>
+              </el-row>
               <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
                 <el-col :span="24">
                   <el-descriptions title="You're using:" direction="vertical" :column="bodyWidth" border>
@@ -230,47 +251,48 @@
                     <el-descriptions-item label="VCPU">{{allData.space.activeOrder.config.vcpu}}</el-descriptions-item>
                     <el-descriptions-item label="Price">{{allData.space.activeOrder.config.price_per_hour}} LAG per hour</el-descriptions-item>
                     <el-descriptions-item label="Description">{{allData.space.activeOrder.config.description}}</el-descriptions-item>
+                    <el-descriptions-item label="Expiration Time">{{system.$commonFun.momentFun(allData.space.expiration_time) || '-'}}</el-descriptions-item>
                   </el-descriptions>
                 </el-col>
               </el-row>
-              <div class="logBody">
+              <div class="logBody" v-if="allData.task">
                 <json-viewer :value="allData.task" :expand-depth=5 copyable boxed sort></json-viewer>
               </div>
             </el-tab-pane>
-            <el-tab-pane v-for="(job, j) in logsCont.data" :key="j">
+            <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data" :key="j">
               <template #label>
                 <span class="custom-tabs-label">
-                  <span :class="{'span-cp': job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                  <span :class="{'span-cp': dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
                 </span>
               </template>
               <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
                 <el-col :span="24">
-                  <el-alert v-if="!job.job_result_uri" :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
+                  <el-alert v-if="!dataJob.job.job_result_uri" :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
                   <el-descriptions title="CP Status:" direction="vertical" :column="bodyWidth" border>
                     <el-descriptions-item label="CP Node ID">
-                      <p v-if="job.bidder_id">
-                        {{system.$commonFun.hiddAddress(job.bidder_id)}}
-                        <i class="icon icon_copy" @click="system.$commonFun.copyContent(job.bidder_id, 'Copied')"></i>
+                      <p v-if="dataJob.job.bidder_id">
+                        {{system.$commonFun.hiddAddress(dataJob.job.bidder_id)}}
+                        <i class="icon icon_copy" @click="system.$commonFun.copyContent(dataJob.job.bidder_id, 'Copied')"></i>
                       </p>
                       <p v-else>Waiting for CP finish deployment</p>
                     </el-descriptions-item>
                     <el-descriptions-item label="Provider status">
-                      {{job.provider_status.status}}, {{job.provider_status.online ? 'Online' : 'Offline'}}
+                      {{dataJob.job.provider_status.status}}, {{dataJob.job.provider_status.online ? 'Online' : 'Offline'}}
                     </el-descriptions-item>
                     <el-descriptions-item label="Name">
-                      {{job.provider_status.name}}
+                      {{dataJob.job.provider_status.name}}
                     </el-descriptions-item>
                     <el-descriptions-item label="Score">
-                      {{job.provider_status.score}}
+                      {{dataJob.job.provider_status.score}}
                     </el-descriptions-item>
                     <el-descriptions-item label="Multi address">
-                      {{job.provider_status.multi_address}}
+                      {{dataJob.job.provider_status.multi_address}}
                     </el-descriptions-item>
                   </el-descriptions>
                 </el-col>
               </el-row>
               <div class="logBody">
-                <json-viewer :value="job" :expand-depth=6 copyable boxed sort></json-viewer>
+                <json-viewer :value="dataJob.job" :expand-depth=6 copyable boxed sort></json-viewer>
               </div>
             </el-tab-pane>
             <el-tab-pane label="Build" name="Build" v-if="false">
@@ -288,6 +310,30 @@
                   </li>
                 </ul>
               </div>
+            </el-tab-pane>
+          </el-tabs>
+          <el-tabs v-model="drawerName" class="demo-tabs" @tab-click="drawerClick" v-else>
+            <el-tab-pane v-for="(dataJob, j) in logsCont.dataLog" v-if="logsCont.dataLog&&logsCont.dataLog.length > 0" :key="j">
+              <template #label>
+                <span class="custom-tabs-label">
+                  <span :class="{'span-cp': dataJob.job && dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                </span>
+              </template>
+              <div class="titleLog">Logs</div>
+              <div class="logBody">
+                <h4>build</h4>
+                <el-card class="box-card mianscroll">
+                  <p v-for="build in dataJob.buildLog" :key="build">{{build}}</p>
+                </el-card>
+                <h4>container</h4>
+                <el-card class="box-card mianscroll">
+                  <p v-for="container in dataJob.containerLog" :key="container">{{container}}</p>
+                </el-card>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="Logs" name="0" v-else>
+              <b> Nothing To Show
+              </b>
             </el-tab-pane>
           </el-tabs>
         </template>
@@ -323,7 +369,7 @@ import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
 import sharePop from '@/components/share.vue'
 import spaceHardware from '@/components/spaceHardware.vue'
-import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, onUnmounted, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import JsonViewer from 'vue-json-viewer'
@@ -356,12 +402,12 @@ export default defineComponent({
     const listLoad = ref(true)
     const filedata = ref([])
     const total = ref(0)
-    const bodyWidth = ref(document.body.clientWidth > 600 ? 6 : 1)
+    const bodyWidth = ref(document.body.clientWidth > 600 ? 7 : 1)
     const diagWidth = ref(document.body.clientWidth > 1536 ? '1536px' : '90%')
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
-    const activeName = ref('card')
+    const activeName = ref('app')
     const settingOneself = ref(false)
     const forkLoad = ref(false)
     const parentValue = ref('')
@@ -370,13 +416,14 @@ export default defineComponent({
     const likesValue = ref(false)
     const drawer = ref(false)
     const drawerName = ref('Overview')
+    const drawerType = ref('detail')
     const direction = ref('btt')
-    const logsValue = ref('')
     const expireTime = reactive({
       time: NaN,
       unit: 'day'    })
     const logsCont = reactive({
-      data: []
+      data: [],
+      dataLog: []
     })
     const nft = reactive({
       contract_address: null,
@@ -403,52 +450,99 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     async function jobList (list) {
       let arr = list || []
       for (let j = 0; j < arr.length; j++) {
-        const response = await fetch(arr[j].job_source_uri)
-        const textUri = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        // console.log(arr[j].bidder_id)
-        // console.log(textUri)
-        arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
+        try {
+          const response = await fetch(arr[j].job_source_uri)
+          const textUri = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
+        } catch (err) {
+          console.log('err space detail job:', err)
+          arr[j].job_textUri = {}
+        }
       }
       return arr
     }
-    const handleValue = async (dataRes, log, exTime, nftCont) => {
+    async function jobWSList (list, space) {
+      let logArr = []
+      let arr = list || []
+      if (arr.length > 0) {
+        for (let j = 0; j < arr.length; j++) {
+          let spaceCont = space || {}
+          logArr.push({
+            job: arr[j],
+            space: spaceCont,
+            buildLog: [],
+            containerLog: []
+          })
+        }
+      } else if (space && space.jobs_status && space.jobs_status.length > 0) {
+        for (let j = 0; j < space.jobs_status.length; j++) {
+          logArr.push({
+            job: {},
+            space: space,
+            buildLog: [],
+            containerLog: []
+          })
+        }
+      }
+      return logArr
+    }
+    const hardRedeploy = (dialog) => {
+      if (dialog) hardwareOperate('renew')
+    }
+    async function requestDetail () {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
-      allData.space = dataRes.space || {}
-      allData.files = dataRes.files || []
-      allData.task = dataRes.task || {}
-      if (log) {
-        log = await system.$commonFun.sortBoole(log)
-        logsCont.data = log
-        logsValue.value = log
-      } else {
-        logsValue.value = ''
-        logsCont.data = []
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+      if (listRes && listRes.status === 'success') {
+        allData.space = listRes.data.space
+        allData.task = listRes.data.task
+        parentValue.value = numRe.test(listRes.data.space.status) ? '' : listRes.data.space.status
+        likeValue.value = listRes.data.space.likes || 0
+        const expireTimeCont = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
+        expireTime.time = expireTimeCont.time
+        expireTime.unit = expireTimeCont.unit
+        logsCont.dataLog = await jobWSList(listRes.data.job, listRes.data.space)
+        logsCont.data = await jobWSList(listRes.data.job)
+      } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
+    }
+    async function requestNft () {
+      const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
+      if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
+        nft.contract_address = listNftRes.data.contract_address
+        nft.chain_id = listNftRes.data.chain_id
+        nftTokens.value = listNftRes.data.tokens || []
       }
-      expireTime.time = exTime.time
-      expireTime.unit = exTime.unit
-      parentValue.value = numRe.test(dataRes.space.status) ? '' : dataRes.space.status
-      likeValue.value = dataRes.space.likes || 0
-      if (nftCont) {
-        nft.contract_address = nftCont.contract_address
-        nft.chain_id = nftCont.chain_id
-        nftTokens.value = nftCont.tokens || []
-      }
+    }
+    async function requestFiles () {
+      const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
+      if (listFilesRes && listFilesRes.status === 'success') allData.files = listFilesRes.data || []
       forkLoad.value = false
+    }
+    async function requestAll (type) {
+      switch (type) {
+        case 'files':
+          requestFiles()
+          break
+        case 'setting':
+          requestDetail()
+          requestNft()
+          break
+        case 'delete':
+          break
+        default:
+          requestDetail()
+          requestFiles()
+          requestNft()
+          break
+      }
+    }
+    const handleValue = async (dataRes, type) => {
+      if (type) requestAll(type)
     }
     const hardwareOperate = async (type) => {
       if (type === 'renew') dialogCont.spaceHardRenew = true
@@ -457,17 +551,70 @@ export default defineComponent({
       dialogCont.spaceHardDia = true
     }
     function init () {
-      activeName.value = route.params.tabs || 'card'
+      activeName.value = route.params.tabs || 'app'
       forkLoad.value = false
       noteShow.value = true
       parentValue.value = ''
-      logsValue.value = ''
       expireTime.time = NaN
       logsCont.data = []
+      logsCont.dataLog = []
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
+      requestAll()
       if (metaAddress.value) likesData()
-      else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'card' } })
+      else if (activeName.value === 'settings') router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'app' } })
+    }
+    let ws = null
+    const websocketclose = async () => {
+      try {
+        if (ws) ws.close()
+        ws = null
+        console.log("closed")
+      } catch (err) {
+        ws = null
+      }
+    }
+    const WebSocketFun = (url, index, n) => {
+      if (typeof (WebSocket) === "undefined") {
+        alert("Your browser does not support sockets")
+      } else {
+        try {
+          ws = new WebSocket(url)
+          ws.onopen = () => {
+            console.log("ws connection successful")
+            // if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection successful")
+            // else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection successful")
+          }
+          ws.onmessage = (event) => {
+            // console.log('ws data:', event.data)
+            if (event.data) {
+              if (event.data === 'ping' && ws) ws.send('pong')
+              else if (index === 1) logsCont.dataLog[n].buildLog.push(event.data)
+              else if (index === 2) logsCont.dataLog[n].containerLog.push(event.data)
+              nextTick(() => {
+                let scrollEl = document.querySelectorAll('.mianscroll')
+                scrollEl.forEach(async el => {
+                  await system.$commonFun.timeout(1000)
+                  el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+                })
+              })
+            }
+          }
+          ws.onerror = (err) => {
+            // console.log("Websocket connection error", err)
+            if (index === 1) logsCont.dataLog[n].buildLog = ["Websocket connection error"]
+            else if (index === 2) logsCont.dataLog[n].containerLog = ["Websocket connection error"]
+          }
+          ws.onclose = () => {
+            console.log("ws connection closed")
+            // if (index === 1) logsCont.dataLog[n].buildLog.push("Websocket connection closed")
+            // else if (index === 2) logsCont.dataLog[n].containerLog.push("Websocket connection closed")
+          }
+        } catch (err) {
+          if (index === 1) logsCont.dataLog[n].buildLog = [{ err }]
+          else if (index === 2) logsCont.dataLog[n].containerLog = [{ err }]
+        }
+      }
     }
     function back () {
       router.push({ path: '/spaces' })
@@ -511,6 +658,7 @@ export default defineComponent({
         const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
       }
       likesValue.value = !likesValue.value
+      requestAll()
       likesData()
     }
     const likesData = async () => {
@@ -518,25 +666,58 @@ export default defineComponent({
       const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
-    const drawerClick = (tab, event) => {
-      // console.log(tab, event)
+    const drawerClick = async (tab, event) => {
+      await websocketclose()
+      if (drawerName.value === 'Overview') return
+      let n = Number(drawerName.value)
+      logsCont.dataLog[n].buildLog = []
+      logsCont.dataLog[n].containerLog = []
+      // 请求logsCont.dataLog[n].space.result_uri地址，获取其中的build_log和container_log
+      if (logsCont.dataLog[n].job.job_result_uri && logsCont.dataLog[n].job.job_result_uri !== 'null') {
+        const response = await fetch(logsCont.dataLog[n].job.job_result_uri)
+        const textUri = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        const logUri = textUri ? JSON.parse(textUri) : {}
+        if (logUri.build_log) await WebSocketFun(logUri.build_log, 1, n)
+        if (logUri.container_log) await WebSocketFun(logUri.container_log, 2, n)
+      } else if (logsCont.dataLog[n].space.jobs_status) {
+        await WebSocketFun(logsCont.dataLog[n].space.jobs_status[n].build_log, 1, n)
+        await WebSocketFun(logsCont.dataLog[n].space.jobs_status[n].container_log, 2, n)
+      } else {
+        logsCont.dataLog[n].buildLog = []
+        logsCont.dataLog[n].containerLog = []
+      }
     }
     function handleHard (val, refresh) {
       dialogCont.spaceHardDia = val
       dialogCont.spaceHardRenew = val
       dialogCont.spaceHardFork = val
-      if (refresh) likesValue.value = !likesValue.value
+      if (refresh) {
+        requestAll()
+        likesValue.value = !likesValue.value
+      }
     }
-    function logDrawer () {
+    function logDrawer (type) {
+      if (type === 'log' && (parentValue.value === 'Created' || parentValue.value === 'Stopped')) return
+      drawerType.value = type
       drawer.value = true
-      drawerName.value = 'Overview'
+      drawerName.value = type === 'detail' ? 'Overview' : '0'
+      if (type === 'log' && logsCont.dataLog && logsCont.dataLog.length > 0) drawerClick()
     }
     onActivated(() => init())
+    onBeforeUnmount(() => {
+      websocketclose()
+    })
+    watch(drawer, (newValue, oldValue) => {
+      if (!drawer.value) websocketclose()
+    })
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
+      requestDetail()
       if (to.params.tabs === 'card') {
         window.scrollTo(0, 0)
-        init()
+        // init()
       }
     })
     return {
@@ -564,10 +745,11 @@ export default defineComponent({
       noteShow,
       allData,
       drawerName,
+      drawerType,
       dialogCont,
       renewButton,
-      parentValue, likeOwner, likeValue, likesValue, drawer, direction, logsValue, expireTime, logsCont, handleValue,
-      NumFormat, handleCurrentChange, handleSizeChange, handleClick,
+      parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, handleValue, hardRedeploy,
+      handleCurrentChange, handleSizeChange, handleClick,
       hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
     }
   }
@@ -997,7 +1179,7 @@ export default defineComponent({
         list-style-type: disc;
         li {
           margin: 0 0 0.1rem;
-          font-size: 0.16rem;
+          font-size: 0.15rem;
           font-weight: 600;
           font-style: normal;
           font-stretch: normal;
@@ -1081,6 +1263,7 @@ export default defineComponent({
       }
       .el-tabs__header {
         width: 100%;
+        min-height: 45px;
         margin: 0;
         background-color: #fff;
         .el-tabs__nav-wrap {
@@ -1092,18 +1275,18 @@ export default defineComponent({
       }
       .el-tabs__content {
         width: 92%;
-        height: calc(100% - 1rem - 18px);
-        padding: 0.3rem 4%;
+        height: calc(100% - 0.8rem - 18px);
+        padding: 0.2rem 4%;
         overflow-y: scroll;
         @media screen and (max-width: 768px) {
           width: 96%;
-          padding: 0.3rem 2%;
+          padding: 0.2rem 2%;
         }
         // .el-tab-pane {
         //   height: 100%;
         // }
         .el-steps {
-          margin: 0.1rem 0 0.4rem;
+          margin: 0.1rem 0 0.2rem;
           box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
           @media screen and (max-width: 600px) {
             flex-wrap: wrap;
@@ -1130,6 +1313,7 @@ export default defineComponent({
           }
         }
         .logRow {
+          margin: 0.2rem 0;
           .el-col {
             word-break: break-word;
             p {
@@ -1161,6 +1345,14 @@ export default defineComponent({
             }
           }
         }
+        .titleLog {
+          margin: 0.2rem 0 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+        .titleLog + .logBody {
+          margin-top: 0.2rem;
+        }
         .logBody {
           width: calc(100% - 30px);
           padding: 15px;
@@ -1168,6 +1360,18 @@ export default defineComponent({
           background-color: #fff;
           border-radius: 5px;
           box-shadow: 0 0 9px rgba(0, 0, 0, 0.1);
+          h4 {
+            margin: 0.1rem 0;
+            text-transform: capitalize;
+          }
+          .box-card {
+            max-height: 300px;
+            margin: 0.1rem 0;
+            white-space: nowrap;
+            color: #525252;
+            font-size: 14px;
+            overflow-y: auto;
+          }
         }
         .uploadBody {
           width: 100%;

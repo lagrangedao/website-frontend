@@ -4,15 +4,15 @@
       <div class="loginBody width">
         <el-row>
           <el-col :xs="24" :sm="12" :md="13" :lg="13" :xl="13" class="left">
-            <h1>{{$t('fs3Login.Connect_text')}}</h1>
-            <h4>{{$t('fs3Login.Connect_text_desc')}}</h4>
+            <h1>Data And Computing</h1>
+            <h4>Decentralized data science without borders</h4>
             <el-button type="primary" @click="getStart">
-              {{$t('fs3Login.Connect_StartFree')}}
+              Get Started
             </el-button>
           </el-col>
           <el-col :xs="24" :sm="12" :md="11" :lg="11" :xl="11" class="metamask" v-if="active === 1">
             <div class="titleCont" v-if="!activeIndex">
-              <p>{{$t('fs3Login.Connect_to_MetaMask')}}</p>
+              <p>Connect to MetaMask</p>
             </div>
             <div class="titleCont" v-else-if="activeIndex == 'connect'">
               <div class="address">
@@ -21,15 +21,15 @@
                 </div>
                 <div class="address_right">
                   <div class="flex-shrink-0 w-2 h-2 rounded-full bg-primary"></div>
-                  <div>{{$t('fs3Login.Connected')}}</div>
+                  <div>Connected</div>
                 </div>
               </div>
             </div>
             <div v-loading="loginLoad">
-              <div class="cont_p">{{$t('fs3Login.Connect_cont_tip')}}</div>
+              <div class="cont_p">Connect your wallet address to create an account</div>
               <div class="login_footer">
                 <el-button type="primary" @click="signFun">
-                  <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> {{$t('fs3Login.Connect_cont_Wallet')}}
+                  <img src="@/assets/images/icons/metamask.png" class="resno" alt=""> Connect Wallet
                 </el-button>
               </div>
             </div>
@@ -43,7 +43,7 @@
                 </div>
                 <div class="address_right">
                   <div class="flex-shrink-0 w-2 h-2 rounded-full bg-primary"></div>
-                  <div>{{$t('fs3Login.Connected')}}</div>
+                  <div>Connected</div>
                 </div>
               </div>
             </div>
@@ -54,7 +54,7 @@
                   <el-input v-model="form.email" placeholder="you@domain.com"></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="submitEmail('ruleFormRef')">{{$t('fs3Login.Connect_form_btn')}}</el-button>
+                  <el-button type="primary" @click="submitEmail('ruleFormRef')">Submit</el-button>
                   <p v-if="form.tip" style="color:#f40000">Unable to verify captcha. Please try again</p>
                 </el-form-item>
               </el-form>
@@ -147,7 +147,7 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      const lStatus = await system.$commonFun.login()
+      const [lStatus, signErr] = await system.$commonFun.login()
       // if (lStatus) active.value = 2
       if (lStatus) router.push({ path: '/personal_center' })
       return false
@@ -171,7 +171,7 @@ export default defineComponent({
       //   store.dispatch('setMetaAddress', account[0])
       //   store.dispatch('setNavLogin', false)
       //   store.dispatch('setLogin', false)
-      //   store.dispatch('setAccessToken', '')
+      //   store.dispatch('setAccessToken', '') 
       //   window.location.reload()
       // })
       // networkChanged

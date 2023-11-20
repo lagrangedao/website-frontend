@@ -59,14 +59,32 @@
           <el-table-column label="url" min-width="140">
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
-              <a v-else :href="`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <a v-else-if="userGateway" :href="`${userGateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${userGateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column label="Created At" align="right" min-width="110">
+          <el-table-column label="Created At" align="center" min-width="110">
             <template #default="scope">
               <div>
                 <span v-if="scope.row.isDir">-</span>
-                <span v-else :title="momentFilter(scope.row._originPath.created_at)">{{ calculateDiffTime(scope.row._originPath.created_at)}}</span>
+                <span v-else :title="system.$commonFun.momentFun(scope.row._originPath.created_at)">{{ system.$commonFun.calculateDiffTime(scope.row._originPath.created_at)}}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="Actions" align="center" width="110" v-if="metaAddress === route.params.wallet_address">
+            <template #default="scope">
+              <div class="hot-cold-box" v-if="!scope.row.isDir">
+                <svg @click="fileEdit(scope.row)" class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                  <path d="M2 26h28v2H2z" fill="currentColor"></path>
+                  <path d="M25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10l3.6 3.6l-10 10H6z" fill="currentColor"></path>
+                </svg>
+                <svg @click="deleteFile(scope.row.title)" class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
+                  viewBox="0 0 32 32">
+                  <path d="M12 12h2v12h-2z" fill="currentColor"></path>
+                  <path d="M18 12h2v12h-2z" fill="currentColor"></path>
+                  <path d="M4 6v2h2v20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8h2V6zm4 22V8h16v20z" fill="currentColor"></path>
+                  <path d="M12 2h8v2h-8z" fill="currentColor"></path>
+                </svg>
               </div>
             </template>
           </el-table-column>
@@ -76,15 +94,15 @@
             <div class="left">
               <img :src="peopleAvatarImg || peopleImg" class="people" width="30" height="30" alt=""> {{peopleName|| system.$commonFun.hiddAddress(route.params.wallet_address)}}
             </div>
-            <div class="right" :title="momentFilter(fileBody._originPath.created_at)">
-              {{calculateDiffTime(fileBody._originPath.created_at)}}
+            <div class="right" :title="system.$commonFun.momentFun(fileBody._originPath.created_at)">
+              {{system.$commonFun.calculateDiffTime(fileBody._originPath.created_at)}}
             </div>
           </div>
           <div v-loading="uploadLoad">
             <div class="worktop" style="justify-content: space-between;">
               <ul>
                 <li v-if="fileTextType !== 'binary'">
-                  <a :href="`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`" target="_blank" :title="fileBody.title">
+                  <a :href="userGateway?`${userGateway}/ipfs/${fileBody._originPath.cid}`:''" target="_blank" :title="fileBody.title">
                     <svg class="mr-raw" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" style="transform: rotate(360deg);">
                       <path d="M31 16l-7 7l-1.41-1.41L28.17 16l-5.58-5.59L24 9l7 7z" fill="currentColor"></path>
                       <path d="M1 16l7-7l1.41 1.41L3.83 16l5.58 5.59L8 23l-7-7z" fill="currentColor"></path>
@@ -102,7 +120,7 @@
                   </a>
                 </li>
                 <li>
-                  <a @click="deleteFile" :class="{'disable': metaAddress !== route.params.wallet_address}">
+                  <a @click="deleteFile()" :class="{'disable': metaAddress !== route.params.wallet_address}">
                     <svg class="mr-edit" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                       <path d="M12 12h2v12h-2z" fill="currentColor"></path>
                       <path d="M18 12h2v12h-2z" fill="currentColor"></path>
@@ -113,7 +131,7 @@
                   </a>
                 </li>
               </ul>
-              <small>{{sizeChange(blobSize)}}</small>
+              <small>{{system.$commonFun.sizeChange(blobSize)}}</small>
             </div>
             <img v-if="fileTextType === 'image'" :src="fileTextEditor" :alt="fileBody.title" class="img_file">
             <div v-else-if="fileTextType === 'text'" v-loading="uploadLoad">
@@ -152,7 +170,7 @@
               </el-upload>
               <el-form :label-position="'top'" ref="ruleFormRef" :model="info" :rules="rules" @submit.native.prevent>
                 <el-form-item label="Commit changes" prop="name">
-                  <el-input v-model="info.name" :placeholder="`Upload ${fileList.length} files (${sizeChange(totalSize)})`" />
+                  <el-input v-model="info.name" :placeholder="`Upload ${fileList.length} files (${system.$commonFun.sizeChange(totalSize)})`" />
                 </el-form-item>
               </el-form>
               <el-button-group class="ml-4">
@@ -185,7 +203,7 @@
               <!-- <v-md-editor v-model="textEditor"></v-md-editor> -->
               <el-form :label-position="'top'" ref="ruleEditName" :model="textInfo" :rules="rulesEdit" @submit.native.prevent>
                 <el-form-item label="File name" prop="name">
-                  <el-input v-model="textInfo.name" :placeholder="'Name your file'" />
+                  <el-input v-model="textInfo.name" :placeholder="'Name your file'" maxlength="96" />
                 </el-form-item>
               </el-form>
               <el-button-group class="ml-4">
@@ -229,13 +247,13 @@ export default defineComponent({
   setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const userGateway = computed(() => (store.state.gateway))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const peopleImg = require("@/assets/images/dashboard/people_default.png")
     const peopleAvatarImg = ref('')
     const peopleName = ref('')
     const tableLayout = ref('fixed')
     const labelTab = ref('list')
-    const listdata = reactive({})
     const fileRow = reactive({
       fileAlldata: [],
       fileResdata: [],
@@ -262,11 +280,13 @@ export default defineComponent({
       uploadFolderRef: null
     })
     const ruleEditName = ref(null)
-    const validateInput = (rule, value, callback) => {
+    const validateInput = async (rule, value, callback) => {
       if (!checkSpecialKey(value)) {
-        callback(new Error("The file name cannot contain any of the following characters: \\/:*?\"<>|"));
+        callback(new Error("File name not valid. Only '.','_','-' are accepted. '..' and '--' are forbidden. Max length is 96."));
       } else {
-        callback();
+        const res = await checkFolder(value)
+        if (!res) callback(new Error("The format of the folder name is incorrect"));
+        else callback()
       }
     }
     const textInfo = reactive({
@@ -295,30 +315,33 @@ export default defineComponent({
 
     function checkSpecialKey (str) {
       let specialKey =
-        "\\/:*?\"<>|";
+        "[~!#$^&*()=|{}':;'\\[\\],<>?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
+      // let specialKey =
+      //   "\\:*?\"<>|";
       for (let i = 0; i < str.length; i++) {
         if (specialKey.indexOf(str.substr(i, 1)) != -1) {
           return false;
         }
       }
+      if (str.indexOf('..') > -1 || str.indexOf('--') > -1) return false
       return true;
+    }
+    async function checkFolder (val) {
+      const name = val.split('/')
+      const key = ['.', '..']
+      for (let n = 0; n < name.length; n++) {
+        const checkName = await key.some(t => t === name[n])
+        if (checkName) return false
+      }
+      return true
     }
     async function init () {
       if (route.name !== 'spaceDetail') return
       listLoad.value = true
-      listdata.value = {}
       fileRow.fileTitle = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
-        fileRow.fileResdata = listRes.data.files || []
-        listdata.value = listRes.data.space || { name: route.params.name }
-        if (listRes.data.owner) {
-          if (listRes.data.owner.avatar) peopleAvatarImg.value = listRes.data.owner.avatar && listRes.data.owner.gateway ? `${listRes.data.owner.gateway}/ipfs/${listRes.data.owner.avatar}` : ''
-          peopleName.value = listRes.data.owner.full_name || ''
-        }
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
-
+        fileRow.fileResdata = listRes.data || []
         const path = await getCatalogPath(fileRow.fileResdata);
         // console.log('path', path)
         const r = await treeify(path);
@@ -331,6 +354,12 @@ export default defineComponent({
         // console.log(fileRow.fileAlldata)
         fileRow.filedata = await sortList(fileRow.fileAlldata)
         // console.log(fileRow.filedata)
+      }
+
+      const listOnwerRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/${route.params.wallet_address}`, 'get')
+      if (listOnwerRes && listOnwerRes.status === 'success') {
+        if (listOnwerRes.data.avatar) peopleAvatarImg.value = listOnwerRes.data.avatar && userGateway.value ? `${userGateway.value}/ipfs/${listOnwerRes.data.avatar}` : ''
+        peopleName.value = listOnwerRes.data.full_name || ''
       }
       await system.$commonFun.timeout(500)
       listLoad.value = false
@@ -375,23 +404,27 @@ export default defineComponent({
     async function handleCommand (command) {
       uploadLoad.value = command === 'create'
       labelTab.value = command
-      pathList.value = []
-      fileRow.fileTitle.forEach((element, i) => {
-        pathList.value.push(element.title)
-      })
+      await pathPush()
       await system.$commonFun.timeout(1000)
       if (command === 'upload') addEvent()
       else if (command === 'create') createText()
     }
-    async function createText () {
-      var response = await fetch(`/static/template/create.md`)
-      textEditor.value = await new Promise(async resolve => {
-        resolve(response.text())
+    async function pathPush () {
+      pathList.value = []
+      fileRow.fileTitle.forEach((element, i) => {
+        pathList.value.push(element.title)
       })
-      uploadLoad.value = false
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
+    async function createText () {
+      try {
+        var response = await fetch(`/static/template/create.md`)
+        textEditor.value = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+      } catch (err) {
+        console.log('err space create.md:', err)
+      }
+      uploadLoad.value = false
     }
     function handleChange (uploadFile, uploadFiles) {
       // console.log('handleChange:', uploadFiles)
@@ -490,6 +523,7 @@ export default defineComponent({
             // else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
+          context.emit('handleValue', true, 'files')
           init()
         } else {
           console.log('error submit!', fields)
@@ -520,6 +554,7 @@ export default defineComponent({
             // else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           } else system.$commonFun.messageTip('error', uploadRes.message ? uploadRes.message : 'Upload failed!')
           reset()
+          context.emit('handleValue', true, 'files')
           init()
         } else {
           console.log('error submit!', fields)
@@ -548,8 +583,9 @@ export default defineComponent({
       const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
       await system.$commonFun.timeout(3000)
       if (uploadRes && uploadRes.status === "success") system.$commonFun.messageTip('success', uploadRes.message ? uploadRes.message : 'Upload files successfully!')
-      else system.$commonFun.messageTip('error', type === 'create' ? 'Create failed!' : 'Update failed!')
+      else system.$commonFun.messageTip('error', uploadRes ? uploadRes.message : type === 'create' ? 'Create failed!' : 'Update failed!')
       reset()
+      context.emit('handleValue', true, 'files')
       init()
     }
     function cancelFun () {
@@ -576,45 +612,53 @@ export default defineComponent({
       totalSize.value = 0
     }
     async function fileEdit (row) {
+      if (!userGateway.value) return
       handleCommand('edit')
       uploadLoad.value = true
       fileTextEditor.value = ''
       fileTextShow.value = false
       fileBody._originPath = row._originPath
       fileBody.title = row.title
-      await getTitle(`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`)
+      await getTitle(`${userGateway.value}/ipfs/${fileBody._originPath.cid}`)
     }
     const getTitle = async (url) => {
       if (!url) return
-      var response = await fetch(url);
-      const resType = response.headers.get("content-type")
-      const text = await new Promise(async resolve => {
-        if (resType.indexOf('image') > -1) {
-          fileTextType.value = 'image'
-          resolve(response.arrayBuffer())
-        }
-        else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
-          fileTextType.value = 'text'
-          resolve(response.text())
-        } else {
-          fileTextType.value = 'binary'
-          resolve(response.arrayBuffer())
-        }
-      })
-      let blob = new Blob([text])
-      blobSize.value = blob.size
+      try {
+        var response = await fetch(url);
+        const resType = response.headers.get("content-type")
+        const text = await new Promise(async resolve => {
+          if (resType.indexOf('image') > -1) {
+            fileTextType.value = 'image'
+            resolve(response.arrayBuffer())
+          }
+          else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
+            fileTextType.value = 'text'
+            resolve(response.text())
+          } else {
+            fileTextType.value = 'binary'
+            resolve(response.arrayBuffer())
+          }
+        })
+        let blob = new Blob([text])
+        blobSize.value = blob.size
 
-      // let reader = new FileReader();
-      // reader.readAsArrayBuffer(blob);
-      // reader.onload = function () {
-      //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
-      //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
-      //   console.log('SHA256', hash)
-      // }
-      if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
-      else if (fileTextType.value === 'text') fileTextEditor.value = text
-      else fileTextEditor.value = url
-      uploadLoad.value = false
+        // let reader = new FileReader();
+        // reader.readAsArrayBuffer(blob);
+        // reader.onload = function () {
+        //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
+        //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
+        //   console.log('SHA256', hash)
+        // }
+        if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
+        else if (fileTextType.value === 'text') fileTextEditor.value = text
+        else fileTextEditor.value = url
+        uploadLoad.value = false
+      } catch (err) {
+        console.log('err space files:', err)
+        system.$commonFun.messageTip('error', err)
+        reset()
+        init()
+      }
     }
     function downFile () {
       var link = document.createElement('a');
@@ -627,11 +671,15 @@ export default defineComponent({
       if (metaAddress.value !== route.params.wallet_address) return
       fileTextShow.value = !fileTextShow.value
     }
-    async function deleteFile () {
+    async function deleteFile (filesTitle) {
       if (metaAddress.value !== route.params.wallet_address) return
+      if (filesTitle) {
+        listLoad.value = true
+        await pathPush()
+      }
       uploadLoad.value = true
       let name = pathList.value.join('/') || ''
-      let fileNew = `${name ? name + '/' : ''}${fileBody.title}`
+      let fileNew = `${name ? name + '/' : ''}${filesTitle ? filesTitle : fileBody.title}`
       let paramsBody = {
         filename: fileNew
       }
@@ -639,34 +687,8 @@ export default defineComponent({
       if (deleteRes && deleteRes.status === 'success') system.$commonFun.messageTip('success', deleteRes.message || 'Delete successfully!')
       else system.$commonFun.messageTip('error', 'Delete failed!')
       reset()
+      context.emit('handleValue', true, 'files')
       init()
-    }
-    function calculateDiffTime (startTime) {
-      var endTime = Math.round(new Date() / 1000)
-      var timeDiff = endTime - startTime
-      var year = timeDiff > (86400 * 365) ? parseInt(timeDiff / 86400 / 365) : 0
-      var month = timeDiff > (86400 * 30) ? parseInt(timeDiff / 86400 / 30) : 0
-      var day = parseInt(timeDiff / 86400)
-      var hour = parseInt((timeDiff % 86400) / 3600)
-      var minute = parseInt((timeDiff % 3600) / 60)
-      var m = parseInt((timeDiff % 60))
-      if (year > 0) return `about ${year}${year > 1 ? ' years' : ' year'} ago`
-      if (month > 0) return `${month} ${month > 1 ? ' months' : ' month'} ago`
-      if (day > 0) return `${day} ${day > 1 ? ' days' : ' day'} ago`
-      else if (hour > 0) return `${hour} ${hour > 1 ? ' hours' : ' hour'} ago`
-      else if (minute > 0) return `${minute} ${minute > 1 ? ' minutes' : ' minute'} ago`
-      else if (m > 0) return `${m} ${m > 1 ? ' seconds' : ' second'} ago`
-      else return '-'
-    }
-    function sizeChange (bytes) {
-      if (bytes === 0) return '0 B'
-      if (!bytes) return '-'
-      var k = 1024 // or 1000
-      var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      var i = Math.floor(Math.log(bytes) / Math.log(k))
-
-      if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     }
 
     const treeify = (nodeList) => {
@@ -788,18 +810,18 @@ export default defineComponent({
     watch(fileList, (newValue, oldValue) => {
       totalFiles(newValue)
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       peopleName,
       metaAddress,
+      userGateway,
       lagLogin,
       peopleImg,
       peopleAvatarImg,
       tableLayout,
       labelTab,
-      listdata,
       fileRow,
       listLoad,
       fileList,
@@ -823,9 +845,9 @@ export default defineComponent({
       blobSize,
       totalSize,
       totalMaximum,
-      init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
+      init, handleCommand, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile, onBlur
+      fileEdit, editChange, downFile, deleteFile, onBlur
     }
   }
 })
@@ -986,6 +1008,26 @@ export default defineComponent({
                 }
                 &:hover {
                   text-decoration: underline;
+                }
+              }
+              .hot-cold-box {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+                i,
+                svg {
+                  width: 15px;
+                  height: 15px;
+                  margin: 0 0.05rem;
+                  cursor: pointer;
+                  path {
+                    cursor: inherit;
+                  }
+                  &:hover {
+                    color: #c37af9;
+                  }
                 }
               }
             }

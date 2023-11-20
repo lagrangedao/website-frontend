@@ -1,5 +1,5 @@
 <template>
-  <section id="dataset">
+  <section id="dataset" ref="spaceCardRef">
     <div id="datasetBody">
       <el-row class="dataset_body" v-loading="listLoad">
         <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
@@ -41,7 +41,7 @@
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
           <div class="labelList" id="permiss">
-            <ul>
+            <ul v-show="titles">
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
@@ -57,11 +57,15 @@
         <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="left left_light">
           <div class="list">
             <div class="title">
-              Downloads last month
-              <b>1,149,560</b>
+              Space Total Views
+              <b>{{system.$commonFun.NumFormat(listdata.stats.views) || 0}}</b>
+            </div>
+            <div class="title">
+              Space Total Forked
+              <b>{{system.$commonFun.NumFormat(listdata.stats.forks) || 0}}</b>
             </div>
             <div class="cont">
-              <el-row :gutter="12" v-if="urlReadme">
+              <el-row :gutter="12" v-if="urlReadme && userGateway">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
                   <a>
                     <span class="a_button" v-if="urlReadme && isPreview" @click="editFun">
@@ -93,7 +97,7 @@
                   </a>
                 </el-col>
               </el-row>
-              <el-row :gutter="12">
+              <el-row :gutter="12" v-if="false">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
                   <router-link to="">
                     <i class="icon icon_01"></i>
@@ -109,7 +113,7 @@
               </el-row>
             </div>
           </div>
-          <div class="labelModel">
+          <div class="labelModel" v-if="false">
             <ul>
               <li>
                 <p>Homepage:</p>
@@ -129,7 +133,7 @@
               </li>
             </ul>
           </div>
-          <div class="list">
+          <div class="list" v-if="false">
             <div class="title">
               <p :title="'Models trained or fine-tuned on '+route.params.name">
                 <i class="icon icon_datasets"></i>
@@ -138,8 +142,8 @@
               </p>
             </div>
           </div>
-          <el-row class="list_body" v-loading="false">
-            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata" :key="l">
+          <el-row class="list_body" v-if="false" v-loading="false">
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata.files" :key="l">
               <el-card class="box-card" @click="detailFun(list, l)">
                 <template #header>
                   <div class="card-header">
@@ -204,6 +208,7 @@ export default defineComponent({
   setup (props, context) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const userGateway = computed(() => (store.state.gateway))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const searchValue = ref('')
     const value = ref('')
@@ -212,10 +217,17 @@ export default defineComponent({
     const fileSpaceData = ref([])
     const isPreview = ref(true)
     const currentPage1 = ref(1)
+    const spaceCardRef = ref(null)
     const small = ref(false)
     const background = ref(false)
     const listLoad = ref(true)
-    const listdata = ref([])
+    const listdata = reactive({
+      files: [],
+      stats: {},
+      space: {},
+      job: null,
+      task: null
+    })
     const total = ref(0)
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
@@ -268,63 +280,42 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
+    async function statsInit () {
+      const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${route.params.wallet_address}&&space_name=${route.params.name}`, 'get')
+      if (listStatsRes && listStatsRes.status === 'success') listdata.stats = listStatsRes.data.stats
     }
     async function init () {
       let gate = false
       if (route.params.tabs !== 'card') return
       listLoad.value = true
-      listdata.value = []
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        const fileLi = listRes.data.files || []
+      listdata.files = []
+      await statsInit()
+      const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
+      if (listFilesRes && listFilesRes.status === 'success') {
+        const fileLi = listFilesRes.data || []
         fileLi.forEach((element, i) => {
-          let el = element.name.split('/')
-          el.shift()
-          el.shift()
-          el.shift()
+          let el = element.name.split('/').slice(3)
           if (el.join('/').toLowerCase() === 'readme.md') {
-            if (element.gateway !== null) {
-              urlReadme.value = `${element.gateway}/ipfs/${element.cid}`
-              urlReadmeName.value = el.join('/')
-              getTitle(urlReadme.value)
-            } else {
+            urlReadme.value = `${userGateway.value}/ipfs/${element.cid}`
+            urlReadmeName.value = el.join('/')
+            if (userGateway.value) getTitle(urlReadme.value)
+            else {
               gate = true
               return
             }
           }
         })
         fileSpaceData.value = fileLi
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        if (!gate) context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
+        listdata.files = fileLi
       }
-      if (gate) {
-        init()
-        return
-      }
+
+      // if (gate) {
+      //   init()
+      //   return
+      // }
+      context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
-      listLoad.value = false
-      listdata.value = [
-        {
-          is_public: "1",
-          name: "Frigg"
-        },
-        {
-          is_public: "1",
-          name: "Travis"
-        },
-        {
-          is_public: "1",
-          name: "Tyree"
-        }
-      ]
+      if (!urlReadme.value || !userGateway.value) listLoad.value = false
     }
     function detailFun (row, index) {
       console.log(row, index)
@@ -346,69 +337,110 @@ export default defineComponent({
     }
     const getTitle = async (cid) => {
       if (!urlReadme.value) return
-      var response = await fetch(urlReadme.value)
-      textEditor.value = await new Promise(async resolve => {
-        resolve(response.text())
-      })
-      nextTick(() => {
-        const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-        titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-        if (!titles.value.length) {
-          titles.value = [];
-          return;
-        }
+      try {
+        var response = await fetch(urlReadme.value)
+        textEditor.value = await new Promise(async resolve => {
+          resolve(response.text())
+        })
+        await system.$commonFun.timeout(1000)
+        nextTick(() => {
+          if (preview.value) {
+            const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+            titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+            if (!titles.value.length) {
+              titles.value = [];
+              listLoad.value = false
+              return;
+            }
 
-        const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
-        titles.value = titles.value.map(el => ({
-          title: el.innerText,
-          lineIndex: el.getAttribute('data-v-md-line'),
-          indent: hTags.indexOf(el.tagName)
-        }));
-      });
+            const hTags = Array.from(new Set(titles.value.map(title => title.tagName))).sort();
+            titles.value = titles.value.map(el => ({
+              title: el.innerText,
+              lineIndex: el.getAttribute('data-v-md-line'),
+              indent: hTags.indexOf(el.tagName)
+            }));
+            scroll()
+          }
+          listLoad.value = false
+        })
+      } catch (err) {
+        console.log('err space card:', err)
+        system.$commonFun.messageTip('error', err)
+        listLoad.value = false
+      }
     }
     async function cardAdd (type) {
       if (type === 'create') createLoad.value = true
       else if (type === 'lag' || type === 'hugging') {
         listLoad.value = true
-        var response = await fetch(type === 'lag' ? `/static/template/lagrangedao-README.md` : `/static/template/huggingface-README.md`)
-        textEditor.value = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        listLoad.value = false
-        createLoad.value = true
+        try {
+          var response = await fetch(type === 'lag' ? `/static/template/lagrangedao-README.md` : `/static/template/huggingface-README.md`)
+          textEditor.value = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          listLoad.value = false
+          createLoad.value = true
+        } catch (err) {
+          listLoad.value = false
+          console.log('err space template:', err)
+        }
       } else if (type === 'docker') {
         listLoad.value = true
         let fd = await formDataRetrue()
         const uploadRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.name}/files/upload`, 'post', fd)
         await system.$commonFun.timeout(1000)
         if (uploadRes && uploadRes.status !== "success") system.$commonFun.messageTip(uploadRes.status, `${uploadRes.message}: ${name}`)
+        context.emit('handleValue', true, 'files')
         init()
       }
     }
     async function formDataRetrue () {
       let formdata = new FormData()
-      const fileList = ['Dockerfile', 'Readme.md', 'requirements.txt', 'app/_init_.py', 'app/main.py']
-      for (let f = 0; f < fileList.length; f++) {
-        let name = fileList[f]
-        let response = await fetch(`/static/template/hello-world/${name}`)
-        let text = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        let newFile = new File([text], name)
-        formdata.append('file', newFile, name)
+      try {
+        const fileList = ['Dockerfile', 'Readme.md', 'requirements.txt', 'app/_init_.py', 'app/main.py']
+        for (let f = 0; f < fileList.length; f++) {
+          let name = fileList[f]
+          let response = await fetch(`/static/template/hello-world/${name}`)
+          let text = await new Promise(async resolve => {
+            resolve(response.text())
+          })
+          let newFile = new File([text], name)
+          formdata.append('file', newFile, name)
+        }
+      } catch (err) {
+        console.log('err space hello-world:', err)
       }
-
       return formdata
     }
     function cancelFun () {
       createLoad.value = false
       textEditor.value = ''
     }
-    onActivated(() => { })
-    onMounted(() => {
+    function scroll () {
+      let line = window.location.hash
+      if (!line) return
+      else line = line.slice(1).toLocaleLowerCase()
+      nextTick(() => {
+        const heading = spaceCardRef.value.querySelector(`[data-v-md-heading="${line}"]`)
+        if (heading) {
+          preview.value.scrollToTarget({
+            target: heading,
+            scrollContainer: window,
+            top: 0,
+          })
+        }
+      })
+    }
+    function resetFun () {
+      textEditor.value = ''
+      titles.value = ''
       urlReadme.value = ''
       createLoad.value = false
       window.scrollTo(0, 0)
+    }
+    onActivated(() => { })
+    onMounted(() => {
+      resetFun()
       init()
     })
     onDeactivated(() => { })
@@ -419,20 +451,28 @@ export default defineComponent({
       if (!lagLogin.value) init()
     })
     watch(route, (to, from) => {
-      if (to.name !== 'spaceDetail') return
-      if (to.params.tabs === 'card') {
-        urlReadme.value = ''
-        createLoad.value = false
-        window.scrollTo(0, 0)
-        init()
+      if (to.name !== 'spaceDetail') {
+        resetFun()
+        return
       }
+      if (to.params.tabs === 'card') {
+        if (!urlReadme.value) {
+          resetFun()
+          init()
+        } else {
+          statsInit()
+          scroll()
+        }
+      } else resetFun()
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
+      spaceCardRef,
       lagLogin,
       metaAddress,
+      userGateway,
       searchValue,
       value,
       currentPage1,
@@ -452,7 +492,7 @@ export default defineComponent({
       templateData,
       createLoad,
       textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
-      init, NumFormat, handleCurrentChange, handleSizeChange, detailFun, handleClick,
+      init, handleCurrentChange, handleSizeChange, detailFun, handleClick,
       cardAdd, cancelFun
     }
   }
@@ -663,7 +703,7 @@ export default defineComponent({
           // max-width: 16.6666666667%;
         }
         .title {
-          padding: 0.05rem 0;
+          padding: 0;
           margin: 0 0 0.1rem;
           font-size: 0.2rem;
           color: #000000;

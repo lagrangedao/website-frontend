@@ -17,6 +17,7 @@
                 </el-tooltip>
               </span>
             </template>
+            <el-button v-if="job.job_result_uri" class="app-button" @click="system.$commonFun.goLink(`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`)">Click here to display in a new tab</el-button>
             <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
             <div v-else>
               <el-alert :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
@@ -25,7 +26,7 @@
         </el-tabs>
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
-          <el-table :data="listdata.space.jobs_status" border style="width: 100%">
+          <el-table :data="listdata.jobs_status" border style="width: 100%">
             <el-table-column prop="node_id" label="CP Node ID">
               <template #default="scope">
                 <div class="flex">{{ system.$commonFun.hiddAddress(scope.row.node_id) }}
@@ -34,16 +35,31 @@
               </template>
             </el-table-column>
             <el-table-column prop="status" label="Status" />
+            <el-table-column prop="job_textUri" label="Quick Look">
+              <template #default="scope">
+                <a v-if="scope.row.job_textUri" :href="scope.row.job_textUri" target="_blank">{{scope.row.job_textUri}}</a>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
           <div>
             <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
+            <p>If your waiting time is prolonged, you might consider
+              <el-button plain @click="hardRedeploy">Redeploy</el-button>
+              <br /> The tokens you paid will be refunded shortly. You can view and request a refund in
+              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>.</p>
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
           <div>
             <el-alert :closable="false" title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting." type="warning" />
+          </div>
+        </div>
+        <div class="deployment" v-else-if="listdata.space.status === 'Stopped'">
+          <div>
+            <el-alert :closable="false" title="This Space is not running" type="warning" />
           </div>
         </div>
       </el-row>
@@ -89,6 +105,7 @@ export default defineComponent({
     const listLoad = ref(true)
     const listdata = reactive({
       jobResult: [],
+      jobs_status: [],
       space: {}
     })
     const bodyWidth = ref(document.body.clientWidth < 992)
@@ -106,13 +123,16 @@ export default defineComponent({
     async function jobList (list) {
       let arr = list || []
       for (let j = 0; j < arr.length; j++) {
-        if (arr[j].job_result_uri) {
-          const response = await fetch(arr[j].job_result_uri)
-          const textUri = await new Promise(async resolve => {
-            resolve(response.text())
-          })
-          arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
-        } else {
+        try {
+          if (arr[j].job_result_uri) {
+            const response = await fetch(arr[j].job_result_uri)
+            const textUri = await new Promise(async resolve => {
+              resolve(response.text())
+            })
+            arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+          } else arr[j].job_result_uri = ''
+        } catch (err) {
+          console.log('err', err)
           arr[j].job_result_uri = ''
         }
       }
@@ -126,13 +146,36 @@ export default defineComponent({
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
         listdata.jobResult = await jobList(listRes.data.job)
+        if (listRes.data.space.status === 'Deploying' && listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
         listdata.space = listRes.data.space
-        listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
+        // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
       }
+      context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
       listLoad.value = false
+    }
+
+    async function jobStatusList (list) {
+      let arr = list || []
+      for (let j = 0; j < arr.length; j++) {
+        try {
+          if (arr[j].result_uri) {
+            const response = await fetch(arr[j].result_uri)
+            const textUri = await new Promise(async (resolve, reject) => {
+              resolve(response.text())
+            })
+            arr[j].job_textUri = textUri ? JSON.parse(textUri).job_result_uri : ''
+          } else arr[j].job_textUri = ''
+        } catch (err) {
+          console.log('err', err)
+          arr[j].job_textUri = ''
+        }
+      }
+      return arr
+    }
+
+    function hardRedeploy () {
+      context.emit('hardRedeploy', true)
     }
 
     onActivated(() => {
@@ -144,15 +187,16 @@ export default defineComponent({
     onDeactivated(() => {
     })
     watch(route, (to, from) => {
+      listdata.space = {}
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'app') {
         window.scrollTo(0, 0)
         init()
       }
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       lagLogin,
       listLoad,
@@ -161,7 +205,7 @@ export default defineComponent({
       system,
       route,
       router,
-      init, handleClick
+      init, handleClick, hardRedeploy
     }
   }
 })
@@ -240,18 +284,48 @@ export default defineComponent({
               }
             }
           }
+
+          td {
+            a {
+              text-decoration: underline;
+              color: inherit;
+            }
+          }
         }
       }
 
       .info {
         margin-top: 0.5rem;
       }
+
+      p {
+        padding-top: 0.3rem;
+        line-height: 2;
+        .el-button {
+          height: auto;
+          padding: 5px 10px;
+        }
+        a {
+          text-decoration: underline;
+          color: inherit;
+          &:hover {
+            color: #c37af9;
+          }
+        }
+      }
     }
 
     .app-tabs {
+      position: relative;
       width: 98%;
+      padding: 0.6rem 0 0;
       margin: 0.1rem auto 0;
-
+      .app-button {
+        position: absolute;
+        top: calc(-0.7rem - 20px);
+        left: 0;
+        z-index: 99;
+      }
       .el-tabs__header {
         max-width: none !important;
         padding: 0 !important;

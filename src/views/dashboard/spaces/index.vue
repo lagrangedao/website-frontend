@@ -10,7 +10,7 @@
           <div class="top_button">
             <router-link :to="{path: '/create_space'}" class="button">Create new Space</router-link>
             or
-            <router-link to="">learn more about Spaces</router-link>
+            <a href="https://docs.lagrangedao.org/lagrange-dao/spaces" target="_blank">learn more about Spaces</a>
           </div>
         </div>
         <div class="top">
@@ -38,7 +38,7 @@
           </div>
 
           <el-row :gutter="32" class="list_body" v-loading="listLoad">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="ls in spaceLikesData" :key="ls">
+            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="ls in spaceLikesData" :key="ls">
               <el-card class="box-card" @click="detailFun(ls, l)">
                 <template #header>
                   <div class="card-header">
@@ -55,9 +55,9 @@
                   <div class="text_left">
                     <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
                     <i class="icon"></i>
-                    <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || hiddAddress(ls.wallet_address)}}</span>
+                    <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || system.$commonFun.hiddAddress(ls.wallet_address)}}</span>
                   </div>
-                  <span>{{momentFilter(ls.created_at)}}</span>
+                  <span>{{system.$commonFun.momentFun(ls.created_at)}}</span>
                 </div>
               </el-card>
             </el-col>
@@ -70,7 +70,7 @@
           </div>
         </div>
         <el-row :gutter="32" class="list_body" v-loading="listLoad">
-          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" v-for="list in spaceData" :key="list">
+          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="list in spaceData" :key="list">
             <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
                 <div class="card-header">
@@ -87,9 +87,9 @@
                 <div class="text_left">
                   <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
                   <i class="icon"></i>
-                  <span class="small" @click.stop="searchChange(list)">{{list.full_name || hiddAddress(list.wallet_address)}}</span>
+                  <span class="small" @click.stop="searchChange(list)">{{list.full_name || system.$commonFun.hiddAddress(list.wallet_address)}}</span>
                 </div>
-                <span>{{momentFilter(list.created_at)}}</span>
+                <span>{{system.$commonFun.momentFun(list.created_at)}}</span>
               </div>
             </el-card>
           </el-col>
@@ -178,15 +178,6 @@ export default defineComponent({
       })
       return data
     }
-    function NumFormat (value) {
-      if (String(value) === '0') return '0'
-      else if (!value) return '-'
-      var intPartArr = String(value).split('.')
-      var intPartFormat = intPartArr[0]
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      return intPartArr[1] ? `${intPartFormat}.${intPartArr[1]}` : intPartFormat
-    }
     function sortChange (val) {
       pagin.sort = val
       pagin.pageNo = 1
@@ -205,7 +196,7 @@ export default defineComponent({
       }
 
       if (typeLikes) {
-        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify({ sort: 'likes', limit: 3 })}`, 'get')
+        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${qs.stringify({ limit: 8 })}`, 'get')
         if (likesRes) spaceLikesData.value = likesRes.spaces || []
       }
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
@@ -220,14 +211,7 @@ export default defineComponent({
     }
     function detailFun (row, index) {
       // console.log(row, index)
-      router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'card' } })
-    }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
-    function hiddAddress (val) {
-      if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
-      else return '-'
+      router.push({ name: 'spaceDetail', params: { wallet_address: row.wallet_address, name: row.name, tabs: 'app' } })
     }
     onActivated(() => {
       window.scrollTo(0, 0)
@@ -255,7 +239,7 @@ export default defineComponent({
       system,
       route,
       router,
-      handleSizeChange, handleCurrentChange, searchChange, detailFun, momentFilter, hiddAddress,
+      handleSizeChange, handleCurrentChange, searchChange, detailFun,
       sortChange, clearMethod
     }
   }
@@ -484,22 +468,22 @@ export default defineComponent({
               display: flex;
               align-items: center;
               justify-content: center;
-              height: 1.85rem;
+              height: 1.6rem;
               padding: 0;
               border: 0;
               border-radius: 0.1rem;
-              font-size: 0.305rem;
+              font-size: 0.2rem;
               color: #fff;
               cursor: pointer;
               .card-header {
                 span {
                   position: absolute;
                   height: 0.25rem;
-                  font-size: 14px;
+                  font-size: 12px;
                   color: #fff;
                   line-height: 0.25rem;
                   @media screen and (min-width: 1800px) {
-                    font-size: 15px;
+                    font-size: 13px;
                   }
                   &.left {
                     left: 0.15rem;
@@ -521,9 +505,9 @@ export default defineComponent({
                     left: 0.15rem;
                     bottom: 0.05rem;
                     opacity: 0.9;
-                    font-size: 13px;
+                    font-size: 12px;
                     @media screen and (min-width: 1800px) {
-                      font-size: 14px;
+                      font-size: 13px;
                     }
                   }
                 }
@@ -547,7 +531,7 @@ export default defineComponent({
               h1 {
                 // text-shadow: 3px 3px rgba(0, 0, 0, 0.2);
                 cursor: pointer;
-                font-size: 0.3rem;
+                font-size: 0.2rem;
                 font-weight: 900;
                 overflow: hidden;
                 text-overflow: ellipsis;

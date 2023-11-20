@@ -142,7 +142,7 @@ export default defineComponent({
     }
     async function signIn () {
       const chainId = await ethereum.request({ method: 'eth_chainId' })
-      const lStatus = await system.$commonFun.login()
+      const [lStatus, signErr] = await system.$commonFun.login()
       if (lStatus) {
         loading.value = false
         listLoad.value = false
@@ -161,7 +161,7 @@ export default defineComponent({
       //   store.dispatch('setMetaAddress', account[0])
       //   store.dispatch('setNavLogin', false)
       //   store.dispatch('setLogin', false)
-      //   store.dispatch('setAccessToken', '')
+      //   store.dispatch('setAccessToken', '') 
       //   window.location.reload()
       // })
       // networkChanged
@@ -177,9 +177,6 @@ export default defineComponent({
         system.$commonFun.signOutFun()
         // window.location.reload()
       })
-    }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
     }
     function settingDetail (row) {
       router.push({ name: 'personalCenterProfile', params: { menu: row } })
@@ -213,7 +210,7 @@ export default defineComponent({
       prevType,
       listLoad,
       fileList,
-      isLogin, signIn, fn, momentFilter, settingDetail,
+      isLogin, signIn, fn, settingDetail,
     }
   }
 })

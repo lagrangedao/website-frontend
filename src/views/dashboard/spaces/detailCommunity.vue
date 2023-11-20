@@ -38,25 +38,23 @@ export default defineComponent({
     const router = useRouter()
 
     async function init () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        context.emit('handleValue', listRes.data, listRes.data.job, expireTime, listRes.data.nft)
-      }
-      await system.$commonFun.timeout(500)
-      renameLoad.value = false
-    }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
+      context.emit('handleValue', false)
+      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+      // if (listRes && listRes.status === 'success') {
+      //   const expireTime = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
+      //   // context.emit('handleValue', listRes.data)
+      // }
+      // await system.$commonFun.timeout(500)
+      // renameLoad.value = false
     }
     onMounted(() => {
       info.name = ''
       window.scrollTo(0, 0)
       init()
     })
-    watch(() => props.likesValue, () => {
-      init()
-    })
+    // watch(() => props.likesValue, () => {
+    //   init()
+    // })
     return {
       lagLogin,
       info,
@@ -64,8 +62,7 @@ export default defineComponent({
       system,
       route,
       router,
-      props,
-      momentFilter
+      props
     }
   }
 })

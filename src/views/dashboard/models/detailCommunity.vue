@@ -42,9 +42,6 @@ export default defineComponent({
       await system.$commonFun.timeout(500)
       renameLoad.value = false
     }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
-    }
     onMounted(() => {
       info.name = ''
       window.scrollTo(0, 0)
@@ -57,7 +54,7 @@ export default defineComponent({
       route,
       router,
       props,
-      renameFun, momentFilter
+      renameFun
     }
   }
 })

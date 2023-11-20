@@ -59,14 +59,15 @@
           <el-table-column label="url" min-width="140">
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
-              <a v-else :href="`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${scope.row._originPath.gateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <a v-else-if="userGateway" :href="`${userGateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${userGateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <span v-else></span>
             </template>
           </el-table-column>
           <el-table-column label="Created At" align="right" min-width="110">
             <template #default="scope">
               <div>
                 <span v-if="scope.row.isDir">-</span>
-                <span v-else :title="momentFilter(scope.row._originPath.created_at)">{{ calculateDiffTime(scope.row._originPath.created_at)}}</span>
+                <span v-else :title="system.$commonFun.momentFun(scope.row._originPath.created_at)">{{ system.$commonFun.calculateDiffTime(scope.row._originPath.created_at)}}</span>
               </div>
             </template>
           </el-table-column>
@@ -76,15 +77,15 @@
             <div class="left">
               <img :src="people_img" class="people" width="30" height="30" alt=""> {{metaAddress === route.params.wallet_address?accessName:'-'}}
             </div>
-            <div class="right" :title="momentFilter(fileBody._originPath.created_at)">
-              {{calculateDiffTime(fileBody._originPath.created_at)}}
+            <div class="right" :title="system.$commonFun.momentFun(fileBody._originPath.created_at)">
+              {{system.$commonFun.calculateDiffTime(fileBody._originPath.created_at)}}
             </div>
           </div>
           <div v-if="!fileTextShow" v-loading="uploadLoad">
             <div class="worktop" style="justify-content: space-between;">
               <ul>
                 <li v-if="fileTextType !== 'binary'">
-                  <a :href="`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`" target="_blank" :title="fileBody.title">
+                  <a :href="userGateway?`${userGateway}/ipfs/${fileBody._originPath.cid}`:''" target="_blank" :title="fileBody.title">
                     <svg class="mr-raw" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" style="transform: rotate(360deg);">
                       <path d="M31 16l-7 7l-1.41-1.41L28.17 16l-5.58-5.59L24 9l7 7z" fill="currentColor"></path>
                       <path d="M1 16l7-7l1.41 1.41L3.83 16l5.58 5.59L8 23l-7-7z" fill="currentColor"></path>
@@ -122,7 +123,7 @@
                   </a>
                 </li>
               </ul>
-              <small>{{sizeChange(blobSize)}}</small>
+              <small>{{system.$commonFun.sizeChange(blobSize)}}</small>
             </div>
             <img v-if="fileTextType === 'image'" :src="fileTextEditor" :alt="fileBody.title" class="img_file">
             <v-md-preview v-else-if="fileTextType === 'text'" :text="fileTextEditor" ref="preview" id="preview"></v-md-preview>
@@ -225,6 +226,7 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const userGateway = computed(() => (store.state.gateway))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const accessName = computed(() => (store.state.accessName))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
@@ -304,7 +306,7 @@ export default defineComponent({
       fileRow.fileTitle = []
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets/${route.params.wallet_address}/${route.params.name}`, 'get')
       if (listRes && listRes.status === 'success') {
-        fileRow.fileResdata = listRes.data.files || []
+        fileRow.fileResdata = listRes.data || []
         listdata.value = listRes.data.dataset || { name: route.params.name }
 
         const path = await getCatalogPath(fileRow.fileResdata);
@@ -368,9 +370,6 @@ export default defineComponent({
       })
       await system.$commonFun.timeout(1000)
       if (command === 'upload') addEvent()
-    }
-    function momentFilter (dateItem) {
-      return system.$commonFun.momentFun(dateItem)
     }
     function handleChange (uploadFile, uploadFiles) {
       // console.log(uploadFile, uploadFiles)
@@ -557,45 +556,51 @@ export default defineComponent({
       fileRow.fileTitle = []
     }
     async function fileEdit (row) {
+      if (!userGateway.value) return
       handleCommand('edit')
       uploadLoad.value = true
       fileTextEditor.value = ''
       fileTextShow.value = false
       fileBody._originPath = row._originPath
       fileBody.title = row.title
-      await getTitle(`${fileBody._originPath.gateway}/ipfs/${fileBody._originPath.cid}`)
+      await getTitle(`${userGateway.value}/ipfs/${fileBody._originPath.cid}`)
     }
     const getTitle = async (url) => {
       if (!url) return
-      var response = await fetch(url);
-      const resType = response.headers.get("content-type")
-      const text = await new Promise(async resolve => {
-        if (resType.indexOf('image') > -1) {
-          fileTextType.value = 'image'
-          resolve(response.arrayBuffer())
-        }
-        else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
-          fileTextType.value = 'text'
-          resolve(response.text())
-        } else {
-          fileTextType.value = 'binary'
-          resolve(response.arrayBuffer())
-        }
-      })
-      let blob = new Blob([text])
-      blobSize.value = blob.size
-      // let reader = new FileReader();
-      // reader.readAsArrayBuffer(blob);
-      // reader.onload = function () {
-      //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
-      //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
-      //   console.log('SHA256',hash)
-      // }
-      if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
-      else if (fileTextType.value === 'text') fileTextEditor.value = text
-      else fileTextEditor.value = url
-      uploadLoad.value = false
-    };
+      try {
+        var response = await fetch(url);
+        const resType = response.headers.get("content-type")
+        const text = await new Promise(async resolve => {
+          if (resType.indexOf('image') > -1) {
+            fileTextType.value = 'image'
+            resolve(response.arrayBuffer())
+          }
+          else if (resType.indexOf('text') > -1 || resType.indexOf('json') > -1) {
+            fileTextType.value = 'text'
+            resolve(response.text())
+          } else {
+            fileTextType.value = 'binary'
+            resolve(response.arrayBuffer())
+          }
+        })
+        let blob = new Blob([text])
+        blobSize.value = blob.size
+        // let reader = new FileReader();
+        // reader.readAsArrayBuffer(blob);
+        // reader.onload = function () {
+        //   var wordArray = system.$CryptoJS.lib.WordArray.create(reader.result);
+        //   var hash = system.$CryptoJS.SHA256(wordArray).toString();
+        //   console.log('SHA256',hash)
+        // }
+        if (fileTextType.value === 'image') fileTextEditor.value = window.URL.createObjectURL(blob)
+        else if (fileTextType.value === 'text') fileTextEditor.value = text
+        else fileTextEditor.value = url
+        uploadLoad.value = false
+      } catch (err) {
+        console.log('err model files:', err)
+        system.$commonFun.messageTip('error', err)
+      }
+    }
     function downFile () {
       var link = document.createElement('a');
       link.href = fileTextEditor.value
@@ -620,33 +625,6 @@ export default defineComponent({
       else system.$commonFun.messageTip('error', 'Delete failed!')
       reset()
       init()
-    }
-    function calculateDiffTime (startTime) {
-      var endTime = Math.round(new Date() / 1000)
-      var timeDiff = endTime - startTime
-      var year = timeDiff > (86400 * 365) ? parseInt(timeDiff / 86400 / 365) : 0
-      var month = timeDiff > (86400 * 30) ? parseInt(timeDiff / 86400 / 30) : 0
-      var day = parseInt(timeDiff / 86400)
-      var hour = parseInt((timeDiff % 86400) / 3600)
-      var minute = parseInt((timeDiff % 3600) / 60)
-      var m = parseInt((timeDiff % 60))
-      if (year > 0) return `about ${year}${year > 1 ? ' years' : ' year'} ago`
-      if (month > 0) return `${month} ${month > 1 ? ' months' : ' month'} ago`
-      if (day > 0) return `${day} ${day > 1 ? ' days' : ' day'} ago`
-      else if (hour > 0) return `${hour} ${hour > 1 ? ' hours' : ' hour'} ago`
-      else if (minute > 0) return `${minute} ${minute > 1 ? ' minutes' : ' minute'} ago`
-      else if (m > 0) return `${m} ${m > 1 ? ' seconds' : ' second'} ago`
-      else return '-'
-    }
-    function sizeChange (bytes) {
-      if (bytes === 0) return '0 B'
-      if (!bytes) return '-'
-      var k = 1024 // or 1000
-      var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      var i = Math.floor(Math.log(bytes) / Math.log(k))
-
-      if (Math.round((bytes / Math.pow(k, i))).toString().length > 3) i += 1
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     }
 
     const treeify = (nodeList) => {
@@ -758,6 +736,7 @@ export default defineComponent({
     return {
       accessAvatar,
       accessName,
+      userGateway,
       metaAddress,
       lagLogin,
       people_img,
@@ -785,9 +764,9 @@ export default defineComponent({
       fileTextShow,
       fileTextType,
       blobSize,
-      init, handleCommand, momentFilter, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
+      init, handleCommand, handleChange, handleRemove, commitFun, reset, cancelFun, commitEditFun,
       folderModeOn, handleFolderRemove, handleFolderChange, commitFolderFun, folderDetails, getListFolderMain,
-      calculateDiffTime, fileEdit, editChange, downFile, sizeChange, deleteFile
+      fileEdit, editChange, downFile, deleteFile
     }
   }
 })

@@ -43,7 +43,7 @@
       <p>The Company does not authorize the collection of personally identifiable information from our users for third party use through advertising technologies without separate member consent.</p>
       <p>California Civil Code Section 1798.83 also permits customers who are California residents to request certain information regarding Our disclosure of Personal Information to third parties for direct marketing purposes. To make such a request,
         please send an email to
-        <a href="mailto:team@filswan.com">team@filswan.com</a>. Please note that the Company is only required to respond to one request per customer each year.</p>
+        <a :href="`mailto:${email_link}`">{{email_link}}</a>. Please note that the Company is only required to respond to one request per customer each year.</p>
       <h3 id="2-use-of-information">2. USE OF INFORMATION</h3>
       <h4 id="purposes-of-the-use-of-information">Purposes of the use of Information</h4>
       <p>The Company may use information from Users for the following purposes:</p>
@@ -104,16 +104,16 @@
       <p>You may be entitled under data protection laws to access and review Personal Information the Company holds related to you.</p>
       <p>You may access, modify or delete the Information we collected by editing your profile or controlling the content that you share at any time.</p>
       <p>If you have any other request, all such communications regarding access to Personal Information should be addressed to:
-        <a href="mailto:team@filswan.com">team@filswan.com</a>. Such inquiries should be clearly marked as data protection queries and you should indicate if the request is time sensitive.</p>
+        <a :href="`mailto:${email_link}`">{{email_link}}</a>. Such inquiries should be clearly marked as data protection queries and you should indicate if the request is time sensitive.</p>
       <h4 id="b-data-retention">B. Data retention</h4>
       <p>We retain your Information for as long as necessary to deliver the Services, to comply with any applicable legal requirements, to maintain security and prevent incidents and, in general, to pursue our legitimate interests.</p>
       <p>You may decide to cancel your account and your content at any time by editing your profile. If you wish to request the erasure of all of your Personal Information that we process, you may do so by sending a written request to
-        <a href="mailto:team@filswan.com">team@filswan.com</a>.</p>
+        <a :href="`mailto:${email_link}`">{{email_link}}</a>.</p>
       <h3 id="5-data-security">5. DATA SECURITY</h3>
       <p>The security of your Personal Information is important to us. The Company follows generally accepted industry standards, including the use of appropriate administrative, physical and technical safeguards, to protect Personal Information.
         However, no method of transmission over the Internet, or method of electronic storage, is fully secure. Therefore, while the Company strives to use commercially acceptable means to protect Personal Information, the Company cannot guarantee
         its absolute security or confidentiality. If you have any questions about security, you can contact the Company at
-        <a href="mailto:team@filswan.com">team@filswan.com</a>.</p>
+        <a :href="`mailto:${email_link}`">{{email_link}}</a>.</p>
       <p>In the event of an incident affecting your Personal Information, we will act promptly acceptable means to identify and address the incident, and to notify you.</p>
       <p>Please be aware that certain Personal Information and other information provided by you in connection with your use of the Services may be stored on your device (even if that Information is not collected by the Company). You are solely
         responsible for maintaining the security of your device from unauthorized access. Similarly, you also remain responsible for maintaining the confidentiality of your password or any other information that should reasonably be held confidential.</p>
@@ -125,20 +125,20 @@
       <p>In particular, if you provide Personal Information, it may be transferred to and processed on computers in the Canada and other countries. We strive to take appropriate safeguards to ensure that your Personal Information will remain protected
         in a manner consistent with standard applicable data protection laws.</p>
       <p>If you have any other question, please contact the Company at:
-        <a href="mailto:team@filswan.com">team@filswan.com</a>.</p>
+        <a :href="`mailto:${email_link}`">{{email_link}}</a>.</p>
       <h3 id="7-childrens-privacy">7. CHILDREN’S PRIVACY</h3>
       <p>The Services are neither directed to nor structured to attract children under the age of 13 years. Accordingly, the Company does not intend to collect Personal Information from anyone it knows to be under 13 years of age. The Company will
         direct potential users under 13 years of age not to use the Services.</p>
       <p>If the Company learns that Personal Information of persons less than 13 years of age has been collected without verifiable parental consent, the Company will take the appropriate steps to delete this information.</p>
       <p>To make such a request, please contact the Company at:
-        <a href="mailto:team@filswan.com">team@filswan.com</a>.</p>
+        <a :href="`mailto:${email_link}`">{{email_link}}</a>.</p>
       <h3 id="8-communications-and-can-spam-act">8. COMMUNICATIONS AND CAN-SPAM ACT</h3>
       <p>The Company may collect your email address in order to send information and respond to inquiries and/or other requests or questions.</p>
       <p>The Company does not use false or misleading subjects or email addresses. The Company reasonably identifies advertisements and includes in its communications the physical address of its business location. The Company honors opt-out/unsubscribe
         requests. Users may follow the instructions at the bottom of an email from the Company in order to unsubscribe from correspondence.</p>
       <h3 id="9-contact-us">9. CONTACT US</h3>
       <p>If you have questions about this Policy, please contact
-        <a href="mailto:team@filswan.com">team@filswan.com</a>.</p>
+        <a :href="`mailto:${email_link}`">{{email_link}}</a>.</p>
       <p>The main establishment in the European Union is Lagrange, SAS, a French société par actions simplifiée à associé unique registered in the Paris Trade and Companies Register under the number 822 168 043, and whose headquarters are located
         on 9 rue des Colonnes, 75002 Paris, France. The designation of this main establishment in the European Union gives full authority to the French Data Protection Agency, la Commission Nationale de l'Informatique et des Libertés (CNIL)
         per the General Data Protection Regulation (GDPR).</p>
@@ -166,3 +166,16 @@
     </div>
   </div>
 </template>
+
+<script>
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
+export default defineComponent({
+  name: "Privacy",
+  setup () {
+    const email_link = process.env.VUE_APP_BASE_EMAIL
+    return {
+      email_link
+    }
+  },
+});
+</script>

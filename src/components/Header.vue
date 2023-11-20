@@ -3,66 +3,68 @@
     <el-row class="headerStyle">
       <el-col :xs="20" :sm="20" :md="20" :lg="8" :xl="8" class="logoImg">
         <img :src="logo" @click="header_logo" alt='' />
-        <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." />
+        <el-divider direction="vertical" />
+        <div class="net">{{info.network||'-'}}</div>
+        <!-- <el-input v-model="searchValue" class="w-50 m-2" placeholder="search spaces, users..." /> -->
       </el-col>
       <el-col :xs="4" :sm="4" :md="4" :lg="16" :xl="16" class="header_right">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
           <el-menu-item index="dataset">
-            <i class="icon icon_datasets"></i>
+            <i class="icon-style icon_datasets"></i>
             Datasets
           </el-menu-item>
           <!-- <el-menu-item index="models">
-            <i class="icon icon_models"></i>
+            <i class="icon-style icon_models"></i>
             Models
           </el-menu-item> -->
           <el-menu-item index="spaces">
-            <i class="icon icon_spaces"></i>
+            <i class="icon-style icon_spaces"></i>
             Spaces
           </el-menu-item>
           <el-menu-item index="4">
-            <i class="icon icon_docs"></i>
+            <i class="icon-style icon_docs"></i>
             Docs
           </el-menu-item>
           <el-menu-item index="5">
-            <i class="icon icon_solutions"></i>
+            <i class="icon-style icon_solutions"></i>
             Solutions
           </el-menu-item>
           <el-menu-item index="dashboard">
             Provider
           </el-menu-item>
-          <el-menu-item index="6">
+          <el-menu-item index="pricing">
             Pricing
           </el-menu-item>
-          <!-- <el-menu-item index="7">
-            &nbsp;
-            <svg class="mr-1.5 text-gray-500 w-5 group-hover:text-gray-400 dark:text-gray-300 dark:group-hover:text-gray-400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="21px"
-              height="21px" viewBox="0 0 32 18" preserveAspectRatio="xMidYMid meet">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 3.30221C14.4504 2.836 14.8284 2.45807 15.2946 2.45807H28.4933C28.9595 2.45807 29.3374 2.836 29.3374 3.30221C29.3374 3.76842 28.9595 4.14635 28.4933 4.14635H15.2946C14.8284 4.14635 14.4504 3.76842 14.4504 3.30221Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 9.00002C14.4504 8.53382 14.8284 8.15588 15.2946 8.15588H28.4933C28.9595 8.15588 29.3374 8.53382 29.3374 9.00002C29.3374 9.46623 28.9595 9.84417 28.4933 9.84417H15.2946C14.8284 9.84417 14.4504 9.46623 14.4504 9.00002Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4504 14.6978C14.4504 14.2316 14.8284 13.8537 15.2946 13.8537H28.4933C28.9595 13.8537 29.3374 14.2316 29.3374 14.6978C29.3374 15.164 28.9595 15.542 28.4933 15.542H15.2946C14.8284 15.542 14.4504 15.164 14.4504 14.6978Z"
-                fill="currentColor"></path>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M1.94549 6.87377C2.27514 6.54411 2.80962 6.54411 3.13928 6.87377L6.23458 9.96907L9.32988 6.87377C9.65954 6.54411 10.194 6.54411 10.5237 6.87377C10.8533 7.20343 10.8533 7.73791 10.5237 8.06756L6.23458 12.3567L1.94549 8.06756C1.61583 7.73791 1.61583 7.20343 1.94549 6.87377Z"
-                fill="currentColor"></path>
-            </svg>
-          </el-menu-item> -->
           <el-menu-item index="personal_center" v-if="!lagLogin">
             &nbsp;
             <span class="loginBtn">Login</span>
           </el-menu-item>
-          <el-sub-menu index="8" v-else>
-            <template #title>
-              <router-link to="/personal_center" class="loginImg">
-                <img :src="accessAvatar||people_img" class="people" width="30" height="30" alt="">
-              </router-link>
-            </template>
-            <el-menu-item index="create_dataset">+ New Dataset</el-menu-item>
-            <el-menu-item index="create_space">+ New Space</el-menu-item>
-            <!-- <el-menu-item index="create_organizations">Create Organizations</el-menu-item> -->
-            <el-menu-item index="settings">Settings</el-menu-item>
-            <el-menu-item index="sign_out">Sign Out</el-menu-item>
-          </el-sub-menu>
+          <el-menu-item index="8" v-else>
+            <div class="set">
+              <el-dropdown split-button @command="handleSelect" :hide-on-click="true" trigger="click">
+                <router-link to="/personal_center" class="loginImg">
+                  <img :src="accessAvatar||people_img" width="20" height="20" alt=""> {{system.$commonFun.hiddAddress(metaAddress)}}
+                </router-link>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="create_dataset">
+                      + New Dataset
+                    </el-dropdown-item>
+                    <el-dropdown-item command="create_space">
+                      + New Space
+                    </el-dropdown-item>
+                    <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
+                    <el-dropdown-item command="settings">
+                      Settings
+                    </el-dropdown-item>
+                    <el-dropdown-item command="sign_out">
+                      Sign Out
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </el-menu-item>
         </el-menu>
       </el-col>
     </el-row>
@@ -72,9 +74,10 @@
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import { ArrowDown } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'header_page',
-  components: {},
+  components: { ArrowDown },
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
@@ -84,6 +87,9 @@ export default defineComponent({
     const people_img = require("@/assets/images/dashboard/people_default.png")
     const searchValue = ref('')
     const activeIndex = ref('')
+    const info = reactive({
+      network: ''
+    })
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
@@ -105,20 +111,26 @@ export default defineComponent({
       else if (key === 'create_dataset') router.push({ path: '/create_dataset' })
       else if (key === 'create_organizations') router.push({ path: '/create_organizations' })
       else if (key === 'dashboard') window.open(process.env.VUE_APP_DASHBOARD_LINK)
+      else if (key === 'pricing') router.push({ path: '/pricing' })
       else if (key === 'settings') router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
       else if (key === 'sign_out') {
-        system.$commonFun.signOutFun()
-        // await system.$commonFun.timeout(200)
+        await system.$commonFun.signOutFun()
+        await system.$commonFun.timeout(200)
         window.location.reload()
       }
       else store.dispatch('setNavLogin', false)
     }
-    function activeMenu (row) {
-      const name = row || route.name
-      if (name.indexOf('dataset') > -1) activeIndex.value = 'dataset'
-      else if (name.indexOf('model') > -1) activeIndex.value = 'models'
-      else if (name.indexOf('space') > -1) activeIndex.value = 'spaces'
-      else activeIndex.value = name
+    async function activeMenu (row) {
+      const nameMenu = row || route.name
+      if (nameMenu.indexOf('dataset') > -1) activeIndex.value = 'dataset'
+      else if (nameMenu.indexOf('model') > -1) activeIndex.value = 'models'
+      else if (nameMenu.indexOf('space') > -1) activeIndex.value = 'spaces'
+      else if (nameMenu.indexOf('pricing') > -1) activeIndex.value = 'pricing'
+      else activeIndex.value = nameMenu
+
+      const chainId = await system.$commonFun.web3Init.eth.net.getId()
+      const { name } = await system.$commonFun.getUnit(chainId)
+      info.network = name || `Chain ID: ${chainId}`
     }
     onMounted(() => activeMenu())
     watch(route, (to, from) => {
@@ -133,6 +145,7 @@ export default defineComponent({
       people_img,
       searchValue,
       activeIndex,
+      info,
       bodyWidth,
       system,
       header_logo, handleSelect
@@ -160,19 +173,60 @@ export default defineComponent({
     @media screen and (min-width: 1536px) {
       max-width: 1536px;
     }
+    @media screen and (max-width: 441px) {
+      padding: 0 2%;
+    }
     .logoImg {
       display: flex;
       align-items: center;
       width: auto;
       height: 0.42rem;
       cursor: pointer;
+      color: #fff;
+      @media screen and (max-width: 441px) {
+        width: 50%;
+        height: auto;
+      }
       img {
         display: block;
         height: 100%;
         width: auto;
         max-width: 100%;
-        margin: 0 0.35rem 0 0;
         cursor: pointer;
+        @media screen and (max-width: 441px) {
+          width: 100%;
+          max-width: 105px;
+          height: auto;
+        }
+      }
+      .net {
+        position: relative;
+        padding: 4px 0 0 13px;
+        font-size: 14px;
+        @media screen and (max-width: 1680px) {
+          font-size: 13px;
+        }
+        @media screen and (max-width: 768px) {
+          font-size: 12px;
+        }
+        &::before {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          content: "";
+          width: 6px;
+          height: 6px;
+          margin-top: -1px;
+          background-color: #fff;
+          border-radius: 6px;
+        }
+      }
+      :deep(.el-divider) {
+        margin: 0 0.15rem;
+        border-color: transparent;
+        @media screen and (max-width: 441px) {
+          margin: 0 10px;
+        }
       }
       :deep(.el-input) {
         .el-input__inner {
@@ -218,7 +272,7 @@ export default defineComponent({
           @media screen and (min-width: 1800px) {
             font-size: 15px;
           }
-          .icon {
+          .icon-style {
             width: 21px;
             height: 20px;
             margin: -1px 6px 0 0;
@@ -271,6 +325,49 @@ export default defineComponent({
               color: #fff;
               opacity: 0.9;
               cursor: pointer;
+            }
+          }
+          .set {
+            vertical-align: middle;
+            * {
+              vertical-align: middle;
+            }
+            .el-button-group > .el-button {
+              border-radius: 7px;
+              &:first-child {
+                padding-left: 10px;
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+              }
+              &:last-child {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+              }
+            }
+            .el-icon {
+              margin: auto;
+              cursor: pointer;
+              svg {
+                width: 1em;
+                cursor: pointer;
+                path {
+                  cursor: pointer;
+                }
+              }
+            }
+            .loginImg {
+              display: flex;
+              align-items: center;
+              cursor: pointer;
+              img {
+                width: 23px;
+                height: 23px;
+                margin: 0 5px 0 0;
+                cursor: pointer;
+                background-color: #fff;
+                border: 1px solid #b9b9b9;
+                border-radius: 50%;
+              }
             }
           }
           &.is-active,
@@ -330,28 +427,61 @@ export default defineComponent({
 
 @media screen and (max-width: 1024px) {
 }
-@media screen and (max-width: 441px) {
-  .headerCont {
-    .headerStyle {
-      padding: 0 2%;
-      .logoImg {
-        width: 50%;
-        height: auto;
-        img {
-          width: 100%;
-          max-width: 105px;
-          height: auto;
-          margin: 0 10px 0 0;
-        }
-      }
-    }
-  }
-}
 </style>
-<style>
+<style lang="scss">
 .loginImg {
   display: flex;
   cursor: pointer;
+}
+
+.el-menu--horizontal .el-menu .el-menu-item,
+.el-menu--horizontal .el-menu .el-sub-menu__title {
+  height: auto;
+  padding: 10px;
+  line-height: 1.2;
+  .set {
+    vertical-align: middle;
+    * {
+      vertical-align: middle;
+    }
+    .el-button-group > .el-button {
+      border-radius: 7px;
+      &:first-child {
+        padding-left: 10px;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      &:last-child {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+    .el-icon {
+      margin: auto;
+      cursor: pointer;
+      svg {
+        width: 1em;
+        cursor: pointer;
+        path {
+          cursor: pointer;
+        }
+      }
+    }
+    .loginImg {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      img {
+        width: 23px;
+        height: 23px;
+        margin: 0 5px 0 0;
+        cursor: pointer;
+        background-color: #fff;
+        border: 1px solid #b9b9b9;
+        border-radius: 50%;
+      }
+    }
+  }
 }
 </style>
 
