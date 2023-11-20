@@ -82,7 +82,7 @@
                   <h5>{{ ol.hardware_name }}</h5>
                   <div class="desc-text">{{ ol.hardware_description }}</div>
                   <div class="price">
-                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} LAG per hour</b>
+                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} LAG/Swan USDC per hour</b>
                     <b v-else>No available CP</b>
                   </div>
                 </el-card>

@@ -2,36 +2,51 @@
   <div id="payment">
     <div class="payment-history container-landing">
       <div class="title">{{paymentType.toLowerCase() === 'provider'?'provider Payment history':'user Payment history'}}</div>
-      <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%">
+      <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-if="paymentType.toLowerCase() !== 'provider'">
         <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
           <template #default="scope">
             <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
           </template>
         </el-table-column>
         <el-table-column prop="chain_id" label="chain id" width="100" />
-        <el-table-column prop="token" label="token" v-if="paymentType.toLowerCase() !== 'provider'">
+        <el-table-column prop="token" label="token">
           <template #default="scope">
-            <span>LAG</span>
+            <span>{{scope.row.chain_id === 80001 ? 'LAG': 'SWAN USDC'}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="message" label="refund reason" v-if="paymentType.toLowerCase() !== 'provider'" min-width="120">
+        <el-table-column prop="message" label="refund/Denied reason" min-width="120">
           <template #default="scope">
             <span>{{scope.row.message || '-'}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="order" label="space name" v-if="paymentType.toLowerCase() !== 'provider'">
+        <el-table-column prop="order" label="space name">
           <template #default="scope">
             <span>{{scope.row.order.space_name}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="amount" label="amount" />
+        <el-table-column prop="status" label="status" width="135">
+          <template #default="scope">
+            <div>
+              <el-button type="primary" v-if="scope.row.review_status.toLowerCase() === 'accepted' || scope.row.review_status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
+              <el-button type="primary" v-else-if="scope.row.review_status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button>
+              <span v-else>{{scope.row.review_status}}</span>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-else>
+        <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
+          <template #default="scope">
+            <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
+          </template>
+        </el-table-column>
+        <el-table-column prop="chain_id" label="chain id" width="100" />
+        <el-table-column prop="amount" label="amount" />
         <el-table-column prop="status" label="status" width="120">
           <template #default="scope">
-            <div v-if="paymentType.toLowerCase() !== 'provider'">
-              <el-button type="primary" v-if="scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
-              <span v-else>{{scope.row.status}}</span>
-            </div>
-            <div v-else>
+            <div>
               <el-button type="primary" v-if="scope.row.claimed === false" plain @click="refundFun(scope.row, 'claim')">Claim</el-button>
               <span v-else>Claimed</span>
             </div>
@@ -46,6 +61,7 @@ import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
+import SpaceTokenABI from '@/utils/abi/SpacePaymentV5.json'
 export default defineComponent({
   name: 'footer_page',
   setup () {
@@ -57,10 +73,23 @@ export default defineComponent({
     const paymentData = ref([])
     const paymentLoad = ref(false)
     const paymentType = ref(route.query.type || 'user')
-    const paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
-    const paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
+    let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
+    let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
 
+    async function reviewFun (row) {
+      paymentLoad.value = true
+      let formData = new FormData()
+      formData.append('tx_hash', row.transaction_hash)
+      formData.append('chain_id', row.chain_id)
+      const reviewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}claim_review`, 'post', formData)
+      if (!reviewRes || reviewRes.status !== 'success') if (reviewRes.message) system.$commonFun.messageTip('error', reviewRes.message)
+      init()
+    }
     async function refundFun (row, type) {
+      if (row.chain_id.toString() !== getnetID.toString()) {
+        await system.$commonFun.walletChain(row.chain_id)
+        return
+      }
       paymentLoad.value = true
       try {
         if (type) {
@@ -78,7 +107,6 @@ export default defineComponent({
             })
             .on('error', () => paymentLoad.value = false)
         } else {
-          console.log('refund_id:', row.transaction_hash)
           let gasLimit = await paymentContract.methods
             .claimRefund(String(row.transaction_hash))
             .estimateGas({ from: store.state.metaAddress })
@@ -131,8 +159,20 @@ export default defineComponent({
       } else if (paymentsRes.message) system.$commonFun.messageTip('error', paymentsRes.message)
       paymentLoad.value = false
     }
-    onMounted(() => { })
-    onActivated(() => { init() })
+    async function paymentEnv () {
+      if (getnetID !== 80001) {
+        paymentContractAddress = process.env.VUE_APP_OPSWAN_ADDRESS
+        paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
+      }
+    }
+    let getnetID = NaN
+    onMounted(async () => {
+    })
+    onActivated(async () => {
+      getnetID = await system.$commonFun.web3Init.eth.net.getId()
+      paymentEnv()
+      init()
+    })
     watch(route, (to, from) => {
       if (to.name === "paymentHistory") init()
     })
@@ -143,7 +183,7 @@ export default defineComponent({
       route,
       router,
       paymentType,
-      refundFun
+      refundFun, reviewFun
     }
   },
 })
