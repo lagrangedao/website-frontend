@@ -11,7 +11,8 @@
         <el-table-column prop="chain_id" label="chain id" width="110" />
         <el-table-column prop="token" label="token">
           <template #default="scope">
-            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>
+<!--            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>-->
+            <span>USDC</span>
           </template>
         </el-table-column>
         <el-table-column prop="message" label="refund/Denied reason" min-width="120">

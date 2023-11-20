@@ -10,7 +10,7 @@
               </el-descriptions-item>
               <el-descriptions-item label="Memory">{{ props.listdata.activeOrder.config.memory }}</el-descriptions-item>
               <el-descriptions-item label="VCPU">{{ props.listdata.activeOrder.config.vcpu }}</el-descriptions-item>
-              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} PUSDC/SUSDC per hour
+              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} USDC per hour
               </el-descriptions-item>
               <el-descriptions-item label="Description">{{ props.listdata.activeOrder.config.description }}
               </el-descriptions-item>
@@ -82,7 +82,7 @@
                   <h5>{{ ol.hardware_name }}</h5>
                   <div class="desc-text">{{ ol.hardware_description }}</div>
                   <div class="price">
-                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} PUSDC/SUSDC per hour</b>
+                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} USDC per hour</b>
                     <b v-else>No available CP</b>
                   </div>
                 </el-card>
@@ -101,7 +101,7 @@
           <h5>{{ sleepSelect.hardware_name }}</h5>
           <div class="desc-text">{{ sleepSelect.hardware_description }}</div>
           <div class="price">
-            <b>{{ sleepSelect.hardware_price }} PUSDC/SUSDC per hour</b>
+            <b>{{ sleepSelect.hardware_price }} USDC per hour</b>
           </div>
         </el-card>
         <div class="sleep_style">
