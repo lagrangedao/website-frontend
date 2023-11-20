@@ -166,15 +166,15 @@ export default defineComponent({
   text-align: left;
   .demo-rich-conent {
     li {
-      padding: 0.1rem 0.2rem;
       font-size: 14px;
       cursor: pointer;
       color: #767676;
+      border-top: 1px solid #e6e6e6;
       svg {
         margin-right: 0.08rem;
       }
       &:nth-child(1) {
-        border-bottom: 1px solid #e6e6e6;
+        border-top: 0;
       }
       &:hover {
         color: rgb(41, 41, 41);
@@ -183,6 +183,9 @@ export default defineComponent({
             fill: rgb(41, 41, 41);
           }
         }
+      }
+      .m-width {
+        padding: 0.1rem 0.2rem;
       }
     }
   }

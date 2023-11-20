@@ -243,6 +243,8 @@ async function getUnit(id) {
     case 8598668088:
       unit = 'SwanETH'
       name = 'OpSwan '
+      url = `${process.env.VUE_APP_OPSWANURL}/address/`
+      url_tx = `${process.env.VUE_APP_OPSWANURL}/tx/`
       break
     case 56:
       unit = 'BNB'
