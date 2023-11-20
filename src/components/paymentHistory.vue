@@ -16,7 +16,7 @@
         </el-table-column>
         <el-table-column prop="message" label="refund/Denied reason" min-width="120">
           <template #default="scope">
-            <span>{{scope.row.message || '-'}}</span>
+            <span>{{scope.row.refund_reason ||scope.row.denied_reason || '-'}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="order" label="space name">
@@ -28,9 +28,9 @@
         <el-table-column prop="status" label="status" width="135">
           <template #default="scope">
             <div>
-              <el-button type="primary" v-if="scope.row.review_status.toLowerCase() === 'accepted' || scope.row.review_status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
-              <el-button type="primary" v-else-if="scope.row.review_status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button>
-              <span v-else>{{scope.row.review_status}}</span>
+              <el-button type="primary" v-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
+              <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button>
+              <span v-else>{{scope.row.status}}</span>
             </div>
           </template>
         </el-table-column>
