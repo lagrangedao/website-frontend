@@ -301,7 +301,7 @@ export default defineComponent({
           })
 
         let payMethod = getnetID === 80001 ? paymentContract.methods
-          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
+          .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
           paymentContract.methods
             .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
 
