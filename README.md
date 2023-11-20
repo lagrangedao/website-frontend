@@ -41,6 +41,14 @@ $ npm run serve_u
 
 Navigate to `http://localhost:8080/`. The app will automatically reload if you change any of the source files.
 
+```shell
+ ERROR  Failed to compile with 1 error       
+ error  in ./node_modules/@intlify/core-base/dist/core-base.mjs
+ ...
+ ...
+ ```
+ Run `npm i vue-i18n@9.1.0` to reinstall the components.
+
 ## Build project
 
 ```shell

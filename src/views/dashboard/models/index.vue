@@ -1,16 +1,16 @@
 <template>
   <section id="dataset">
-    <el-row class="dataset_body">
+    <el-row class="dataset_body container-landing flex-row">
       <el-col :xs="24" :sm="24" :md="24" :lg="6" :xl="6" class="left">
         <div class="list">
-          <div class="title">
+          <div class="title flex-row">
             <!-- <i class="icon icon_licenses"></i> -->
             Tasks
           </div>
           <div class="cont">
             <el-row :gutter="12">
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Tasks" :key="index">
-                <router-link to="">
+                <router-link to="" class=" flex-row">
                   <i class="icon"></i>
                   <span class="a_text">{{l}}</span>
                 </router-link>
@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="list">
-          <div class="title">
+          <div class="title flex-row">
             <!-- <i class="icon icon_sizes"></i> -->
             Libraries
           </div>
@@ -30,7 +30,7 @@
             <el-row :gutter="12">
               <!-- :xs="6" :sm="6" :md="6" :lg="12" :xl="12" -->
               <el-col v-for="(l, index) in dataList.Libraries" :key="index">
-                <router-link to="">
+                <router-link to="" class=" flex-row">
                   <span class="a_text">{{l}}</span>
                 </router-link>
               </el-col>
@@ -41,14 +41,14 @@
           </div>
         </div>
         <div class="list">
-          <div class="title">
+          <div class="title flex-row">
             <!-- <i class="icon icon_licenses"></i> -->
             Datasets
           </div>
           <div class="cont">
             <el-row :gutter="12">
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Datasets" :key="index">
-                <router-link to="">
+                <router-link to="" class=" flex-row">
                   <i class="icon icon_licenses"></i>
                   <span class="a_text">{{l}}</span>
                 </router-link>
@@ -60,14 +60,14 @@
           </div>
         </div>
         <div class="list">
-          <div class="title">
+          <div class="title flex-row">
             <!-- <i class="icon icon_licenses"></i> -->
             Licenses
           </div>
           <div class="cont">
             <el-row :gutter="12">
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Licenses" :key="index">
-                <router-link to="">
+                <router-link to="" class=" flex-row">
                   <i class="icon icon_licenses"></i>
                   <span class="a_text">{{l}}</span>
                 </router-link>
@@ -79,14 +79,14 @@
           </div>
         </div>
         <div class="list">
-          <div class="title">
+          <div class="title flex-row">
             <!-- <i class="icon icon_licenses"></i> -->
             Other
           </div>
           <div class="cont">
             <el-row :gutter="12">
               <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-for="(l, index) in dataList.Other" :key="index">
-                <router-link to="">
+                <router-link to="" class=" flex-row">
                   <i class="icon icon_licenses"></i>
                   <span class="a_text">{{l}}</span>
                 </router-link>
@@ -99,8 +99,8 @@
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="18" class="right">
-        <div class="top">
-          <div class="top_text">
+        <div class="top flex-row">
+          <div class="top_text flex-row">
             <b>Models</b> {{system.$commonFun.NumFormat(pagin.total)}}
             <el-input v-model="searchValue" clearable @input="searchChange" class="w-50 m-2" placeholder="Filter by name" />
           </div>
@@ -115,38 +115,38 @@
           <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
             <el-card class="box-card" @click="detailFun(list, l)">
               <template #header>
-                <div class="card-header">
-                  <div class="name">
+                <div class="card-header flex-row">
+                  <div class="name flex-row">
                     <!-- <img src="@/assets/images/dashboard/people.png" alt=""> -->
                     <b>{{list.name}}</b>
                   </div>
                   <span>27</span>
                 </div>
               </template>
-              <div class="text">
+              <div class="text flex-row">
                 <i class="icon icon_text"></i>
                 <p class="ellipsis">{{list.license}}</p>
               </div>
-              <div class="text">
+              <div class="text flex-row">
                 <i class="icon icon_wallet"></i>
                 <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
               </div>
-              <div class="text item">
-                <div class="item_body">
+              <div class="text item flex-row">
+                <div class="item_body flex-row">
                   <i class="icon icon_time"></i>
                   <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
-                <!-- <div class="item_body">
+                <!-- <div class="item_body flex-row">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
                 </div> -->
               </div>
             </el-card>
           </el-col>
-          <p v-if="listdata && listdata.length === 0" class="list_nodata">No Data</p>
+          <p v-if="listdata && listdata.length === 0" class="list_nodata flex-row">No Data</p>
         </el-row>
-        <el-pagination hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        />
+        <el-pagination class=" flex-row" hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange"
+          @current-change="handleCurrentChange" />
       </el-col>
     </el-row>
   </section>
@@ -155,7 +155,6 @@
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
-import qs from 'qs'
 export default defineComponent({
   name: 'Models',
   components: {},
@@ -261,7 +260,7 @@ export default defineComponent({
         sort: pagin.sort, // alphabetical， updated
         name: searchValue.value
       }
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets?${qs.stringify(params)}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}datasets?${Qs.stringify(params)}`, 'get')
       if (listRes) {
         listdataAll.value = listRes.datasets || []
         listdata.value = listRes.datasets || []
@@ -312,17 +311,9 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0 0.16rem;
     margin: auto;
     font-size: 14px;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .left {
       position: relative;
       padding: 1rem 1% 0.5rem 0;
@@ -333,9 +324,7 @@ export default defineComponent({
       .list {
         margin: 0.2rem 0 0;
         .title {
-          display: flex;
           justify-content: flex-start;
-          align-items: center;
           padding: 0.11rem;
           font-size: 0.19rem;
           color: #000;
@@ -375,7 +364,6 @@ export default defineComponent({
               width: auto;
               flex: auto;
               a {
-                display: flex;
                 padding: 0;
                 margin: 0.03rem auto;
                 background-color: transparent;
@@ -444,8 +432,6 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
                   &:hover {
                     background-color: #eee;
                   }
@@ -556,8 +542,6 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
                   background-color: #dfbafa;
                   color: #5b21c6;
                   border: 0;
@@ -577,8 +561,6 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
                   &:hover {
                     background-color: #eee;
                   }
@@ -606,8 +588,6 @@ export default defineComponent({
       position: relative;
       padding: 0.4rem 3%;
       .top {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         color: #606060;
         font-size: 0.19rem;
@@ -615,8 +595,6 @@ export default defineComponent({
           flex-wrap: wrap;
         }
         .top_text {
-          display: flex;
-          align-items: center;
           b {
             padding: 0.08rem 0.25rem;
             margin: 0 0.17rem 0 0;
@@ -730,11 +708,8 @@ export default defineComponent({
               padding: 0;
               border: 0;
               .card-header {
-                display: flex;
                 justify-content: space-between;
                 .name {
-                  display: flex;
-                  align-items: center;
                   flex-wrap: wrap;
                   width: 80%;
                   color: #606060;
@@ -773,9 +748,7 @@ export default defineComponent({
             .el-card__body {
               padding: 0.05rem 0 0;
               .text {
-                display: flex;
                 justify-content: flex-start;
-                align-items: center;
                 flex-wrap: wrap;
                 margin-bottom: 0.1rem;
                 color: #000;
@@ -864,10 +837,6 @@ export default defineComponent({
               .item {
                 justify-content: space-between;
                 margin: 0.2rem 0 0;
-                .item_body {
-                  display: flex;
-                  align-items: center;
-                }
               }
             }
           }
@@ -935,9 +904,7 @@ export default defineComponent({
           }
         }
         .list_nodata {
-          display: flex;
           justify-content: center;
-          align-items: center;
           width: 100%;
           height: 200px;
           font-size: 18px;
@@ -945,7 +912,6 @@ export default defineComponent({
       }
       .el-pagination {
         margin: 0.1rem auto;
-        display: flex;
         justify-content: center;
         .btn-prev {
           i {
@@ -979,10 +945,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

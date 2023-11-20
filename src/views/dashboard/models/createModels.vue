@@ -1,6 +1,6 @@
 <template>
     <section id="dataset">
-        <el-row class="dataset_body" v-loading="createLoad">
+        <el-row class="dataset_body container-landing flex-row" v-loading="createLoad">
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <div class="text-center">
                     <!-- <svg class="w-12 h-12 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 25 25">
@@ -13,7 +13,7 @@
                     <h1 class="text-xl md:text-3xl font-semibold">Create a new dataset repository</h1>
                     <p class="text-lg text-gray-500">A repository contains all dataset files, including the revision history.</p>
                 </div>
-                <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
+                <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm flex-row" status-icon>
                     <el-form-item prop="" class="flex_form">
                         <label class="label" for="owner">
                             Owner
@@ -162,17 +162,9 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0 0.16rem;
     margin: auto;
     font-size: 14px;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .el-col {
       position: relative;
       padding: 1rem 3% 0.5rem 0;
@@ -202,7 +194,6 @@ export default defineComponent({
         }
       }
       .demo-ruleForm {
-        display: flex;
         flex-wrap: wrap;
         width: 95%;
         max-width: 640px;
@@ -223,7 +214,6 @@ export default defineComponent({
               width: 100%;
               text-align: left;
               .flex-row {
-                display: flex;
                 width: 100%;
                 .el-select {
                   width: calc(100% - 30px);
@@ -280,10 +270,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

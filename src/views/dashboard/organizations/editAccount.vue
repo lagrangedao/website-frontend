@@ -1,12 +1,12 @@
 <template>
   <section class="profile_body" v-loading="loading" :element-loading-text="loadingText">
     <div class="list">
-      <div class="title">
+      <div class="title flex-row">
         Account Settings
       </div>
     </div>
 
-    <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" v-loading="listLoad" class="demo-ruleForm list_body_spaces" status-icon>
+    <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" v-loading="listLoad" class="demo-ruleForm list_body_spaces flex-row" status-icon>
       <el-form-item prop="name">
         <label class="label" for="dataname">
           Organization Username
@@ -93,7 +93,6 @@
   </section>
 </template>
 <script>
-const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -386,10 +385,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

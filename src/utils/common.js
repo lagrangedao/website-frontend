@@ -1,6 +1,4 @@
 import store from '../store'
-import axios from 'axios'
-import moment from 'moment'
 import {
   ElMessage
 } from 'element-plus'
@@ -32,7 +30,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
   } catch (err) {
     console.error(err, err.response)
     const time = await throttle()
-    if (time) messageTip('error', err.response ? err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    if (time) messageTip('error', err.response ? err.response.statusText || err.response.data.msg || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
     } else if (err.response && err.response.status === 404) {
@@ -109,7 +107,6 @@ async function login() {
     })
     store.dispatch('setMetaAddress', accounts[0])
   }
-
   const time = await throttle()
   if (!time) return [false, '']
   const [signature, signErr] = await sign()
@@ -243,6 +240,12 @@ async function getUnit(id) {
       unit = 'ETH'
       name = 'Ethereum Mainnet '
       break
+    case 8598668088:
+      unit = 'SwanETH'
+      name = 'OpSwan '
+      url = `${process.env.VUE_APP_OPSWANURL}/address/`
+      url_tx = `${process.env.VUE_APP_OPSWANURL}/tx/`
+      break
     case 56:
       unit = 'BNB'
       name = 'Binance Smart Chain Mainnet '
@@ -278,6 +281,10 @@ async function getUnit(id) {
       url = `${process.env.VUE_APP_SEPOLIABLOCKURL}/address/`
       url_tx = `${process.env.VUE_APP_SEPOLIABLOCKURL}/tx/`
       break
+    default:
+      unit = '-'
+      name = `Chain ${id}`
+      break
   }
   return ({
     unit,
@@ -287,13 +294,83 @@ async function getUnit(id) {
   })
 }
 
+async function walletChain(chainId) {
+  let text = {}
+  switch (chainId) {
+    case 8598668088:
+      text = {
+        chainId: web3Init.utils.numberToHex(8598668088),
+        chainName: 'OpSwan',
+        // nativeCurrency: {
+        //   name: 'SwanETH',
+        //   symbol: 'SwanETH', // 2-6 characters long
+        //   decimals: 18
+        // },
+        rpcUrls: [process.env.VUE_APP_OPSWANRPCURL],
+        blockExplorerUrls: [process.env.VUE_APP_OPSWANURL]
+      }
+      break
+    case 80001:
+      text = {
+        chainId: web3Init.utils.numberToHex(80001),
+        chainName: 'Mumbai Testnet',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: [process.env.VUE_APP_MUMBAIRPCURL],
+        blockExplorerUrls: [process.env.VUE_APP_MUMBAIPAYMENTURL]
+      }
+      break
+    case 97:
+      text = {
+        chainId: web3Init.utils.numberToHex(97),
+        chainName: 'BSC TestNet',
+        nativeCurrency: {
+          name: 'tBNB',
+          symbol: 'tBNB', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
+        blockExplorerUrls: [process.env.VUE_APP_BSCTESTNETBLOCKURL]
+      }
+      break
+    case 137:
+      text = {
+        chainId: web3Init.utils.numberToHex(137),
+        chainName: 'Polygon Mainnet',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: ['https://polygon-rpc.com'],
+        blockExplorerUrls: [process.env.VUE_APP_POLYGONBLOCKURL]
+      }
+      break
+  }
+  try {
+    await ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [
+        text
+      ]
+    })
+    // const [lStatus, signErr] = await login()
+    // if (lStatus) getdataList()
+  } catch (err) {
+    if (err.message) messageTip('error', err.message)
+  }
+}
+
 async function changeIDLogin(type) {
   const chainId = await ethereum.request({
     method: 'eth_chainId'
   })
-  const list = [137, 80001, 97]
+  const list = [80001]
   const getPast = await list.some(t => t === parseInt(chainId, 16))
-  if (type) {} else if (!getPast) messageTip('error', 'Switch to Polygon Mainnet, Mumbai Testnet or Binance Smart Chain Testnet!')
+  if (type) {} else if (!getPast) messageTip('error', 'Switch to Mumbai Testnet!')
   return getPast
 }
 
@@ -357,6 +434,11 @@ function calculateDiffTime(startTime) {
   else return '-'
 }
 
+function expiredTime(validDays) {
+  if (String(validDays) === '0') return 'Forever'
+  else return momentFun(validDays)
+}
+
 function sizeChange(bytes) {
   if (bytes === 0) return '0 B'
   if (!bytes) return '-'
@@ -395,6 +477,12 @@ function goLink(link) {
   window.open(link)
 }
 
+function strToHexCharCode(str) {
+  if (str === "") return "";
+  const code = Number(str)
+  return `0x${code.toString(16)}`
+}
+
 function cmOptions(owner) {
   return {
     mode: 'text/x-markdown', // Language mode
@@ -410,7 +498,7 @@ function cmOptions(owner) {
   }
 }
 
-const Web3 = require('web3');
+// const Web3 = require('web3');
 let web3Init
 if (typeof window.ethereum === 'undefined') {
   window.open('https://metamask.io/download.html')
@@ -444,12 +532,15 @@ export default {
   popupwindow,
   copyContent,
   getUnit,
+  walletChain,
   changeIDLogin,
   hiddAddress,
   NumFormat,
   calculateDiffTime,
+  expiredTime,
   sizeChange,
   goLink,
+  strToHexCharCode,
   cmOptions,
   expireTimeFun,
   gatewayGain

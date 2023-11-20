@@ -1,6 +1,6 @@
 <template>
   <section id="space">
-    <el-row class="space_body">
+    <el-row class="space_body flex-row">
       <div class="fileList">
         No Data
       </div>
@@ -77,21 +77,12 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.space_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0.4rem 0;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0.4rem 0.16rem;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .fileList {
       width: 100%;
       margin: 0.2rem 0 0;
@@ -113,11 +104,3 @@ export default defineComponent({
   }
 }
 </style>
-
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

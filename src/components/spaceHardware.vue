@@ -10,7 +10,7 @@
               </el-descriptions-item>
               <el-descriptions-item label="Memory">{{ props.listdata.activeOrder.config.memory }}</el-descriptions-item>
               <el-descriptions-item label="VCPU">{{ props.listdata.activeOrder.config.vcpu }}</el-descriptions-item>
-              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} LAG per hour
+              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} PUSDC/SUSDC per hour
               </el-descriptions-item>
               <el-descriptions-item label="Description">{{ props.listdata.activeOrder.config.description }}
               </el-descriptions-item>
@@ -22,8 +22,8 @@
         <el-row class="space_hardware" :gutter="30">
           <el-col :md="24" :lg="6" class="hardware-left">
             <div class="sleep_style">
-              <div class="title_tip flex pause_margin">
-                <p>
+              <div class="title_tip flex-row pause_margin">
+                <p class="flex-row">
                   Pause Space
                   <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                     <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
@@ -46,16 +46,16 @@
                 </span>.
               </p>
             </div>
-            <div class="fork-btn" v-if="props.renewButton === 'fork'">
+            <div class="fork-btn flex-row" v-if="props.renewButton === 'fork'">
               <el-button type="info" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
             </div>
           </el-col>
           <el-col :md="24" :lg="18" class="hardware-right">
-            <!-- <div class="price_switch flex">
+            <!-- <div class="price_switch flex-row">
                 Display price:
                 <el-switch v-model="ruleForm.displayPrice" size="small" active-text="per month" inactive-text="per hour" />
               </div> -->
-            <h2 class="flex">
+            <h2 class="flex-row">
               <svg class="mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M9.92865 7.42863H10.643C10.7377 7.42863 10.8285 7.39098 10.8955 7.32405C10.9625 7.25705 11.0001 7.16619 11.0001 7.07148C11.0001 6.97676 10.9625 6.88591 10.8955 6.81891C10.8285 6.75198 10.7377 6.71433 10.643 6.71433H9.92865V5.28575H10.643C10.7377 5.28575 10.8285 5.24812 10.8955 5.18114C10.9625 5.11417 11.0001 5.02333 11.0001 4.9286C11.0001 4.83388 10.9625 4.74304 10.8955 4.67607C10.8285 4.60909 10.7377 4.57146 10.643 4.57146H9.92865V2.78573C9.92865 2.59628 9.85336 2.4146 9.71943 2.28065C9.5855 2.1467 9.40378 2.07144 9.21435 2.07144H7.42862V1.35715C7.42862 1.26242 7.39098 1.17158 7.32405 1.10461C7.25705 1.03763 7.16619 1 7.07148 1C6.97676 1 6.88591 1.03763 6.81891 1.10461C6.75198 1.17158 6.71433 1.26242 6.71433 1.35715V2.07144H5.28575V1.35715C5.28575 1.26242 5.24812 1.17158 5.18114 1.10461C5.11417 1.03763 5.02333 1 4.9286 1C4.83388 1 4.74304 1.03763 4.67607 1.10461C4.60909 1.17158 4.57146 1.26242 4.57146 1.35715V2.07144H2.78573C2.59628 2.07144 2.4146 2.1467 2.28065 2.28065C2.14669 2.4146 2.07144 2.59628 2.07144 2.78573V4.57146H1.35714C1.26242 4.57146 1.17158 4.60909 1.10461 4.67607C1.03763 4.74304 1 4.83388 1 4.9286C1 5.02333 1.03763 5.11417 1.10461 5.18114C1.17158 5.24812 1.26242 5.28575 1.35714 5.28575H2.07144V6.71433H1.35714C1.26242 6.71433 1.17158 6.75198 1.10461 6.81891C1.03763 6.88591 1 6.97676 1 7.07148C1 7.16619 1.03763 7.25705 1.10461 7.32405C1.17158 7.39098 1.26242 7.42863 1.35714 7.42863H2.07144V9.21435C2.07144 9.40378 2.14669 9.5855 2.28065 9.71943C2.4146 9.85336 2.59628 9.92865 2.78573 9.92865H4.57146V10.6429C4.57146 10.7377 4.60909 10.8285 4.67607 10.8955C4.74304 10.9624 4.83388 11.0001 4.9286 11.0001C5.02333 11.0001 5.11417 10.9624 5.18114 10.8955C5.24812 10.8285 5.28575 10.7377 5.28575 10.6429V9.92865H6.71433V10.6429C6.71433 10.7377 6.75198 10.8285 6.81891 10.8955C6.88591 10.9624 6.97676 11.0001 7.07148 11.0001C7.16619 11.0001 7.25705 10.9624 7.32405 10.8955C7.39098 10.8285 7.42862 10.7377 7.42862 10.6429V9.92865H9.21435C9.40378 9.92865 9.5855 9.85336 9.71943 9.71943C9.85336 9.5855 9.92865 9.40378 9.92865 9.21435V7.42863Z"
                   fill="currentColor" fill-opacity="0.3"></path>
@@ -64,7 +64,7 @@
               <span v-if="props.listdata.activeOrder === null || props.renewButton !== 'setting'">Space Hardware</span>
               <span v-else>Update Hardware</span>
             </h2>
-            <p class="p-2">Choose a hardware for your Space.</p>
+            <p class="p-2 flex-row">Choose a hardware for your Space.</p>
 
             <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
               <el-divider content-position="left">{{ item.label }}</el-divider>
@@ -82,7 +82,7 @@
                   <h5>{{ ol.hardware_name }}</h5>
                   <div class="desc-text">{{ ol.hardware_description }}</div>
                   <div class="price">
-                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} LAG per hour</b>
+                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} PUSDC/SUSDC per hour</b>
                     <b v-else>No available CP</b>
                   </div>
                 </el-card>
@@ -101,37 +101,37 @@
           <h5>{{ sleepSelect.hardware_name }}</h5>
           <div class="desc-text">{{ sleepSelect.hardware_description }}</div>
           <div class="price">
-            <b>{{ sleepSelect.hardware_price }} LAG per hour</b>
+            <b>{{ sleepSelect.hardware_price }} PUSDC/SUSDC per hour</b>
           </div>
         </el-card>
         <div class="sleep_style">
           <div>
-            <div class="title_tip flex">
-              <div class="flex">
+            <div class="title_tip flex-row">
+              <div class="flex-row">
                 Usage Time
               </div>
               <el-divider/>
             </div>
-            <div class="time flex">
+            <div class="time flex-row">
               <el-input-number v-model="ruleForm.usageTime" :min="24" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
           </div>
           <div>
-            <div class="title_tip flex">
-              <div class="flex">
+            <div class="title_tip flex-row">
+              <div class="flex-row">
                 Region
               </div>
               <el-divider/>
             </div>
-            <div class="time flex">
+            <div class="time flex-row">
               <el-select v-model="sleepSelect.regionValue" class="m-region" placeholder="Region">
                 <el-option v-for="item in sleepSelect.regionOption" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </div>
           </div>
           <div>
-            <div class="title_tip flex">
-              <div class="flex">
+            <div class="title_tip flex-row">
+              <div class="flex-row">
                 Start time settings
                 <el-popover placement="top-start" :width="200" trigger="hover" content="If the task isn't successfully taken by the CP within the specified time, we will consider it as failed and refund your tokens.">
                   <template #reference>
@@ -147,7 +147,7 @@
               </div>
               <el-divider/>
             </div>
-            <div class="time flex">
+            <div class="time flex-row">
               Start after
               <el-select v-model="ruleForm.sleepTime" class="m-2" placeholder="Select" size="small">
                 <el-option v-for="item in ruleForm.sleepTimeOption" :key="item.value" :label="item.label" :value="item.value" />
@@ -170,7 +170,7 @@
 
       <template #footer>
         <span class="dialog-footer">
-          <el-button-group class="flex">
+          <el-button-group class="flex-row">
             <el-button @click="hardwareFun" :disabled="hardwareLoad">Confirm new hardware</el-button>
             <el-button @click="close" :disabled="hardwareLoad">Cancel</el-button>
           </el-button-group>
@@ -184,8 +184,10 @@ import { defineComponent, computed, onMounted, watch, ref, reactive, nextTick, g
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
-import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
+import SpacePaymentABI from '@/utils/abi/SpacePaymentV6.json'
+import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
+import tokenUSDCABI from '@/utils/abi/USDC.json'
 import {
   InfoFilled
 } from '@element-plus/icons-vue'
@@ -267,10 +269,10 @@ export default defineComponent({
     const forkLoad = ref(false)
     const sleepSelect = ref({})
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
-    const tokenAddress = process.env.VUE_APP_LLL_ADDRESS
-    const tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
-    const paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
-    const paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
+    let tokenAddress = process.env.VUE_APP_MUMBAI_USDC_ADDRESS
+    let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
+    let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
+    let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpacePaymentABI, paymentContractAddress)
 
     async function hardwareFun () {
       const net = await networkEstimate()
@@ -285,27 +287,26 @@ export default defineComponent({
           }
         }
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
-        const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'ether')
-        const approveAmount = pricePerHour * ruleForm.usageTime
+        const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
+        const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6) // usdc is 6 decimal, ensure the amount will not be more than 6
 
         let approveGasLimit = await tokenContract.methods
-          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether'))
+          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
           .estimateGas({ from: store.state.metaAddress })
 
         const approve_tx = await tokenContract.methods
-          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether'))
+          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
           .send({
             from: store.state.metaAddress, gasLimit: approveGasLimit
           })
 
+        let payMethod = getnetID === 80001 ? paymentContract.methods
+          .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
+          paymentContract.methods
+            .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
 
-        let gasLimit = await paymentContract.methods
-          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
-          .estimateGas({ from: store.state.metaAddress })
-
-        const tx = await paymentContract.methods
-          .makePayment(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
-          .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+        let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
+        const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
             await hardwareHash(transactionHash, approveAmount)
@@ -342,14 +343,15 @@ export default defineComponent({
     }
 
     async function networkEstimate () {
-      let chainID = '80001'
       const getID = await system.$commonFun.web3Init.eth.net.getId()
-      if (getID.toString() !== chainID) {
-        const { name } = await system.$commonFun.getUnit(Number(chainID))
-        await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
+      const list = [80001, 8598668088]
+      const getPast = await list.some(t => t === getID)
+      if (getPast) return true
+      else {
+        context.emit('handleHard', false, false, true)
+        // await system.$commonFun.messageTip('error', 'Please switch to the network: Mumbai Testnet, OpSwan')
         return false
       }
-      return true
     }
 
     async function hardwareHash (tx_hash, approveAmount) {
@@ -382,6 +384,8 @@ export default defineComponent({
         close()
         return
       } else if (row.hardware_status.toLowerCase() !== 'available' || (props.listdata.activeOrder && (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))) return false
+      const net = await networkEstimate()
+      if (!net) return
       ruleForm.usageTime = 24
       sleepSelect.value = row
       sleepSelect.value.regionOption = await regionList(row.region)
@@ -431,7 +435,14 @@ export default defineComponent({
       return arr;
     }
 
-
+    async function paymentEnv () {
+      if (getnetID !== 80001) {
+        tokenAddress = process.env.VUE_APP_OPSWAN_USDC_ADDRESS
+        tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenUSDCABI, tokenAddress);
+        paymentContractAddress = process.env.VUE_APP_OPSWAN_ADDRESS
+        paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
+      }
+    }
     async function init (params) {
       machinesLoad.value = true
       const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
@@ -449,7 +460,10 @@ export default defineComponent({
       machinesLoad.value = false
     }
 
-    onMounted(() => {
+    let getnetID = NaN
+    onMounted(async () => {
+      getnetID = await system.$commonFun.web3Init.eth.net.getId()
+      paymentEnv()
       init()
     })
     return {
@@ -475,12 +489,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 #hardware {
   width: 100%;
-
-  .flex {
-    display: flex;
-    align-items: center;
-  }
-
   .space-hard {
     width: 100%;
     margin: 0.15rem 0;
@@ -525,7 +533,6 @@ export default defineComponent({
       }
 
       .p-2 {
-        display: flex;
         align-items: flex-start;
         margin: 0 0 0.08rem;
         font-size: 17px;
@@ -617,8 +624,7 @@ export default defineComponent({
           }
 
           p {
-            display: flex;
-            align-items: center;
+            flex-wrap: inherit;
           }
 
           svg {
@@ -889,7 +895,6 @@ export default defineComponent({
       position: absolute;
       bottom: 0;
       left: 0;
-      display: flex;
       justify-content: flex-end;
       padding: 0 0.2rem;
 
@@ -1063,8 +1068,7 @@ export default defineComponent({
         }
 
         p {
-          display: flex;
-          align-items: center;
+          flex-wrap: inherit;
         }
 
         svg {

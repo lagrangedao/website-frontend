@@ -4,12 +4,12 @@
       <h1 class="text_h3">Pricing</h1>
       <h2 class="text_h1">The simplest way to access compute for AI</h2>
       <h4 class="text_h2">Users and organizations already use the Hub as a collaboration platform, <br />we’re making it easy to seamlessly and scalably launch ML compute directly from the Hub.</h4>
-      <el-row class="bid">
+      <el-row class="bid flex-row">
         <el-col :xs="24" :sm="24" :md="12" :lg="12">
           <el-card shadow="hover">
             <template #header>
               <div class="card-header">
-                <div class="logo-style">
+                <div class="logo-style flex-row">
                   <img src="@/assets/images/icons/logo_lagrange.png" alt=""> Lagrange
                 </div>
                 <p>Collaborate on Machine Learning</p>
@@ -17,7 +17,7 @@
             </template>
             <div class="grid-content">
               <div class="introduce" v-for="(o, oIndex) in introduce.free" :key="oIndex">
-                <div class="cont">
+                <div class="cont flex-row">
                   <el-icon>
                     <Check />
                   </el-icon>
@@ -35,7 +35,7 @@
           <el-card shadow="hover">
             <template #header>
               <div class="card-header">
-                <div class="logo-style">
+                <div class="logo-style flex-row">
                   <span class="pro">PRO</span> Pro Account
                 </div>
                 <p>Show your support for the best ML community</p>
@@ -43,7 +43,7 @@
             </template>
             <div class="grid-content">
               <div class="introduce" v-for="(o, oIndex) in introduce.pro" :key="oIndex">
-                <div class="cont">
+                <div class="cont flex-row">
                   <el-icon>
                     <Check />
                   </el-icon>
@@ -61,13 +61,13 @@
     </div>
     <div class="pricing-space">
       <div class="top_text">
-        <h2>Spaces Hardware
+        <h2 class=" flex-row">Spaces Hardware
           <span>Starting at $0</span>
         </h2>
-        <div class="space">
+        <div class="space flex-row">
           <p>Spaces are one of the most popular ways to share ML applications and demos with the world.
             <br /> Upgrade your Spaces with our selection of custom on-demand hardware:</p>
-          <router-link to="/spaces">
+          <router-link to="/spaces" class=" flex-row">
             <el-icon>
               <Right />
             </el-icon>
@@ -99,7 +99,6 @@
 </template>
 
 <script>
-const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -197,7 +196,7 @@ export default defineComponent({
   width: 100%;
   // max-width: 1440px;
   min-width: 300px;
-  margin: 0.1rem auto;
+  margin: 0 auto 0.1rem;
   padding: 0.8rem 0;
   background-color: #fff;
   font-family: "Helvetica-light";
@@ -206,6 +205,7 @@ export default defineComponent({
   color: #010102;
   line-height: 1.3;
   text-align: left;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 992px) {
     padding: 0.8rem 0 0.25rem;
   }
@@ -217,7 +217,7 @@ export default defineComponent({
   }
   .pricing-cont {
     padding: 0 0 0.5rem;
-    background: url(../../../assets/images/dashboard/bg-pricing.png) no-repeat;
+    background: url(../../../assets/images/dashboard/bg-pricing.jpg) no-repeat;
     background-size: cover;
     background-position: 50%;
     border-bottom: 1px solid rgb(243, 244, 246);
@@ -262,7 +262,6 @@ export default defineComponent({
       }
     }
     :deep(.bid) {
-      display: flex;
       align-items: stretch;
       flex-wrap: wrap;
       width: 95%;
@@ -285,8 +284,6 @@ export default defineComponent({
             padding: 0.25rem;
             border-color: rgb(243, 244, 246);
             .logo-style {
-              display: flex;
-              align-items: center;
               margin: 0 0 0.15rem;
               font-size: 0.224rem;
               font-weight: bold;
@@ -325,8 +322,6 @@ export default defineComponent({
             .introduce {
               padding: 0.1rem 0;
               .cont {
-                display: flex;
-                align-items: center;
                 font-size: 0.18rem;
                 line-height: 1.3;
                 i {
@@ -371,8 +366,6 @@ export default defineComponent({
     }
     .top_text {
       h2 {
-        display: flex;
-        align-items: center;
         padding: 0 0 0 0.6rem;
         background: url(../../../assets/images/icons/icon_15.png) no-repeat left
           center;
@@ -398,8 +391,6 @@ export default defineComponent({
         }
       }
       .space {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         margin: 0.3rem 0;
         @media screen and (max-width: 768px) {
@@ -411,8 +402,6 @@ export default defineComponent({
           line-height: 1.5;
         }
         a {
-          display: flex;
-          align-items: center;
           padding: 0.08rem 0.12rem;
           margin: 0.15rem 0;
           background-color: rgba(239, 239, 239, 0.44);

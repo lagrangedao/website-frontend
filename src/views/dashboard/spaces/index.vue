@@ -1,8 +1,8 @@
 <template>
   <section id="space">
-    <el-row class="space_body">
-      <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="space_area">
-        <div class="top">
+    <el-row class="space_body flex-row">
+      <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="space_area mt-border">
+        <div class="top container-landing flex-row">
           <div class="top_text">
             <h2>Spaces</h2>
             <p>Discover amazing ML apps made by the community!</p>
@@ -13,8 +13,10 @@
             <a href="https://docs.lagrangedao.org/lagrange-dao/spaces" target="_blank">learn more about Spaces</a>
           </div>
         </div>
-        <div class="top">
-          <div class="top_input">
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="space_area container-landing">
+        <div class="top flex-row">
+          <div class="top_input flex-row">
             <div>
               <el-input v-model="searchValue" clearable @input="searchChange()" class="search_name w-50 m-2" placeholder="search Space" />
             </div>
@@ -30,29 +32,28 @@
           </div>
         </div>
         <div class="week" v-if="pagin.pageNo<=1 && optionsValue === 'updated' && !searchValue">
-          <div class="top">
-            <div class="title">
+          <div class="top flex-row">
+            <div class="title flex-row">
               Spaces of the week
               <i class="icon icon_week"></i>
             </div>
           </div>
-
           <el-row :gutter="32" class="list_body" v-loading="listLoad">
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="ls in spaceLikesData" :key="ls">
               <el-card class="box-card" @click="detailFun(ls, l)">
                 <template #header>
                   <div class="card-header">
                     <span class="left">{{ls.status}}</span>
-                    <span class="right">{{ls.likes}}</span>
+                    <span class="right flex-row">{{ls.likes}}</span>
                     <span class="bottom" v-if="ls.activeOrder && ls.activeOrder.config">{{ls.activeOrder.config.description}}</span>
                   </div>
                   <h1>{{ls.name}}</h1>
-                  <!-- <div class="card-owner">
+                  <!-- <div class="card-owner flex-row">
                     <span>Owner: {{ls.wallet_address}}</span>
                   </div> -->
                 </template>
-                <div class="text">
-                  <div class="text_left">
+                <div class="text flex-row">
+                  <div class="text_left flex-row">
                     <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
                     <i class="icon"></i>
                     <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || system.$commonFun.hiddAddress(ls.wallet_address)}}</span>
@@ -62,40 +63,41 @@
               </el-card>
             </el-col>
           </el-row>
-
-          <div class="top">
-            <div class="title title_all">
+          <div class="top flex-row">
+            <div class="title title_all flex-row">
               All running spaces, recently uploaded first
             </div>
           </div>
         </div>
-        <el-row :gutter="32" class="list_body" v-loading="listLoad">
-          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="list in spaceData" :key="list">
-            <el-card class="box-card" @click="detailFun(list, l)">
-              <template #header>
-                <div class="card-header">
-                  <span class="left">{{list.status}}</span>
-                  <span class="right">{{list.likes}}</span>
-                  <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span>
-                </div>
-                <h1>{{list.name}}</h1>
-                <!-- <div class="card-owner">
+        <div class="week">
+          <el-row :gutter="32" class="list_body" v-loading="listLoad">
+            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="list in spaceData" :key="list">
+              <el-card class="box-card" @click="detailFun(list, l)">
+                <template #header>
+                  <div class="card-header">
+                    <span class="left">{{list.status}}</span>
+                    <span class="right flex-row">{{list.likes}}</span>
+                    <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span>
+                  </div>
+                  <h1>{{list.name}}</h1>
+                  <!-- <div class="card-owner flex-row">
                   <span>Owner: {{list.wallet_address}}</span>
                 </div> -->
-              </template>
-              <div class="text">
-                <div class="text_left">
-                  <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
-                  <i class="icon"></i>
-                  <span class="small" @click.stop="searchChange(list)">{{list.full_name || system.$commonFun.hiddAddress(list.wallet_address)}}</span>
+                </template>
+                <div class="text flex-row">
+                  <div class="text_left flex-row">
+                    <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
+                    <i class="icon"></i>
+                    <span class="small" @click.stop="searchChange(list)">{{list.full_name || system.$commonFun.hiddAddress(list.wallet_address)}}</span>
+                  </div>
+                  <span>{{system.$commonFun.momentFun(list.created_at)}}</span>
                 </div>
-                <span>{{system.$commonFun.momentFun(list.created_at)}}</span>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <el-pagination hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        />
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
+        <el-pagination class="flex-row" hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange"
+          @current-change="handleCurrentChange" />
       </el-col>
     </el-row>
   </section>
@@ -104,7 +106,6 @@
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
-import qs from 'qs'
 export default defineComponent({
   name: 'Spaces',
   components: {},
@@ -196,10 +197,10 @@ export default defineComponent({
       }
 
       if (typeLikes) {
-        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${qs.stringify({ limit: 8 })}`, 'get')
+        const likesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/spaces_of_the_week?${Qs.stringify({ limit: 8 })}`, 'get')
         if (likesRes) spaceLikesData.value = likesRes.spaces || []
       }
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${qs.stringify(params)}`, 'get')
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces?${Qs.stringify(params)}`, 'get')
       if (listRes) {
         spaceData.value = listRes.spaces || []
         spaceDataAll.value = listRes.spaces || []
@@ -250,55 +251,54 @@ export default defineComponent({
 #space {
   color: #333;
   font-size: 18px;
+  border-top: 1px solid rgba(229, 231, 235, 0.7);
   @media screen and (max-width: 1200px) {
     font-size: 16px;
   }
   :deep(.space_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0 0.16rem;
     margin: auto;
     font-size: 14px;
     overflow: hidden;
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .space_area {
       position: relative;
-      padding: 0.74rem 0 0.45rem;
+      padding-bottom: 0.28rem;
+      &.mt-border {
+        padding-top: 0.4rem;
+        padding-bottom: 0.13rem;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.7);
+        @media screen and (max-width: 768px) {
+          padding-top: 0.2rem;
+        }
+      }
       @media screen and (max-width: 768px) {
-        padding: 0.45rem 0;
+        padding: 0.45rem 16px;
       }
       .top {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
         color: #9ca3b1;
         font-size: 0.19rem;
         .top_text {
+          text-align: left;
           h2 {
             display: block;
-            padding: 0 0 0 0.8rem;
+            padding: 0 0 0 0.6rem;
             background: url(../../../assets/images/icons/icon_15.png) no-repeat
               left center;
-            background-size: auto 100%;
+            background-size: 0.45rem;
             font-family: "Helvetica-Bold";
-            font-size: 0.44rem;
+            font-size: 0.36rem;
             color: #000;
             text-align: left;
             @media screen and (max-width: 441px) {
-              padding: 0 0 0 0.65rem;
-              font-size: 0.34rem;
+              font-size: 0.3rem;
             }
           }
           p {
             margin: 0.15rem 0;
-            font-size: 0.16rem;
-            color: #9ca3b1;
+            font-size: 0.18rem;
+            color: rgb(107, 114, 128);
             line-height: 1;
           }
         }
@@ -324,7 +324,7 @@ export default defineComponent({
             }
           }
           .button {
-            padding: 0.1rem 0.3rem;
+            padding: 0.07rem 0.2rem;
             margin: 0 0.1rem 0 0;
             background-color: #f5f6f8;
             color: #000;
@@ -334,23 +334,20 @@ export default defineComponent({
           }
         }
         .top_input {
-          display: flex;
-          align-items: center;
           justify-content: space-between;
+          flex-wrap: wrap;
           width: 100%;
-          margin: 0.65rem 0 0.32rem;
-          @media screen and (max-width: 768px) {
-            margin: 0.32rem 0;
-          }
+          margin: 0.32rem 0 0.16rem;
           .search_name {
             max-width: 3.4rem;
             margin: 0;
             .el-input__inner {
               padding-left: 0.35rem;
+              margin: 0 0 0.16rem;
               background: url(../../../assets/images/icons/icon_13_1.png)
                 no-repeat 0.1rem center;
-              background-size: 17px;
-              border-radius: 0.1rem;
+              background-size: 15px;
+              border-radius: 0.5rem;
               border-color: #cfcfcf;
               @media screen and (min-width: 1800px) {
                 font-size: 15px;
@@ -369,10 +366,12 @@ export default defineComponent({
           }
           .top_input_search {
             .el-button {
+              height: 30px;
               padding: 0.1rem 0.3rem;
               margin: 0 0 0 0.1rem;
               color: #000;
               background: linear-gradient(180deg, #fefefe, #f0f0f0);
+              font-size: 13px;
               border-color: #e1e1e1;
               border-radius: 0.09rem;
               text-decoration: none;
@@ -390,11 +389,12 @@ export default defineComponent({
           .el-input {
             cursor: pointer;
             .el-input__inner {
-              width: 195px;
-              padding: 0 12px 0 40px !important;
+              max-width: 175px;
+              height: 30px;
+              padding: 0 8px 0 32px !important;
               background: linear-gradient(180deg, #fefefe, #f0f0f0);
               border-color: #e1e1e1;
-              font-size: 14px;
+              font-size: 13px;
               line-height: 1;
               border-radius: 0.09rem;
               @media screen and (min-width: 1800px) {
@@ -404,8 +404,8 @@ export default defineComponent({
             .el-input__prefix {
               color: #9ca3b1;
               .el-icon-select {
-                width: 21px;
-                height: 21px;
+                width: 14px;
+                height: 14px;
                 background: url(../../../assets/images/icons/icon_12.png)
                   no-repeat left center;
                 background-size: 100%;
@@ -430,21 +430,19 @@ export default defineComponent({
         }
         .title {
           float: left;
-          display: flex;
-          align-items: center;
-          padding: 0.07rem 0 0.07rem 0.35rem;
+          padding: 0.05rem 0 0.05rem 0.25rem;
           background-color: #7405ff;
           font-size: 0.16rem;
           color: #fff;
-          border-radius: 0.1rem;
+          border-radius: 0.5rem;
           line-height: 1.4;
           @media screen and (max-width: 768px) {
             font-size: 14px;
           }
           .icon_week {
-            width: 0.25rem;
-            height: 0.25rem;
-            margin: 0 0.14rem;
+            width: 18px;
+            height: 18px;
+            margin: 0 15px;
             background: url(../../../assets/images/icons/icon_14.png) no-repeat
               center;
             background-size: 100%;
@@ -455,9 +453,9 @@ export default defineComponent({
         }
       }
       .list_body {
-        padding: 0.16rem 0 0.5rem;
+        padding: 0 0 0.56rem;
         .el-col {
-          margin: 0.16rem 0;
+          margin: 0.16rem 0 0;
           .box-card {
             background-color: #fff;
             box-shadow: none;
@@ -494,8 +492,6 @@ export default defineComponent({
                   &.right {
                     right: 0.15rem;
                     top: 0.1rem;
-                    display: flex;
-                    align-items: center;
                     padding-left: 0.25rem;
                     background: url(../../../assets/images/icons/icon_9_1.png)
                       no-repeat left 0px;
@@ -516,8 +512,6 @@ export default defineComponent({
                 position: absolute;
                 right: 0.15rem;
                 bottom: 0.05rem;
-                display: flex;
-                align-items: center;
                 opacity: 0.8;
                 span {
                   font-size: 13px;
@@ -550,9 +544,7 @@ export default defineComponent({
               padding: 0.1rem 0;
               cursor: pointer;
               .text {
-                display: flex;
                 justify-content: space-between;
-                align-items: center;
                 color: #000;
                 line-height: 1;
                 cursor: pointer;
@@ -560,9 +552,7 @@ export default defineComponent({
                   font-size: 15px;
                 }
                 .text_left {
-                  display: flex;
                   justify-content: space-between;
-                  align-items: center;
                 }
                 .icon,
                 .icon_img {
@@ -773,8 +763,7 @@ export default defineComponent({
         }
       }
       .el-pagination {
-        margin: 0.1rem auto;
-        display: flex;
+        margin: 0 auto 0.28rem;
         justify-content: center;
         .btn-prev {
           i {
@@ -790,10 +779,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

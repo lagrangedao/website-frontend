@@ -3,12 +3,12 @@
     <el-row>
       <el-col :span="24">
         <div class="list">
-          <div class="title">As Client</div>
+          <div class="title flex-row">As Client</div>
         </div>
-        <div class="token_list">
+        <div class="token_list flex-row">
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="Profile" name="profile">
-              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
                 <el-form-item prop="name">
                   <label class="label" for="dataname">
                     Username
@@ -48,7 +48,7 @@
               </el-form>
             </el-tab-pane>
             <el-tab-pane label="Password" name="password">
-              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+              <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
                 <el-form-item prop="name">
                   <label class="label" for="password">
                     Current Password
@@ -84,15 +84,15 @@
             </el-tab-pane>
             <el-tab-pane label="Payment" name="payment">
               <div class="card">
-                <div class="card_header">
-                  <div class="card_left">
+                <div class="card_header flex-row">
+                  <div class="card_left flex-row">
                     <div class="face"></div>
-                    <div class="name">
+                    <div class="name flex-row">
                       User Name
                       <small>No Data</small>
                     </div>
                   </div>
-                  <div class="card_right">
+                  <div class="card_right flex-row">
                     <el-button size="large" class="token_button token_setting" @click="settingShow=true">
                       <el-icon>
                         <Setting />
@@ -111,36 +111,47 @@
                 </h6>
                 <div class="form_table">
                   <el-button type="primary" class="new_api" @click="addVisible=true">New API Key</el-button>
-                  <el-table :data="toolData" style="width: 100%" empty-text="No Data" class="table_cell">
-                    <el-table-column prop="key_name" label="NAME"></el-table-column>
-
-                    <el-table-column prop="apikey" label="KEY"></el-table-column>
-                    <el-table-column prop="token" label="ACCESS TOKEN">
-                      <template>*******</template>
-                    </el-table-column>
-                    <el-table-column prop="created_on" label="DATA CREATED">
+                  <el-table :data="toolData" v-loading="tokenShow" style="width: 100%" empty-text="No Data" class="table_cell">
+                    <el-table-column prop="name" label="NAME"></el-table-column>
+                    <el-table-column prop="key" label="KEY">
                       <template #default="scope">
-                        <div style="">
-                          {{scope.row.created_on}}
+                        <div class="flex-row" style="justify-content: center;">
+                          {{system.$commonFun.hiddAddress(scope.row.key)}}
+                          <i class="icon icon_copy" @click="system.$commonFun.copyContent(scope.row.key, 'Copied')"></i>
                         </div>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="status" label="STATUS" width="85"></el-table-column>
-                    <el-table-column prop="qr_code" width="85" label="">
+                    <el-table-column prop="expired_at" label="Expiration date">
+                      <template #default="scope">
+                        <div style="">
+                          {{system.$commonFun.expiredTime(scope.row.expired_at)}}
+                        </div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="status" label="STATUS" width="100">
+                      <template #default="scope">
+                        <div>
+                          {{scope.row.status ? 'Valid': 'Invalid'}}
+                        </div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="" width="100" label="">
                       <template #default="scope">
                         <div class="revoke">
-                          <el-button type="danger" :disabled="scope.row.status == 'Deleted'?true:false" @click="deleteApiKey(scope.row.apikey)">Revoke</el-button>
+                          <el-button type="danger" @click="deleteApiKey(scope.row.id)">Delete</el-button>
                         </div>
                       </template>
                     </el-table-column>
                   </el-table>
+                  <el-pagination class="flex-row" hide-on-single-page :page-size="pagin.pageSize" :current-page="pagin.pageNo" :pager-count="5" :small="small" :background="background" layout="total, prev, pager, next" :total="pagin.total" @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange" />
                 </div>
               </div>
             </el-tab-pane>
             <el-tab-pane label="Payment Method" name="payment_method">
               <div class="rightCont">
                 <h3>NBAI Wallet</h3>
-                <div class="main_second">
+                <div class="main_second flex-row">
                   <el-button type="primary">
                     <el-icon>
                       <CirclePlusFilled />
@@ -160,7 +171,7 @@
                     <el-input v-model="ruleFormSecond.cardNumber" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" autocomplete="off"></el-input>
                   </el-form-item>
                   <el-form-item label="Expiration date*" prop="expiration">
-                    <el-col :span="24" style="display: flex;justify-content: space-between;">
+                    <el-col :span="24" class=" flex-row" style="justify-content: space-between;">
                       <el-select v-model="expiration_month" placeholder="">
                         <el-option v-for="item in expiration_month_options" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
@@ -250,7 +261,6 @@
   </section>
 </template>
 <script>
-const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -271,14 +281,17 @@ export default defineComponent({
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const listLoad = ref(false)
     const tokenShow = ref(false)
-    const computeShow = ref(false)
+    const small = ref(false)
+    const background = ref(false)
+    const pagin = reactive({
+      pageSize: 12,
+      pageNo: 1,
+      total: 0,
+      sort: 'updated'
+    })
     const addVisible = ref(false)
     const settingShow = ref(false)
-    const apiToken = ref('')
-    const spData = ref([])
     const activeName = ref('profile')
-    const multipleSelection = ref([])
-    const multipleTableRef = ref(null)
     const ruleForm = reactive({
       name: '',
       node_id: '',
@@ -327,67 +340,44 @@ export default defineComponent({
     const expiration_month_options = ref([])
     const expiration_year = ref("")
     const expiration_year_options = ref([])
-    const addCreditcards = ref(false)
     const fileList = ref([])
     const toolData = ref([])
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
 
-    async function getToken () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}api_token`, 'get')
-      if (listRes && listRes.status === 'success') {
-        if (listRes.data) return listRes.data.token.token
-        // else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
-      }
-      return ''
-    }
     async function getdataList () {
-      listLoad.value = true
-      spData.value = []
-      apiToken.value = await getToken()
-      // if (!apiToken.value) return
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp`, 'get', '', apiToken.value)
-      if (listRes && listRes.status === 'success') {
-        if (listRes.data) spData.value = listRes.data.computing_providers
-      } else {
-        spData.value = []
-        system.$commonFun.messageTip('error', listRes.error ? listRes.error : 'Failed!')
-        return
+      tokenShow.value = true
+      toolData.value = []
+      const page = pagin.pageNo > 0 ? pagin.pageNo - 1 : 0
+      const params = {
+        page_size: pagin.pageSize,
+        page_no: page * pagin.pageSize,
       }
-      // await system.$commonFun.timeout(500)
-      listLoad.value = false
+      const keysRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}v1/keys?${Qs.stringify(params)}`, 'get')
+      if (keysRes && String(keysRes.code) === '0') {
+        toolData.value = keysRes.data.list || []
+        pagin.total = keysRes.data.total || 0
+      } else if (keysRes.msg) system.$commonFun.messageTip('error', keysRes.msg)
+      tokenShow.value = false
     }
     async function createCom () {
-      // listLoad.value = true
-      // let fd = new FormData()
-      // fd.append('name', ruleForm.name)
-      // fd.append('node_id', ruleForm.node_id)
-      // fd.append('multi_address', ruleForm.multi_address)
-      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp`, 'post', fd, apiToken.value)
-      // if (listRes && listRes.status === 'success') {
-      //   system.$commonFun.messageTip('success', listRes.message ? listRes.message : 'Success!')
-      //   getdataList()
-      //   computeShow.value = false
-      //   addVisible.value = false
-      //   return
-      // } else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Failed!')
-      // // await system.$commonFun.timeout(500)
-      // listLoad.value = false
+      listLoad.value = true
+      const params = {
+        "name": ruleForm.name
+      }
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}v1/keys`, 'post', params)
+      if (listRes && String(listRes.code) === '0') pagin.pageNo = 1
+      ruleForm.name = ''
+      getdataList()
+      listLoad.value = false
       addVisible.value = false
     }
-    async function deleteCom (comName) {
-      listLoad.value = true
-      let formData = new FormData()
-      formData.append('name', comName)
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/delete`, 'post', formData, apiToken.value)
-      if (listRes && listRes.status === 'success') system.$commonFun.messageTip('success', listRes.message ? listRes.message : 'Delete successfully!')
-      else system.$commonFun.messageTip('error', listRes.message ? listRes.message : 'Delete failed!')
+    async function deleteApiKey (id) {
+      tokenShow.value = true
+      const deleteRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_RPCAPI}v1/keys/${id}`, 'delete')
       getdataList()
-    }
-
-    function detailSetting () {
-      // router.push({ name: 'organizationsSettings', params: { submenu: 'profile' } })
+      tokenShow.value = false
     }
 
     function handleChange (uploadFile, uploadFiles) {
@@ -396,14 +386,20 @@ export default defineComponent({
       if (uploadFile) fileList.value.push(uploadFile)
       // console.log(fileList.value)
     }
+
     function handleRemove (file, uploadFiles) {
       // console.log(file, uploadFiles)
       fileList.value = []
     }
-    function handleSelectionChange (val) {
-      multipleSelection.value = val
-      console.log(val)
+
+    function handleSizeChange (val) { }
+
+    async function handleCurrentChange (currentPage) {
+      // console.log('handleCurrentChange:', currentPage)
+      pagin.pageNo = currentPage
+      getdataList()
     }
+
     function getYear () {
       let tMonth = new Array();
       for (let month = 1; month < 13; month++) {
@@ -428,28 +424,24 @@ export default defineComponent({
       expiration_year_options.value = nfOptionsArray;
     }
     onMounted(() => {
+      if (route.query.tabs) activeName.value = route.query.tabs || 'profile'
       getdataList()
       getYear()
     })
-    onActivated(() => {
-      spData.value = []
-    })
+    onActivated(() => { })
     return {
       metaAddress,
       accessAvatar,
       navLogin,
       lagLogin,
       system,
-      spData,
       listLoad,
       tokenShow,
-      computeShow,
+      pagin, background, small,
       addVisible,
       ruleForm,
       fileList,
       settingShow,
-      multipleSelection,
-      multipleTableRef,
       activeName,
       rules,
       toolData,
@@ -457,12 +449,11 @@ export default defineComponent({
       apiCont,
       ruleFormSecond,
       rulesSecond,
-      addCreditcards,
       expiration_month,
       expiration_month_options,
       expiration_year,
       expiration_year_options,
-      getdataList, createCom, deleteCom, detailSetting, handleChange, handleRemove, handleSelectionChange
+      createCom, deleteApiKey, handleChange, handleRemove, handleSizeChange, handleCurrentChange
     }
   }
 })
@@ -480,14 +471,10 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.token_list) {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     margin: 0.35rem 0 0.2rem;
     .title {
-      display: flex;
       justify-content: space-between;
-      align-items: center;
       flex-wrap: wrap;
       width: 100%;
       padding: 0.35rem 0 0;
@@ -546,8 +533,6 @@ export default defineComponent({
       border: 1px solid #e1e1e1;
       border-radius: 0.05rem;
       .card_header {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         font-size: 0.18rem;
         color: #565656;
@@ -563,8 +548,6 @@ export default defineComponent({
         }
         .card_left,
         .card_right {
-          display: flex;
-          align-items: center;
           .token_setting {
             padding: 0.12rem;
             font-size: 0.22rem;
@@ -575,8 +558,6 @@ export default defineComponent({
           align-items: stretch;
           color: #606060;
           .name {
-            display: flex;
-            align-items: center;
             flex-wrap: wrap;
             margin-left: 0.1rem;
             color: #565656;
@@ -605,8 +586,6 @@ export default defineComponent({
             border-color: inherit;
           }
           .action {
-            display: flex;
-            align-items: center;
             height: 100%;
           }
           .icon_copy {
@@ -753,6 +732,7 @@ export default defineComponent({
                 word-break: break-word;
                 font-weight: 500;
                 color: #565656;
+                text-transform: uppercase;
               }
             }
             th:first-child {
@@ -797,9 +777,7 @@ export default defineComponent({
                   font-size: 0.1372rem;
                 }
                 .bot {
-                  display: flex;
                   justify-content: center;
-                  align-items: center;
                   p {
                     font-size: 0.1372rem;
                     padding: 0 0.08rem;
@@ -843,9 +821,9 @@ export default defineComponent({
           }
         }
         .el-button {
-          float: left;
+          height: auto;
           margin: 0.2rem 0;
-          padding: 0.2rem 0.25rem;
+          padding: 0.1rem 0.25rem;
           background-color: #c27af8;
           border-color: #c27af8;
           border-radius: 0.08rem;
@@ -856,11 +834,26 @@ export default defineComponent({
         }
         .revoke {
           .el-button {
-            float: right;
-            padding: 0.05rem 0.1rem;
+            padding: 0.07rem 0.1rem;
             margin: 0 auto;
             border-radius: 4px;
             font-size: 0.12rem;
+          }
+        }
+        .icon_copy {
+          width: 15px;
+          height: 15px;
+          margin: -1px 0 0 0.07rem;
+          background: url(../../../assets/images/icons/icon_36.png) no-repeat
+            left center;
+          background-size: auto 100%;
+          cursor: pointer;
+          @media screen and (min-width: 1800px) {
+            width: 17px;
+            height: 17px;
+          }
+          &:hover {
+            opacity: 0.7;
           }
         }
       }
@@ -934,15 +927,12 @@ export default defineComponent({
         color: #212529;
       }
       .main_third {
-        display: flex;
-        align-items: center;
         margin: 0 0 0.2rem;
         h5 {
           margin: 0 0.3rem;
         }
       }
       .main_second {
-        display: flex;
         .el-button {
           margin: 0;
           padding: 0.2rem 0.25rem;
@@ -977,10 +967,6 @@ export default defineComponent({
           font-weight: 500;
           line-height: 1.1;
           color: #565656;
-        }
-        .main_six_cont {
-          display: flex;
-          align-items: center;
         }
       }
       .refer_list {
@@ -1146,10 +1132,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

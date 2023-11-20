@@ -3,20 +3,20 @@
     <el-row>
       <el-col :span="24" v-if="!settingShow">
         <div class="list">
-          <div class="title">Computing Provider</div>
+          <div class="title flex-row">Computing Provider</div>
         </div>
-        <div class="token_list" v-if="false">
-          <div class="title">Computing Provider</div>
+        <div class="token_list flex-row" v-if="false">
+          <div class="title flex-row">Computing Provider</div>
           <div class="card">
-            <div class="card_header">
-              <div class="card_left">
+            <div class="card_header flex-row">
+              <div class="card_left flex-row">
                 <div class="face"></div>
-                <div class="name">
+                <div class="name flex-row">
                   User Name
                   <small>No Data</small>
                 </div>
               </div>
-              <div class="card_right">
+              <div class="card_right flex-row">
                 <el-button size="large" class="token_button token_setting" @click="settingShow=true">
                   <el-icon>
                     <Setting />
@@ -27,7 +27,7 @@
           </div>
         </div>
         <div class="token_list">
-          <div class="title">
+          <div class="title flex-row">
             <div class="title_left">
               Your Computing Providers
               <el-button size="large" v-if="computeShow" class="token_button token_manage" :disabled="apiToken===''?true:false" @click="addVisible=true">Add</el-button>
@@ -67,12 +67,12 @@
       </el-col>
       <el-col :span="24" v-else>
         <div class="list">
-          <div class="title">
+          <div class="title flex-row">
             Setting
           </div>
         </div>
 
-        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces" status-icon>
+        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm list_body_spaces flex-row" status-icon>
           <el-form-item prop="name">
             <label class="label" for="dataname">
               Username
@@ -153,7 +153,6 @@
   </section>
 </template>
 <script>
-const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -313,14 +312,10 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.token_list) {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     margin: 0 0 0.2rem;
     .title {
-      display: flex;
       justify-content: space-between;
-      align-items: center;
       flex-wrap: wrap;
       width: 100%;
       padding: 0.35rem 0 0;
@@ -380,8 +375,6 @@ export default defineComponent({
       border: 1px solid #e1e1e1;
       border-radius: 0.05rem;
       .card_header {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
         font-size: 0.18rem;
         color: #565656;
@@ -397,8 +390,6 @@ export default defineComponent({
         }
         .card_left,
         .card_right {
-          display: flex;
-          align-items: center;
           .token_setting {
             padding: 0.12rem;
             font-size: 0.22rem;
@@ -409,8 +400,6 @@ export default defineComponent({
           align-items: stretch;
           color: #606060;
           .name {
-            display: flex;
-            align-items: center;
             flex-wrap: wrap;
             margin-left: 0.1rem;
             color: #565656;
@@ -439,8 +428,6 @@ export default defineComponent({
             border-color: inherit;
           }
           .action {
-            display: flex;
-            align-items: center;
             height: 100%;
           }
           .icon_copy {
@@ -657,10 +644,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

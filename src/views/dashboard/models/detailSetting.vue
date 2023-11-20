@@ -1,10 +1,10 @@
 <template>
   <section id="dataset">
-    <el-row class="dataset_body" v-loading="listLoad">
+    <el-row class="dataset_body container-landing flex-row" v-loading="listLoad">
       <div class="fileList" v-loading="renameLoad">
         <div class="title">Rename or transfer this dataset</div>
         <!-- <div class="desc">New: Automatic Redirection</div> -->
-        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
+        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm flex-row" status-icon>
           <el-form-item prop="" class="flex_left">
             <label class="label" for="owner">
               New owner
@@ -77,7 +77,7 @@
           <b>cannot</b> be undone. This will permanently delete the
           <b class="b">{{route.params.name}}</b> dataset repository and all its files.</div>
 
-        <el-form ref="ruleFormRefDelete" :model="ruleForm" :rules="rulesDelete" class="demo-ruleForm" status-icon>
+        <el-form ref="ruleFormRefDelete" :model="ruleForm" :rules="rulesDelete" class="demo-ruleForm flex-row" status-icon>
           <el-form-item prop="delete" style="width:100%">
             <label class="label" for="dataname">
               Please type
@@ -296,21 +296,12 @@ export default defineComponent({
     font-size: 16px;
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0.4rem 0 0.6rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.6rem;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0.4rem 0.16rem;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .fileList {
       width: 100%;
       margin: 0.15rem 0;
@@ -362,7 +353,6 @@ export default defineComponent({
         font-weight: bold;
       }
       .demo-ruleForm {
-        display: flex;
         flex-wrap: wrap;
         padding: 0 0.2rem;
         margin: 0;
@@ -400,7 +390,6 @@ export default defineComponent({
                 font-size: 17px;
               }
               .flex-row {
-                display: flex;
                 width: 100%;
                 .el-select {
                   width: calc(100% - 30px);
@@ -635,10 +624,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

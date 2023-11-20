@@ -1,14 +1,14 @@
 <template>
   <section id="dataset">
-    <div class="dataset_head">
-      <div class="content">
-        <div class="backTo" @click="back">
+    <div class="dataset_head container-landing">
+      <div class="content flex-row">
+        <div class="backTo flex-row" @click="back">
           <el-icon>
             <ArrowLeft />
           </el-icon>
           <span>Go Back</span>
         </div>
-        <div class="name">
+        <div class="name flex-row">
           <b>{{route.params.name}}</b>
           <i class="icon icon_copy" @click="copyName(route.params.name)"></i>
           <el-button-group class="ml-4">
@@ -19,21 +19,21 @@
           <share-pop></share-pop>
         </div>
       </div>
-      <div class="tag content">
-        <router-link to="">
+      <div class="tag content flex-row">
+        <router-link to="" class=" flex-row">
           <i class="icon"></i>
           <span class="a_text">Text Classification</span>
         </router-link>
       </div>
-      <div class="tag tag_sub content">
-        <router-link to="">
+      <div class="tag tag_sub content flex-row">
+        <router-link to="" class=" flex-row">
           <span class="a_text">language-modeling</span>
         </router-link>
       </div>
       <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
         <el-tab-pane name="card">
           <template #label>
-            <span class="custom-tabs-label">
+            <span class="custom-tabs-label flex-row">
               <i class="icon icon_datasets"></i>
               <span>Model card</span>
             </span>
@@ -42,7 +42,7 @@
         </el-tab-pane>
         <el-tab-pane name="files">
           <template #label>
-            <span class="custom-tabs-label">
+            <span class="custom-tabs-label flex-row">
               <i class="icon"></i>
               <span>Files and versions</span>
             </span>
@@ -51,7 +51,7 @@
         </el-tab-pane>
         <el-tab-pane name="community">
           <template #label>
-            <span class="custom-tabs-label">
+            <span class="custom-tabs-label flex-row">
               <i class="icon"></i>
               <span>Community</span>
               <!-- <b>3</b> -->
@@ -61,7 +61,7 @@
         </el-tab-pane>
         <!-- <el-tab-pane name="settings">
           <template #label>
-            <span class="custom-tabs-label">
+            <span class="custom-tabs-label flex-row">
               <el-icon class="icon">
                 <Setting />
               </el-icon>
@@ -196,25 +196,15 @@ export default defineComponent({
     font-size: 16px;
   }
   .dataset_head {
-    padding: 0.3rem 0 0;
+    padding-top: 0.3rem;
     background-color: #fbfbfc;
     border-bottom: 1px solid #f1f1f1;
     .content {
-      display: flex;
       align-items: stretch;
       flex-wrap: wrap;
-      padding: 0 0.16rem;
       margin: 0 auto 0.25rem;
       font-size: 14px;
-      @media screen and (min-width: 1280px) {
-        max-width: 1280px;
-      }
-      @media screen and (min-width: 1536px) {
-        max-width: 1536px;
-      }
       .backTo {
-        display: flex;
-        align-items: center;
         padding: 0 0 0.25rem;
         font-size: 0.2rem;
         text-align: left;
@@ -230,8 +220,6 @@ export default defineComponent({
         }
       }
       .name {
-        display: flex;
-        align-items: center;
         font-family: "Helvetica-Bold";
         width: 100%;
         font-size: 0.21rem;
@@ -293,8 +281,6 @@ export default defineComponent({
       line-height: 0.3rem;
       font-size: 0.18rem;
       a {
-        display: flex;
-        align-items: center;
         padding: 0;
         margin: 0 0 0 0.1rem;
         background-color: transparent;
@@ -355,15 +341,8 @@ export default defineComponent({
       .el-tabs__header {
         display: flex;
         align-items: stretch;
-        padding: 0 0.16rem;
         margin: 0 auto;
         font-size: 14px;
-        @media screen and (min-width: 1280px) {
-          max-width: 1280px;
-        }
-        @media screen and (min-width: 1536px) {
-          max-width: 1536px;
-        }
       }
       .el-tabs__content {
         border-top: 1px solid #f1f1f1;
@@ -382,8 +361,6 @@ export default defineComponent({
           font-size: 14px;
         }
         .custom-tabs-label {
-          display: flex;
-          align-items: center;
           padding: 0 0.2rem;
           .icon {
             height: 16px;
@@ -441,10 +418,3 @@ export default defineComponent({
 }
 </style>
 
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

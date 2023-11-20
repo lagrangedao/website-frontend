@@ -4,7 +4,8 @@ const webpack = require('webpack')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const productionGzipExtensions = /\.(js|css|json|txt|html|ico|svg)(\?.*)?$/i
-const BranchVersionWebpackPlugin = require('./webpack-plugin/branch-version-webpack-plugin');
+const BranchVersionWebpackPlugin = require('./webpack-plugin/branch-version-webpack-plugin')
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const NOT_DEV = process.env.NODE_ENV !== 'development'
 
 const globalConfig = require('./src/config/index.js')
@@ -12,6 +13,13 @@ const globalConfig = require('./src/config/index.js')
 const resolve = dir => path.join(__dirname, dir)
 const addOptions = {
   preserveWhitespace: true
+}
+
+const externals = {
+  "axios": "axios",
+  'moment': 'moment',
+  'qs': 'Qs',
+  'web3': 'Web3'
 }
 
 module.exports = {
@@ -31,10 +39,6 @@ module.exports = {
     }
   },
 
-  transpileDependencies: [
-    /[/\\]node_modules[/\\](.+?)?@intlify(.*)/
-  ],
-
   configureWebpack: (config) => {
     config.name = globalConfig.baseTitle
     config.entry.app = ['babel-polyfill', './src/main.js'];
@@ -43,8 +47,9 @@ module.exports = {
         uglifyOptions: {
           warnings: false,
           compress: {
-            // drop_console:true,
-            drop_debugger: true
+            drop_console: true,
+            drop_debugger: true,
+            pure_funcs: ['console.log']
           },
           output: {
             comments: false,
@@ -60,8 +65,15 @@ module.exports = {
         threshold: 10240,
         minRatio: 0.8,
         deleteOriginalAssets: false
-      })
-    ];
+      }),
+      new webpack.DefinePlugin({
+        __INTLIFY_PROD_DEVTOOLS__: JSON.stringify(false)
+      }),
+      // new BundleAnalyzerPlugin()
+    ]
+    Object.assign(config, {
+      externals,
+    })
     if (NOT_DEV) {
       config.mode = 'production';
       config.plugins = [...config.plugins, ...plugins];

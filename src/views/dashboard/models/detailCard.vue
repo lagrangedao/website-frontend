@@ -1,9 +1,9 @@
 <template>
   <section id="dataset">
     <div id="datasetBody">
-      <el-row class="dataset_body" v-loading="listLoad">
+      <el-row class="dataset_body container-landing flex-row" v-loading="listLoad">
         <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
-          <div class="readme_body">
+          <div class="readme_body flex-row">
             <div>
               <b>No model card yet</b>
               <p>New: Create and edit this model card directly on the website!</p>
@@ -20,36 +20,33 @@
           </div>
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
-          <div class="button">
+          <div class="button flex-row">
             <el-button type="" text bg v-if="urlReadme && isPreview && metaAddress === route.params.wallet_address" @click="editFun">Edit model card</el-button>
           </div>
           <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
         </el-col>
         <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
-          <div class="button">
+          <div class="button flex-row">
             <el-button type="" text bg @click="isPreview=true">Cancel</el-button>
             <el-button type="" text bg @click="editCommitFun">Commit changes</el-button>
           </div>
           <v-md-editor v-model="textEditorChange"></v-md-editor>
         </el-col>
         <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7" class="left left_light">
-          <div class="list" style="display: flex;justify-content: space-between;">
-            <div class="title">
+          <div class="list flex-row" style="justify-content: space-between;">
+            <div class="title flex-row">
               Downloads last month
               <b>30,701,057</b>
             </div>
-            <div class="echarts">
-              <div id="maychar"></div>
-            </div>
           </div>
           <div class="list list_border">
-            <div class="title">
+            <div class="title flex-row">
               Hosted inference API
             </div>
-            <div class="list_select">
-              <router-link to="">
+            <div class="list_select flex-row">
+              <router-link to="" class=" flex-row">
                 <i class="icon icon_fillMask"></i>
-                <span class="a_text">Fill-Mask</span>
+                <span class="a_text flex-row">Fill-Mask</span>
               </router-link>
               <el-select v-model="formInline.region" placeholder="">
                 <el-option label="Example 1" value="Example1" />
@@ -98,8 +95,8 @@
             </div>
           </div>
           <div class="list">
-            <div class="title title_top">
-              <p>
+            <div class="title title_top flex-row">
+              <p class=" flex-row">
                 <i class="icon icon_models"></i>
                 Datasets used to train</p>
               <small>{{route.params.name}}</small>
@@ -109,8 +106,8 @@
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata" :key="l">
               <el-card class="box-card" @click="detailFun(list, l)">
                 <template #header>
-                  <div class="card-header">
-                    <div class="name">
+                  <div class="card-header flex-row">
+                    <div class="name flex-row">
                       <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
                       <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
                       <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
@@ -119,11 +116,11 @@
                     <span>27</span>
                   </div>
                 </template>
-                <div class="text">
+                <div class="text flex-row">
                   <i class="icon icon_image"></i>
                   <p class="ellipsis">argilla/news-summary</p>
                 </div>
-                <!-- <div class="text">
+                <!-- <div class="text flex-row">
                                   <el-row :gutter="6">
                                       <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
                                           <router-link to="" class="ellipsis">
@@ -132,12 +129,12 @@
                                       </el-col>
                                   </el-row>
                               </div> -->
-                <div class="text item">
-                  <div class="item_body">
+                <div class="text item flex-row">
+                  <div class="item_body flex-row">
                     <i class="icon icon_time"></i>
                     <span class="small">5 Sept 2022 - 5 Oct 2022</span>
                   </div>
-                  <!-- <div class="item_body">
+                  <!-- <div class="item_body flex-row">
                     <i class="icon icon_up"></i>
                     <span class="small">5.15M</span>
                   </div> -->
@@ -347,60 +344,6 @@ export default defineComponent({
         })
       }
     }
-    let echarts = inject("echarts")
-    const changetype = () => {
-      const machart = echarts.init(document.getElementById("maychar"));
-      const option = {
-        grid: {
-          top: '0',
-          left: '0',
-          right: '0',
-          bottom: '0',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          show: false,
-          data: [820, 1100, 1080, 982, 951, 934, 900, 930, 920]
-        },
-        yAxis: {
-          type: 'value',
-          show: false,
-          scale: true,
-          splitNumber: 5,
-          alignTicks: true
-        },
-        series: [
-          {
-            data: [920, 1500, 780, 982, 851, 934, 900, 1030, 920],
-            type: 'line',
-            // smooth:true,
-            symbolSize: 0,
-            areaStyle: {},
-            itemStyle: {
-              color: '#5d2eff'
-            },
-            areaStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                {
-                  offset: 0,
-                  color: '#cdb8ff'
-                },
-                {
-                  offset: 1,
-                  color: '#f3ecff'
-                }
-              ])
-            },
-          }
-        ]
-      }
-      machart.setOption(option);
-      window.addEventListener("resize", function () {
-        machart.resize();
-      })
-    }
     onActivated(() => { })
     onMounted(() => {
       textEditor.value = ''
@@ -408,7 +351,6 @@ export default defineComponent({
       urlReadme.value = ''
       window.scrollTo(0, 0)
       init()
-      changetype();
     })
     onDeactivated(() => { })
     watch(() => props.urlChange, (newValue, oldValue) => {
@@ -463,7 +405,6 @@ export default defineComponent({
     font-size: 16px;
   }
   .mark {
-    display: flex;
     flex-wrap: wrap;
     .left,
     .right {
@@ -471,21 +412,10 @@ export default defineComponent({
     }
   }
   :deep(.dataset_body) {
-    display: flex;
     align-items: stretch;
-    padding: 0;
     margin: auto;
     font-size: 14px;
     text-align: left;
-    @media screen and (max-width: 1600px) {
-      padding: 0 0.16rem;
-    }
-    @media screen and (min-width: 1280px) {
-      max-width: 1280px;
-    }
-    @media screen and (min-width: 1536px) {
-      max-width: 1536px;
-    }
     .left {
       position: relative;
       padding: 0.3rem 0;
@@ -624,8 +554,6 @@ export default defineComponent({
             }
           }
           p {
-            display: flex;
-            align-items: center;
             justify-content: flex-start;
             text-align: left;
             .icon {
@@ -633,9 +561,7 @@ export default defineComponent({
           }
         }
         .title_top {
-          display: flex;
           justify-content: space-between;
-          align-items: center;
           font-size: 16px;
           color: #000;
           p {
@@ -649,15 +575,6 @@ export default defineComponent({
               display: block;
               float: left;
             }
-          }
-        }
-        .echarts {
-          display: flex;
-          align-items: center;
-          margin-top: 0.2rem;
-          #maychar {
-            width: 150px;
-            height: 50px;
           }
         }
         .cont {
@@ -725,8 +642,6 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
                   &:hover {
                     background-color: #eee;
                   }
@@ -829,8 +744,6 @@ export default defineComponent({
             .el-row {
               .el-col {
                 a {
-                  display: flex;
-                  align-items: center;
                   &:hover {
                     background-color: #eee;
                   }
@@ -856,11 +769,9 @@ export default defineComponent({
           }
         }
         .list_select {
-          display: flex;
           justify-content: space-between;
           margin-bottom: 0.2rem;
           a {
-            display: flex;
             padding: 0;
             margin: 0.03rem 0;
             background-color: transparent;
@@ -878,8 +789,6 @@ export default defineComponent({
               opacity: 0.9;
             }
             .a_text {
-              align-items: center;
-              display: flex;
               padding: 0.04rem 0.07rem;
             }
             .icon {
@@ -968,7 +877,6 @@ export default defineComponent({
         border-bottom: 1px solid #f1f1f1;
         text-align: left;
         ul {
-          display: flex;
           flex-wrap: wrap;
           li {
             width: auto;
@@ -1015,11 +923,8 @@ export default defineComponent({
               padding: 0;
               border: 0;
               .card-header {
-                display: flex;
                 justify-content: space-between;
                 .name {
-                  display: flex;
-                  align-items: center;
                   flex-wrap: wrap;
                   width: 80%;
                   color: #606060;
@@ -1071,9 +976,7 @@ export default defineComponent({
             .el-card__body {
               padding: 0.05rem 0 0;
               .text {
-                display: flex;
                 justify-content: flex-start;
-                align-items: center;
                 flex-wrap: wrap;
                 color: #000;
                 line-height: 1;
@@ -1162,10 +1065,6 @@ export default defineComponent({
               .item {
                 justify-content: space-between;
                 margin: 0.2rem 0 0;
-                .item_body {
-                  display: flex;
-                  align-items: center;
-                }
               }
             }
           }
@@ -1233,9 +1132,7 @@ export default defineComponent({
           }
         }
         .list_nodata {
-          display: flex;
           justify-content: center;
-          align-items: center;
           width: 100%;
           height: 200px;
           font-size: 18px;
@@ -1253,9 +1150,7 @@ export default defineComponent({
         padding: 0.3rem 0;
       }
       .readme_body {
-        display: flex;
         justify-content: center;
-        align-items: center;
         flex-wrap: wrap;
         min-height: 300px;
         background-color: #fbfbfc;
@@ -1294,15 +1189,11 @@ export default defineComponent({
         color: #606060;
         overflow: hidden;
         .top {
-          display: flex;
-          align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
           padding: 0.1rem 4%;
           font-size: 0.19rem;
           .top_text {
-            display: flex;
-            align-items: center;
             flex-wrap: wrap;
             font-size: 0.2rem;
             color: #000000;
@@ -1449,7 +1340,6 @@ export default defineComponent({
         }
       }
       .button {
-        display: flex;
         justify-content: flex-end;
         padding: 0 0 0.2rem;
         .el-button {
@@ -1489,11 +1379,3 @@ export default defineComponent({
   }
 }
 </style>
-
-
-<i18n>
-{
-  "en": {},
-  "zh": {}
-}
-</i18n>

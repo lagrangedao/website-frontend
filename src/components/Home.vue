@@ -1,11 +1,11 @@
 <template>
   <div class="wrapper" id="wrapper" ref="area">
     <el-container :class="{'container_height':true}">
-      <el-header>
+      <el-header v-if="!(route.name === 'spaceDetail' && route.params.tabs === 'app')">
         <v-head></v-head>
       </el-header>
       <el-main>
-        <div class="content">
+        <div class="content flex-row">
           <router-view v-slot="{ Component }">
             <transition name="move" mode="out-in">
               <keep-alive>
@@ -13,7 +13,7 @@
               </keep-alive>
             </transition>
           </router-view>
-          <el-backtop :right="20" :bottom="20" />
+          <el-backtop :right="20" :bottom="50" />
         </div>
       </el-main>
       <el-footer v-if="route.name !== 'main'" :class="{'footer_position': positionStyle}">
@@ -57,6 +57,7 @@ export default defineComponent({
       document.addEventListener('visibilitychange', function () {
         prevType.value = !document.hidden
       })
+      if (typeof window.ethereum === 'undefined') return
       ethereum.on('accountsChanged', function (account) {
         // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
         if (!prevType.value) return false
@@ -124,41 +125,16 @@ export default defineComponent({
   .el-header {
     height: auto;
     padding: 0;
-    background-color: #180e1a;
+    // background-color: #180e1a;
   }
   .el-main {
-    display: flex;
-    flex-wrap: wrap;
     padding: 0;
     background-color: #fff;
     overflow: visible;
     .content {
-      display: flex;
-      flex-wrap: wrap;
       width: 100%;
       min-height: 100%;
       flex: 1;
-    }
-    &.main_position {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: calc(100% - 0.68rem);
-      background-color: #180e1a;
-      .content {
-        width: 100%;
-        height: 100%;
-      }
-    }
-    &.main_app {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: calc(100% - 1.48rem);
-      .content {
-        width: 100%;
-        height: 100%;
-      }
     }
   }
   .el-footer {
@@ -190,17 +166,15 @@ export default defineComponent({
   text-align: left;
   .demo-rich-conent {
     li {
-      display: flex;
-      align-items: center;
-      padding: 0.1rem 0.2rem;
       font-size: 14px;
       cursor: pointer;
       color: #767676;
+      border-top: 1px solid #e6e6e6;
       svg {
         margin-right: 0.08rem;
       }
       &:nth-child(1) {
-        border-bottom: 1px solid #e6e6e6;
+        border-top: 0;
       }
       &:hover {
         color: rgb(41, 41, 41);
@@ -209,6 +183,9 @@ export default defineComponent({
             fill: rgb(41, 41, 41);
           }
         }
+      }
+      .m-width {
+        padding: 0.1rem 0.2rem;
       }
     }
   }
@@ -246,6 +223,33 @@ export default defineComponent({
       font-size: 13px;
     }
   }
+}
+
+.container-landing {
+  padding: 0 16px;
+  margin: auto;
+  box-sizing: border-box;
+  @media screen and (min-width: 640px) {
+    max-width: 640px;
+  }
+  @media screen and (min-width: 768px) {
+    max-width: 768px;
+  }
+  @media screen and (min-width: 1024px) {
+    max-width: 1024px;
+  }
+  @media screen and (min-width: 1280px) {
+    max-width: 1280px;
+  }
+  @media screen and (min-width: 1536px) {
+    max-width: 1536px;
+  }
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+  // flex-wrap: wrap;
 }
 </style>
 
