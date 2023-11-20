@@ -13,12 +13,14 @@
             Space: &nbsp;
           </div>
           <b>{{route.params.name}}</b>
-          <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
+          <!-- <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i> -->
           <el-button-group class="ml-4">
             <el-button @click="likeMethod" v-if="likeOwner">
-              <i class="icon icon_like"></i>Unlike</el-button>
+              <i class="icon icon_like"></i>
+            </el-button>
             <el-button @click="likeMethod" v-else :disabled="metaAddress?false:true">
-              <i class="icon icon_like"></i>Like</el-button>
+              <i class="icon icon_like unlink"></i>
+            </el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
           <div class="status" v-if="parentValue">{{parentValue}}</div>
@@ -34,7 +36,6 @@
                     <WarningFilled />
                   </el-icon>
                   &nbsp;Expired</el-button>
-                <el-button type="warning" plain @click="hardwareOperate('renew')">Renew</el-button>
           </el-button-group>
           <div :class="{'logs_style flex-row': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
@@ -44,17 +45,38 @@
                 p-id="2676" fill="#878c93"></path>
             </svg> Request License
           </div>
-          <div class="logs_style flex-row" @click="logDrawer('detail')">
-            <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-              <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
-            </svg> Space Detail
-          </div>
           <div class="logs_style flex-row" @click="hardwareOperate('fork')" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
               <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
             </svg> Fork
           </div>
-          <share-pop></share-pop>
+
+          <div class="logs_style popDown flex-row">
+            <el-popover :width="190" trigger="click" popper-class="popper_style">
+              <template #reference>
+                <div class="share_style flex-row">
+                  <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                  </svg>
+                </div>
+              </template>
+              <template #default>
+                <ul class="demo-rich-conent">
+                  <li class="flex-row" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
+                    <div class="m-width" @click="hardwareOperate('renew')">Renew</div>
+                  </li>
+                  <li class="flex-row">
+                    <div class="m-width" @click="logDrawer('detail')">
+                      Space Detail
+                    </div>
+                  </li>
+                  <li class="flex-row">
+                    <share-pop></share-pop>
+                  </li>
+                </ul>
+              </template>
+            </el-popover>
+          </div>
         </div>
 
         <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
@@ -827,15 +849,21 @@ export default defineComponent({
           }
         }
         .icon_like {
-          width: 16px;
-          height: 16px;
+          width: 14px;
+          height: 14px;
+          margin: 0;
           background: url(../../../assets/images/icons/icon_37.png) no-repeat
             left center;
           background-size: auto 100%;
           cursor: inherit;
           @media screen and (min-width: 1800px) {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
+          }
+          &.unlink {
+            background: url(../../../assets/images/icons/icon_37_1.png)
+              no-repeat left center;
+            background-size: auto 100%;
           }
         }
         .el-button {
@@ -941,6 +969,13 @@ export default defineComponent({
           &.is-disabled {
             opacity: 0.5;
             cursor: no-drop;
+          }
+          &.popDown {
+            svg {
+              width: 16px;
+              height: 16px;
+              margin: 0;
+            }
           }
           svg {
             width: 14px;

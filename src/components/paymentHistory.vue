@@ -8,10 +8,10 @@
             <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
           </template>
         </el-table-column>
-        <el-table-column prop="chain_id" label="chain id" width="100" />
+        <el-table-column prop="chain_id" label="chain id" width="110" />
         <el-table-column prop="token" label="token">
           <template #default="scope">
-            <span>{{scope.row.chain_id === 80001 ? 'LAG': 'SWAN USDC'}}</span>
+            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="message" label="refund/Denied reason" min-width="120">
@@ -60,8 +60,9 @@
 import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
-import SpaceTokenABI from '@/utils/abi/SpacePaymentV5.json'
+import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 export default defineComponent({
   name: 'footer_page',
   setup () {
@@ -82,8 +83,21 @@ export default defineComponent({
       formData.append('tx_hash', row.transaction_hash)
       formData.append('chain_id', row.chain_id)
       const reviewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}claim_review`, 'post', formData)
-      if (!reviewRes || reviewRes.status !== 'success') if (reviewRes.message) system.$commonFun.messageTip('error', reviewRes.message)
-      init()
+      if (reviewRes) {
+        ElMessageBox.alert(
+          `Status: ${reviewRes.status}<br />Message: ${reviewRes.message}`,
+          'Review Detail',
+          {
+            // if you want to disable its autofocus
+            // autofocus: false,
+            confirmButtonText: 'OK',
+            dangerouslyUseHTMLString: true,
+            callback: (action) => {
+              init()
+            }
+          }
+        )
+      }
     }
     async function refundFun (row, type) {
       if (row.chain_id.toString() !== getnetID.toString()) {
