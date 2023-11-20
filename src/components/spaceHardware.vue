@@ -184,7 +184,7 @@ import { defineComponent, computed, onMounted, watch, ref, reactive, nextTick, g
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
-import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
+import SpacePaymentABI from '@/utils/abi/SpacePaymentV6.json'
 import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
 import tokenUSDCABI from '@/utils/abi/USDC.json'
@@ -272,7 +272,7 @@ export default defineComponent({
     let tokenAddress = process.env.VUE_APP_MUMBAI_USDC_ADDRESS
     let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
     let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
-    let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
+    let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpacePaymentABI, paymentContractAddress)
 
     async function hardwareFun () {
       const net = await networkEstimate()
