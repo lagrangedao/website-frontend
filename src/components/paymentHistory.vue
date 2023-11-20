@@ -11,7 +11,7 @@
         <el-table-column prop="chain_id" label="chain id" width="110" />
         <el-table-column prop="token" label="token">
           <template #default="scope">
-<!--            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>-->
+            <!--            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>-->
             <span>USDC</span>
           </template>
         </el-table-column>
@@ -29,7 +29,8 @@
         <el-table-column prop="status" label="status" width="135">
           <template #default="scope">
             <div>
-              <el-button type="primary" v-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
+              <span v-if="scope.row.chain_id === 80001 && scope.row.order.updated_at < 1700508000">Pending</span>
+              <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
               <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button>
               <span v-else>{{scope.row.status}}</span>
             </div>
