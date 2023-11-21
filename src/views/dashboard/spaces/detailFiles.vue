@@ -1133,7 +1133,8 @@ export default defineComponent({
             padding: 0;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             .el-tabs__item {
-              padding: 0.15rem;
+              height: auto;
+              padding: 0 0.15rem;
               font-size: 16px;
               @media screen and (min-width: 1800px) {
                 font-size: 18px;
