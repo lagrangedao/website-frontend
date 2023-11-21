@@ -63,7 +63,7 @@ import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
-import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
+import SpaceHardwareABI from '@/utils/abi/SpacePaymentV6.json'
 import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 export default defineComponent({
   name: 'footer_page',
@@ -123,6 +123,7 @@ export default defineComponent({
             })
             .on('error', () => paymentLoad.value = false)
         } else {
+          console.log('refund id:', row.transaction_hash)
           let gasLimit = await paymentContract.methods
             .claimRefund(String(row.transaction_hash))
             .estimateGas({ from: store.state.metaAddress })
