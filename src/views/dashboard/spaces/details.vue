@@ -88,14 +88,14 @@
               </span>
             </template>
           </el-tab-pane>
-          <el-tab-pane name="card">
+          <!-- <el-tab-pane name="card">
             <template #label>
               <span class="custom-tabs-label flex-row">
                 <i class="icon icon_spaces"></i>
                 <span>Space card</span>
               </span>
             </template>
-          </el-tab-pane>
+          </el-tab-pane> -->
           <el-tab-pane name="files">
             <template #label>
               <span class="custom-tabs-label flex-row">
@@ -717,6 +717,7 @@ export default defineComponent({
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
       if (!metaAddress.value) activeName.value = 'app'
+      console.log(activeName.value)
       requestDetail()
       if (to.params.tabs === 'card') {
         window.scrollTo(0, 0)
