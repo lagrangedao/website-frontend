@@ -40,13 +40,13 @@
           </div>
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
-          <div class="labelList" id="permiss">
+          <!-- <div class="labelList" id="permiss">
             <ul v-show="titles">
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
             </ul>
-          </div>
+          </div> -->
         </el-col>
         <el-col v-if="urlReadme && isPreview" :xs="24" :sm="24" :md="13" :lg="14" :xl="14" class="right">
           <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
@@ -298,6 +298,7 @@ export default defineComponent({
           if (el.join('/').toLowerCase() === 'readme.md') {
             urlReadme.value = `${userGateway.value}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
+            console.log('11-----11:', urlReadme.value)
             if (userGateway.value) getTitle(urlReadme.value)
             else {
               gate = true
@@ -315,6 +316,7 @@ export default defineComponent({
       // }
       context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
+      console.log('66-----66:', !urlReadme.value, !userGateway.value)
       if (!urlReadme.value || !userGateway.value) listLoad.value = false
     }
     function detailFun (row, index) {
@@ -342,11 +344,17 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
+        console.log('22-----22:', textEditor.value)
         await system.$commonFun.timeout(1000)
         nextTick(() => {
+          console.log('33-----33:', preview.value)
           if (preview.value) {
+            console.log('33-----33:', 'jinlai')
             const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
+            console.log('44-----44:', anchors)
             titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
+            console.log('55-----55:', titles.value, titles.value.length)
+            console.log('55-----5555:', titles.value.length)
             if (!titles.value.length) {
               titles.value = [];
               listLoad.value = false
