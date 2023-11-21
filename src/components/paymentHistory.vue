@@ -11,7 +11,7 @@
         <el-table-column prop="chain_id" label="chain id" width="110" />
         <el-table-column prop="token" label="token">
           <template #default="scope">
-<!--            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>-->
+            <!--            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>-->
             <span>USDC</span>
           </template>
         </el-table-column>
@@ -29,7 +29,8 @@
         <el-table-column prop="status" label="status" width="135">
           <template #default="scope">
             <div>
-              <el-button type="primary" v-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
+              <span v-if="scope.row.chain_id === 80001 && scope.row.order.updated_at < 1700508000 && scope.row.status.toLowerCase() === 'refundable'">Pending</span>
+              <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
               <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button>
               <span v-else>{{scope.row.status}}</span>
             </div>
@@ -62,7 +63,7 @@ import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
-import SpaceHardwareABI from '@/utils/abi/SpaceHardware.json'
+import SpaceHardwareABI from '@/utils/abi/SpacePaymentV6.json'
 import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 export default defineComponent({
   name: 'footer_page',
@@ -122,6 +123,7 @@ export default defineComponent({
             })
             .on('error', () => paymentLoad.value = false)
         } else {
+          console.log('refund id:', row.transaction_hash)
           let gasLimit = await paymentContract.methods
             .claimRefund(String(row.transaction_hash))
             .estimateGas({ from: store.state.metaAddress })
