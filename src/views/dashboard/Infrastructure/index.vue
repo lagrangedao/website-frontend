@@ -9,7 +9,7 @@
               <el-input v-model="searchValue" clearable @change="searchChange()" class="search_name w-50 m-2" placeholder="Chain name or chain id" />
             </div>
           </div>
-          <p>This list show all your configured chains and all the RPC endpoints that thirdweb supports.</p>
+          <p>This list show all your configured chains and all the RPC endpoints that Lagrange supports.</p>
         </div>
         <div class="top_button">
           <div class="add-network flex-row" @click="addValidate">
