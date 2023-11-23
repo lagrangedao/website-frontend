@@ -2,16 +2,16 @@
   <section id="dataset" ref="spaceCardRef">
     <div id="datasetBody">
       <el-row class="dataset_body flex-row" v-loading="listLoad">
-        <el-col v-if="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
+        <el-col v-show="!urlReadme" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="readme_text">
           <div class="readme_body flex-row" v-if="!createLoad">
             <div class="desc">
               <b>No space card yet</b>
-              <p v-if="metaAddress === route.params.wallet_address">
-                <span v-if="fileSpaceData.length === 0">Create a new space card by using following template</span>
-                <span v-else>Create a new space card by creating a Readme.md file</span>
+              <p v-show="metaAddress === route.params.wallet_address">
+                <span v-if="fileSpaceData && fileSpaceData.length > 0">Create a new space card by creating a Readme.md file</span>
+                <span v-else>Create a new space card by using following template</span>
               </p>
             </div>
-            <el-row class="card" :gutter="20" v-if="metaAddress === route.params.wallet_address && fileSpaceData.length === 0">
+            <el-row class="card" :gutter="20" v-show="metaAddress === route.params.wallet_address && fileSpaceData.length === 0">
               <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="col-title">
                 <b>Start with hello-world template</b>
               </el-col>
@@ -39,19 +39,19 @@
             </el-tabs>
           </div>
         </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
-          <!-- <div class="labelList" id="permiss">
+        <el-col v-show="urlReadme && isPreview" :xs="0" :sm="0" :md="4" :lg="4" :xl="4" class="left">
+          <div class="labelList" id="permiss">
             <ul v-show="titles">
               <li v-for="(anchor, index) in titles" :key="index + 'art'">
                 <a @click="handleAnchorClick(anchor, index, anchor.indent)" :class="{'title':anchor.indent===0,'sub_title':anchor.indent===1}">{{ anchor.title }}</a>
               </li>
             </ul>
-          </div> -->
+          </div>
         </el-col>
-        <el-col v-if="urlReadme && isPreview" :xs="24" :sm="24" :md="13" :lg="14" :xl="14" class="right">
-          <v-md-preview :text="textEditor" ref="preview" @image-click="imgClick" id="preview"></v-md-preview>
+        <el-col v-show="urlReadme && isPreview" :xs="24" :sm="24" :md="13" :lg="14" :xl="14" class="right">
+          <v-md-preview :text="textEditor" ref="previewRef" @image-click="imgClick" id="previewRef"></v-md-preview>
         </el-col>
-        <el-col v-if="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
+        <el-col v-show="urlReadme && !isPreview" :xs="24" :sm="24" :md="17" :lg="17" :xl="17" class="right">
           <v-md-editor v-model="textEditorChange"></v-md-editor>
         </el-col>
         <el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="6" class="left left_light">
@@ -65,10 +65,10 @@
               <b>{{system.$commonFun.NumFormat(listdata.stats.forks) || 0}}</b>
             </div>
             <div class="cont">
-              <el-row :gutter="12" v-if="urlReadme && userGateway">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress === route.params.wallet_address">
+              <el-row :gutter="12" v-show="urlReadme && userGateway">
+                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-show="isPreview && metaAddress === route.params.wallet_address">
                   <a class=" flex-row">
-                    <span class="a_button flex-row" v-if="urlReadme && isPreview" @click="editFun">
+                    <span class="a_button flex-row" v-show="urlReadme && isPreview" @click="editFun">
                       <el-icon>
                         <EditPen />
                       </el-icon>
@@ -97,91 +97,8 @@
                   </a>
                 </el-col>
               </el-row>
-              <el-row :gutter="12" v-if="false">
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="" class=" flex-row">
-                    <i class="icon icon_01"></i>
-                    <span class="a_text">Image Classification</span>
-                  </router-link>
-                </el-col>
-                <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12">
-                  <router-link to="" class=" flex-row">
-                    <i class="icon icon_02"></i>
-                    <span class="a_text">Translation</span>
-                  </router-link>
-                </el-col>
-              </el-row>
             </div>
           </div>
-          <div class="labelModel" v-if="false">
-            <ul class=" flex-row">
-              <li>
-                <p>Homepage:</p>
-                <b>github.com</b>
-              </li>
-              <li>
-                <p>Size of downloaded space files:</p>
-                <b>55.66MB</b>
-              </li>
-              <li>
-                <p>Size of the generated space:</p>
-                <b>238.01MB</b>
-              </li>
-              <li>
-                <p>Total amount of disk used:</p>
-                <b>293.67MB</b>
-              </li>
-            </ul>
-          </div>
-          <div class="list" v-if="false">
-            <div class="title flex-row">
-              <p :title="'Models trained or fine-tuned on '+route.params.name">
-                <i class="icon icon_datasets"></i>
-                Models trained or fine-tuned on
-                <small>{{route.params.name}}</small>
-              </p>
-            </div>
-          </div>
-          <el-row class="list_body" v-if="false" v-loading="false">
-            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(list, l) in listdata.files" :key="l">
-              <el-card class="box-card" @click="detailFun(list, l)">
-                <template #header>
-                  <div class="card-header flex-row">
-                    <div class="name flex-row">
-                      <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
-                      <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
-                      <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
-                      <b>{{list.name}}</b>
-                    </div>
-                    <span>27</span>
-                  </div>
-                </template>
-                <div class="text flex-row">
-                  <i class="icon icon_image"></i>
-                  <p class="ellipsis">argilla/news-summary</p>
-                </div>
-                <!-- <div class="text flex-row">
-                                  <el-row :gutter="6">
-                                      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-                                          <router-link to="" class="ellipsis">
-                                              {{list.license}}
-                                          </router-link>
-                                      </el-col>
-                                  </el-row>
-                              </div> -->
-                <div class="text item flex-row">
-                  <div class="item_body flex-row">
-                    <i class="icon icon_time"></i>
-                    <span class="small">5 Sept 2022 - 5 Oct 2022</span>
-                  </div>
-                  <!-- <div class="item_body flex-row">
-                    <i class="icon icon_up"></i>
-                    <span class="small">5.15M</span>
-                  </div> -->
-                </div>
-              </el-card>
-            </el-col>
-          </el-row>
         </el-col>
       </el-row>
     </div>
@@ -235,7 +152,7 @@ export default defineComponent({
     const router = useRouter()
     const textEditor = ref('')
     const textEditorChange = ref('')
-    const preview = ref(null)
+    const previewRef = ref(null)
     const titles = ref([])
     const createLoad = ref(false)
     const templateData = ref([
@@ -298,7 +215,6 @@ export default defineComponent({
           if (el.join('/').toLowerCase() === 'readme.md') {
             urlReadme.value = `${userGateway.value}/ipfs/${element.cid}`
             urlReadmeName.value = el.join('/')
-            console.log('11-----11:', urlReadme.value)
             if (userGateway.value) getTitle(urlReadme.value)
             else {
               gate = true
@@ -316,7 +232,6 @@ export default defineComponent({
       // }
       context.emit('handleValue', false)
       await system.$commonFun.timeout(500)
-      console.log('66-----66:', !urlReadme.value, !userGateway.value)
       if (!urlReadme.value || !userGateway.value) listLoad.value = false
     }
     function detailFun (row, index) {
@@ -324,10 +239,10 @@ export default defineComponent({
     }
     function handleAnchorClick (anchor) {
       const { lineIndex } = anchor
-      const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
+      const heading = previewRef.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
 
       if (heading) {
-        preview.value.scrollToTarget({
+        previewRef.value.scrollToTarget({
           target: heading,
           scrollContainer: window,
           top: 0,
@@ -344,17 +259,12 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
-        console.log('22-----22:', textEditor.value)
         await system.$commonFun.timeout(1000)
         nextTick(() => {
-          console.log('33-----33:', preview.value)
-          if (preview.value) {
-            console.log('33-----33:', 'jinlai')
-            const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
-            console.log('44-----44:', anchors)
+          console.log('previewRef:', previewRef.value)
+          if (previewRef.value) {
+            const anchors = previewRef.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
             titles.value = Array.from(anchors).filter(title => !!title.innerText.trim());
-            console.log('55-----55:', titles.value, titles.value.length)
-            console.log('55-----5555:', titles.value.length)
             if (!titles.value.length) {
               titles.value = [];
               listLoad.value = false
@@ -431,7 +341,7 @@ export default defineComponent({
       nextTick(() => {
         const heading = spaceCardRef.value.querySelector(`[data-v-md-heading="${line}"]`)
         if (heading) {
-          preview.value.scrollToTarget({
+          previewRef.value.scrollToTarget({
             target: heading,
             scrollContainer: window,
             top: 0,
@@ -499,7 +409,7 @@ export default defineComponent({
       isPreview,
       templateData,
       createLoad,
-      textEditor, textEditorChange, imgClick, getTitle, titles, preview, handleAnchorClick, editFun, editCommitFun,
+      textEditor, textEditorChange, imgClick, getTitle, titles, previewRef, handleAnchorClick, editFun, editCommitFun,
       init, handleCurrentChange, handleSizeChange, detailFun, handleClick,
       cardAdd, cancelFun
     }
