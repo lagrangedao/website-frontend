@@ -3,11 +3,11 @@
     <div class="payment-history container-landing">
       <div class="title">{{paymentType.toLowerCase() === 'provider'?'provider Payment history':'user Payment history'}}</div>
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-if="paymentType.toLowerCase() !== 'provider'">
-        <!-- <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
+        <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
           <template #default="scope">
             <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
           </template>
-        </el-table-column> -->
+        </el-table-column>
         <el-table-column prop="chain_id" label="chain id" width="110" />
         <el-table-column prop="token" label="token">
           <template #default="scope">
@@ -157,7 +157,7 @@ export default defineComponent({
       let formData = new FormData()
       formData.append('tx_hash', row.transaction_hash)
       formData.append('chain_id', row.chain_id)
-      formData.append('uuid', row.job.task_uuid)
+      formData.append('uuid', row.uuid)
       const claimRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/provider/payments`, 'post', formData)
       if (!claimRes || claimRes.status !== 'success') if (claimRes.message) system.$commonFun.messageTip('error', claimRes.message)
       init()
