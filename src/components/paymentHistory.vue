@@ -3,11 +3,11 @@
     <div class="payment-history container-landing">
       <div class="title">{{paymentType.toLowerCase() === 'provider'?'provider Payment history':'user Payment history'}}</div>
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-if="paymentType.toLowerCase() !== 'provider'">
-        <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
+        <!-- <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
           <template #default="scope">
             <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column prop="chain_id" label="chain id" width="110" />
         <el-table-column prop="token" label="token">
           <template #default="scope">
