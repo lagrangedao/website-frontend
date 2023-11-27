@@ -44,7 +44,7 @@
             <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
           </template>
         </el-table-column> -->
-        <!-- <el-table-column prop="chain_id" label="chain id" width="100" /> -->
+        <el-table-column prop="chain_id" label="chain id" width="100" />
         <el-table-column prop="amount" label="amount" />
         <el-table-column prop="status" label="status" width="120">
           <template #default="scope">
