@@ -39,11 +39,11 @@
       </el-table>
 
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-else>
-        <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
+        <!-- <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
           <template #default="scope">
             <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column prop="chain_id" label="chain id" width="100" />
         <el-table-column prop="amount" label="amount" />
         <el-table-column prop="status" label="status" width="120">
@@ -87,17 +87,17 @@ export default defineComponent({
       const reviewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}claim_review`, 'post', formData)
       if (reviewRes) {
         ElMessageBox.alert(
-          `Status: ${reviewRes.status}<br />Message: ${reviewRes.message}`,
-          'Review Detail',
-          {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: 'OK',
-            dangerouslyUseHTMLString: true,
-            callback: (action) => {
-              init()
+            `Status: ${reviewRes.status}<br />Message: ${reviewRes.message}`,
+            'Review Detail',
+            {
+              // if you want to disable its autofocus
+              // autofocus: false,
+              confirmButtonText: 'OK',
+              dangerouslyUseHTMLString: true,
+              callback: (action) => {
+                init()
+              }
             }
-          }
         )
       }
     }
@@ -109,33 +109,33 @@ export default defineComponent({
       paymentLoad.value = true
       try {
         if (type) {
-          console.log('task_uuid:', row.job.task_uuid)
+          console.log('task_uuid:', row.job.uuid)
           let gasLimit = await paymentContract.methods
-            .claimReward(String(row.job.task_uuid))
-            .estimateGas({ from: store.state.metaAddress })
+              .claimReward(String(row.job.uuid))
+              .estimateGas({ from: store.state.metaAddress })
 
           const tx = await paymentContract.methods
-            .claimReward(String(row.job.task_uuid))
-            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-            .on('transactionHash', async (transactionHash) => {
-              console.log('claim transactionHash:', transactionHash)
-              claimStatus(row)
-            })
-            .on('error', () => paymentLoad.value = false)
+              .claimReward(String(row.job.uuid))
+              .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+              .on('transactionHash', async (transactionHash) => {
+                console.log('claim transactionHash:', transactionHash)
+                claimStatus(row)
+              })
+              .on('error', () => paymentLoad.value = false)
         } else {
           console.log('refund id:', row.transaction_hash)
           let gasLimit = await paymentContract.methods
-            .claimRefund(String(row.transaction_hash))
-            .estimateGas({ from: store.state.metaAddress })
+              .claimRefund(String(row.transaction_hash))
+              .estimateGas({ from: store.state.metaAddress })
 
           const tx = await paymentContract.methods
-            .claimRefund(String(row.transaction_hash))
-            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-            .on('transactionHash', async (transactionHash) => {
-              console.log('refund transactionHash:', transactionHash)
-              refundStatus(row)
-            })
-            .on('error', () => paymentLoad.value = false)
+              .claimRefund(String(row.transaction_hash))
+              .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+              .on('transactionHash', async (transactionHash) => {
+                console.log('refund transactionHash:', transactionHash)
+                refundStatus(row)
+              })
+              .on('error', () => paymentLoad.value = false)
         }
       } catch (err) {
         console.log('err', err)
@@ -157,7 +157,7 @@ export default defineComponent({
       let formData = new FormData()
       formData.append('tx_hash', row.transaction_hash)
       formData.append('chain_id', row.chain_id)
-      formData.append('uuid', row.job.task_uuid)
+      formData.append('uuid', row.uuid)
       const claimRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/provider/payments`, 'post', formData)
       if (!claimRes || claimRes.status !== 'success') if (claimRes.message) system.$commonFun.messageTip('error', claimRes.message)
       init()
