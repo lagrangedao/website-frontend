@@ -87,23 +87,23 @@ export default defineComponent({
       const reviewRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}claim_review`, 'post', formData)
       if (reviewRes) {
         ElMessageBox.alert(
-            `Status: ${reviewRes.status}<br />Message: ${reviewRes.message}`,
-            'Review Detail',
-            {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              dangerouslyUseHTMLString: true,
-              callback: (action) => {
-                init()
-              }
+          `Status: ${reviewRes.status}<br />Message: ${reviewRes.message}`,
+          'Review Detail',
+          {
+            // if you want to disable its autofocus
+            // autofocus: false,
+            confirmButtonText: 'OK',
+            dangerouslyUseHTMLString: true,
+            callback: (action) => {
+              init()
             }
+          }
         )
       }
     }
     async function refundFun (row, type) {
       if (row.chain_id.toString() !== getnetID.toString()) {
-        await system.$commonFun.walletChain(row.chain_id)
+        await system.$commonFun.walletChain(Number(row.chain_id))
         return
       }
       paymentLoad.value = true
@@ -111,31 +111,31 @@ export default defineComponent({
         if (type) {
           console.log('task_uuid:', row.job.uuid)
           let gasLimit = await paymentContract.methods
-              .claimReward(String(row.job.uuid))
-              .estimateGas({ from: store.state.metaAddress })
+            .claimReward(String(row.job.uuid))
+            .estimateGas({ from: store.state.metaAddress })
 
           const tx = await paymentContract.methods
-              .claimReward(String(row.job.uuid))
-              .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-              .on('transactionHash', async (transactionHash) => {
-                console.log('claim transactionHash:', transactionHash)
-                claimStatus(row)
-              })
-              .on('error', () => paymentLoad.value = false)
+            .claimReward(String(row.job.uuid))
+            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+            .on('transactionHash', async (transactionHash) => {
+              console.log('claim transactionHash:', transactionHash)
+              claimStatus(row, transactionHash)
+            })
+            .on('error', () => paymentLoad.value = false)
         } else {
           console.log('refund id:', row.transaction_hash)
           let gasLimit = await paymentContract.methods
-              .claimRefund(String(row.transaction_hash))
-              .estimateGas({ from: store.state.metaAddress })
+            .claimRefund(String(row.transaction_hash))
+            .estimateGas({ from: store.state.metaAddress })
 
           const tx = await paymentContract.methods
-              .claimRefund(String(row.transaction_hash))
-              .send({ from: store.state.metaAddress, gasLimit: gasLimit })
-              .on('transactionHash', async (transactionHash) => {
-                console.log('refund transactionHash:', transactionHash)
-                refundStatus(row)
-              })
-              .on('error', () => paymentLoad.value = false)
+            .claimRefund(String(row.transaction_hash))
+            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+            .on('transactionHash', async (transactionHash) => {
+              console.log('refund transactionHash:', transactionHash)
+              refundStatus(row, transactionHash)
+            })
+            .on('error', () => paymentLoad.value = false)
         }
       } catch (err) {
         console.log('err', err)
@@ -143,7 +143,7 @@ export default defineComponent({
         if (err && err.message) system.$commonFun.messageTip('error', err.message)
       }
     }
-    async function refundStatus (row) {
+    async function refundStatus (row, transactionHash) {
       paymentLoad.value = true
       let formData = new FormData()
       formData.append('tx_hash', row.transaction_hash)
@@ -152,10 +152,10 @@ export default defineComponent({
       if (!refundRes || refundRes.status !== 'success') if (refundRes.message) system.$commonFun.messageTip('error', refundRes.message)
       init()
     }
-    async function claimStatus (row) {
+    async function claimStatus (row, transactionHash) {
       paymentLoad.value = true
       let formData = new FormData()
-      formData.append('tx_hash', row.transaction_hash)
+      formData.append('tx_hash', transactionHash)
       formData.append('chain_id', row.chain_id)
       formData.append('uuid', row.uuid)
       const claimRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/provider/payments`, 'post', formData)
