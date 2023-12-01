@@ -710,7 +710,7 @@ export default defineComponent({
 
     async function netChange (dialog, rows) {
       networkC.value = dialog
-      if (rows) system.$commonFun.walletChain(rows)
+      if (rows) system.$commonFun.walletChain(Number(rows))
     }
 
     let copyTransaction
