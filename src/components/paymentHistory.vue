@@ -59,6 +59,7 @@
   </div>
 </template>
 <script>
+const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -76,6 +77,7 @@ export default defineComponent({
     const paymentData = ref([])
     const paymentLoad = ref(false)
     const paymentType = ref(route.query.type || 'user')
+    const prevType = ref(true)
     let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
     let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
 
@@ -182,8 +184,20 @@ export default defineComponent({
         paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
       }
     }
+    function fn () {
+      document.addEventListener('visibilitychange', function () {
+        prevType.value = !document.hidden
+      })
+      if (typeof window.ethereum === 'undefined') return
+      ethereum.on('chainChanged', async function (accounts) {
+        if (!prevType.value) return false
+        console.log('payment')
+        system.$commonFun.signOutFun()
+      })
+    }
     let getnetID = NaN
     onMounted(async () => {
+      fn()
     })
     onActivated(async () => {
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
