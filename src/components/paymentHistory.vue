@@ -111,13 +111,13 @@ export default defineComponent({
       paymentLoad.value = true
       try {
         if (type) {
-          console.log('task_uuid:', row.job.uuid)
+          console.log('task_uuid:', row.job.task_uuid)
           let gasLimit = await paymentContract.methods
-            .claimReward(String(row.job.uuid))
+            .claimReward(String(row.job.task_uuid))
             .estimateGas({ from: store.state.metaAddress })
 
           const tx = await paymentContract.methods
-            .claimReward(String(row.job.uuid))
+            .claimReward(String(row.job.task_uuid))
             .send({ from: store.state.metaAddress, gasLimit: gasLimit })
             .on('transactionHash', async (transactionHash) => {
               console.log('claim transactionHash:', transactionHash)
