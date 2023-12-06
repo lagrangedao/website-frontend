@@ -329,7 +329,9 @@ export default defineComponent({
       const time = await throttle()
       if (!time) return false
       loadingText.value = ''
+      console.log('isLogin')
       system.$commonFun.Init(async addr => {
+        console.log('addr: ', addr, lagLogin.value)
         info.address = addr
         system.$commonFun.web3Init.eth.getBalance(addr).then((balance) => {
           // console.log(balance)
@@ -427,6 +429,7 @@ export default defineComponent({
       // networkChanged
       ethereum.on('chainChanged', async function (accounts) {
         if (!prevType.value) return false
+        console.log('personal')
         isLogin()
       })
       // 监听metamask网络断开

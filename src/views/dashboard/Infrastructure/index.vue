@@ -22,6 +22,9 @@
         <el-row class="rpc-list" :gutter="32" v-if="chainsData.length > 0">
           <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="chain in chainsData" :key="chain">
             <el-card class="box-card">
+              <div class="recommended" v-if="chain.chain_id === '8598668088'">
+                <img src="@/assets/images/icons/Recommend.png" alt="">
+              </div>
               <div class="grid-content">
                 <div class="flex-row head">
                   <img :src="chain.icon" width="37" height="37" :alt="`${chain.chain}`"> {{chain.chain}} - {{chain.network}}
@@ -36,7 +39,7 @@
                   </li>
                   <li>
                     <div class="tit">Chain ID</div>
-                    <div class="desc">{{chain.chain_id}} ({{system.$commonFun.strToHexCharCode(chain.chain_id)}})</div>
+                    <div class="desc">{{chain.chain_id}} <br />({{system.$commonFun.strToHexCharCode(chain.chain_id)}})</div>
                   </li>
                   <li>
                     <div class="tit">Native Token</div>
@@ -337,12 +340,24 @@ export default defineComponent({
       }
       .rpc-list {
         .box-card {
+          position: relative;
           margin: 0.16rem 0;
           border-color: #dfdfdf;
           border-radius: 0.15rem;
           box-shadow: 0.05rem 0.05rem 0.1rem rgba(0, 0, 0, 0.1);
           color: #7a7a7a;
           cursor: pointer;
+          .recommended {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 60px;
+            font-size: 12px;
+            color: #4f85ff;
+            img {
+              height: 100%;
+            }
+          }
           .el-card__body {
             padding: 0.25rem;
             .grid-content {
@@ -358,6 +373,7 @@ export default defineComponent({
                 width: 100%;
                 padding: 0.15rem 0 0;
                 flex-wrap: wrap;
+                align-items: flex-start;
                 li {
                   width: 50%;
                   padding: 0;

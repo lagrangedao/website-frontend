@@ -59,6 +59,7 @@
   </div>
 </template>
 <script>
+const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -76,6 +77,7 @@ export default defineComponent({
     const paymentData = ref([])
     const paymentLoad = ref(false)
     const paymentType = ref(route.query.type || 'user')
+    const prevType = ref(true)
     let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
     let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
 
@@ -103,7 +105,7 @@ export default defineComponent({
     }
     async function refundFun (row, type) {
       if (row.chain_id.toString() !== getnetID.toString()) {
-        await system.$commonFun.walletChain(row.chain_id)
+        await system.$commonFun.walletChain(Number(row.chain_id))
         return
       }
       paymentLoad.value = true
@@ -119,7 +121,7 @@ export default defineComponent({
             .send({ from: store.state.metaAddress, gasLimit: gasLimit })
             .on('transactionHash', async (transactionHash) => {
               console.log('claim transactionHash:', transactionHash)
-              claimStatus(row)
+              claimStatus(row, transactionHash)
             })
             .on('error', () => paymentLoad.value = false)
         } else {
@@ -133,7 +135,7 @@ export default defineComponent({
             .send({ from: store.state.metaAddress, gasLimit: gasLimit })
             .on('transactionHash', async (transactionHash) => {
               console.log('refund transactionHash:', transactionHash)
-              refundStatus(row)
+              refundStatus(row, transactionHash)
             })
             .on('error', () => paymentLoad.value = false)
         }
@@ -143,7 +145,7 @@ export default defineComponent({
         if (err && err.message) system.$commonFun.messageTip('error', err.message)
       }
     }
-    async function refundStatus (row) {
+    async function refundStatus (row, transactionHash) {
       paymentLoad.value = true
       let formData = new FormData()
       formData.append('tx_hash', row.transaction_hash)
@@ -152,12 +154,12 @@ export default defineComponent({
       if (!refundRes || refundRes.status !== 'success') if (refundRes.message) system.$commonFun.messageTip('error', refundRes.message)
       init()
     }
-    async function claimStatus (row) {
+    async function claimStatus (row, transactionHash) {
       paymentLoad.value = true
       let formData = new FormData()
-      formData.append('tx_hash', row.transaction_hash)
+      formData.append('tx_hash', transactionHash)
       formData.append('chain_id', row.chain_id)
-      formData.append('uuid', row.job.task_uuid)
+      formData.append('uuid', row.uuid)
       const claimRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/provider/payments`, 'post', formData)
       if (!claimRes || claimRes.status !== 'success') if (claimRes.message) system.$commonFun.messageTip('error', claimRes.message)
       init()
@@ -182,8 +184,20 @@ export default defineComponent({
         paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
       }
     }
+    function fn () {
+      document.addEventListener('visibilitychange', function () {
+        prevType.value = !document.hidden
+      })
+      if (typeof window.ethereum === 'undefined') return
+      ethereum.on('chainChanged', async function (accounts) {
+        if (!prevType.value) return false
+        console.log('payment')
+        system.$commonFun.signOutFun()
+      })
+    }
     let getnetID = NaN
     onMounted(async () => {
+      fn()
     })
     onActivated(async () => {
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
