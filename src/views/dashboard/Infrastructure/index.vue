@@ -57,7 +57,7 @@
       <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" class="rpc-right">
         <div class="content" v-for="d in describeData" :key="d">
           <div class="title">{{d.title}}</div>
-          <div :class="{'sub_title color':true, 'u': d.nav}" @click="goToken(d.nav, d.tabs)">{{d.subTitle}}</div>
+          <div :class="{'sub_title':true, 'u color': d.nav}" @click="goToken(d.nav, d.tabs)">{{d.subTitle}}</div>
           <div class="sub_title">{{d.desc}}</div>
         </div>
       </el-col>
@@ -346,7 +346,7 @@ export default defineComponent({
           border-radius: 0.15rem;
           box-shadow: 0.05rem 0.05rem 0.1rem rgba(0, 0, 0, 0.1);
           color: #7a7a7a;
-          cursor: pointer;
+          cursor: text;
           .recommended {
             position: absolute;
             right: 0;
