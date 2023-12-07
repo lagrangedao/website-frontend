@@ -15,7 +15,7 @@
           </div>
           <b>{{route.params.name}}</b>
           <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
-          <el-button-group class="ml-4">
+          <el-button-group class="ml-4 flex-row">
             <el-button @click="likeMethod" v-if="likeOwner">
               <i class="icon icon_like"></i>Unlike</el-button>
             <el-button @click="likeMethod" v-else :disabled="metaAddress?false:true">
@@ -30,7 +30,7 @@
                 p-id="2676" fill="#878c93"></path>
             </svg> Request License
           </div>
-          <share-pop></share-pop>
+          <share-to></share-to>
         </div>
       </div>
       <div class="tag content flex-row">
@@ -96,7 +96,7 @@ import detailCard from './detailCard.vue'
 import detailFiles from './detailFiles.vue'
 import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
-import sharePop from '@/components/share.vue'
+import shareTo from '@/components/shareTo.vue'
 import { defineComponent, computed, onMounted, onUnmounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -111,7 +111,7 @@ export default defineComponent({
     detailCard,
     detailCommunity,
     detailSetting,
-    Setting, Share, sharePop, ArrowLeft
+    Setting, Share, shareTo, ArrowLeft
   },
   setup () {
     const store = useStore()
@@ -373,7 +373,7 @@ export default defineComponent({
           cursor: inherit;
         }
         .el-button {
-          height: 28px;
+          height: auto;
           padding: 0.05rem 0.1rem;
           margin: 0.1rem 0;
           font-family: inherit;
@@ -409,6 +409,7 @@ export default defineComponent({
           border: 1px solid rgba(229, 231, 235, 1);
           border-radius: 0.05rem;
           font-size: 14px;
+          white-space: nowrap;
           line-height: 1;
           cursor: pointer;
           @media screen and (max-width: 1600px) {
