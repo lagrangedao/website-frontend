@@ -290,16 +290,16 @@
                     </p>
                     <p v-else>Waiting for CP finish deployment</p>
                   </el-descriptions-item>
-                  <el-descriptions-item label="Provider status">
+                  <el-descriptions-item label="Provider status" v-if="dataJob.job.provider_status">
                     {{dataJob.job.provider_status.status}}, {{dataJob.job.provider_status.online ? 'Online' : 'Offline'}}
                   </el-descriptions-item>
-                  <el-descriptions-item label="Name">
+                  <el-descriptions-item label="Name" v-if="dataJob.job.provider_status">
                     {{dataJob.job.provider_status.name}}
                   </el-descriptions-item>
-                  <el-descriptions-item label="Score">
+                  <el-descriptions-item label="Score" v-if="dataJob.job.provider_status">
                     {{dataJob.job.provider_status.score}}
                   </el-descriptions-item>
-                  <el-descriptions-item label="Multi address">
+                  <el-descriptions-item label="Multi address" v-if="dataJob.job.provider_status">
                     {{dataJob.job.provider_status.multi_address}}
                   </el-descriptions-item>
                 </el-descriptions>

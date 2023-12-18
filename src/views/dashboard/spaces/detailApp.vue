@@ -11,7 +11,9 @@
                     <template #content>
                       <small>
                         CP Status:
-                        <br/> {{ job.provider_status.online ? 'Online' : 'Offline' }}, {{ job.provider_status.status }}
+                        <br/>
+                        <span v-if="job.provider_status">{{ job.provider_status.online ? 'Online' : 'Offline' }}, {{ job.provider_status.status }}</span>
+                        <span v-else>-</span>
                       </small>
                     </template>
                     <div :class="{'span-cp': job.is_leading_job && job.is_leading_job.toString() === 'true', 'cp-style flex-row': true}">
@@ -125,6 +127,10 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const statusCode = reactive({
+      code: -1000,
+      reload: false
+    })
 
     function handleClick (tab, event) {
       router.push({
@@ -152,20 +158,31 @@ export default defineComponent({
       return arr
     }
 
-    async function init () {
+    async function init (type) {
       if (route.params.tabs !== 'app') return
-      listLoad.value = true
-      listdata.jobResult = []
+      listLoad.value = type ? true : false
+      if (type) listdata.jobResult = []
+      let code = -1
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
-        listdata.jobResult = await jobList(listRes.data.job)
-        if (listRes.data.space.status === 'Deploying' && listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
-        listdata.space = listRes.data.space
-        // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
+        code = listRes.data.space && listRes.data.space.status_code ? listRes.data.space.status_code : -1
+        statusCode.reload = Number(code) > 1 && Number(code) < 6 ? true : false
+        if (type) {
+          console.log('load')
+          statusCode.code = code
+          listdata.jobResult = await jobList(listRes.data.job)
+          if (listRes.data.space.status === 'Deploying' && listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
+          listdata.space = listRes.data.space
+          // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
+        }
       }
       context.emit('handleValue', false)
-      await system.$commonFun.timeout(500)
       listLoad.value = false
+      // if (statusCode.reload) {
+      //   await system.$commonFun.timeout(1000)
+      //   if (Number(code) === Number(statusCode.code)) init()
+      //   else init(1)
+      // }
     }
 
     async function jobStatusList (list) {
@@ -195,7 +212,7 @@ export default defineComponent({
     })
     onMounted(() => {
       window.scrollTo(0, 0)
-      init()
+      init(1)
     })
     onDeactivated(() => {
     })
@@ -204,11 +221,11 @@ export default defineComponent({
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'app') {
         window.scrollTo(0, 0)
-        init()
+        init(1)
       }
     })
     // watch(() => props.likesValue, () => {
-    //   init()
+    //   init(1)
     // })
     return {
       metaAddress,
