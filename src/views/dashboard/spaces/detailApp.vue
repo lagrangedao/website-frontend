@@ -2,7 +2,7 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body flex-row" v-loading="listLoad">
-        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0">
+        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0 && listdata.space.status === 'Running'">
           <el-tabs>
             <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
               <template #label>
@@ -76,6 +76,11 @@
             <el-alert :closable="false" title="This Space is not running" type="warning" />
           </div>
         </div>
+        <div class="deployment" v-else>
+          <div>
+            <el-alert :closable="false" :title="listdata.space.status" type="error" />
+          </div>
+        </div>
       </el-row>
     </div>
   </section>
@@ -141,21 +146,26 @@ export default defineComponent({
 
     async function jobList (list) {
       let arr = list || []
+      let arrJob = []
       for (let j = 0; j < arr.length; j++) {
-        try {
-          if (arr[j].job_result_uri) {
-            const response = await fetch(arr[j].job_result_uri)
-            const textUri = await new Promise(async resolve => {
-              resolve(response.text())
-            })
-            arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
-          } else arr[j].job_result_uri = ''
-        } catch (err) {
-          console.log('err', err)
-          arr[j].job_result_uri = ''
+        // 如果status为running才显示
+        if (arr[j] && arr[j].status === "Running") {
+          try {
+            if (arr[j].job_result_uri) {
+              const response = await fetch(arr[j].job_result_uri)
+              const textUri = await new Promise(async resolve => {
+                resolve(response.text())
+              })
+              arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+            } else arr[j].job_result_uri = ''
+          } catch (err) {
+            console.log('err', err)
+            arr[j].job_result_uri = ''
+          }
+          arrJob.push(arr[j])
         }
       }
-      return arr
+      return arrJob
     }
 
     async function init (type) {

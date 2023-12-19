@@ -23,8 +23,8 @@
             </el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
-          <div class="status" v-if="parentValue">{{parentValue}}</div>
-          <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
+          <div class="status" :class="{'is-status': parentValue === 'Failed' || parentValue === 'Stopped'}" v-if="parentValue">{{parentValue}}</div>
+          <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours')) && parentValue !== 'Failed' && parentValue !== 'Stopped'">
             <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
               <el-icon>
                 <WarningFilled />
@@ -913,6 +913,14 @@ export default defineComponent({
           }
           @media screen and (max-width: 441px) {
             font-size: 12px;
+          }
+          &.is-status {
+            background-color: #ffecf2;
+            color: #f56c6c;
+            border: 1px solid #f56c6c;
+            &::after {
+              background-color: #f56c6c;
+            }
           }
           &::after {
             position: absolute;

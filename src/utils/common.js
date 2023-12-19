@@ -357,6 +357,7 @@ async function walletChain(chainId) {
         text
       ]
     })
+    signOutFun()
     // const [lStatus, signErr] = await login()
     // if (lStatus) getdataList()
   } catch (err) {
