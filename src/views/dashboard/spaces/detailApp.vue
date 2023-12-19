@@ -2,7 +2,7 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body flex-row" v-loading="listLoad">
-        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0">
+        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0  && listdata.space.status === 'Running'">
           <el-tabs>
             <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
               <template #label>
@@ -72,6 +72,11 @@
         <div class="deployment" v-else-if="listdata.space.status === 'Stopped'">
           <div>
             <el-alert :closable="false" title="This Space is not running" type="warning" />
+          </div>
+        </div>
+        <div class="deployment" v-else>
+          <div>
+            <el-alert :closable="false" :title="listdata.space.status" type="error" />
           </div>
         </div>
       </el-row>
