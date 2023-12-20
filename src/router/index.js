@@ -42,6 +42,8 @@ const pricing = () =>
     import ("@/views/dashboard/pricing/index");
 const Infrastructure = () =>
     import ("@/views/dashboard/Infrastructure/index");
+const services = () =>
+    import ("@/views/dashboard/services/index");
 
 const routes = [{
         path: '/',
@@ -240,6 +242,15 @@ const routes = [{
                 }
             },
         ]
+    },
+    {
+        path: '/services',
+        name: 'services',
+        component: services,
+        meta: {
+            keepAlive: true,
+            title: ''
+        }
     },
     {
         path: '/:pathMatch(.*)*',

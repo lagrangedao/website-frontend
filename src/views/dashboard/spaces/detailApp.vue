@@ -2,7 +2,7 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body flex-row" v-loading="listLoad">
-        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0">
+        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0  && listdata.space.status === 'Running'">
           <el-tabs>
             <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
               <template #label>
@@ -14,7 +14,7 @@
                         <br/> {{ job.provider_status.online ? 'Online' : 'Offline' }}, {{ job.provider_status.status }}
                       </small>
                     </template>
-                    <div :class="{'span-cp': job.is_leading_job.toString() === 'true', 'cp-style flex-row': true}">
+                    <div :class="{'span-cp': job.is_leading_job && job.is_leading_job.toString() === 'true', 'cp-style flex-row': true}">
                       CP {{ j + 1 }}
 
                       <svg width="16" height="16" v-if="job.job_result_uri" @click="system.$commonFun.goLink(`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`)" t="1700718365282" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -72,6 +72,11 @@
         <div class="deployment" v-else-if="listdata.space.status === 'Stopped'">
           <div>
             <el-alert :closable="false" title="This Space is not running" type="warning" />
+          </div>
+        </div>
+        <div class="deployment" v-else>
+          <div>
+            <el-alert :closable="false" :title="listdata.space.status" type="error" />
           </div>
         </div>
       </el-row>
