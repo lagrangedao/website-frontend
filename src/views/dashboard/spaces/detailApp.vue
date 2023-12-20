@@ -443,7 +443,7 @@ export default defineComponent({
       }
 
       p {
-        padding-top: 0.3rem;
+        // padding-top: 0.3rem;
         line-height: 2;
         &.m {
           padding-top: 0;
@@ -532,7 +532,7 @@ export default defineComponent({
     }
 
     .space_iframe {
-      width: 100%;
+      width: calc(100% - 4px);
       min-height: 315px;
       overflow: auto;
       @media screen and (min-height: 500px) and (min-width: 769px) {
