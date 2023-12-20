@@ -193,6 +193,11 @@ a:focus {
     cursor: pointer;
 }
 
+.el-popper {
+    max-width: 300px;
+    word-break: break-word;
+}
+
 .landing {
     width: 17rem;
     max-width: 100%;

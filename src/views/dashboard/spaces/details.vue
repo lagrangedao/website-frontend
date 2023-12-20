@@ -23,7 +23,14 @@
             </el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
-          <div class="status" :class="{'is-status': parentValue === 'Failed' || parentValue === 'Stopped'}" v-if="parentValue">{{parentValue}}</div>
+          <div class="status" :class="{'is-status': parentValue === 'Failed' || parentValue === 'Stopped'}" v-if="parentValue">
+            <el-tooltip v-if="parentValue === 'Stopped'" placement="bottom" content="All deployments has been not available before the space expires.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Assigning to provider'" placement="bottom" content="The server is awaiting the CP to initiate the task.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Waiting for transaction'" placement="bottom" content="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Failed'" placement="bottom" content="All deployments has been not available before the space expires.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Expired'" placement="bottom" content="All deployments has expired.">{{parentValue}}</el-tooltip>
+            <span v-else>{{parentValue}}</span>
+          </div>
           <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours')) && parentValue !== 'Failed' && parentValue !== 'Stopped'">
             <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
               <el-icon>
@@ -478,13 +485,16 @@ export default defineComponent({
       let arr = list || []
       if (arr.length > 0) {
         for (let j = 0; j < arr.length; j++) {
-          let spaceCont = space || {}
-          logArr.push({
-            job: arr[j],
-            space: spaceCont,
-            buildLog: [],
-            containerLog: []
-          })
+          // 如果status为running才显示
+          if (arr[j] && arr[j].status === "Running") {
+            let spaceCont = space || {}
+            logArr.push({
+              job: arr[j],
+              space: spaceCont,
+              buildLog: [],
+              containerLog: []
+            })
+          }
         }
       }
       //  else if (space && space.jobs_status && space.jobs_status.length > 0) {
@@ -500,7 +510,7 @@ export default defineComponent({
       return logArr
     }
     const hardRedeploy = (dialog) => {
-      if (dialog) hardwareOperate('renew')
+      if (dialog) hardwareOperate('setting')
     }
     async function requestDetail () {
       var numReg = /^[0-9]*$/
@@ -1546,6 +1556,27 @@ export default defineComponent({
         }
         &:hover {
           color: #c37af9;
+        }
+      }
+    }
+    .log_app {
+      height: 100%;
+      padding: 0;
+      overflow-y: scroll;
+      .logBody {
+        h4 {
+          margin: 0.1rem 0;
+          text-transform: capitalize;
+        }
+        .box-card {
+          box-shadow: none;
+          background: transparent;
+          border: 0;
+          margin: 0.1rem 0;
+          white-space: nowrap;
+          color: #525252;
+          font-size: 14px;
+          overflow-y: auto;
         }
       }
     }

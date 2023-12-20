@@ -92,7 +92,7 @@
         </el-row>
       </div>
     </div>
-    <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" title="Confirm hardware update" :width="dialogWidth">
+    <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" :title="props.renewButton === 'renew'?'Confirm duration update':'Confirm hardware update'" :width="dialogWidth">
       <div v-loading="hardwareLoad">
         <div class="title-hard">The hardware of
           <span>{{ accessName || system.$commonFun.hiddAddress(metaAddress) }}/{{ route.params.name }}</span> will be switched to:
@@ -108,7 +108,7 @@
           <div>
             <div class="title_tip flex-row">
               <div class="flex-row">
-                Usage Time
+                {{props.renewButton === 'renew'? 'Usage Time': 'Extend Time'}}
               </div>
               <el-divider/>
             </div>
@@ -124,12 +124,12 @@
               <el-divider/>
             </div>
             <div class="time flex-row">
-              <el-select v-model="sleepSelect.regionValue" class="m-region" placeholder="Region">
+              <el-select v-model="sleepSelect.regionValue" :disabled="props.renewButton === 'renew'?true:false" class="m-region" placeholder="Region">
                 <el-option v-for="item in sleepSelect.regionOption" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </div>
           </div>
-          <div>
+          <div v-if="props.renewButton !== 'renew'">
             <div class="title_tip flex-row">
               <div class="flex-row">
                 Start time settings
@@ -171,7 +171,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button-group class="flex-row">
-            <el-button @click="hardwareFun" :disabled="hardwareLoad">Confirm new hardware</el-button>
+            <el-button @click="hardwareFun" :disabled="hardwareLoad">{{props.renewButton === 'renew'?'Renew':'Confirm new hardware'}}</el-button>
             <el-button @click="close" :disabled="hardwareLoad">Cancel</el-button>
           </el-button-group>
         </span>
@@ -368,9 +368,15 @@ export default defineComponent({
       fd.append('chain_id', getID)
       fd.append('region', sleepSelect.value.regionValue)
       fd.append('start_in', ruleForm.sleepTime * 60)
-      const urlRes = `${process.env.VUE_APP_BASEAPI}space/deployment`
-      const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
-      if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+      if (props.renewButton === 'renew') {
+        const urlRes = `${process.env.VUE_APP_BASEAPI}spaces/${props.listdata.uuid}/deployment/renew`
+        const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
+        if (hardhashRes && hardhashRes.status && hardhashRes.message) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+      } else {
+        const urlRes = `${process.env.VUE_APP_BASEAPI}space/deployment`
+        const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
+        if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+      }
     }
 
     function close () {
@@ -389,7 +395,8 @@ export default defineComponent({
       ruleForm.usageTime = 24
       sleepSelect.value = row
       sleepSelect.value.regionOption = await regionList(row.region)
-      sleepSelect.value.regionValue = row.region && row.region[0] ? "Global" : ''
+      if (props.renewButton === 'renew') sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
+      else sleepSelect.value.regionValue = row.region && row.region[0] ? "Global" : ''
       ruleForm.sleepTime = sleepSelect.value.hardware_type.toLowerCase() === 'gpu' ? '20' : '1'
       sleepVisible.value = true
     }

@@ -41,25 +41,34 @@
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
           <el-table :data="listdata.jobs_status" border style="width: 100%">
-            <el-table-column prop="node_id" label="CP Node ID">
+            <el-table-column prop="bidder_id" label="CP Node ID">
               <template #default="scope">
-                <div class=" flex-row">{{ system.$commonFun.hiddAddress(scope.row.node_id) }}
-                  <i class="icon icon_copy" @click="system.$commonFun.copyContent(scope.row.node_id, 'Copied')"></i>
+                <div class=" flex-row">{{ system.$commonFun.hiddAddress(scope.row.bidder_id) }}
+                  <i class="icon icon_copy" @click="system.$commonFun.copyContent(scope.row.bidder_id, 'Copied')"></i>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="status" label="Status" />
+            <!-- <el-table-column prop="status" label="Status" /> -->
             <el-table-column prop="job_textUri" label="Quick Look">
               <template #default="scope">
                 <a v-if="scope.row.job_textUri" :href="scope.row.job_textUri" target="_blank">{{scope.row.job_textUri}}</a>
                 <span v-else>-</span>
               </template>
             </el-table-column>
+            <el-table-column prop="build_log" label="Deploy Log" width="120" align="center">
+              <template #default="scope">
+                <div class="log_style" :class="{'is-disabled': !scope.row.build_log}" @click="logMethod(scope.row.build_log)">
+                  <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                  </svg>
+                </div>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
           <div>
-            <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
+            <p class="m">The server is awaiting the CP to initiate the task.</p>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">If your waiting time is prolonged, you might consider
               <el-button plain @click="hardRedeploy">Redeploy</el-button>
               <br /> The tokens you paid will be refunded shortly. You can view and request a refund in
@@ -68,21 +77,51 @@
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
           <div>
-            <el-alert :closable="false" title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting." type="warning" />
+            <p class="m">Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting.</p>
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Stopped'">
           <div>
-            <el-alert :closable="false" title="This Space is not running" type="warning" />
+            <p class="m">All deployments has been not available before the space expires.</p>
+            <p v-if="metaAddress && metaAddress === route.params.wallet_address">
+              The Remaining tokens will be refunded shortly. You can view and request a refund in
+              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
+              please
+              <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
           </div>
         </div>
-        <div class="deployment" v-else>
+        <div class="deployment" v-else-if="listdata.space.status === 'Failed'">
           <div>
-            <el-alert :closable="false" :title="listdata.space.status" type="error" />
+            <p class="m">All deployments has been not available before the space expires.</p>
+            <p v-if="metaAddress && metaAddress === route.params.wallet_address">
+              The Remaining tokens will be refunded shortly. You can view and request a refund in
+              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
+              please
+              <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
+          </div>
+        </div>
+        <div class="deployment" v-else-if="listdata.space.status === 'Expired'">
+          <div>
+            <p>
+              All deployments has expired
+              <span v-if="metaAddress && metaAddress === route.params.wallet_address">, You can
+                <el-button plain @click="hardRedeploy">Redeploy</el-button> it</span>.</p>
           </div>
         </div>
       </el-row>
     </div>
+
+    <el-drawer v-model="drawer" title="Logs" :direction="direction" :size="'70% '" :destroy-on-close="true" custom-class="drawer_style" :before-close="handleClose">
+      <template #default>
+        <div class="log_app">
+          <div class="logBody" v-loading="logsLoad">
+            <el-card class="box-card mianscroll">
+              <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
+            </el-card>
+          </div>
+        </div>
+      </template>
+    </el-drawer>
   </section>
 </template>
 <script>
@@ -102,7 +141,7 @@ import {
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  EditPen, Edit, CircleClose
+  EditPen, Edit, CloseBold
 } from '@element-plus/icons-vue'
 
 export default defineComponent({
@@ -110,7 +149,7 @@ export default defineComponent({
   components: {
     EditPen,
     Edit,
-    CircleClose
+    CloseBold
   },
   props: {
     urlChange: { type: String, default: 'app' },
@@ -136,6 +175,13 @@ export default defineComponent({
       code: -1000,
       reload: false
     })
+    const logsCont = reactive({
+      buildLog: [],
+      containerLog: []
+    })
+    const drawer = ref(false)
+    const direction = ref('btt')
+    const logsLoad = ref(false)
 
     function handleClick (tab, event) {
       router.push({
@@ -181,7 +227,7 @@ export default defineComponent({
           console.log('load')
           statusCode.code = code
           listdata.jobResult = await jobList(listRes.data.job)
-          if (listRes.data.space.status === 'Deploying' && listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
+          if (listRes.data.space.status === 'Deploying' && listRes.data.job) listdata.jobs_status = await jobStatusList(listRes.data.job)
           listdata.space = listRes.data.space
           // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
         }
@@ -199,8 +245,8 @@ export default defineComponent({
       let arr = list || []
       for (let j = 0; j < arr.length; j++) {
         try {
-          if (arr[j].result_uri) {
-            const response = await fetch(arr[j].result_uri)
+          if (arr[j].job_result_uri) {
+            const response = await fetch(arr[j].job_result_uri)
             const textUri = await new Promise(async (resolve, reject) => {
               resolve(response.text())
             })
@@ -218,6 +264,66 @@ export default defineComponent({
       context.emit('hardRedeploy', true)
     }
 
+    async function logMethod (row) {
+      if (!row) return
+      drawer.value = true
+      // logsLoad.value = true
+      WebSocketFun(row, 1)
+    }
+    const WebSocketFun = (url, index, n) => {
+      if (typeof (WebSocket) === "undefined") {
+        alert("Your browser does not support sockets")
+      } else {
+        try {
+          ws = new WebSocket(url)
+          ws.onopen = () => {
+            console.log("ws connection successful")
+          }
+          ws.onmessage = (event) => {
+            // console.log('ws data:', event.data)
+            if (event.data) {
+              if (event.data === 'ping' && ws) ws.send('pong')
+              else if (index === 1) logsCont.buildLog.push(event.data)
+              else if (index === 2) logsCont.containerLog.push(event.data)
+              nextTick(() => {
+                let scrollEl = document.querySelectorAll('.mianscroll')
+                scrollEl.forEach(async el => {
+                  await system.$commonFun.timeout(1000)
+                  el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+                })
+              })
+            }
+          }
+          ws.onerror = (err) => {
+            // console.log("Websocket connection error", err)
+            if (index === 1) logsCont.buildLog = ["Websocket connection error"]
+            else if (index === 2) logsCont.containerLog = ["Websocket connection error"]
+          }
+          ws.onclose = () => {
+            console.log("ws connection closed")
+          }
+        } catch (err) {
+          if (index === 1) logsCont.buildLog = [{ err }]
+          else if (index === 2) logsCont.containerLog = [{ err }]
+        }
+      }
+    }
+    function handleClose () {
+      drawer.value = false
+      logsCont.buildLog = []
+      logsCont.containerLog = []
+      websocketclose()
+    }
+    let ws = null
+    const websocketclose = async () => {
+      try {
+        if (ws) ws.close()
+        ws = null
+        console.log("closed")
+      } catch (err) {
+        ws = null
+      }
+    }
     onActivated(() => {
     })
     onMounted(() => {
@@ -234,9 +340,9 @@ export default defineComponent({
         init(1)
       }
     })
-    // watch(() => props.likesValue, () => {
-    //   init(1)
-    // })
+    watch(() => props.likesValue, () => {
+      init(1)
+    })
     return {
       metaAddress,
       lagLogin,
@@ -246,7 +352,9 @@ export default defineComponent({
       system,
       route,
       router,
-      init, handleClick, hardRedeploy
+      logsCont,
+      drawer, direction, logsLoad,
+      init, handleClick, hardRedeploy, logMethod, handleClose
     }
   }
 })
@@ -319,6 +427,13 @@ export default defineComponent({
               text-decoration: underline;
               color: inherit;
             }
+            .log_style {
+              cursor: pointer;
+              &.is-disabled {
+                cursor: no-drop;
+                opacity: 0.4;
+              }
+            }
           }
         }
       }
@@ -330,6 +445,9 @@ export default defineComponent({
       p {
         padding-top: 0.3rem;
         line-height: 2;
+        &.m {
+          padding-top: 0;
+        }
         .el-button {
           height: auto;
           padding: 5px 10px;
