@@ -13,7 +13,7 @@
             Space: &nbsp;
           </div>
           <b>{{route.params.name}}</b>
-          <!-- <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i> -->
+          <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
           <el-button-group class="ml-4">
             <el-button @click="likeMethod" v-if="likeOwner">
               <i class="icon icon_like"></i>
@@ -23,13 +23,20 @@
             </el-button>
             <el-button disabled>{{likeValue}}</el-button>
           </el-button-group>
-          <div class="status" :class="{'is-status': parentValue === 'Failed' || parentValue === 'Stopped'}" v-if="parentValue">
+          <div class="status" :class="{'is-status': parentValue === 'Failed' || parentValue === 'Stopped', 'animate-spin-slow': parentValue === 'Running'}" v-if="parentValue">
+            <svg v-if="parentValue === 'Running'" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 15 15">
+              <path d="M7.48877 6.75C7.29015 6.75 7.09967 6.82902 6.95923 6.96967C6.81879 7.11032 6.73989 7.30109 6.73989 7.5C6.73989 7.69891 6.81879 7.88968 6.95923 8.03033C7.09967 8.17098 7.29015 8.25 7.48877 8.25C7.68738 8.25 7.87786 8.17098 8.0183 8.03033C8.15874 7.88968 8.23764 7.69891 8.23764 7.5C8.23764 7.30109 8.15874 7.11032 8.0183 6.96967C7.87786 6.82902 7.68738 6.75 7.48877 6.75ZM7.8632 0C11.2331 0 11.3155 2.6775 9.54818 3.5625C8.80679 3.93 8.47728 4.7175 8.335 5.415C8.69446 5.565 9.00899 5.7975 9.24863 6.0975C12.0195 4.5975 15 5.19 15 7.875C15 11.25 12.3265 11.325 11.4428 9.5475C11.0684 8.805 10.2746 8.475 9.57813 8.3325C9.42836 8.6925 9.19621 9 8.89665 9.255C10.3869 12.0225 9.79531 15 7.11433 15C3.74438 15 3.67698 12.315 5.44433 11.43C6.17823 11.0625 6.50774 10.2825 6.65751 9.5925C6.29056 9.4425 5.96855 9.2025 5.72891 8.9025C2.96555 10.3875 0 9.8025 0 7.125C0 3.75 2.666 3.6675 3.54967 5.445C3.92411 6.1875 4.71043 6.51 5.40689 6.6525C5.54918 6.2925 5.78882 5.9775 6.09586 5.7375C4.60559 2.97 5.1972 0 7.8632 0Z"
+                fill="currentColor"></path>
+            </svg>
             <el-tooltip v-if="parentValue === 'Stopped'" placement="bottom" content="All deployments has been not available before the space expires.">{{parentValue}}</el-tooltip>
             <el-tooltip v-else-if="parentValue === 'Assigning to provider'" placement="bottom" content="The server is awaiting the CP to initiate the task.">{{parentValue}}</el-tooltip>
             <el-tooltip v-else-if="parentValue === 'Waiting for transaction'" placement="bottom" content="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting.">{{parentValue}}</el-tooltip>
             <el-tooltip v-else-if="parentValue === 'Failed'" placement="bottom" content="All deployments has been not available before the space expires.">{{parentValue}}</el-tooltip>
             <el-tooltip v-else-if="parentValue === 'Expired'" placement="bottom" content="All deployments has expired.">{{parentValue}}</el-tooltip>
             <span v-else>{{parentValue}}</span>
+            <span v-if="parentValue === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config && allData.space.activeOrder.config.hardware_type && allData.space.activeOrder.config.hardware_type === 'GPU'">&nbsp;on
+              <strong style="text-transform: uppercase;">{{allData.space.activeOrder.config.hardware}}</strong>
+            </span>
           </div>
           <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours')) && parentValue !== 'Failed' && parentValue !== 'Stopped'">
             <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
@@ -352,22 +359,6 @@
         </el-tabs>
       </template>
     </el-drawer>
-
-    <div class="note" v-if="noteShow && !forkLoad && !dialogCont.spaceHardDia && !(allData.files.length>0 && allData.space.status !== allData.paymentStatus)">
-      <div class="close flex-row" @click="noteShow=false">
-        <el-icon>
-          <Close />
-        </el-icon>
-      </div>
-      <div class="box">
-        <div class="title">Space 101</div>
-        <ul>
-          <li :class="{'strikeout': allData.files.length>0}">Upload runnable file</li>
-          <li :class="{'strikeout': allData.space.status !== allData.paymentStatus}">Choose the hardware you want</li>
-          <li>Done!</li>
-        </ul>
-      </div>
-    </div>
 
     <el-dialog v-model="dialogCont.spaceHardFork" title="" :width="diagWidth" :show-close="true" :close-on-click-modal="false">
       <space-hardware v-if="dialogCont.spaceHardFork" @handleHard="handleHard" :listdata="allData.space" :renewButton="renewButton"></space-hardware>
@@ -844,15 +835,15 @@ export default defineComponent({
           background-size: auto 100%;
         }
         .icon_copy {
-          width: 16px;
-          height: 16px;
+          width: 14px;
+          height: 14px;
           background: url(../../../assets/images/icons/icon_36.png) no-repeat
             left center;
           background-size: auto 100%;
           cursor: pointer;
           @media screen and (min-width: 1800px) {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
           }
           &:hover {
             opacity: 0.7;
@@ -923,6 +914,18 @@ export default defineComponent({
           }
           @media screen and (max-width: 441px) {
             font-size: 12px;
+          }
+          &.animate-spin-slow {
+            padding: 0.05rem 0.1rem;
+            svg {
+              width: 10px;
+              height: 10px;
+              margin-right: 0.05rem;
+              animation: spin-running 3s linear infinite;
+            }
+            &::after {
+              display: none;
+            }
           }
           &.is-status {
             background-color: #ffecf2;
@@ -1560,23 +1563,27 @@ export default defineComponent({
       }
     }
     .log_app {
-      height: 100%;
+      height: 320px;
       padding: 0;
-      overflow-y: scroll;
+      margin: 10px 0 0;
       .logBody {
         h4 {
           margin: 0.1rem 0;
           text-transform: capitalize;
         }
         .box-card {
-          box-shadow: none;
+          max-height: 320px;
+          margin: 0;
           background: transparent;
-          border: 0;
-          margin: 0.1rem 0;
-          white-space: nowrap;
-          color: #525252;
           font-size: 14px;
+          color: #525252;
+          // white-space: nowrap;
+          border: 0;
           overflow-y: auto;
+          box-shadow: none;
+          p {
+            word-break: break-word;
+          }
         }
       }
     }

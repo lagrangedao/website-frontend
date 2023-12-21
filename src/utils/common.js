@@ -30,7 +30,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
   } catch (err) {
     console.error(err, err.response)
     const time = await throttle()
-    if (time) messageTip('error', err.response ? err.response.statusText || err.response.data.msg || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.statusText || err.response.data.msg || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
     }
@@ -67,8 +67,7 @@ async function Init(callback) {
     window.open('https://metamask.io/download.html')
     alert("Consider installing MetaMask!");
   } else {
-    const ethereum = window.ethereum;
-    ethereum
+    providerInit
       .request({
         method: 'eth_requestAccounts'
       })
@@ -78,7 +77,7 @@ async function Init(callback) {
         }
         web3Init.eth.getAccounts().then(async webAccounts => {
             store.dispatch('setMetaAddress', webAccounts[0])
-            // const chainId = await ethereum.request({ method: 'eth_chainId' })
+            // const chainId = await providerInit.request({ method: 'eth_chainId' })
             // console.log(parseInt(chainId, 16))
             callback(webAccounts[0])
           })
@@ -104,7 +103,7 @@ async function Init(callback) {
 
 async function login() {
   if (!store.state.metaAddress || store.state.metaAddress === undefined) {
-    const accounts = await ethereum.request({
+    const accounts = await providerInit.request({
       method: 'eth_requestAccounts'
     })
     store.dispatch('setMetaAddress', accounts[0])
@@ -133,7 +132,7 @@ async function sign(nonce) {
   const buff = Buffer.from("Signing in to " + local + " at " + sortanow, 'utf-8')
   let signature = null
   let signErr = ''
-  await ethereum.request({
+  await providerInit.request({
     method: 'personal_sign',
     params: [buff.toString('hex'), store.state.metaAddress]
   }).then(sig => {
@@ -353,7 +352,7 @@ async function walletChain(chainId) {
       break
   }
   try {
-    await ethereum.request({
+    await providerInit.request({
       method: 'wallet_addEthereumChain',
       params: [
         text
@@ -368,7 +367,7 @@ async function walletChain(chainId) {
 }
 
 async function changeIDLogin(type) {
-  const chainId = await ethereum.request({
+  const chainId = await providerInit.request({
     method: 'eth_chainId'
   })
   const list = [80001]
@@ -503,13 +502,15 @@ function cmOptions(owner) {
 
 // const Web3 = require('web3');
 let web3Init
+const providerInit = window.ethereum && window.ethereum.providers ? window.ethereum.providers.find((provider) => provider.isMetaMask) : window.ethereum
+console.log(window.ethereum)
 if (typeof window.ethereum === 'undefined') {
   window.open('https://metamask.io/download.html')
   alert("Consider installing MetaMask!");
 } else {
   if (window.ethereum) {
-    web3 = new Web3(ethereum);
-    web3.setProvider(ethereum);
+    web3 = new Web3(providerInit);
+    web3.setProvider(providerInit);
   } else if (window.web3) {
     web3 = window.web3;
     console.log("Injected web3 detected.");
@@ -546,5 +547,6 @@ export default {
   strToHexCharCode,
   cmOptions,
   expireTimeFun,
-  gatewayGain
+  gatewayGain,
+  providerInit
 }

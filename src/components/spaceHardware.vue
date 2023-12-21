@@ -108,7 +108,7 @@
           <div>
             <div class="title_tip flex-row">
               <div class="flex-row">
-                {{props.renewButton === 'renew'? 'Usage Time': 'Extend Time'}}
+                {{props.renewButton === 'renew'? 'Extend Time' : 'Usage Time'}}
               </div>
               <el-divider/>
             </div>
@@ -209,12 +209,8 @@ export default defineComponent({
     const router = useRouter()
     const ruleForm = reactive({
       usageTime: 24,
-      sleepTime: '1',
+      sleepTime: '5',
       sleepTimeOption: [
-        {
-          value: "1",
-          label: "1 minute",
-        },
         {
           value: '5',
           label: "5 minutes",
@@ -397,7 +393,7 @@ export default defineComponent({
       sleepSelect.value.regionOption = await regionList(row.region)
       if (props.renewButton === 'renew') sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
       else sleepSelect.value.regionValue = row.region && row.region[0] ? "Global" : ''
-      ruleForm.sleepTime = sleepSelect.value.hardware_type.toLowerCase() === 'gpu' ? '20' : '1'
+      ruleForm.sleepTime = sleepSelect.value.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
       sleepVisible.value = true
     }
 

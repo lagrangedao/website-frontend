@@ -36,7 +36,6 @@
   </section>
 </template>
 <script>
-const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -138,7 +137,7 @@ export default defineComponent({
       })
     }
     async function signIn () {
-      const chainId = await ethereum.request({ method: 'eth_chainId' })
+      const chainId = await system.$commonFun.providerInit.request({ method: 'eth_chainId' })
       const [lStatus, signErr] = await system.$commonFun.login()
       if (lStatus) {
         loading.value = false
@@ -152,7 +151,7 @@ export default defineComponent({
         prevType.value = !document.hidden
       })
       if (typeof window.ethereum === 'undefined') return
-      // ethereum.on('accountsChanged', function (account) {
+      // system.$commonFun.providerInit.on('accountsChanged', function (account) {
       //   // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
       //   if (!prevType.value) return false
       //   loading.value = true
@@ -163,12 +162,12 @@ export default defineComponent({
       //   window.location.reload()
       // })
       // networkChanged
-      ethereum.on('chainChanged', async function (accounts) {
+      system.$commonFun.providerInit.on('chainChanged', async function (accounts) {
         if (!prevType.value) return false
         isLogin()
       })
       // 监听metamask网络断开
-      ethereum.on('disconnect', (code, reason) => {
+      system.$commonFun.providerInit.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         loading.value = true
         // loadingText.value = system.$NetworkPrompt

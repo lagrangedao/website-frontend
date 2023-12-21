@@ -41,7 +41,7 @@
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
           <el-table :data="listdata.jobs_status" border style="width: 100%">
-            <el-table-column prop="bidder_id" label="CP Node ID">
+            <el-table-column prop="bidder_id" label="CP Node ID" min-width="140">
               <template #default="scope">
                 <div class=" flex-row">{{ system.$commonFun.hiddAddress(scope.row.bidder_id) }}
                   <i class="icon icon_copy" @click="system.$commonFun.copyContent(scope.row.bidder_id, 'Copied')"></i>
@@ -49,13 +49,13 @@
               </template>
             </el-table-column>
             <!-- <el-table-column prop="status" label="Status" /> -->
-            <el-table-column prop="job_textUri" label="Quick Look">
+            <el-table-column prop="job_textUri" label="Quick Look" min-width="140">
               <template #default="scope">
                 <a v-if="scope.row.job_textUri" :href="scope.row.job_textUri" target="_blank">{{scope.row.job_textUri}}</a>
                 <span v-else>-</span>
               </template>
             </el-table-column>
-            <el-table-column prop="build_log" label="Deploy Log" width="120" align="center">
+            <el-table-column prop="build_log" label="Deploy Log" min-width="120" align="center">
               <template #default="scope">
                 <div class="log_style" :class="{'is-disabled': !scope.row.build_log}" @click="logMethod(scope.row.build_log)">
                   <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
@@ -111,7 +111,7 @@
       </el-row>
     </div>
 
-    <el-drawer v-model="drawer" title="Logs" :direction="direction" :size="'70% '" :destroy-on-close="true" custom-class="drawer_style" :before-close="handleClose">
+    <el-drawer v-model="drawer" title="Logs" :direction="direction" :size="'370px'" :destroy-on-close="true" custom-class="drawer_style" :before-close="handleClose">
       <template #default>
         <div class="log_app">
           <div class="logBody" v-loading="logsLoad">

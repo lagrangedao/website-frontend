@@ -210,6 +210,24 @@ a:focus {
     text-align: left;
 }
 
+@-webkit-keyframes spin-running {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-running {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 @media screen and (max-width:1920px) {
     .landing {
         width: 21.5rem;
