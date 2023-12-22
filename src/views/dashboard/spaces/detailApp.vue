@@ -57,7 +57,7 @@
             </el-table-column>
             <el-table-column prop="build_log" label="Deploy Log" min-width="120" align="center">
               <template #default="scope">
-                <div class="log_style" :class="{'is-disabled': !scope.row.build_log}" @click="logMethod(scope.row.build_log)">
+                <div class="log_style" :class="{'is-disabled': !scope.row.build_log}" @click="logMethod(scope.row)">
                   <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                     <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
                   </svg>
@@ -77,7 +77,7 @@
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
           <div>
-            <p class="m">Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting.</p>
+            <p class="m">Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. </p>
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Stopped'">
@@ -111,12 +111,30 @@
       </el-row>
     </div>
 
-    <el-drawer v-model="drawer" title="Logs" :direction="direction" :size="'370px'" :destroy-on-close="true" custom-class="drawer_style" :before-close="handleClose">
+    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'370px'" :destroy-on-close="true" custom-class="drawer_style" :before-close="handleClose">
       <template #default>
         <div class="log_app">
           <div class="logBody" v-loading="logsLoad">
-            <el-card class="box-card mianscroll">
+            <div class="flex-row log-title">
+              <div class="close flex-row" @click="drawer=false">
+                <el-icon>
+                  <CloseBold />
+                </el-icon>
+              </div>
+              <div class="flex-row log">
+                <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="16px" height="16px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                  <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                </svg>
+                <p class="text-base font-semibold">Logs</p>
+              </div>
+              <h4 class="font-16 weight-6" :class="{'is-active': logsType === 'build'}" @click="logsMethod(1, 'build')">build</h4>
+              <h4 class="font-16 weight-6" :class="{'is-active': logsType !== 'build'}" @click="logsMethod(2, 'container')">container</h4>
+            </div>
+            <el-card class="box-card mianscroll font-14" v-show="logsType === 'build'">
               <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
+            </el-card>
+            <el-card class="box-card mianscroll font-14" v-show="logsType !== 'build'">
+              <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
             </el-card>
           </div>
         </div>
@@ -177,11 +195,13 @@ export default defineComponent({
     })
     const logsCont = reactive({
       buildLog: [],
-      containerLog: []
+      containerLog: [],
+      wsUrl: {}
     })
     const drawer = ref(false)
     const direction = ref('btt')
     const logsLoad = ref(false)
+    const logsType = ref('build')
 
     function handleClick (tab, event) {
       router.push({
@@ -264,11 +284,24 @@ export default defineComponent({
       context.emit('hardRedeploy', true)
     }
 
+    async function logsMethod (type, name) {
+      logsType.value = name
+      await websocketclose()
+      if (type === 1) {
+        logsCont.buildLog = []
+        if (logsCont.wsUrl && logsCont.wsUrl.build_log) await WebSocketFun(logsCont.wsUrl.build_log, 1)
+      } else {
+        logsCont.containerLog = []
+        if (logsCont.wsUrl && logsCont.wsUrl.container_log) await WebSocketFun(logsCont.wsUrl.container_log, 2)
+      }
+    }
     async function logMethod (row) {
       if (!row) return
       drawer.value = true
+      logsType.value = 'build'
+      logsCont.wsUrl = row
       // logsLoad.value = true
-      WebSocketFun(row, 1)
+      WebSocketFun(logsCont.wsUrl.build_log, 1)
     }
     const WebSocketFun = (url, index, n) => {
       if (typeof (WebSocket) === "undefined") {
@@ -312,6 +345,7 @@ export default defineComponent({
       drawer.value = false
       logsCont.buildLog = []
       logsCont.containerLog = []
+      logsCont.wsUrl = {}
       websocketclose()
     }
     let ws = null
@@ -353,8 +387,8 @@ export default defineComponent({
       route,
       router,
       logsCont,
-      drawer, direction, logsLoad,
-      init, handleClick, hardRedeploy, logMethod, handleClose
+      drawer, direction, logsLoad, logsType,
+      init, handleClick, hardRedeploy, logMethod, handleClose, logsMethod
     }
   }
 })

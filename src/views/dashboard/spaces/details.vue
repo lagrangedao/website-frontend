@@ -28,11 +28,14 @@
               <path d="M7.48877 6.75C7.29015 6.75 7.09967 6.82902 6.95923 6.96967C6.81879 7.11032 6.73989 7.30109 6.73989 7.5C6.73989 7.69891 6.81879 7.88968 6.95923 8.03033C7.09967 8.17098 7.29015 8.25 7.48877 8.25C7.68738 8.25 7.87786 8.17098 8.0183 8.03033C8.15874 7.88968 8.23764 7.69891 8.23764 7.5C8.23764 7.30109 8.15874 7.11032 8.0183 6.96967C7.87786 6.82902 7.68738 6.75 7.48877 6.75ZM7.8632 0C11.2331 0 11.3155 2.6775 9.54818 3.5625C8.80679 3.93 8.47728 4.7175 8.335 5.415C8.69446 5.565 9.00899 5.7975 9.24863 6.0975C12.0195 4.5975 15 5.19 15 7.875C15 11.25 12.3265 11.325 11.4428 9.5475C11.0684 8.805 10.2746 8.475 9.57813 8.3325C9.42836 8.6925 9.19621 9 8.89665 9.255C10.3869 12.0225 9.79531 15 7.11433 15C3.74438 15 3.67698 12.315 5.44433 11.43C6.17823 11.0625 6.50774 10.2825 6.65751 9.5925C6.29056 9.4425 5.96855 9.2025 5.72891 8.9025C2.96555 10.3875 0 9.8025 0 7.125C0 3.75 2.666 3.6675 3.54967 5.445C3.92411 6.1875 4.71043 6.51 5.40689 6.6525C5.54918 6.2925 5.78882 5.9775 6.09586 5.7375C4.60559 2.97 5.1972 0 7.8632 0Z"
                 fill="currentColor"></path>
             </svg>
-            <el-tooltip v-if="parentValue === 'Stopped'" placement="bottom" content="All deployments has been not available before the space expires.">{{parentValue}}</el-tooltip>
-            <el-tooltip v-else-if="parentValue === 'Assigning to provider'" placement="bottom" content="The server is awaiting the CP to initiate the task.">{{parentValue}}</el-tooltip>
-            <el-tooltip v-else-if="parentValue === 'Waiting for transaction'" placement="bottom" content="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting.">{{parentValue}}</el-tooltip>
-            <el-tooltip v-else-if="parentValue === 'Failed'" placement="bottom" content="All deployments has been not available before the space expires.">{{parentValue}}</el-tooltip>
-            <el-tooltip v-else-if="parentValue === 'Expired'" placement="bottom" content="All deployments has expired.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-if="parentValue === 'Stopped'" placement="bottom" content="The deployment has ceased before its scheduled expiration due to unforeseen reasons.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Assigning to provider'" placement="bottom" content="Matching the Space with a computing provider.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Waiting for transaction'" placement="bottom" content="Awaiting payment confirmation.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Failed'" placement="bottom" content="The deployment has encountered an error.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Expired'" placement="bottom" content="The deployment has concluded upon reaching its expiration date.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Created'" placement="bottom" content="The Space has been successfully created.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Deploying'" placement="bottom" content="The Space is currently being deployed to the provider.">{{parentValue}}</el-tooltip>
+            <el-tooltip v-else-if="parentValue === 'Running'" placement="bottom" content="The Space has been successfully deployed.">{{parentValue}}</el-tooltip>
             <span v-else>{{parentValue}}</span>
             <span v-if="parentValue === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config && allData.space.activeOrder.config.hardware_type && allData.space.activeOrder.config.hardware_type === 'GPU'">&nbsp;on
               <strong style="text-transform: uppercase;">{{allData.space.activeOrder.config.hardware}}</strong>
@@ -51,94 +54,104 @@
                   </el-icon>
                   &nbsp;Expired</el-button>
           </el-button-group>
-          <div :class="{'logs_style flex-row': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" @click="reqNFT" v-if="metaAddress && metaAddress !== route.params.wallet_address">
-            <svg t="1687225756039" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2674" width="200" height="200">
-              <path d="M256 128c-70.58 0-128 57.42-128 128 0 47.274 25.78 88.614 64 110.782l0 354.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 366.782c38.22-22.168 64-63.508 64-110.782C384 185.42 326.58 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM256 320c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 320 256 320z"
-                p-id="2675" fill="#878c93"></path>
-              <path d="M830 720.068 830 409.978c0-67.974-20.98-122.004-62.36-160.588-44.222-41.236-108.628-60.776-191.64-58.212L576 64l-192 192 192 192 0-128c53 0 85.34 5.284 104.35 23.008 14.366 13.396 21.65 35.928 21.65 66.97l0 312.392c-37.124 22.434-62 63.178-62 109.628 0 70.58 57.42 128 128 128s128-57.42 128-128C896 783.902 869.324 741.938 830 720.068zM768 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S803.346 896 768 896z"
-                p-id="2676" fill="#878c93"></path>
-            </svg> Request License
-          </div>
           <div class="logs_style flex-row" @click="hardwareOperate('fork')" v-if="metaAddress && metaAddress !== route.params.wallet_address">
             <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
               <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
             </svg> Fork
           </div>
 
+          <div class="logs_style popDown flex-row" v-if="parentValue && (parentValue === 'Deploying' || parentValue === 'Running')">
+            <div class="share_style flex-row" @click="logDrawer('log')">
+              <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-right flex-row">
+          <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
+            <el-tab-pane name="app">
+              <template #label>
+                <span class="custom-tabs-label flex-row">
+                  <i class="icon icon_spaces"></i>
+                  <span>App</span>
+                </span>
+              </template>
+            </el-tab-pane>
+            <el-tab-pane name="card">
+              <template #label>
+                <span class="custom-tabs-label flex-row">
+                  <i class="icon icon_spaces"></i>
+                  <span>Space card</span>
+                </span>
+              </template>
+            </el-tab-pane>
+            <el-tab-pane name="files">
+              <template #label>
+                <span class="custom-tabs-label flex-row">
+                  <i class="icon"></i>
+                  <span>Files and versions</span>
+                </span>
+              </template>
+            </el-tab-pane>
+            <el-tab-pane name="community">
+              <template #label>
+                <span class="custom-tabs-label flex-row">
+                  <i class="icon"></i>
+                  <span>Community</span>
+                  <!-- <b>3</b> -->
+                </span>
+              </template>
+            </el-tab-pane>
+            <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
+              <template #label>
+                <span class="custom-tabs-label flex-row">
+                  <!-- <i class="icon icon_spaces"></i> -->
+                  <el-icon class="icon">
+                    <Setting />
+                  </el-icon>
+                  <span>Settings</span>
+                </span>
+              </template>
+            </el-tab-pane>
+          </el-tabs>
+
           <div class="logs_style popDown flex-row">
             <el-popover :width="190" trigger="click" popper-class="popper_style">
               <template #reference>
                 <div class="share_style flex-row">
-                  <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                    <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024" data-v-ea893728="">
+                    <path fill="currentColor" d="M176 416a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224"></path>
                   </svg>
                 </div>
               </template>
               <template #default>
                 <ul class="demo-rich-conent">
-                  <li class="flex-row" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))">
-                    <div class="m-width" @click="hardwareOperate('renew')">Renew</div>
-                  </li>
                   <li class="flex-row">
                     <div class="m-width" @click="logDrawer('detail')">
                       Space Detail
                     </div>
                   </li>
+                  <li :class="{'flex-row': true, 'is-disabled':parentValue !== 'Running' ||!((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))}" v-if="metaAddress && metaAddress === route.params.wallet_address">
+                    <div class="m-width">
+                      <el-tooltip v-if="parentValue !== 'Running' || !((expireTime.time <=5&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))" placement="bottom" content="The space expiration time can be renewed only when it is less than 24 hours">Renew</el-tooltip>
+                      <span v-else @click="hardwareOperate('renew')">Renew</span>
+                    </div>
+                  </li>
+                  <li :class="{'flex-row': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+                    <div class="m-width" @click="reqNFT">Request License</div>
+                  </li>
                   <li class="flex-row">
-                    <share-pop></share-pop>
+                    <div class="m-width" @click="shareTwitter">
+                      Share on Twitter
+                    </div>
                   </li>
                 </ul>
               </template>
             </el-popover>
           </div>
         </div>
-
-        <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
-          <el-tab-pane name="app">
-            <template #label>
-              <span class="custom-tabs-label flex-row">
-                <i class="icon icon_spaces"></i>
-                <span>App</span>
-              </span>
-            </template>
-          </el-tab-pane>
-          <el-tab-pane name="card">
-            <template #label>
-              <span class="custom-tabs-label flex-row">
-                <i class="icon icon_spaces"></i>
-                <span>Space card</span>
-              </span>
-            </template>
-          </el-tab-pane>
-          <el-tab-pane name="files">
-            <template #label>
-              <span class="custom-tabs-label flex-row">
-                <i class="icon"></i>
-                <span>Files and versions</span>
-              </span>
-            </template>
-          </el-tab-pane>
-          <el-tab-pane name="community">
-            <template #label>
-              <span class="custom-tabs-label flex-row">
-                <i class="icon"></i>
-                <span>Community</span>
-                <!-- <b>3</b> -->
-              </span>
-            </template>
-          </el-tab-pane>
-          <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
-            <template #label>
-              <span class="custom-tabs-label flex-row">
-                <!-- <i class="icon icon_spaces"></i> -->
-                <el-icon class="icon">
-                  <Setting />
-                </el-icon>
-                <span>Settings</span>
-              </span>
-            </template>
-          </el-tab-pane>
-        </el-tabs>
       </div>
 
       <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
@@ -155,8 +168,8 @@
             <CloseBold />
           </el-icon>
         </div>
-        <el-tabs v-model="drawerName" @tab-click="drawerClick" class="demo-tabs" v-if="drawerType === 'detail'">
-          <el-tab-pane label="Overview" name="Overview">
+        <el-tabs v-model="drawerName" @tab-click="drawerClick" class="demo-tabs">
+          <el-tab-pane label="Overview" name="Overview" v-if="drawerType === 'detail'">
             <div class="el-steps el-steps--simple">
               <div class="el-step is-simple is-flex">
                 <div class="el-step__head" :class="{'is-success': allData.files.length>0, 'is-wait':allData.files.length === 0}">
@@ -290,55 +303,75 @@
           <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data" :key="j" :name="j.toString()">
             <template #label>
               <span class="custom-tabs-label flex-row">
-                <span :class="{'span-cp': dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
               </span>
             </template>
-            <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
-              <el-col :span="24">
-                <el-alert v-if="!dataJob.job.job_result_uri" :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
-                <el-descriptions title="CP Status:" direction="vertical" :column="bodyWidth" border>
-                  <el-descriptions-item label="CP Node ID">
-                    <p v-if="dataJob.job.bidder_id">
-                      {{system.$commonFun.hiddAddress(dataJob.job.bidder_id)}}
-                      <i class="icon icon_copy" @click="system.$commonFun.copyContent(dataJob.job.bidder_id, 'Copied')"></i>
-                    </p>
-                    <p v-else>Waiting for CP finish deployment</p>
-                  </el-descriptions-item>
-                  <el-descriptions-item label="Provider status" v-if="dataJob.job.provider_status">
-                    {{dataJob.job.provider_status.status}}, {{dataJob.job.provider_status.online ? 'Online' : 'Offline'}}
-                  </el-descriptions-item>
-                  <el-descriptions-item label="Name" v-if="dataJob.job.provider_status">
-                    {{dataJob.job.provider_status.name}}
-                  </el-descriptions-item>
-                  <el-descriptions-item label="Score" v-if="dataJob.job.provider_status">
-                    {{dataJob.job.provider_status.score}}
-                  </el-descriptions-item>
-                  <el-descriptions-item label="Multi address" v-if="dataJob.job.provider_status">
-                    {{dataJob.job.provider_status.multi_address}}
-                  </el-descriptions-item>
-                </el-descriptions>
-              </el-col>
-            </el-row>
-            <div class="logBody">
-              <json-viewer :value="dataJob.job" :expand-depth=6 copyable boxed sort></json-viewer>
-            </div>
+            <div v-if="drawerType === 'detail'">
+              <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
+                <el-col :span="24">
+                  <el-alert v-if="!dataJob.job.job_result_uri" :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
+                  <el-descriptions title="CP Status:" direction="vertical" :column="bodyWidth" border>
+                    <el-descriptions-item label="CP Node ID">
+                      <p v-if="dataJob.job.bidder_id">
+                        {{system.$commonFun.hiddAddress(dataJob.job.bidder_id)}}
+                        <i class="icon icon_copy" @click="system.$commonFun.copyContent(dataJob.job.bidder_id, 'Copied')"></i>
+                      </p>
+                      <p v-else>Waiting for CP finish deployment</p>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Provider status" v-if="dataJob.job.provider_status">
+                      {{dataJob.job.provider_status.status}}, {{dataJob.job.provider_status.online ? 'Online' : 'Offline'}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Name" v-if="dataJob.job.provider_status">
+                      {{dataJob.job.provider_status.name}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Score" v-if="dataJob.job.provider_status">
+                      {{dataJob.job.provider_status.score}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Multi address" v-if="dataJob.job.provider_status">
+                      {{dataJob.job.provider_status.multi_address}}
+                    </el-descriptions-item>
+                  </el-descriptions>
+                </el-col>
+              </el-row>
+              <div class="logBody">
+                <json-viewer :value="dataJob.job" :expand-depth=6 copyable boxed sort></json-viewer>
+              </div>
 
-            <div :class="{'logs_style flex-row': true, 'is-disabled': parentValue === 'Created' || parentValue === 'Stopped' }">
-              <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
-              </svg> Logs
+              <!-- <div :class="{'logs_style flex-row': true, 'is-disabled': parentValue === 'Created' || parentValue === 'Stopped' }">
+                <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                  <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                </svg> Logs
+              </div>
+              <div class="logBody" v-if="!(parentValue.value === 'Created' || parentValue.value === 'Stopped')">
+                <h4>build</h4>
+                <el-card class="box-card mianscroll">
+                  <p v-for="build in dataJob.buildLog" :key="build">{{build}}</p>
+                </el-card>
+                <h4>container</h4>
+                <el-card class="box-card mianscroll">
+                  <p v-for="container in dataJob.containerLog" :key="container">{{container}}</p>
+                </el-card>
+              </div>
+              <b v-else>Nothing To Show</b> -->
             </div>
-            <div class="logBody" v-if="!(parentValue.value === 'Created' || parentValue.value === 'Stopped')">
-              <h4>build</h4>
-              <el-card class="box-card mianscroll">
+            <div class="log-all" v-else-if="drawerType === 'log'">
+              <div class="flex-row log-title">
+                <div class="flex-row log">
+                  <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="16px" height="16px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                  </svg>
+                  <p class="text-base font-semibold">Logs</p>
+                </div>
+                <h4 class="font-16 weight-6" :class="{'is-active': logsType === 'build'}" @click="logsMethod(1, 'build', j)">build</h4>
+                <h4 class="font-16 weight-6" :class="{'is-active': logsType !== 'build'}" @click="logsMethod(2, 'container', j)">container</h4>
+              </div>
+              <el-card class="box-card mianscroll font-14" v-show="logsType === 'build'">
                 <p v-for="build in dataJob.buildLog" :key="build">{{build}}</p>
               </el-card>
-              <h4>container</h4>
-              <el-card class="box-card mianscroll">
+              <el-card class="box-card mianscroll font-14" v-show="logsType !== 'build'">
                 <p v-for="container in dataJob.containerLog" :key="container">{{container}}</p>
               </el-card>
             </div>
-            <b v-else>Nothing To Show</b>
           </el-tab-pane>
           <el-tab-pane label="Build" name="Build" v-if="false">
             <div class="uploadBody">
@@ -449,6 +482,7 @@ export default defineComponent({
       spaceHardDia: false
     })
     const renewButton = ref('renew')
+    const logsType = ref('build')
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -669,12 +703,24 @@ export default defineComponent({
       const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
     }
+    async function logsMethod (type, name, index) {
+      logsType.value = name
+      await websocketclose()
+      if (type === 1) {
+        logsCont.data[index].buildLog = []
+        await WebSocketFun(logsCont.data[index].job.build_log, 1, index)
+      } else {
+        logsCont.data[index].containerLog = []
+        await WebSocketFun(logsCont.data[index].job.container_log, 2, index)
+      }
+    }
     const drawerClick = async (tab, event) => {
       await websocketclose()
       if (drawerName.value === 'Overview') return
       let n = Number(drawerName.value)
       logsCont.data[n].buildLog = []
       logsCont.data[n].containerLog = []
+      logsType.value = 'build'
       // 请求logsCont.data[n].space.result_uri地址，获取其中的build_log和container_log
       if (logsCont.data[n].job.job_result_uri && logsCont.data[n].job.job_result_uri !== 'null') {
         const response = await fetch(logsCont.data[n].job.job_result_uri)
@@ -683,10 +729,10 @@ export default defineComponent({
         })
         const logUri = textUri ? JSON.parse(textUri) : {}
         if (logUri.build_log) await WebSocketFun(logUri.build_log, 1, n)
-        if (logUri.container_log) await WebSocketFun(logUri.container_log, 2, n)
+        if (logUri.container_log && drawerName.value !== 'log') await WebSocketFun(logUri.container_log, 2, n)
       } else if (logsCont.data[n].space.jobs_status) {
         await WebSocketFun(logsCont.data[n].space.jobs_status[n].build_log, 1, n)
-        await WebSocketFun(logsCont.data[n].space.jobs_status[n].container_log, 2, n)
+        if (drawerName.value !== 'log') await WebSocketFun(logsCont.data[n].space.jobs_status[n].container_log, 2, n)
       } else {
         logsCont.data[n].buildLog = []
         logsCont.data[n].containerLog = []
@@ -707,6 +753,38 @@ export default defineComponent({
       drawer.value = true
       drawerName.value = type === 'detail' ? 'Overview' : '0'
       if (type === 'log' && logsCont.data && logsCont.data.length > 0) drawerClick()
+    }
+
+    function shareTwitter () {
+      let typeName = 'Space'
+      let type = 'space'
+      let urlType = `spaces`
+      switch (route.name) {
+        case 'spaceDetail':
+          typeName = 'Space'
+          type = 'space'
+          urlType = `spaces`
+          break;
+        case 'modelsDetail':
+          typeName = 'Model'
+          type = 'model'
+          urlType = `models`
+          break;
+        case 'datasetDetail':
+          typeName = 'Dataset'
+          type = 'dataset'
+          urlType = `datasets`
+          break;
+      }
+      const text =
+        `Try out this ${type} on the Lagrange platform! ` +
+        '\n\n' +
+        `${typeName} Name: ${route.params.name} ` +
+        '\n' +
+        `${typeName} Link: ${process.env.VUE_APP_DOMAINLINK}/${urlType}/${route.params.wallet_address}/${route.params.name}/card` +
+        '\n\n' +
+        `#LagrangeDAO #DecentralizedComputing #Web3GitHub`
+      system.$commonFun.popupwindow(text);
     }
     onActivated(() => init())
     onBeforeUnmount(() => {
@@ -752,8 +830,9 @@ export default defineComponent({
       drawerType,
       dialogCont,
       renewButton,
+      logsType,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, handleValue, hardRedeploy,
-      handleCurrentChange, handleSizeChange, handleClick,
+      handleCurrentChange, handleSizeChange, handleClick, shareTwitter, logsMethod,
       hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
     }
   }
@@ -1083,9 +1162,27 @@ export default defineComponent({
         margin-right: 5px;
       }
     }
+    .space-right {
+      .logs_style {
+        position: relative;
+        padding: 0.05rem 0.05rem;
+        margin: 0.05rem 0 0;
+        background-color: linear-gradient(to bottom, #fff, #f3f4f6);
+        color: #878c93;
+        border: 1px solid rgba(229, 231, 235, 1);
+        border-radius: 0.05rem;
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+        &:hover {
+          box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+        }
+      }
+    }
     :deep(.demo-tabs) {
       display: block;
       flex-wrap: wrap;
+      height: 100%;
       margin: 0;
       @media screen and (max-width: 1260px) {
         width: 100%;
@@ -1420,6 +1517,44 @@ export default defineComponent({
             }
           }
         }
+        .log-all {
+          margin: 0;
+          .log-title {
+            .log {
+              p {
+                margin: 0 32px 0 6px;
+                font-size: 15px;
+                font-weight: 600;
+              }
+            }
+            h4 {
+              padding: 0.5px 6px;
+              margin: 0 12px 0 0;
+              font-size: 13px;
+              font-weight: 500;
+              text-transform: capitalize;
+              border-radius: 6px;
+              cursor: pointer;
+              &.is-active,
+              &:hover {
+                background-color: rgb(229, 231, 235);
+              }
+            }
+          }
+          .box-card {
+            max-height: 395px;
+            margin: 16px 0 0;
+            background-color: transparent;
+            white-space: nowrap;
+            overflow-y: auto;
+            box-shadow: none;
+            border: 0;
+            padding: 0;
+            .el-card__body {
+              padding: 0;
+            }
+          }
+        }
         .titleLog {
           margin: 0.2rem 0 0;
           font-size: 16px;
@@ -1562,8 +1697,13 @@ export default defineComponent({
         }
       }
     }
+    .drawer-header {
+      height: 40px;
+      padding: 0 20px;
+      line-height: 40px;
+    }
     .log_app {
-      height: 320px;
+      height: 360px;
       padding: 0;
       margin: 10px 0 0;
       .logBody {
@@ -1571,9 +1711,32 @@ export default defineComponent({
           margin: 0.1rem 0;
           text-transform: capitalize;
         }
+        .log-title {
+          padding: 0 20px;
+          .log {
+            p {
+              margin: 0 32px 0 6px;
+              font-size: 15px;
+              font-weight: 600;
+            }
+          }
+          h4 {
+            padding: 0.5px 6px;
+            margin: 0 12px 0 0;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: capitalize;
+            border-radius: 6px;
+            cursor: pointer;
+            &.is-active,
+            &:hover {
+              background-color: rgb(229, 231, 235);
+            }
+          }
+        }
         .box-card {
-          max-height: 320px;
-          margin: 0;
+          max-height: 315px;
+          margin: 20px 0 0;
           background: transparent;
           font-size: 14px;
           color: #525252;
@@ -1581,6 +1744,9 @@ export default defineComponent({
           border: 0;
           overflow-y: auto;
           box-shadow: none;
+          .el-card__body {
+            padding: 0 20px;
+          }
           p {
             word-break: break-word;
           }

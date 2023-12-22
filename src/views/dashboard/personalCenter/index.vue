@@ -115,7 +115,8 @@
           <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
             <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<9: true">
               <template #header>
-                <div class="card-warn flex-row" v-if="list.expiration_time !== null && ((list.expireTime <=5&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))">
+                <div class="card-warn flex-row" v-if="list.status === 'Running' && list.activeOrder && list.activeOrder.config && list.activeOrder.config.hardware_type">
+                  <!-- v-if="list.expiration_time !== null && ((list.expireTime <=5&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))"
                   <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime
               < 0.1 ? '3': list.expireTime} ${list.expireTimeUnit}, please click to the details page to renew`" popper-style="word-break: break-word; text-align: left;">
                     <template #reference>
@@ -123,7 +124,10 @@
                         <Warning />
                       </el-icon>
                     </template>
-                  </el-popover>
+                  </el-popover> -->
+                  <span class="run">Running on
+                    <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware_type === 'GPU' ? list.activeOrder.config.hardware : 'CPU'}}</strong>
+                  </span>
                 </div>
                 <div class="card-header flex-row">
                   <span>{{list.likes}}</span>
@@ -1310,7 +1314,7 @@ export default defineComponent({
               cursor: pointer;
               .card-warn {
                 position: absolute;
-                left: 0.33rem;
+                left: 0.15rem;
                 top: 0.1rem;
                 @media screen and (max-width: 768px) {
                   left: 0.2rem;
@@ -1323,10 +1327,14 @@ export default defineComponent({
                   font-size: 14px;
                   color: #e6a23c;
                 }
+                .run {
+                  font-size: 12px;
+                  line-height: 0.25rem;
+                }
               }
               .card-header {
                 position: absolute;
-                right: 0.33rem;
+                right: 0.15rem;
                 top: 0.1rem;
                 @media screen and (max-width: 768px) {
                   right: 0.2rem;

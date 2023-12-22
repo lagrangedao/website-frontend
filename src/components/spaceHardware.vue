@@ -94,8 +94,8 @@
     </div>
     <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" :title="props.renewButton === 'renew'?'Confirm duration update':'Confirm hardware update'" :width="dialogWidth">
       <div v-loading="hardwareLoad">
-        <div class="title-hard">The hardware of
-          <span>{{ accessName || system.$commonFun.hiddAddress(metaAddress) }}/{{ route.params.name }}</span> will be switched to:
+        <div class="title-hard">The {{props.renewButton === 'renew'?'current':''}} hardware of
+          <span>{{ accessName || system.$commonFun.hiddAddress(metaAddress) }}/{{ route.params.name }}</span> {{props.renewButton === 'renew'?'is':'will be switched to'}}:
         </div>
         <el-card class="box-card">
           <h5>{{ sleepSelect.hardware_name }}</h5>
