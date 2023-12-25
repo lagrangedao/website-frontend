@@ -43,7 +43,11 @@
               <el-card class="box-card" @click="detailFun(ls, l)">
                 <template #header>
                   <div class="card-header">
-                    <span class="left">{{ls.status}}</span>
+                    <span class="left">{{ls.status}}
+                      <a v-if="ls.status === 'Running'">on
+                        <strong style="text-transform: uppercase;">{{ls.activeOrder.config.hardware_type === 'GPU' ? ls.activeOrder.config.hardware : 'CPU'}}</strong>
+                      </a>
+                    </span>
                     <span class="right flex-row">{{ls.likes}}</span>
                     <span class="bottom" v-if="ls.activeOrder && ls.activeOrder.config">{{ls.activeOrder.config.description}}</span>
                   </div>
@@ -75,7 +79,11 @@
               <el-card class="box-card" @click="detailFun(list, l)">
                 <template #header>
                   <div class="card-header">
-                    <span class="left">{{list.status}}</span>
+                    <span class="left">{{list.status}}
+                      <a v-if="list.status === 'Running'">on
+                        <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware_type === 'GPU' ? list.activeOrder.config.hardware : 'CPU'}}</strong>
+                      </a>
+                    </span>
                     <span class="right flex-row">{{list.likes}}</span>
                     <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span>
                   </div>
@@ -505,6 +513,9 @@ export default defineComponent({
                     @media screen and (min-width: 1800px) {
                       font-size: 13px;
                     }
+                  }
+                  a {
+                    color: inherit;
                   }
                 }
               }

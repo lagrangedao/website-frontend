@@ -90,7 +90,7 @@
               <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Failed'">
+        <div class="deployment" v-else-if="listdata.space.status && listdata.space.status.toLowerCase() === 'failed'">
           <div>
             <p class="m">All deployments has been not available before the space expires.</p>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">
@@ -116,24 +116,28 @@
         <div class="log_app">
           <div class="logBody" v-loading="logsLoad">
             <div class="flex-row log-title">
-              <div class="close flex-row" @click="drawer=false">
-                <el-icon>
-                  <CloseBold />
-                </el-icon>
+              <div class="flex-row">
+                <div class="flex-row log">
+                  <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="16px" height="16px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                  </svg>
+                  <p class="text-base font-semibold">Logs</p>
+                </div>
+                <h4 class="font-16 weight-6" :class="{'is-active': logsType === 'build'}" @click="logsMethod(1, 'build')">build</h4>
+                <h4 class="font-16 weight-6" :class="{'is-active': logsType !== 'build'}" @click="logsMethod(2, 'container')">container</h4>
               </div>
-              <div class="flex-row log">
-                <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="16px" height="16px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                  <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
-                </svg>
-                <p class="text-base font-semibold">Logs</p>
+              <div class="flex-row clear">
+                <div class="close-btn flex-row" @click="drawer=false">
+                  <el-icon>
+                    <Close />
+                  </el-icon>
+                </div>
               </div>
-              <h4 class="font-16 weight-6" :class="{'is-active': logsType === 'build'}" @click="logsMethod(1, 'build')">build</h4>
-              <h4 class="font-16 weight-6" :class="{'is-active': logsType !== 'build'}" @click="logsMethod(2, 'container')">container</h4>
             </div>
             <el-card class="box-card mianscroll font-14" v-show="logsType === 'build'">
               <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
             </el-card>
-            <el-card class="box-card mianscroll font-14" v-show="logsType !== 'build'">
+            <el-card class="box-card mianscroll-container font-14" v-show="logsType !== 'build'">
               <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
             </el-card>
           </div>
@@ -159,7 +163,7 @@ import {
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  EditPen, Edit, CloseBold
+  EditPen, Edit, Close
 } from '@element-plus/icons-vue'
 
 export default defineComponent({
@@ -167,7 +171,7 @@ export default defineComponent({
   components: {
     EditPen,
     Edit,
-    CloseBold
+    Close
   },
   props: {
     urlChange: { type: String, default: 'app' },
@@ -215,7 +219,7 @@ export default defineComponent({
       let arrJob = []
       for (let j = 0; j < arr.length; j++) {
         // 如果status为running才显示
-        if (arr[j] && arr[j].status === "Running") {
+        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
           try {
             if (arr[j].job_result_uri) {
               const response = await fetch(arr[j].job_result_uri)
@@ -296,7 +300,7 @@ export default defineComponent({
       }
     }
     async function logMethod (row) {
-      if (!row) return
+      if (!row || !row.build_log) return
       drawer.value = true
       logsType.value = 'build'
       logsCont.wsUrl = row
@@ -321,8 +325,13 @@ export default defineComponent({
               nextTick(() => {
                 let scrollEl = document.querySelectorAll('.mianscroll')
                 scrollEl.forEach(async el => {
-                  await system.$commonFun.timeout(1000)
-                  el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+                  // await system.$commonFun.timeout(1000)
+                  el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
+                })
+                let scrollContainerEl = document.querySelectorAll('.mianscroll-container')
+                scrollContainerEl.forEach(async el => {
+                  // await system.$commonFun.timeout(1000)
+                  el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
                 })
               })
             }

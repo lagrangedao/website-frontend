@@ -113,7 +113,7 @@
               <el-divider/>
             </div>
             <div class="time flex-row">
-              <el-input-number v-model="ruleForm.usageTime" :min="24" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
           </div>
           <div>

@@ -30,7 +30,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
   } catch (err) {
     console.error(err, err.response)
     const time = await throttle()
-    if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.statusText || err.response.data.msg || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.status === 403 ? 'The Token has expired. Please log in again' : err.response.statusText || err.response.data.msg || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
     }
