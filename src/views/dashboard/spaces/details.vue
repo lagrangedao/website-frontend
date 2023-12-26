@@ -225,13 +225,13 @@
                   </div>
               </div>
           </el-tab-pane>
-          <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data" :key="j" :name="j.toString()">
+          <el-tab-pane v-for="(dataJob, j) in logsContAll.data" v-if="logsContAll.data && drawerType === 'detail'" :key="j" :name="j.toString()">
             <template #label>
               <span class="custom-tabs-label flex-row">
                 <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
               </span>
             </template>
-            <div class="over-view" v-if="drawerType === 'detail'">
+            <div class="over-view">
               <el-row class="logRow" :gutter="30" v-if="allData.space.activeOrder&&allData.space.activeOrder.config">
                 <el-col :span="24">
                   <el-alert v-if="!dataJob.job.job_result_uri" :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
@@ -279,16 +279,42 @@
               </div>
               <b v-else>Nothing To Show</b> -->
             </div>
-            <div class="log-all" v-else-if="drawerType === 'log'">
+          </el-tab-pane>
+          <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data && drawerType === 'log'" :key="j" :name="j.toString()">
+            <template #label>
+              <span class="custom-tabs-label flex-row">
+                <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+              </span>
+            </template>
+            <div class="log-all">
               <div class="flex-row log-title">
-                <div class="flex-row log">
-                  <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="16px" height="16px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                    <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
-                  </svg>
-                  <p class="text-base font-semibold">Logs</p>
+                <div class="flex-row">
+                  <div class="flex-row log">
+                    <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="16px" height="16px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                      <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                    </svg>
+                    <p class="text-base font-semibold">Logs</p>
+                  </div>
+                  <h4 class="font-16 weight-6" :class="{'is-active': logsType === 'build'}" @click="logsMethod(1, 'build', j)">build</h4>
+                  <h4 class="font-16 weight-6" :class="{'is-active': logsType !== 'build'}" @click="logsMethod(2, 'container', j)">container</h4>
                 </div>
-                <h4 class="font-16 weight-6" :class="{'is-active': logsType === 'build'}" @click="logsMethod(1, 'build', j)">build</h4>
-                <h4 class="font-16 weight-6" :class="{'is-active': logsType !== 'build'}" @click="logsMethod(2, 'container', j)">container</h4>
+                <div class="flex-row clear">
+                  <div class="close-btn flex-row">
+                    <el-checkbox v-model="checkedLock" label="Lock scroll" size="small" />
+                  </div>
+                  <div class="close-btn flex-row" @click="clearWebsocket(j)">
+                    <svg class="text-sm" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" viewBox="0 0 12 12">
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.25H8.25V3H1.5V2.25ZM1.5 4.5H8.25V5.25H1.5V4.5ZM1.5 6.75H6V7.5H1.5V6.75ZM8.60889 8.10352L7.75293 7.24756L8.2479 6.75258L9.10386 7.60854L9.95996 6.75244L10.4549 7.24742L9.59884 8.10352L10.455 8.95968L9.96003 9.45466L9.10386 8.59849L8.24784 9.45451L7.75286 8.95954L8.60889 8.10352Z"
+                        fill="currentColor"></path>
+                    </svg>
+                    &nbsp;Clear
+                  </div>
+                  <div class="close-btn flex-row" @click="upWebsocket(j)">
+                    <el-icon>
+                      <ArrowUp />
+                    </el-icon>
+                  </div>
+                </div>
               </div>
               <div class="box-card mianscroll font-14" v-show="logsType === 'build'">
                 <!-- <div class="mian"> -->
@@ -335,12 +361,12 @@ import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
 import sharePop from '@/components/share.vue'
 import spaceHardware from '@/components/spaceHardware.vue'
-import { defineComponent, computed, onMounted, onUnmounted, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
+import { defineComponent, computed, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import JsonViewer from 'vue-json-viewer'
 import {
-  Setting, ArrowLeft, WarningFilled, CloseBold, Close, Timer
+  Setting, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp
 } from '@element-plus/icons-vue'
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
@@ -353,7 +379,7 @@ export default defineComponent({
     detailSetting,
     spaceHardware,
     JsonViewer,
-    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer
+    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp
   },
   setup () {
     const store = useStore()
@@ -391,6 +417,10 @@ export default defineComponent({
       data: [],
       dataLog: []
     })
+    const logsContAll = reactive({
+      data: [],
+      dataLog: []
+    })
     const nft = reactive({
       contract_address: null,
       chain_id: null
@@ -411,6 +441,7 @@ export default defineComponent({
     })
     const renewButton = ref('renew')
     const logsType = ref('build')
+    const checkedLock = ref(false)
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -433,13 +464,20 @@ export default defineComponent({
       }
       return arr
     }
-    async function jobWSList (list, space) {
+    async function jobWSList (list, space, type) {
       let logArr = []
       let arr = list || []
       if (arr.length > 0) {
         for (let j = 0; j < arr.length; j++) {
-          // 如果status为running才显示
-          if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
+          if (type === 'log') {
+            let spaceCont = space || {}
+            logArr.push({
+              job: arr[j],
+              space: spaceCont,
+              buildLog: [],
+              containerLog: []
+            })
+          } else if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
             let spaceCont = space || {}
             logArr.push({
               job: arr[j],
@@ -477,7 +515,8 @@ export default defineComponent({
         const expireTimeCont = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
         expireTime.time = expireTimeCont.time
         expireTime.unit = expireTimeCont.unit
-        logsCont.data = await jobWSList(listRes.data.job, listRes.data.space)
+        logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
+        logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
       } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
     }
     async function requestNft () {
@@ -489,8 +528,8 @@ export default defineComponent({
       }
     }
     async function requestFiles () {
-      const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
-      if (listFilesRes && listFilesRes.status === 'success') allData.files = listFilesRes.data || []
+      // const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
+      // if (listFilesRes && listFilesRes.status === 'success') allData.files = listFilesRes.data || []
       forkLoad.value = false
     }
     async function requestAll (type) {
@@ -527,6 +566,7 @@ export default defineComponent({
       parentValue.value = ''
       expireTime.time = NaN
       logsCont.data = []
+      logsContAll.data = []
       window.scrollTo(0, 0)
       settingOneself.value = accessSpace.value.some(ele => ele === route.params.name)
       requestAll()
@@ -560,11 +600,12 @@ export default defineComponent({
               else if (index === 2) logsCont.data[n].containerLog.push(event.data)
               nextTick(() => {
                 let scrollEl = document.querySelectorAll('.mianscroll')
+                let scrollContainerEl = document.querySelectorAll('.mianscroll-container')
+                if (checkedLock.value) return
                 scrollEl.forEach(async el => {
                   // await system.$commonFun.timeout(1000)
                   el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
                 })
-                let scrollContainerEl = document.querySelectorAll('.mianscroll-container')
                 scrollContainerEl.forEach(async el => {
                   // await system.$commonFun.timeout(1000)
                   el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
@@ -671,6 +712,20 @@ export default defineComponent({
         logsCont.data[n].containerLog = []
       }
     }
+    function clearWebsocket (index) {
+      if (logsType.value === 'build') logsCont.data[index].buildLog = []
+      else logsCont.data[index].containerLog = []
+    }
+    function upWebsocket () {
+      const name = logsType.value === 'build' ? 'mianscroll' : 'mianscroll-container'
+      nextTick(() => {
+        checkedLock.value = true
+        let scrollEl = document.querySelectorAll('.' + name)
+        scrollEl.forEach(async el => {
+          el.scrollTo({ top: 0, behavior: 'instant' })
+        })
+      })
+    }
     function handleHard (val, refresh) {
       dialogCont.spaceHardDia = val
       dialogCont.spaceHardRenew = val
@@ -764,8 +819,9 @@ export default defineComponent({
       dialogCont,
       renewButton,
       logsType,
-      parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, handleValue, hardRedeploy,
-      handleCurrentChange, handleSizeChange, handleClick, shareTwitter, logsMethod,
+      checkedLock,
+      parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, logsContAll, handleValue, hardRedeploy,
+      handleCurrentChange, handleSizeChange, handleClick, shareTwitter, logsMethod, clearWebsocket, upWebsocket,
       hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
     }
   }
@@ -1314,6 +1370,10 @@ export default defineComponent({
     border: 1px solid rgb(229, 231, 235);
     border-radius: 6px;
     cursor: pointer;
+    line-height: 1.2;
+    &:hover {
+      background-color: rgba(229, 231, 235, 0.2);
+    }
     i,
     svg,
     path {
@@ -1477,6 +1537,11 @@ export default defineComponent({
             padding: 20px 0 20px 2%;
           }
           .log-title {
+            justify-content: space-between;
+            padding: 0 4% 0 0;
+            @media screen and (max-width: 768px) {
+              padding: 0 2% 0 0;
+            }
             .log {
               p {
                 margin: 0 32px 0 6px;
@@ -1495,6 +1560,28 @@ export default defineComponent({
               &.is-active,
               &:hover {
                 background-color: rgb(229, 231, 235);
+              }
+            }
+            .clear {
+              align-items: stretch;
+              font-size: 12px;
+              color: #000;
+              .close-btn {
+                padding: 5px 8px;
+                margin: 0 0 0 5px;
+              }
+              .el-checkbox {
+                display: flex;
+                height: auto;
+                .el-checkbox__inner {
+                  // background-color: #e5e7eb;
+                  border-color: #e5e7eb;
+                }
+                .el-checkbox__label {
+                  padding-left: 5px;
+                  line-height: 1.2;
+                  color: #000;
+                }
               }
             }
           }
@@ -1693,6 +1780,28 @@ export default defineComponent({
             &.is-active,
             &:hover {
               background-color: rgb(229, 231, 235);
+            }
+          }
+          .clear {
+            align-items: stretch;
+            font-size: 12px;
+            color: #000;
+            .close-btn {
+              padding: 5px 8px;
+              margin: 0 0 0 5px;
+            }
+            .el-checkbox {
+              display: flex;
+              height: auto;
+              .el-checkbox__inner {
+                // background-color: #e5e7eb;
+                border-color: #e5e7eb;
+              }
+              .el-checkbox__label {
+                padding-left: 5px;
+                line-height: 1.2;
+                color: #000;
+              }
             }
           }
         }

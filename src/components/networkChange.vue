@@ -30,7 +30,7 @@
   </div>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, nextTick, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 export default defineComponent({

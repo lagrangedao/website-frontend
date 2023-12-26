@@ -112,11 +112,12 @@
           </div>
         </div>
         <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
-          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list,sIndex) in listdata.spaces" :key="sIndex" @click="detailFun(list, 'space')">
-            <el-card class="box-card is-hover" v-show="!listdata.spacesIsShow ? sIndex<9: true">
-              <template #header>
-                <div class="card-warn flex-row" v-if="list.status === 'Running' && list.activeOrder && list.activeOrder.config && list.activeOrder.config.hardware_type">
-                  <!-- v-if="list.expiration_time !== null && ((list.expireTime <=3&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))"
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list,sIndex) in listdata.spaces" :key="sIndex">
+            <a :href="`/spaces/${list.wallet_address}/${list.name}/app`" v-show="!listdata.spacesIsShow ? sIndex<9: true">
+              <el-card class="box-card is-hover">
+                <template #header>
+                  <div class="card-warn flex-row" v-if="list.status === 'Running' && list.activeOrder && list.activeOrder.config && list.activeOrder.config.hardware_type">
+                    <!-- v-if="list.expiration_time !== null && ((list.expireTime <=3&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))"
                   <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime
               < 0.1 ? '3': list.expireTime} ${list.expireTimeUnit}, please click to the details page to renew`" popper-style="word-break: break-word; text-align: left;">
                     <template #reference>
@@ -125,16 +126,17 @@
                       </el-icon>
                     </template>
                   </el-popover> -->
-                  <span class="run">Running on
-                    <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware_type === 'GPU' ? list.activeOrder.config.hardware : 'CPU'}}</strong>
-                  </span>
-                </div>
-                <div class="card-header flex-row">
-                  <span>{{list.likes}}</span>
-                </div>
-                <h1>{{list.name}}</h1>
-              </template>
-            </el-card>
+                    <span class="run">Running on
+                      <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware_type === 'GPU' ? list.activeOrder.config.hardware : 'CPU'}}</strong>
+                    </span>
+                  </div>
+                  <div class="card-header flex-row">
+                    <span>{{list.likes}}</span>
+                  </div>
+                  <h1>{{list.name}}</h1>
+                </template>
+              </el-card>
+            </a>
           </el-col>
         </el-row>
         <div class="more_style flex-row" v-if="listdata.spaces.length>9">
@@ -158,36 +160,38 @@
           </el-select> -->
         </div>
         <el-row :gutter="32" :class="{'list_body':true,'list_flex':!listdata.datasetsIsShow}" v-loading="listLoad">
-          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l" @click="detailFun(list, 'dataset')">
-            <el-card class="box-card is-hover" v-show="!listdata.datasetsIsShow ? l<3: true">
-              <template #header>
-                <div class="card-header card-datasets flex-row">
-                  <div class="name flex-row">
-                    <!-- <div class="img"></div> -->
-                    <b>{{list.name}}</b>
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list, l) in listdata.datasets" :key="l">
+            <a :href="`/datasets/${list.wallet_address}/${list.name}/card`" v-show="!listdata.datasetsIsShow ? l<3: true">
+              <el-card class="box-card is-hover">
+                <template #header>
+                  <div class="card-header card-datasets flex-row">
+                    <div class="name flex-row">
+                      <!-- <div class="img"></div> -->
+                      <b>{{list.name}}</b>
+                    </div>
+                    <span>{{list.likes}}</span>
                   </div>
-                  <span>{{list.likes}}</span>
+                </template>
+                <div class="text flex-row">
+                  <i class="icon icon_text"></i>
+                  <p class="ellipsis">{{list.license}}</p>
                 </div>
-              </template>
-              <div class="text flex-row">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.license}}</p>
-              </div>
-              <div class="text flex-row">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
-              </div>
-              <div class="text item flex-row">
-                <div class="item_body flex-row">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
+                <div class="text flex-row">
+                  <i class="icon icon_wallet"></i>
+                  <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
                 </div>
-                <!-- <div class="item_body flex-row">
+                <div class="text item flex-row">
+                  <div class="item_body flex-row">
+                    <i class="icon icon_time"></i>
+                    <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
+                  </div>
+                  <!-- <div class="item_body flex-row">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
                 </div> -->
-              </div>
-            </el-card>
+                </div>
+              </el-card>
+            </a>
           </el-col>
         </el-row>
         <div class="more_style flex-row" v-if="listdata.datasets.length>3 || (bodyWidth&&listdata.datasets.length>1)">

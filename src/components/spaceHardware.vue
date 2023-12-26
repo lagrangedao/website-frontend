@@ -69,9 +69,9 @@
             <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
               <el-divider content-position="left">{{ item.label }}</el-divider>
               <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o">
-                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))) && props.listdata.status !== 'Stopped','is-disabled':ol.hardware_status !== 'available'}"
+                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))),'is-disabled':ol.hardware_status !== 'available'}"
                   @click="sleepChange(ol)">
-                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))) && props.listdata.status !== 'Stopped'">
+                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))">
                     <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
                       <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
                         fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
@@ -116,7 +116,7 @@
               <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
           </div>
-          <div>
+          <div v-if="props.renewButton !== 'renew'">
             <div class="title_tip flex-row">
               <div class="flex-row">
                 Region
@@ -180,7 +180,7 @@
   </div>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, nextTick, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
@@ -394,6 +394,7 @@ export default defineComponent({
       if (props.renewButton === 'renew') sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
       else sleepSelect.value.regionValue = row.region && row.region[0] ? "Global" : ''
       ruleForm.sleepTime = sleepSelect.value.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
+      if (props.renewButton === 'renew') hardwareLoad.value = false
       sleepVisible.value = true
     }
 
@@ -448,6 +449,23 @@ export default defineComponent({
     }
     async function init (params) {
       machinesLoad.value = true
+      if (props.renewButton === 'renew') {
+        if (props.listdata.activeOrder === null || props.listdata.activeOrder.config === null) return
+        ruleForm.usageTime = 24
+        sleepSelect.value = {
+          hardware_description: props.listdata.activeOrder.config.description,
+          hardware_id: props.listdata.activeOrder.config.hardware_id,
+          hardware_name: props.listdata.activeOrder.config.name,
+          hardware_price: props.listdata.activeOrder.config.price_per_hour,
+          hardware_status: "available",
+          hardware_type: props.listdata.activeOrder.config.hardware_type,
+          region: []
+        }
+        sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
+        ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
+        sleepVisible.value = true
+        return
+      }
       const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
       if (machinesRes && machinesRes.status === 'success') {
         if (props.renewButton === 'renew') {

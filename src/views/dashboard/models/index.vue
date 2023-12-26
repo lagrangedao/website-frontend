@@ -117,7 +117,6 @@
               <template #header>
                 <div class="card-header flex-row">
                   <div class="name flex-row">
-                    <!-- <img src="@/assets/images/dashboard/people.png" alt=""> -->
                     <b>{{list.name}}</b>
                   </div>
                   <span>27</span>

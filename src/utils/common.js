@@ -65,7 +65,7 @@ async function sortBoole(arr) {
 async function Init(callback) {
   if (typeof window.ethereum === 'undefined') {
     window.open('https://metamask.io/download.html')
-    alert("Consider installing MetaMask!");
+    // alert("Consider installing MetaMask!");
   } else {
     providerInit
       .request({
@@ -89,6 +89,9 @@ async function Init(callback) {
       .catch((error) => {
         store.dispatch('setNavLogin', false)
         store.dispatch('setLogin', false)
+        router.push({
+          name: 'spaces'
+        })
         if (error === "User rejected provider access") {} else {
           alert("Please unlock MetaMask and switch to the correct network.");
           return false
@@ -506,7 +509,7 @@ const providerInit = window.ethereum && window.ethereum.providers ? window.ether
 console.log(window.ethereum)
 if (typeof window.ethereum === 'undefined') {
   window.open('https://metamask.io/download.html')
-  alert("Consider installing MetaMask!");
+  // alert("Consider installing MetaMask!");
 } else {
   if (window.ethereum) {
     web3 = new Web3(providerInit);

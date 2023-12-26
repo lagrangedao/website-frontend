@@ -127,6 +127,21 @@
                 <h4 class="font-16 weight-6" :class="{'is-active': logsType !== 'build'}" @click="logsMethod(2, 'container')">container</h4>
               </div>
               <div class="flex-row clear">
+                <div class="close-btn flex-row">
+                  <el-checkbox v-model="checkedLock" label="Lock scroll" size="small" />
+                </div>
+                <div class="close-btn flex-row" @click="clearWebsocket()">
+                  <svg class="text-sm" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" viewBox="0 0 12 12">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.25H8.25V3H1.5V2.25ZM1.5 4.5H8.25V5.25H1.5V4.5ZM1.5 6.75H6V7.5H1.5V6.75ZM8.60889 8.10352L7.75293 7.24756L8.2479 6.75258L9.10386 7.60854L9.95996 6.75244L10.4549 7.24742L9.59884 8.10352L10.455 8.95968L9.96003 9.45466L9.10386 8.59849L8.24784 9.45451L7.75286 8.95954L8.60889 8.10352Z"
+                      fill="currentColor"></path>
+                  </svg>
+                  &nbsp;Clear
+                </div>
+                <div class="close-btn flex-row" @click="upWebsocket(j)">
+                  <el-icon>
+                    <ArrowUp />
+                  </el-icon>
+                </div>
                 <div class="close-btn flex-row" @click="drawer=false">
                   <el-icon>
                     <Close />
@@ -134,10 +149,10 @@
                 </div>
               </div>
             </div>
-            <el-card class="box-card mianscroll font-14" v-show="logsType === 'build'">
+            <el-card class="box-card deployscroll font-14" v-show="logsType === 'build'">
               <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
             </el-card>
-            <el-card class="box-card mianscroll-container font-14" v-show="logsType !== 'build'">
+            <el-card class="box-card deployscroll-container font-14" v-show="logsType !== 'build'">
               <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
             </el-card>
           </div>
@@ -163,7 +178,7 @@ import {
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  EditPen, Edit, Close
+  EditPen, Edit, Close, ArrowUp
 } from '@element-plus/icons-vue'
 
 export default defineComponent({
@@ -171,7 +186,8 @@ export default defineComponent({
   components: {
     EditPen,
     Edit,
-    Close
+    Close,
+    ArrowUp
   },
   props: {
     urlChange: { type: String, default: 'app' },
@@ -206,6 +222,7 @@ export default defineComponent({
     const direction = ref('btt')
     const logsLoad = ref(false)
     const logsType = ref('build')
+    const checkedLock = ref(false)
 
     function handleClick (tab, event) {
       router.push({
@@ -323,12 +340,13 @@ export default defineComponent({
               else if (index === 1) logsCont.buildLog.push(event.data)
               else if (index === 2) logsCont.containerLog.push(event.data)
               nextTick(() => {
-                let scrollEl = document.querySelectorAll('.mianscroll')
+                let scrollEl = document.querySelectorAll('.deployscroll')
+                let scrollContainerEl = document.querySelectorAll('.deployscroll-container')
+                if (checkedLock.value) return
                 scrollEl.forEach(async el => {
                   // await system.$commonFun.timeout(1000)
                   el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
                 })
-                let scrollContainerEl = document.querySelectorAll('.mianscroll-container')
                 scrollContainerEl.forEach(async el => {
                   // await system.$commonFun.timeout(1000)
                   el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
@@ -349,6 +367,20 @@ export default defineComponent({
           else if (index === 2) logsCont.containerLog = [{ err }]
         }
       }
+    }
+    function clearWebsocket (index) {
+      if (logsType.value === 'build') logsCont.buildLog = []
+      else logsCont.containerLog = []
+    }
+    function upWebsocket () {
+      const name = logsType.value === 'build' ? 'deployscroll' : 'deployscroll-container'
+      nextTick(() => {
+        checkedLock.value = true
+        let scrollEl = document.querySelectorAll('.' + name)
+        scrollEl.forEach(async el => {
+          el.scrollTo({ top: 0, behavior: 'instant' })
+        })
+      })
     }
     function handleClose () {
       drawer.value = false
@@ -396,7 +428,8 @@ export default defineComponent({
       route,
       router,
       logsCont,
-      drawer, direction, logsLoad, logsType,
+      checkedLock,
+      drawer, direction, logsLoad, logsType, clearWebsocket, upWebsocket,
       init, handleClick, hardRedeploy, logMethod, handleClose, logsMethod
     }
   }

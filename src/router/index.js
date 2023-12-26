@@ -142,7 +142,7 @@ const routes = [{
                     title: 'Settings - '
                 },
                 // beforeEnter: (to, from, next) => {
-                //   if (!sessionStorage.getItem('metaAddressLag')) {
+                //   if (!localStorage.getItem('metaAddressLag')) {
                 //     next({
                 //       path: '/dashboard',
                 //       query: { redirect: to.fullPath }

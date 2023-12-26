@@ -108,9 +108,6 @@
                 <template #header>
                   <div class="card-header flex-row">
                     <div class="name flex-row">
-                      <!-- <img v-if="l===0" src="@/assets/images/dashboard/people_01.png" alt="">
-                      <img v-else-if="l===1" src="@/assets/images/dashboard/people_02.png" alt="">
-                      <img v-else src="@/assets/images/dashboard/people_03.png" alt=""> -->
                       <b>{{list.name}}</b>
                     </div>
                     <span>27</span>

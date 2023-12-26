@@ -93,35 +93,37 @@
         </div>
         <el-row :gutter="32" class="list_body">
           <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="(list, l) in listdata" :key="l">
-            <el-card class="box-card" @click="detailFun(list, l)">
-              <template #header>
-                <div class="card-header flex-row">
-                  <div class="name flex-row">
-                    <!-- <div class="img"></div> -->
-                    <b>{{list.name}}</b>
+            <a :href="`/datasets/${list.wallet_address}/${list.name}/card`">
+              <el-card class="box-card">
+                <template #header>
+                  <div class="card-header flex-row">
+                    <div class="name flex-row">
+                      <!-- <div class="img"></div> -->
+                      <b>{{list.name}}</b>
+                    </div>
+                    <span>{{list.likes}}</span>
                   </div>
-                  <span>{{list.likes}}</span>
+                </template>
+                <div class="text flex-row">
+                  <i class="icon icon_text"></i>
+                  <p class="ellipsis">{{list.license}}</p>
                 </div>
-              </template>
-              <div class="text flex-row">
-                <i class="icon icon_text"></i>
-                <p class="ellipsis">{{list.license}}</p>
-              </div>
-              <div class="text flex-row">
-                <i class="icon icon_wallet"></i>
-                <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
-              </div>
-              <div class="text item flex-row">
-                <div class="item_body flex-row">
-                  <i class="icon icon_time"></i>
-                  <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
+                <div class="text flex-row">
+                  <i class="icon icon_wallet"></i>
+                  <p class="ellipsis">{{system.$commonFun.hiddAddress(list.wallet_address)}}</p>
                 </div>
-                <!-- <div class="item_body flex-row">
+                <div class="text item flex-row">
+                  <div class="item_body flex-row">
+                    <i class="icon icon_time"></i>
+                    <span class="small">{{system.$commonFun.momentFun(list.created_at)}}</span>
+                  </div>
+                  <!-- <div class="item_body flex-row">
                   <i class="icon icon_up"></i>
                   <span class="small">5.15M</span>
                 </div> -->
-              </div>
-            </el-card>
+                </div>
+              </el-card>
+            </a>
           </el-col>
           <p v-if="listdata && listdata.length === 0" class="list_nodata flex-row">No Data</p>
         </el-row>
