@@ -676,6 +676,7 @@ export default defineComponent({
       forkLoad.value = true
       const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
       if (getLikeRes) likeOwner.value = getLikeRes.data.liked
+      forkLoad.value = false
     }
     async function logsMethod (type, name, index) {
       logsType.value = name

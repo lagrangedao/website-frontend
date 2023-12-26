@@ -47,6 +47,30 @@
               </p>
             </div>
             <div class="fork-btn flex-row" v-if="props.renewButton === 'fork'">
+              <div class="fileList">
+                <el-form ref="ruleFormRef" :model="ruleForm" class="demo-ruleForm flex-row" status-icon>
+                  <el-form-item prop="" class="flex_left">
+                    <label class="label" for="owner">
+                      Owner *
+                      <div class="flex-row">
+                        <el-select v-model="metaAddress" placeholder="">
+                          <el-option :label="metaAddress" :value="metaAddress" />
+                        </el-select>
+                        <span class="text-2xl text-gray-400 self-end pb-2">/</span>
+                      </div>
+                    </label>
+                  </el-form-item>
+                  <el-form-item prop="name" class="flex_right">
+                    <label class="label" for="dataname">
+                      Repository name *
+                      <div class="flex-row">
+                        <el-input v-model="ruleForm.rename" placeholder="Space name" />
+                      </div>
+                    </label>
+                  </el-form-item>
+                </el-form>
+                <p class="p-5">By default, forks are named the same as their upstream space. You can customize the name to distinguish it further.</p>
+              </div>
               <el-button type="info" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
             </div>
           </el-col>
@@ -201,10 +225,11 @@ export default defineComponent({
   },
   setup (props, context) {
     const store = useStore()
+    const system = getCurrentInstance().appContext.config.globalProperties
     const metaAddress = computed(() => store.state.metaAddress)
+    const metaSmallAddress = system.$commonFun.hiddAddress(metaAddress.value)
     const accessName = computed(() => (store.state.accessName))
     const bodyWidth = ref(document.body.clientWidth < 992)
-    const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
     const ruleForm = reactive({
@@ -256,7 +281,8 @@ export default defineComponent({
         }
       ],
       pauseSpace: false,
-      displayPrice: false
+      displayPrice: false,
+      rename: ''
     })
     const hardwareOptions = ref([])
     const hardwareLoad = ref(false)
@@ -327,15 +353,31 @@ export default defineComponent({
       forkLoad.value = true
       const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/duplicate`, 'post', {})
       if (forkRes && forkRes.status === 'success') {
+        const rename = await renameMethod()
         system.$commonFun.messageTip('success', forkRes.message ? forkRes.message : 'Fork successfully!')
         if (type) context.emit('handleHard', false, false)
         router.push({
           name: 'spaceDetail',
-          params: { wallet_address: metaAddress.value, name: route.params.name, tabs: 'card' }
+          params: { wallet_address: metaAddress.value, name: rename ? ruleForm.rename : route.params.name, tabs: 'app' }
         })
       } else system.$commonFun.messageTip('error', forkRes.message ? forkRes.message : 'Fork failed!')
       forkLoad.value = false
       return forkRes.status
+    }
+
+    async function renameMethod () {
+      if (!ruleForm.rename) return false
+      try {
+        const formData = new FormData();
+        formData.append('name', route.params.name);
+        formData.append('is_public', '1'); // public:1, private:0
+        formData.append('new_name', ruleForm.rename);
+
+        const renameRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/update`, 'post', formData);
+        return true
+      } catch{
+        return false
+      }
     }
 
     async function networkEstimate () {
@@ -483,6 +525,7 @@ export default defineComponent({
 
     let getnetID = NaN
     onMounted(async () => {
+      ruleForm.rename = ''
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
       paymentEnv()
       init()
@@ -491,6 +534,7 @@ export default defineComponent({
       route,
       accessName,
       metaAddress,
+      metaSmallAddress,
       bodyWidth,
       system,
       props,
@@ -607,6 +651,15 @@ export default defineComponent({
         }
       }
 
+      .p-5 {
+        margin: 0 0 0.08rem;
+        font-size: 12px;
+        color: rgba(107, 114, 128, 1);
+        @media screen and (min-width: 1680px) {
+          font-size: 13px;
+        }
+      }
+
       .fork {
         position: absolute;
         bottom: 0;
@@ -624,7 +677,9 @@ export default defineComponent({
       }
 
       .hardware-left {
-        padding-bottom: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        padding-bottom: 0.1rem;
       }
 
       .sleep_style {
@@ -913,12 +968,11 @@ export default defineComponent({
     }
 
     .fork-btn {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      justify-content: flex-end;
-      padding: 0 0.2rem;
-
+      // position: absolute;
+      // bottom: 0;
+      // left: 0;
+      flex-wrap: wrap;
+      padding: 0;
       .el-button {
         span {
           cursor: inherit;
@@ -926,6 +980,81 @@ export default defineComponent({
 
         &:hover {
           text-decoration: underline;
+        }
+      }
+      .fileList {
+        .demo-ruleForm {
+          margin: 0;
+          .el-form-item {
+            margin-bottom: 6px;
+            @media screen and (max-width: 768px) {
+              width: 100% !important;
+            }
+            &.flex_left {
+              max-width: 120px;
+            }
+            .el-form-item__content {
+              width: 100%;
+              display: flex;
+              flex-wrap: wrap;
+              align-items: flex-start;
+              justify-content: flex-start;
+              .label {
+                width: 100%;
+                text-align: left;
+                font-size: 13px;
+                color: #666;
+                @media screen and (max-width: 768px) {
+                  font-size: 12px;
+                }
+                @media screen and (min-width: 1800px) {
+                  font-size: 14px;
+                }
+                .flex-row {
+                  width: 100%;
+                  .el-select {
+                    width: calc(100% - 20px);
+                    @media screen and (max-width: 768px) {
+                      width: 100%;
+                    }
+                  }
+                  .el-form {
+                    width: 100%;
+                  }
+                  .self-end {
+                    width: 20px;
+                    text-align: center;
+                    @media screen and (max-width: 768px) {
+                      display: none;
+                    }
+                  }
+                }
+              }
+              .el-input {
+                font-size: inherit;
+                .el-input__inner {
+                  height: auto;
+                  padding: 0.03rem 0.1rem;
+                  font-size: inherit;
+                }
+              }
+            }
+            .el-form-item__label {
+              display: none;
+            }
+            &.is-error {
+              .el-form-item__content {
+                .el-input {
+                  .el-input__inner {
+                    border-color: #c37af9;
+                  }
+                  .el-input__validateIcon {
+                    color: #c37af9;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
