@@ -11,7 +11,7 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import en from 'element-plus/es/locale/lang/en'
 // import Web3 from 'web3'
 import commonFun from '@/utils/common'
-import CryptoJS from 'crypto-js'
+// import CryptoJS from 'crypto-js'
 // codemirror-editor-vue3
 // language  
 // import "codemirror/mode/javascript/javascript.js";
@@ -48,7 +48,7 @@ const app = createApp(App)
 app.config.globalProperties.$commonFun = commonFun
 // app.config.globalProperties.$Web3 = Web3
 app.config.globalProperties.$NetworkPrompt = "Switch to Filecoin TestNet, Polygon Mainnet, BSC TestNet or Sepolia TestNet!"
-app.config.globalProperties.$CryptoJS = CryptoJS
+// app.config.globalProperties.$CryptoJS = CryptoJS
 app.use(ElementPlus, {
         locale: en,
     })

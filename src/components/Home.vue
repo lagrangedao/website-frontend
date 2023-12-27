@@ -24,7 +24,6 @@
 </template>
 
 <script>
-const ethereum = window.ethereum;
 import vHead from './Header.vue';
 import vFoot from './Footer.vue';
 import elementResizeDetectorMaker from "element-resize-detector"
@@ -58,7 +57,7 @@ export default defineComponent({
         prevType.value = !document.hidden
       })
       if (typeof window.ethereum === 'undefined') return
-      ethereum.on('accountsChanged', function (account) {
+      system.$commonFun.providerInit.on('accountsChanged', function (account) {
         // console.log('account header:', account[0], !(account[0]));  //Once the account is switched, it will be executed here
         if (!prevType.value) return false
         store.dispatch('setMetaAddress', '')
@@ -70,7 +69,7 @@ export default defineComponent({
         window.location.reload()
       })
       // 监听metamask网络断开
-      ethereum.on('disconnect', (code, reason) => {
+      system.$commonFun.providerInit.on('disconnect', (code, reason) => {
         // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
         system.$commonFun.signOutFun()
         // window.location.reload()
@@ -173,6 +172,10 @@ export default defineComponent({
       svg {
         margin-right: 0.08rem;
       }
+      &.is-disabled {
+        opacity: 0.5;
+        cursor: no-drop;
+      }
       &:nth-child(1) {
         border-top: 0;
       }
@@ -238,8 +241,8 @@ export default defineComponent({
   @media screen and (min-width: 1024px) {
     max-width: 1024px;
   }
-  @media screen and (min-width: 1280px) {
-    max-width: 1280px;
+  @media screen and (min-width: 1200px) {
+    max-width: 1200px;
   }
   @media screen and (min-width: 1536px) {
     max-width: 1536px;

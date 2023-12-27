@@ -252,7 +252,7 @@ export default defineComponent({
         const init = async () => {
             try {
                 if (ruleForm.hardware === '0') return false
-                const chainId = await ethereum.request({ method: 'eth_chainId' })
+                const chainId = await system.$commonFun.providerInit.request({ method: 'eth_chainId' })
                 if (parseInt(chainId, 16) !== 3141) {
                     await errFun('please switch to Filecoin TestNet.')
                     return false

@@ -18,16 +18,18 @@
           </b>
           <div class="to-white right"></div>
         </div>
-        <el-row justify="space-between" class="list_body" v-loading="listLoad">
+        <el-row justify="center" class="list_body" v-loading="listLoad">
           <el-col :xs="24" :sm="12" :md="7" :lg="7" :xl="7" v-for="ls in spaceLikesData" :key="ls">
-            <el-card class="box-card" @click="detailFun(ls, l)">
-              <template #header>
-                <div class="card-header">
-                  <span class="right flex-row">{{ls.likes}}</span>
-                </div>
-                <h1>{{ls.name}}</h1>
-              </template>
-            </el-card>
+            <a :href="`/spaces/${ls.wallet_address}/${ls.name}/app`">
+              <el-card class="box-card">
+                <template #header>
+                  <div class="card-header">
+                    <span class="right flex-row">{{ls.likes}}</span>
+                  </div>
+                  <h1>{{ls.name}}</h1>
+                </template>
+              </el-card>
+            </a>
           </el-col>
         </el-row>
       </div>

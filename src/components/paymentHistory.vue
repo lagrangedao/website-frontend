@@ -59,7 +59,6 @@
   </div>
 </template>
 <script>
-const ethereum = window.ethereum;
 import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
@@ -189,7 +188,7 @@ export default defineComponent({
         prevType.value = !document.hidden
       })
       if (typeof window.ethereum === 'undefined') return
-      ethereum.on('chainChanged', async function (accounts) {
+      system.$commonFun.providerInit.on('chainChanged', async function (accounts) {
         if (!prevType.value) return false
         console.log('payment')
         system.$commonFun.signOutFun()

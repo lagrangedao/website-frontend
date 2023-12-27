@@ -2,7 +2,7 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body flex-row" v-loading="listLoad">
-        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0">
+        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0 && listdata.space.status === 'Running'">
           <el-tabs>
             <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
               <template #label>
@@ -11,10 +11,12 @@
                     <template #content>
                       <small>
                         CP Status:
-                        <br/> {{ job.provider_status.online ? 'Online' : 'Offline' }}, {{ job.provider_status.status }}
+                        <br/>
+                        <span v-if="job.provider_status">{{ job.provider_status.online ? 'Online' : 'Offline' }}, {{ job.provider_status.status }}</span>
+                        <span v-else>-</span>
                       </small>
                     </template>
-                    <div :class="{'span-cp': job.is_leading_job.toString() === 'true', 'cp-style flex-row': true}">
+                    <div :class="{'span-cp': job.is_leading_job && job.is_leading_job.toString() === 'true', 'cp-style flex-row': true}">
                       CP {{ j + 1 }}
 
                       <svg width="16" height="16" v-if="job.job_result_uri" @click="system.$commonFun.goLink(`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`)" t="1700718365282" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -39,25 +41,34 @@
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
           <el-table :data="listdata.jobs_status" border style="width: 100%">
-            <el-table-column prop="node_id" label="CP Node ID">
+            <el-table-column prop="bidder_id" label="CP Node ID" min-width="140">
               <template #default="scope">
-                <div class=" flex-row">{{ system.$commonFun.hiddAddress(scope.row.node_id) }}
-                  <i class="icon icon_copy" @click="system.$commonFun.copyContent(scope.row.node_id, 'Copied')"></i>
+                <div class=" flex-row">{{ system.$commonFun.hiddAddress(scope.row.bidder_id) }}
+                  <i class="icon icon_copy" @click="system.$commonFun.copyContent(scope.row.bidder_id, 'Copied')"></i>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="status" label="Status" />
-            <el-table-column prop="job_textUri" label="Quick Look">
+            <!-- <el-table-column prop="status" label="Status" /> -->
+            <el-table-column prop="job_textUri" label="Quick Look" min-width="140">
               <template #default="scope">
                 <a v-if="scope.row.job_textUri" :href="scope.row.job_textUri" target="_blank">{{scope.row.job_textUri}}</a>
                 <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="build_log" label="Deploy Log" min-width="120" align="center">
+              <template #default="scope">
+                <div class="log_style" :class="{'is-disabled': !scope.row.build_log}" @click="logMethod(scope.row)">
+                  <svg class="xl:mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                  </svg>
+                </div>
               </template>
             </el-table-column>
           </el-table>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
           <div>
-            <el-alert :closable="false" title="The server is awaiting the CP to initiate the task." type="warning" />
+            <p class="m">The server is awaiting the CP to initiate the task.</p>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">If your waiting time is prolonged, you might consider
               <el-button plain @click="hardRedeploy">Redeploy</el-button>
               <br /> The tokens you paid will be refunded shortly. You can view and request a refund in
@@ -66,16 +77,88 @@
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
           <div>
-            <el-alert :closable="false" title="Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. We appreciate your patience and understanding. Thank you for waiting." type="warning" />
+            <p class="m">Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. </p>
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Stopped'">
           <div>
-            <el-alert :closable="false" title="This Space is not running" type="warning" />
+            <p class="m">All deployments has been not available before the space expires.</p>
+            <p v-if="metaAddress && metaAddress === route.params.wallet_address">
+              The Remaining tokens will be refunded shortly. You can view and request a refund in
+              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
+              please
+              <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
+          </div>
+        </div>
+        <div class="deployment" v-else-if="listdata.space.status && listdata.space.status.toLowerCase() === 'failed'">
+          <div>
+            <p class="m">All deployments has been not available before the space expires.</p>
+            <p v-if="metaAddress && metaAddress === route.params.wallet_address">
+              The Remaining tokens will be refunded shortly. You can view and request a refund in
+              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
+              please
+              <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
+          </div>
+        </div>
+        <div class="deployment" v-else-if="listdata.space.status === 'Expired'">
+          <div>
+            <p>
+              All deployments has expired
+              <span v-if="metaAddress && metaAddress === route.params.wallet_address">, You can
+                <el-button plain @click="hardRedeploy">Redeploy</el-button> it</span>.</p>
           </div>
         </div>
       </el-row>
     </div>
+
+    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'370px'" :destroy-on-close="true" custom-class="drawer_style" :before-close="handleClose">
+      <template #default>
+        <div class="log_app">
+          <div class="logBody" v-loading="logsLoad">
+            <div class="flex-row log-title">
+              <div class="flex-row">
+                <div class="flex-row log">
+                  <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="16px" height="16px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
+                  </svg>
+                  <p class="text-base font-semibold">Logs</p>
+                </div>
+                <h4 class="font-16 weight-6" :class="{'is-active': logsType === 'build'}" @click="logsMethod(1, 'build')">build</h4>
+                <h4 class="font-16 weight-6" :class="{'is-active': logsType !== 'build'}" @click="logsMethod(2, 'container')">container</h4>
+              </div>
+              <div class="flex-row clear">
+                <div class="close-btn flex-row">
+                  <el-checkbox v-model="checkedLock" label="Lock scroll" size="small" />
+                </div>
+                <div class="close-btn flex-row" @click="clearWebsocket()">
+                  <svg class="text-sm" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" viewBox="0 0 12 12">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.25H8.25V3H1.5V2.25ZM1.5 4.5H8.25V5.25H1.5V4.5ZM1.5 6.75H6V7.5H1.5V6.75ZM8.60889 8.10352L7.75293 7.24756L8.2479 6.75258L9.10386 7.60854L9.95996 6.75244L10.4549 7.24742L9.59884 8.10352L10.455 8.95968L9.96003 9.45466L9.10386 8.59849L8.24784 9.45451L7.75286 8.95954L8.60889 8.10352Z"
+                      fill="currentColor"></path>
+                  </svg>
+                  &nbsp;Clear
+                </div>
+                <div class="close-btn flex-row" @click="upWebsocket(j)">
+                  <el-icon>
+                    <ArrowUp />
+                  </el-icon>
+                </div>
+                <div class="close-btn flex-row" @click="drawer=false">
+                  <el-icon>
+                    <Close />
+                  </el-icon>
+                </div>
+              </div>
+            </div>
+            <el-card class="box-card deployscroll font-14" v-show="logsType === 'build'">
+              <p v-for="build in logsCont.buildLog" :key="build">{{build}}</p>
+            </el-card>
+            <el-card class="box-card deployscroll-container font-14" v-show="logsType !== 'build'">
+              <p v-for="container in logsCont.containerLog" :key="container">{{container}}</p>
+            </el-card>
+          </div>
+        </div>
+      </template>
+    </el-drawer>
   </section>
 </template>
 <script>
@@ -95,7 +178,7 @@ import {
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import {
-  EditPen, Edit, CircleClose
+  EditPen, Edit, Close, ArrowUp
 } from '@element-plus/icons-vue'
 
 export default defineComponent({
@@ -103,7 +186,8 @@ export default defineComponent({
   components: {
     EditPen,
     Edit,
-    CircleClose
+    Close,
+    ArrowUp
   },
   props: {
     urlChange: { type: String, default: 'app' },
@@ -125,6 +209,20 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const statusCode = reactive({
+      code: -1000,
+      reload: false
+    })
+    const logsCont = reactive({
+      buildLog: [],
+      containerLog: [],
+      wsUrl: {}
+    })
+    const drawer = ref(false)
+    const direction = ref('btt')
+    const logsLoad = ref(false)
+    const logsType = ref('build')
+    const checkedLock = ref(false)
 
     function handleClick (tab, event) {
       router.push({
@@ -135,45 +233,61 @@ export default defineComponent({
 
     async function jobList (list) {
       let arr = list || []
+      let arrJob = []
       for (let j = 0; j < arr.length; j++) {
-        try {
-          if (arr[j].job_result_uri) {
-            const response = await fetch(arr[j].job_result_uri)
-            const textUri = await new Promise(async resolve => {
-              resolve(response.text())
-            })
-            arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
-          } else arr[j].job_result_uri = ''
-        } catch (err) {
-          console.log('err', err)
-          arr[j].job_result_uri = ''
+        // 如果status为running才显示
+        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
+          try {
+            if (arr[j].job_result_uri) {
+              const response = await fetch(arr[j].job_result_uri)
+              const textUri = await new Promise(async resolve => {
+                resolve(response.text())
+              })
+              arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+            } else arr[j].job_result_uri = ''
+          } catch (err) {
+            console.log('err', err)
+            arr[j].job_result_uri = ''
+          }
+          arrJob.push(arr[j])
         }
       }
-      return arr
+      return arrJob
     }
 
-    async function init () {
+    async function init (type) {
       if (route.params.tabs !== 'app') return
-      listLoad.value = true
-      listdata.jobResult = []
+      listLoad.value = type ? true : false
+      if (type) listdata.jobResult = []
+      let code = -1
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
-        listdata.jobResult = await jobList(listRes.data.job)
-        if (listRes.data.space.status === 'Deploying' && listRes.data.space.jobs_status) listdata.jobs_status = await jobStatusList(listRes.data.space.jobs_status)
-        listdata.space = listRes.data.space
-        // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
+        code = listRes.data.space && listRes.data.space.status_code ? listRes.data.space.status_code : -1
+        statusCode.reload = Number(code) > 1 && Number(code) < 6 ? true : false
+        if (type) {
+          console.log('load')
+          statusCode.code = code
+          listdata.jobResult = await jobList(listRes.data.job)
+          if (listRes.data.space.status === 'Deploying' && listRes.data.job) listdata.jobs_status = await jobStatusList(listRes.data.job)
+          listdata.space = listRes.data.space
+          // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
+        }
       }
       context.emit('handleValue', false)
-      await system.$commonFun.timeout(500)
       listLoad.value = false
+      // if (statusCode.reload) {
+      //   await system.$commonFun.timeout(1000)
+      //   if (Number(code) === Number(statusCode.code)) init()
+      //   else init(1)
+      // }
     }
 
     async function jobStatusList (list) {
       let arr = list || []
       for (let j = 0; j < arr.length; j++) {
         try {
-          if (arr[j].result_uri) {
-            const response = await fetch(arr[j].result_uri)
+          if (arr[j].job_result_uri) {
+            const response = await fetch(arr[j].job_result_uri)
             const textUri = await new Promise(async (resolve, reject) => {
               resolve(response.text())
             })
@@ -191,11 +305,105 @@ export default defineComponent({
       context.emit('hardRedeploy', true)
     }
 
+    async function logsMethod (type, name) {
+      logsType.value = name
+      await websocketclose()
+      if (type === 1) {
+        logsCont.buildLog = []
+        if (logsCont.wsUrl && logsCont.wsUrl.build_log) await WebSocketFun(logsCont.wsUrl.build_log, 1)
+      } else {
+        logsCont.containerLog = []
+        if (logsCont.wsUrl && logsCont.wsUrl.container_log) await WebSocketFun(logsCont.wsUrl.container_log, 2)
+      }
+    }
+    async function logMethod (row) {
+      if (!row || !row.build_log) return
+      drawer.value = true
+      logsType.value = 'build'
+      logsCont.wsUrl = row
+      // logsLoad.value = true
+      WebSocketFun(logsCont.wsUrl.build_log, 1)
+    }
+    const WebSocketFun = (url, index, n) => {
+      if (typeof (WebSocket) === "undefined") {
+        alert("Your browser does not support sockets")
+      } else {
+        try {
+          ws = new WebSocket(url)
+          ws.onopen = () => {
+            console.log("ws connection successful")
+          }
+          ws.onmessage = (event) => {
+            // console.log('ws data:', event.data)
+            if (event.data) {
+              if (event.data === 'ping' && ws) ws.send('pong')
+              else if (index === 1) logsCont.buildLog.push(event.data)
+              else if (index === 2) logsCont.containerLog.push(event.data)
+              nextTick(() => {
+                let scrollEl = document.querySelectorAll('.deployscroll')
+                let scrollContainerEl = document.querySelectorAll('.deployscroll-container')
+                if (checkedLock.value) return
+                scrollEl.forEach(async el => {
+                  // await system.$commonFun.timeout(1000)
+                  el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
+                })
+                scrollContainerEl.forEach(async el => {
+                  // await system.$commonFun.timeout(1000)
+                  el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
+                })
+              })
+            }
+          }
+          ws.onerror = (err) => {
+            // console.log("Websocket connection error", err)
+            if (index === 1) logsCont.buildLog = ["Websocket connection error"]
+            else if (index === 2) logsCont.containerLog = ["Websocket connection error"]
+          }
+          ws.onclose = () => {
+            console.log("ws connection closed")
+          }
+        } catch (err) {
+          if (index === 1) logsCont.buildLog = [{ err }]
+          else if (index === 2) logsCont.containerLog = [{ err }]
+        }
+      }
+    }
+    function clearWebsocket (index) {
+      if (logsType.value === 'build') logsCont.buildLog = []
+      else logsCont.containerLog = []
+    }
+    function upWebsocket () {
+      const name = logsType.value === 'build' ? 'deployscroll' : 'deployscroll-container'
+      nextTick(() => {
+        checkedLock.value = true
+        let scrollEl = document.querySelectorAll('.' + name)
+        scrollEl.forEach(async el => {
+          el.scrollTo({ top: 0, behavior: 'instant' })
+        })
+      })
+    }
+    function handleClose () {
+      drawer.value = false
+      logsCont.buildLog = []
+      logsCont.containerLog = []
+      logsCont.wsUrl = {}
+      websocketclose()
+    }
+    let ws = null
+    const websocketclose = async () => {
+      try {
+        if (ws) ws.close()
+        ws = null
+        console.log("closed")
+      } catch (err) {
+        ws = null
+      }
+    }
     onActivated(() => {
     })
     onMounted(() => {
       window.scrollTo(0, 0)
-      init()
+      init(1)
     })
     onDeactivated(() => {
     })
@@ -204,12 +412,12 @@ export default defineComponent({
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'app') {
         window.scrollTo(0, 0)
-        init()
+        init(1)
       }
     })
-    // watch(() => props.likesValue, () => {
-    //   init()
-    // })
+    watch(() => props.likesValue, () => {
+      init(1)
+    })
     return {
       metaAddress,
       lagLogin,
@@ -219,7 +427,10 @@ export default defineComponent({
       system,
       route,
       router,
-      init, handleClick, hardRedeploy
+      logsCont,
+      checkedLock,
+      drawer, direction, logsLoad, logsType, clearWebsocket, upWebsocket,
+      init, handleClick, hardRedeploy, logMethod, handleClose, logsMethod
     }
   }
 })
@@ -292,6 +503,13 @@ export default defineComponent({
               text-decoration: underline;
               color: inherit;
             }
+            .log_style {
+              cursor: pointer;
+              &.is-disabled {
+                cursor: no-drop;
+                opacity: 0.4;
+              }
+            }
           }
         }
       }
@@ -301,8 +519,11 @@ export default defineComponent({
       }
 
       p {
-        padding-top: 0.3rem;
+        // padding-top: 0.3rem;
         line-height: 2;
+        &.m {
+          padding-top: 0;
+        }
         .el-button {
           height: auto;
           padding: 5px 10px;
@@ -387,7 +608,7 @@ export default defineComponent({
     }
 
     .space_iframe {
-      width: 100%;
+      width: calc(100% - 4px);
       min-height: 315px;
       overflow: auto;
       @media screen and (min-height: 500px) and (min-width: 769px) {

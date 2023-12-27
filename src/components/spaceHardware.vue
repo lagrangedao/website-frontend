@@ -47,6 +47,30 @@
               </p>
             </div>
             <div class="fork-btn flex-row" v-if="props.renewButton === 'fork'">
+              <div class="fileList">
+                <el-form ref="ruleFormRef" :model="ruleForm" class="demo-ruleForm flex-row" status-icon>
+                  <el-form-item prop="" class="flex_left">
+                    <label class="label" for="owner">
+                      Owner *
+                      <div class="flex-row">
+                        <el-select v-model="metaAddress" placeholder="">
+                          <el-option :label="metaAddress" :value="metaAddress" />
+                        </el-select>
+                        <span class="text-2xl text-gray-400 self-end pb-2">/</span>
+                      </div>
+                    </label>
+                  </el-form-item>
+                  <el-form-item prop="name" class="flex_right">
+                    <label class="label" for="dataname">
+                      Repository name *
+                      <div class="flex-row">
+                        <el-input v-model="ruleForm.rename" placeholder="Space name" />
+                      </div>
+                    </label>
+                  </el-form-item>
+                </el-form>
+                <p class="p-5">By default, forks are named the same as their upstream space. You can customize the name to distinguish it further.</p>
+              </div>
               <el-button type="info" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
             </div>
           </el-col>
@@ -69,9 +93,9 @@
             <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
               <el-divider content-position="left">{{ item.label }}</el-divider>
               <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o">
-                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))) && props.listdata.status !== 'Stopped','is-disabled':ol.hardware_status !== 'available'}"
+                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))),'is-disabled':ol.hardware_status !== 'available'}"
                   @click="sleepChange(ol)">
-                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))) && props.listdata.status !== 'Stopped'">
+                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))">
                     <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
                       <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
                         fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
@@ -92,10 +116,10 @@
         </el-row>
       </div>
     </div>
-    <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" title="Confirm hardware update" :width="dialogWidth">
+    <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" :title="props.renewButton === 'renew'?'Confirm duration update':'Confirm hardware update'" :width="dialogWidth">
       <div v-loading="hardwareLoad">
-        <div class="title-hard">The hardware of
-          <span>{{ accessName || system.$commonFun.hiddAddress(metaAddress) }}/{{ route.params.name }}</span> will be switched to:
+        <div class="title-hard">The {{props.renewButton === 'renew'?'current':''}} hardware of
+          <span>{{ accessName || system.$commonFun.hiddAddress(metaAddress) }}/{{ route.params.name }}</span> {{props.renewButton === 'renew'?'is':'will be switched to'}}:
         </div>
         <el-card class="box-card">
           <h5>{{ sleepSelect.hardware_name }}</h5>
@@ -108,15 +132,15 @@
           <div>
             <div class="title_tip flex-row">
               <div class="flex-row">
-                Usage Time
+                {{props.renewButton === 'renew'? 'Extend Time' : 'Usage Time'}}
               </div>
               <el-divider/>
             </div>
             <div class="time flex-row">
-              <el-input-number v-model="ruleForm.usageTime" :min="24" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
           </div>
-          <div>
+          <div v-if="props.renewButton !== 'renew'">
             <div class="title_tip flex-row">
               <div class="flex-row">
                 Region
@@ -124,12 +148,12 @@
               <el-divider/>
             </div>
             <div class="time flex-row">
-              <el-select v-model="sleepSelect.regionValue" class="m-region" placeholder="Region">
+              <el-select v-model="sleepSelect.regionValue" :disabled="props.renewButton === 'renew'?true:false" class="m-region" placeholder="Region">
                 <el-option v-for="item in sleepSelect.regionOption" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </div>
           </div>
-          <div>
+          <div v-if="props.renewButton !== 'renew'">
             <div class="title_tip flex-row">
               <div class="flex-row">
                 Start time settings
@@ -171,7 +195,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button-group class="flex-row">
-            <el-button @click="hardwareFun" :disabled="hardwareLoad">Confirm new hardware</el-button>
+            <el-button @click="hardwareFun" :disabled="hardwareLoad">{{props.renewButton === 'renew'?'Renew':'Confirm new hardware'}}</el-button>
             <el-button @click="close" :disabled="hardwareLoad">Cancel</el-button>
           </el-button-group>
         </span>
@@ -180,7 +204,7 @@
   </div>
 </template>
 <script>
-import { defineComponent, computed, onMounted, watch, ref, reactive, nextTick, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 
@@ -201,20 +225,17 @@ export default defineComponent({
   },
   setup (props, context) {
     const store = useStore()
+    const system = getCurrentInstance().appContext.config.globalProperties
     const metaAddress = computed(() => store.state.metaAddress)
+    const metaSmallAddress = system.$commonFun.hiddAddress(metaAddress.value)
     const accessName = computed(() => (store.state.accessName))
     const bodyWidth = ref(document.body.clientWidth < 992)
-    const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
     const ruleForm = reactive({
       usageTime: 24,
-      sleepTime: '1',
+      sleepTime: '5',
       sleepTimeOption: [
-        {
-          value: "1",
-          label: "1 minute",
-        },
         {
           value: '5',
           label: "5 minutes",
@@ -260,7 +281,8 @@ export default defineComponent({
         }
       ],
       pauseSpace: false,
-      displayPrice: false
+      displayPrice: false,
+      rename: ''
     })
     const hardwareOptions = ref([])
     const hardwareLoad = ref(false)
@@ -331,15 +353,31 @@ export default defineComponent({
       forkLoad.value = true
       const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/duplicate`, 'post', {})
       if (forkRes && forkRes.status === 'success') {
+        const rename = await renameMethod()
         system.$commonFun.messageTip('success', forkRes.message ? forkRes.message : 'Fork successfully!')
         if (type) context.emit('handleHard', false, false)
         router.push({
           name: 'spaceDetail',
-          params: { wallet_address: metaAddress.value, name: route.params.name, tabs: 'card' }
+          params: { wallet_address: metaAddress.value, name: rename ? ruleForm.rename : route.params.name, tabs: 'app' }
         })
       } else system.$commonFun.messageTip('error', forkRes.message ? forkRes.message : 'Fork failed!')
       forkLoad.value = false
       return forkRes.status
+    }
+
+    async function renameMethod () {
+      if (!ruleForm.rename) return false
+      try {
+        const formData = new FormData();
+        formData.append('name', route.params.name);
+        formData.append('is_public', '1'); // public:1, private:0
+        formData.append('new_name', ruleForm.rename);
+
+        const renameRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/update`, 'post', formData);
+        return true
+      } catch{
+        return false
+      }
     }
 
     async function networkEstimate () {
@@ -368,9 +406,15 @@ export default defineComponent({
       fd.append('chain_id', getID)
       fd.append('region', sleepSelect.value.regionValue)
       fd.append('start_in', ruleForm.sleepTime * 60)
-      const urlRes = `${process.env.VUE_APP_BASEAPI}space/deployment`
-      const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
-      if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+      if (props.renewButton === 'renew') {
+        const urlRes = `${process.env.VUE_APP_BASEAPI}spaces/${props.listdata.uuid}/deployment/renew`
+        const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
+        if (hardhashRes && hardhashRes.status && hardhashRes.message) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+      } else {
+        const urlRes = `${process.env.VUE_APP_BASEAPI}space/deployment`
+        const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
+        if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+      }
     }
 
     function close () {
@@ -389,8 +433,10 @@ export default defineComponent({
       ruleForm.usageTime = 24
       sleepSelect.value = row
       sleepSelect.value.regionOption = await regionList(row.region)
-      sleepSelect.value.regionValue = row.region && row.region[0] ? "Global" : ''
-      ruleForm.sleepTime = sleepSelect.value.hardware_type.toLowerCase() === 'gpu' ? '20' : '1'
+      if (props.renewButton === 'renew') sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
+      else sleepSelect.value.regionValue = row.region && row.region[0] ? "Global" : ''
+      ruleForm.sleepTime = sleepSelect.value.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
+      if (props.renewButton === 'renew') hardwareLoad.value = false
       sleepVisible.value = true
     }
 
@@ -445,6 +491,23 @@ export default defineComponent({
     }
     async function init (params) {
       machinesLoad.value = true
+      if (props.renewButton === 'renew') {
+        if (props.listdata.activeOrder === null || props.listdata.activeOrder.config === null) return
+        ruleForm.usageTime = 24
+        sleepSelect.value = {
+          hardware_description: props.listdata.activeOrder.config.description,
+          hardware_id: props.listdata.activeOrder.config.hardware_id,
+          hardware_name: props.listdata.activeOrder.config.name,
+          hardware_price: props.listdata.activeOrder.config.price_per_hour,
+          hardware_status: "available",
+          hardware_type: props.listdata.activeOrder.config.hardware_type,
+          region: []
+        }
+        sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
+        ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
+        sleepVisible.value = true
+        return
+      }
       const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
       if (machinesRes && machinesRes.status === 'success') {
         if (props.renewButton === 'renew') {
@@ -462,6 +525,7 @@ export default defineComponent({
 
     let getnetID = NaN
     onMounted(async () => {
+      ruleForm.rename = ''
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
       paymentEnv()
       init()
@@ -470,6 +534,7 @@ export default defineComponent({
       route,
       accessName,
       metaAddress,
+      metaSmallAddress,
       bodyWidth,
       system,
       props,
@@ -586,6 +651,15 @@ export default defineComponent({
         }
       }
 
+      .p-5 {
+        margin: 0 0 0.08rem;
+        font-size: 12px;
+        color: rgba(107, 114, 128, 1);
+        @media screen and (min-width: 1680px) {
+          font-size: 13px;
+        }
+      }
+
       .fork {
         position: absolute;
         bottom: 0;
@@ -603,7 +677,9 @@ export default defineComponent({
       }
 
       .hardware-left {
-        padding-bottom: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        padding-bottom: 0.1rem;
       }
 
       .sleep_style {
@@ -892,12 +968,11 @@ export default defineComponent({
     }
 
     .fork-btn {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      justify-content: flex-end;
-      padding: 0 0.2rem;
-
+      // position: absolute;
+      // bottom: 0;
+      // left: 0;
+      flex-wrap: wrap;
+      padding: 0;
       .el-button {
         span {
           cursor: inherit;
@@ -905,6 +980,81 @@ export default defineComponent({
 
         &:hover {
           text-decoration: underline;
+        }
+      }
+      .fileList {
+        .demo-ruleForm {
+          margin: 0;
+          .el-form-item {
+            margin-bottom: 6px;
+            @media screen and (max-width: 768px) {
+              width: 100% !important;
+            }
+            &.flex_left {
+              max-width: 120px;
+            }
+            .el-form-item__content {
+              width: 100%;
+              display: flex;
+              flex-wrap: wrap;
+              align-items: flex-start;
+              justify-content: flex-start;
+              .label {
+                width: 100%;
+                text-align: left;
+                font-size: 13px;
+                color: #666;
+                @media screen and (max-width: 768px) {
+                  font-size: 12px;
+                }
+                @media screen and (min-width: 1800px) {
+                  font-size: 14px;
+                }
+                .flex-row {
+                  width: 100%;
+                  .el-select {
+                    width: calc(100% - 20px);
+                    @media screen and (max-width: 768px) {
+                      width: 100%;
+                    }
+                  }
+                  .el-form {
+                    width: 100%;
+                  }
+                  .self-end {
+                    width: 20px;
+                    text-align: center;
+                    @media screen and (max-width: 768px) {
+                      display: none;
+                    }
+                  }
+                }
+              }
+              .el-input {
+                font-size: inherit;
+                .el-input__inner {
+                  height: auto;
+                  padding: 0.03rem 0.1rem;
+                  font-size: inherit;
+                }
+              }
+            }
+            .el-form-item__label {
+              display: none;
+            }
+            &.is-error {
+              .el-form-item__content {
+                .el-input {
+                  .el-input__inner {
+                    border-color: #c37af9;
+                  }
+                  .el-input__validateIcon {
+                    color: #c37af9;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

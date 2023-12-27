@@ -4,53 +4,53 @@ import {
 
 export default createStore({
   state: {
-    metaAddress: sessionStorage.getItem('metaAddressLag') || '',
-    navLogin: sessionStorage.getItem('navLogin') || false,
-    lagLogin: sessionStorage.getItem('loginLag') || false,
-    accessToken: sessionStorage.getItem('access_token_lag') || '',
-    accessAvatar: sessionStorage.getItem('access_avatar') || require("@/assets/images/dashboard/people_default.png"),
+    metaAddress: localStorage.getItem('metaAddressLag') || '',
+    navLogin: localStorage.getItem('navLogin') || false,
+    lagLogin: localStorage.getItem('loginLag') || false,
+    accessToken: localStorage.getItem('access_token_lag') || '',
+    accessAvatar: localStorage.getItem('access_avatar') || require("@/assets/images/dashboard/people_default.png"),
     // accessAvatar: require("@/assets/images/dashboard/people_default.png"),
-    accessName: sessionStorage.getItem('access_name') || '-',
-    accessSpace: sessionStorage.getItem('access_space') || '',
-    accessDataset: sessionStorage.getItem('access_dataset') || '',
-    gateway: sessionStorage.getItem('lag_gateway') || ''
+    accessName: localStorage.getItem('access_name') || '-',
+    accessSpace: localStorage.getItem('access_space') || '',
+    accessDataset: localStorage.getItem('access_dataset') || '',
+    gateway: localStorage.getItem('lag_gateway') || ''
   },
   mutations: {
     SET_METAADDRESS: (state, metaAddress) => {
       state.metaAddress = metaAddress
-      sessionStorage.setItem('metaAddressLag', metaAddress)
+      localStorage.setItem('metaAddressLag', metaAddress)
     },
     SET_NAVLOGIN: (state, navLogin) => {
       state.navLogin = navLogin
-      sessionStorage.setItem('navLogin', navLogin)
+      localStorage.setItem('navLogin', navLogin)
     },
     SET_LAGLOGIN: (state, lagLogin) => {
       state.lagLogin = lagLogin
-      sessionStorage.setItem('loginLag', lagLogin)
+      localStorage.setItem('loginLag', lagLogin)
     },
     SET_ACCESSTOKEN: (state, accessToken) => {
       state.accessToken = accessToken
-      sessionStorage.setItem('access_token_lag', accessToken)
+      localStorage.setItem('access_token_lag', accessToken)
     },
     SET_ACCESSAVATAR: (state, accessAvatar) => {
       state.accessAvatar = accessAvatar
-      sessionStorage.setItem('access_avatar', accessAvatar)
+      localStorage.setItem('access_avatar', accessAvatar)
     },
     SET_ACCESSNAME: (state, accessName) => {
       state.accessName = accessName
-      sessionStorage.setItem('access_name', accessName)
+      localStorage.setItem('access_name', accessName)
     },
     SET_ACCESSSPACE: (state, accessSpace) => {
       state.accessSpace = accessSpace
-      sessionStorage.setItem('access_space', accessSpace)
+      localStorage.setItem('access_space', accessSpace)
     },
     SET_ACCESSDATASET: (state, accessDataset) => {
       state.accessDataset = accessDataset
-      sessionStorage.setItem('access_dataset', accessDataset)
+      localStorage.setItem('access_dataset', accessDataset)
     },
     SET_GATEWAY: (state, gateway) => {
       state.gateway = gateway
-      sessionStorage.setItem('lag_gateway', gateway)
+      localStorage.setItem('lag_gateway', gateway)
     }
   },
   actions: {

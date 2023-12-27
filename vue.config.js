@@ -86,6 +86,19 @@ module.exports = {
   },
 
   chainWebpack: (config) => {
+    // config.optimization.minimize(true);
+    // config.optimization.splitChunks({
+    //   chunks: 'all'
+    // })
+    // config.module
+    //   .rule('images')
+    //   .use('image-webpack-loader')
+    //   .loader('image-webpack-loader')
+    //   .options({
+    //     bypassOnDebug: true
+    //   })
+    //   .end()
+    // config.optimization.usedExports = true
     config.resolve.alias
       .set('@', resolve('src'))
       .set('@api', resolve('src/api'))
@@ -108,6 +121,11 @@ module.exports = {
         options.compilerOptions = addOptions;
         return options;
       });
+
+    // 移除 preload(预载) 插件
+    config.plugins.delete('preload')
+    // 移除 prefetch(预取) 插件
+    config.plugins.delete('prefetch')
   },
 
   devServer: {

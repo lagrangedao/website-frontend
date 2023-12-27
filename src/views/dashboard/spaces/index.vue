@@ -40,27 +40,33 @@
           </div>
           <el-row :gutter="32" class="list_body" v-loading="listLoad">
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="ls in spaceLikesData" :key="ls">
-              <el-card class="box-card" @click="detailFun(ls, l)">
-                <template #header>
-                  <div class="card-header">
-                    <span class="left">{{ls.status}}</span>
-                    <span class="right flex-row">{{ls.likes}}</span>
-                    <span class="bottom" v-if="ls.activeOrder && ls.activeOrder.config">{{ls.activeOrder.config.description}}</span>
-                  </div>
-                  <h1>{{ls.name}}</h1>
-                  <!-- <div class="card-owner flex-row">
+              <a :href="`/spaces/${ls.wallet_address}/${ls.name}/app`">
+                <el-card class="box-card">
+                  <template #header>
+                    <div class="card-header">
+                      <span class="left">{{ls.status}}
+                        <a v-if="ls.status === 'Running'">on
+                          <strong style="text-transform: uppercase;">{{ls.activeOrder.config.hardware_type === 'GPU' ? ls.activeOrder.config.hardware : 'CPU'}}</strong>
+                        </a>
+                      </span>
+                      <span class="right flex-row">{{ls.likes}}</span>
+                      <span class="bottom" v-if="ls.activeOrder && ls.activeOrder.config">{{ls.activeOrder.config.description}}</span>
+                    </div>
+                    <h1>{{ls.name}}</h1>
+                    <!-- <div class="card-owner flex-row">
                     <span>Owner: {{ls.wallet_address}}</span>
                   </div> -->
-                </template>
-                <div class="text flex-row">
-                  <div class="text_left flex-row">
-                    <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
-                    <i class="icon"></i>
-                    <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || system.$commonFun.hiddAddress(ls.wallet_address)}}</span>
+                  </template>
+                  <div class="text flex-row">
+                    <div class="text_left flex-row">
+                      <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
+                      <i class="icon"></i>
+                      <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || system.$commonFun.hiddAddress(ls.wallet_address)}}</span>
+                    </div>
+                    <span>{{system.$commonFun.momentFun(ls.created_at)}}</span>
                   </div>
-                  <span>{{system.$commonFun.momentFun(ls.created_at)}}</span>
-                </div>
-              </el-card>
+                </el-card>
+              </a>
             </el-col>
           </el-row>
           <div class="top flex-row">
@@ -72,27 +78,33 @@
         <div class="week">
           <el-row :gutter="32" class="list_body" v-loading="listLoad">
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="list in spaceData" :key="list">
-              <el-card class="box-card" @click="detailFun(list, l)">
-                <template #header>
-                  <div class="card-header">
-                    <span class="left">{{list.status}}</span>
-                    <span class="right flex-row">{{list.likes}}</span>
-                    <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span>
-                  </div>
-                  <h1>{{list.name}}</h1>
-                  <!-- <div class="card-owner flex-row">
+              <a :href="`/spaces/${list.wallet_address}/${list.name}/app`">
+                <el-card class="box-card">
+                  <template #header>
+                    <div class="card-header">
+                      <span class="left">{{list.status}}
+                        <a v-if="list.status === 'Running'">on
+                          <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware_type === 'GPU' ? list.activeOrder.config.hardware : 'CPU'}}</strong>
+                        </a>
+                      </span>
+                      <span class="right flex-row">{{list.likes}}</span>
+                      <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span>
+                    </div>
+                    <h1>{{list.name}}</h1>
+                    <!-- <div class="card-owner flex-row">
                   <span>Owner: {{list.wallet_address}}</span>
                 </div> -->
-                </template>
-                <div class="text flex-row">
-                  <div class="text_left flex-row">
-                    <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
-                    <i class="icon"></i>
-                    <span class="small" @click.stop="searchChange(list)">{{list.full_name || system.$commonFun.hiddAddress(list.wallet_address)}}</span>
+                  </template>
+                  <div class="text flex-row">
+                    <div class="text_left flex-row">
+                      <!-- <img :src="accessAvatar||''" alt="" class="icon_img"> -->
+                      <i class="icon"></i>
+                      <span class="small" @click.stop="searchChange(list)">{{list.full_name || system.$commonFun.hiddAddress(list.wallet_address)}}</span>
+                    </div>
+                    <span>{{system.$commonFun.momentFun(list.created_at)}}</span>
                   </div>
-                  <span>{{system.$commonFun.momentFun(list.created_at)}}</span>
-                </div>
-              </el-card>
+                </el-card>
+              </a>
             </el-col>
           </el-row>
         </div>
@@ -103,7 +115,7 @@
   </section>
 </template>
 <script>
-import { defineComponent, computed, onMounted, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
+import { defineComponent, computed, onActivated, onDeactivated, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 export default defineComponent({
@@ -505,6 +517,9 @@ export default defineComponent({
                     @media screen and (min-width: 1800px) {
                       font-size: 13px;
                     }
+                  }
+                  a {
+                    color: inherit;
                   }
                 }
               }

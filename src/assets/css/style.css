@@ -193,6 +193,11 @@ a:focus {
     cursor: pointer;
 }
 
+.el-popper {
+    max-width: 300px;
+    word-break: break-word;
+}
+
 .landing {
     width: 17rem;
     max-width: 100%;
@@ -203,6 +208,24 @@ a:focus {
 .el-popper {
     word-break: break-word;
     text-align: left;
+}
+
+@-webkit-keyframes spin-running {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-running {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @media screen and (max-width:1920px) {
