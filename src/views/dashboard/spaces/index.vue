@@ -44,9 +44,9 @@
                 <el-card class="box-card">
                   <template #header>
                     <div class="card-header">
-                      <span class="left">{{ls.status}}
-                        <a v-if="ls.status === 'Running'">on
-                          <strong style="text-transform: uppercase;">{{ls.activeOrder.config.hardware_type === 'GPU' ? ls.activeOrder.config.hardware : 'CPU'}}</strong>
+                      <span class="left" v-if="ls.status === 'Running' ||ls.status === 'Deploying'">{{ls.status}}
+                        <a v-if="ls.status === 'Running' && ls.activeOrder.config.hardware_type === 'GPU'">on
+                          <strong style="text-transform: uppercase;">{{ ls.activeOrder.config.hardware}}</strong>
                         </a>
                       </span>
                       <span class="right flex-row">{{ls.likes}}</span>
@@ -82,9 +82,9 @@
                 <el-card class="box-card">
                   <template #header>
                     <div class="card-header">
-                      <span class="left">{{list.status}}
-                        <a v-if="list.status === 'Running'">on
-                          <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware_type === 'GPU' ? list.activeOrder.config.hardware : 'CPU'}}</strong>
+                      <span class="left" v-if="list.status === 'Running' ||list.status === 'Deploying'">{{list.status}}
+                        <a v-if="list.status === 'Running' && list.activeOrder.config.hardware_type === 'GPU'">on
+                          <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware}}</strong>
                         </a>
                       </span>
                       <span class="right flex-row">{{list.likes}}</span>

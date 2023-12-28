@@ -411,6 +411,11 @@ function hiddAddress(val) {
   else return '-'
 }
 
+function hiddAddressSmall(val) {
+  if (val) return `${val.substring(0, 2)}...${val.substring(val.length - 5)}`
+  else return '-'
+}
+
 function NumFormat(value) {
   if (String(value) === '0') return '0'
   else if (!value) return '-'
@@ -542,6 +547,7 @@ export default {
   walletChain,
   changeIDLogin,
   hiddAddress,
+  hiddAddressSmall,
   NumFormat,
   calculateDiffTime,
   expiredTime,

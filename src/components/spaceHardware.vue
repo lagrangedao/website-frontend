@@ -51,10 +51,11 @@
                 <el-form ref="ruleFormRef" :model="ruleForm" class="demo-ruleForm flex-row" status-icon>
                   <el-form-item prop="" class="flex_left">
                     <label class="label" for="owner">
-                      Owner *
+                      Owner
+                      <span>*</span>
                       <div class="flex-row">
-                        <el-select v-model="metaAddress" placeholder="">
-                          <el-option :label="metaAddress" :value="metaAddress" />
+                        <el-select v-model="metaSmallAddress" placeholder="" disabled>
+                          <el-option :label="metaSmallAddress" :value="metaSmallAddress" />
                         </el-select>
                         <span class="text-2xl text-gray-400 self-end pb-2">/</span>
                       </div>
@@ -63,15 +64,29 @@
                   <el-form-item prop="name" class="flex_right">
                     <label class="label" for="dataname">
                       Repository name *
-                      <div class="flex-row">
-                        <el-input v-model="ruleForm.rename" placeholder="Space name" />
+                      <div class="flex-row tip">
+                        <el-input @change="nameExist()" v-model="ruleForm.rename" :class="{'err': !ruleForm.rename || ruleForm.rename_err}" placeholder="Space name" />
+                        <div class="flex-row text g" v-if="!ruleForm.rename_err">
+                          <el-icon>
+                            <CircleCheckFilled />
+                          </el-icon>
+                          {{ruleForm.rename_tip}} is available.
+                        </div>
+                        <div class="flex-row text r" v-else>
+                          <el-icon>
+                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 1024 1024" data-v-ea893728="">
+                              <path fill="currentColor" d="M928.99 755.83 574.6 203.25c-12.89-20.16-36.76-32.58-62.6-32.58s-49.71 12.43-62.6 32.58L95.01 755.83c-12.91 20.12-12.9 44.91.01 65.03 12.92 20.12 36.78 32.51 62.59 32.49h708.78c25.82.01 49.68-12.37 62.59-32.49 12.91-20.12 12.92-44.91.01-65.03M554.67 768h-85.33v-85.33h85.33zm0-426.67v298.66h-85.33V341.32z"></path>
+                            </svg>
+                          </el-icon>
+                          The space {{ruleForm.rename_tip}} already exists on this account.
+                        </div>
                       </div>
                     </label>
                   </el-form-item>
                 </el-form>
                 <p class="p-5">By default, forks are named the same as their upstream space. You can customize the name to distinguish it further.</p>
               </div>
-              <el-button type="info" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
+              <el-button type="info" :disabled="!ruleForm.rename || ruleForm.rename_err" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
             </div>
           </el-col>
           <el-col :md="24" :lg="18" class="hardware-right">
@@ -213,12 +228,14 @@ import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
 import tokenUSDCABI from '@/utils/abi/USDC.json'
 import {
-  InfoFilled
+  CircleCheckFilled
 } from '@element-plus/icons-vue'
 
 export default defineComponent({
   name: 'Space Hardware',
-  components: {},
+  components: {
+    CircleCheckFilled
+  },
   props: {
     listdata: { type: Object, default: {} },
     renewButton: { type: String, default: 'setting' }
@@ -227,7 +244,7 @@ export default defineComponent({
     const store = useStore()
     const system = getCurrentInstance().appContext.config.globalProperties
     const metaAddress = computed(() => store.state.metaAddress)
-    const metaSmallAddress = system.$commonFun.hiddAddress(metaAddress.value)
+    const metaSmallAddress = system.$commonFun.hiddAddressSmall(metaAddress.value)
     const accessName = computed(() => (store.state.accessName))
     const bodyWidth = ref(document.body.clientWidth < 992)
     const route = useRoute()
@@ -282,7 +299,9 @@ export default defineComponent({
       ],
       pauseSpace: false,
       displayPrice: false,
-      rename: ''
+      rename: '',
+      rename_err: false,
+      rename_tip: ''
     })
     const hardwareOptions = ref([])
     const hardwareLoad = ref(false)
@@ -303,6 +322,7 @@ export default defineComponent({
       try {
         if (props.renewButton === 'fork') {
           const forkRes = await forkDuplicate()
+          console.log(forkRes)
           if (forkRes !== 'success') {
             closePart()
             return
@@ -351,14 +371,21 @@ export default defineComponent({
 
     async function forkDuplicate (type) {
       forkLoad.value = true
-      const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/duplicate`, 'post', {})
+      if (!ruleForm.rename) {
+        ruleForm.rename_err = true
+        forkLoad.value = false
+        return false
+      } else ruleForm.rename_err = false
+      const fd = new FormData();
+      fd.append('new_name', ruleForm.rename);
+      const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/fork`, 'post', fd)
       if (forkRes && forkRes.status === 'success') {
-        const rename = await renameMethod()
+        // const rename = await renameMethod()
         system.$commonFun.messageTip('success', forkRes.message ? forkRes.message : 'Fork successfully!')
         if (type) context.emit('handleHard', false, false)
         router.push({
           name: 'spaceDetail',
-          params: { wallet_address: metaAddress.value, name: rename ? ruleForm.rename : route.params.name, tabs: 'app' }
+          params: { wallet_address: metaAddress.value, name: ruleForm.rename ? ruleForm.rename : route.params.name, tabs: 'app' }
         })
       } else system.$commonFun.messageTip('error', forkRes.message ? forkRes.message : 'Fork failed!')
       forkLoad.value = false
@@ -423,6 +450,7 @@ export default defineComponent({
     }
 
     async function sleepChange (row) {
+      if (props.renewButton === 'fork' && (!ruleForm.rename || ruleForm.rename_err)) return
       if (row.hardware_status.toLowerCase() !== 'available' && props.renewButton === 'renew') {
         system.$commonFun.messageTip('warning', 'There are no corresponding resources for the current configuration, unable to renew. Please try again later')
         close()
@@ -489,6 +517,11 @@ export default defineComponent({
         paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
       }
     }
+    async function nameExist () {
+      const existRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${ruleForm.rename}/exist`, 'get')
+      if (existRes && existRes.status === 'success') ruleForm.rename_err = true
+      else ruleForm.rename_err = false
+    }
     async function init (params) {
       machinesLoad.value = true
       if (props.renewButton === 'renew') {
@@ -525,10 +558,12 @@ export default defineComponent({
 
     let getnetID = NaN
     onMounted(async () => {
-      ruleForm.rename = ''
+      ruleForm.rename = route.params.name
+      ruleForm.rename_tip = route.params.name
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
       paymentEnv()
       init()
+      nameExist()
     })
     return {
       route,
@@ -546,7 +581,7 @@ export default defineComponent({
       hardwareLoad,
       machinesLoad,
       forkLoad,
-      sleepChange, hardwareFun, close, forkDuplicate
+      sleepChange, hardwareFun, close, forkDuplicate, nameExist
     }
   }
 })
@@ -967,7 +1002,7 @@ export default defineComponent({
       }
     }
 
-    .fork-btn {
+    :deep(.fork-btn) {
       // position: absolute;
       // bottom: 0;
       // left: 0;
@@ -984,6 +1019,7 @@ export default defineComponent({
       }
       .fileList {
         .demo-ruleForm {
+          align-items: stretch;
           margin: 0;
           .el-form-item {
             margin-bottom: 6px;
@@ -992,6 +1028,32 @@ export default defineComponent({
             }
             &.flex_left {
               max-width: 120px;
+              .el-form-item__content {
+                .el-input {
+                  .el-input__inner {
+                    width: 100px;
+                  }
+                }
+              }
+            }
+            &.flex_right {
+              .tip {
+                flex-wrap: wrap;
+                .text {
+                  padding: 0.06rem 0 0;
+                  font-size: 12px;
+                  line-height: 1;
+                  &.g {
+                    color: #047857;
+                  }
+                  &.r {
+                    color: #f56c6c;
+                  }
+                  i {
+                    margin: 0 5px 0 0;
+                  }
+                }
+              }
             }
             .el-form-item__content {
               width: 100%;
@@ -1032,10 +1094,16 @@ export default defineComponent({
               }
               .el-input {
                 font-size: inherit;
+                &.err {
+                  .el-input__inner {
+                    border-color: #ff0000;
+                  }
+                }
                 .el-input__inner {
                   height: auto;
                   padding: 0.03rem 0.1rem;
                   font-size: inherit;
+                  line-height: 2;
                 }
               }
             }

@@ -18,8 +18,8 @@
           </b>
           <div class="to-white right"></div>
         </div>
-        <el-row justify="center" class="list_body" v-loading="listLoad">
-          <el-col :xs="24" :sm="12" :md="7" :lg="7" :xl="7" v-for="ls in spaceLikesData" :key="ls">
+        <el-row class="list_body" v-loading="listLoad">
+          <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="ls in spaceLikesData" :key="ls">
             <a :href="`/spaces/${ls.wallet_address}/${ls.name}/app`">
               <el-card class="box-card">
                 <template #header>

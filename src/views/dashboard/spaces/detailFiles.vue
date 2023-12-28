@@ -421,6 +421,8 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
+        await system.$commonFun.timeout(500)
+        textEditor.value = ''
       } catch (err) {
         console.log('err space create.md:', err)
       }

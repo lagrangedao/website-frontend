@@ -161,7 +161,7 @@
       <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" v-else></detail-app>
     </div>
 
-    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'370px'" :destroy-on-close="true" custom-class="drawer_style">
+    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style">
       <template #default>
         <div class="close flex-row" @click="drawer=false">
           <el-icon>
@@ -227,7 +227,7 @@
           </el-tab-pane>
           <el-tab-pane v-for="(dataJob, j) in logsContAll.data" v-if="logsContAll.data && drawerType === 'detail'" :key="j" :name="j.toString()">
             <template #label>
-              <span class="custom-tabs-label flex-row">
+              <span class="custom-tabs-label font-14 flex-row">
                 <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
               </span>
             </template>
@@ -282,7 +282,7 @@
           </el-tab-pane>
           <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data && drawerType === 'log'" :key="j" :name="j.toString()">
             <template #label>
-              <span class="custom-tabs-label flex-row">
+              <span class="custom-tabs-label font-14 flex-row">
                 <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
               </span>
             </template>
@@ -663,19 +663,23 @@ export default defineComponent({
     }
     async function likeMethod () {
       forkLoad.value = true
-      if (likeOwner.value) {
-        const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
-      } else {
-        const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
-      }
+      try {
+        if (likeOwner.value) {
+          const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
+        } else {
+          const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
+        }
+      } catch{ }
       likesValue.value = !likesValue.value
       requestAll()
       likesData()
     }
     const likesData = async () => {
       forkLoad.value = true
-      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
-      if (getLikeRes) likeOwner.value = getLikeRes.data.liked
+      try {
+        const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
+        if (getLikeRes) likeOwner.value = getLikeRes.data.liked
+      } catch{ }
       forkLoad.value = false
     }
     async function logsMethod (type, name, index) {
@@ -690,6 +694,7 @@ export default defineComponent({
       }
     }
     const drawerClick = async (tab, event) => {
+      checkedLock.value = false
       await websocketclose()
       if (drawerName.value === 'Overview') return
       let n = Number(drawerName.value)
@@ -830,7 +835,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,600;1,700&display=swap");
+// @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,600;1,700&display=swap");
 #space {
   background: #fff;
   color: #333;
@@ -1208,6 +1213,9 @@ export default defineComponent({
         .custom-tabs-label {
           height: 100%;
           padding: 0 0.15rem;
+          &.font-14 {
+            font-size: 14px;
+          }
           .icon {
             height: 16px;
           }
@@ -1351,6 +1359,11 @@ export default defineComponent({
   text-align: left;
   font-size: 14px;
   line-height: 1.5;
+  &.app {
+    .el-drawer__body {
+      overflow: hidden;
+    }
+  }
   .close {
     width: 20px;
     height: 20px;
@@ -1591,9 +1604,11 @@ export default defineComponent({
           }
           .box-card {
             position: relative;
-            max-height: 260px;
+            max-height: calc(100% - 60px);
             margin: 11px 0 0;
             background-color: transparent;
+            font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
+              Monaco, Consolas, Liberation Mono, Courier New, monospace;
             white-space: nowrap;
             overflow-y: auto;
             box-shadow: none;
@@ -1707,7 +1722,7 @@ export default defineComponent({
       }
       .el-tabs__item {
         height: auto;
-        padding: 0.18rem 0;
+        padding: 0.2rem 0;
         margin: 0 0.45rem 0 0;
         font-size: 20px;
         line-height: 1;
@@ -1723,6 +1738,9 @@ export default defineComponent({
         }
         .custom-tabs-label {
           line-height: 1;
+          &.font-14 {
+            font-size: 14px;
+          }
           i {
             margin: 0 5px 0 0;
             font-size: 16px;
@@ -1752,7 +1770,7 @@ export default defineComponent({
       line-height: 40px;
     }
     .log_app {
-      height: 360px;
+      height: calc(100% - 10px);
       padding: 0;
       margin: 10px 0 0;
       .logBody {
@@ -1807,9 +1825,11 @@ export default defineComponent({
           }
         }
         .box-card {
-          max-height: 315px;
+          max-height: calc(100% - 60px);
           margin: 20px 0 0;
           background: transparent;
+          font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
+            Monaco, Consolas, Liberation Mono, Courier New, monospace;
           font-size: 14px;
           color: #525252;
           // white-space: nowrap;

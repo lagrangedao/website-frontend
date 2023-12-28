@@ -70,9 +70,9 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item command="asProvider">
+                <!-- <el-dropdown-item command="asProvider">
                   <div class="profile router-link">- As Provider</div>
-                </el-dropdown-item>
+                </el-dropdown-item> -->
                 <el-dropdown-item command="asUser">
                   <div class="profile router-link b">- As Space Builder</div>
                 </el-dropdown-item>
@@ -832,7 +832,7 @@ export default defineComponent({
           display: block;
           width: 100%;
           height: auto;
-          padding: 3px 3px 3px 22px;
+          padding: 3px 3px 3px 0;
           &:hover {
             text-decoration: underline;
           }

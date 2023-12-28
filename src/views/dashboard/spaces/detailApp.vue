@@ -111,10 +111,10 @@
       </el-row>
     </div>
 
-    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'370px'" :destroy-on-close="true" custom-class="drawer_style" :before-close="handleClose">
+    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style app" :before-close="handleClose">
       <template #default>
         <div class="log_app">
-          <div class="logBody" v-loading="logsLoad">
+          <div class="logBody" style="height:100%" v-loading="logsLoad">
             <div class="flex-row log-title">
               <div class="flex-row">
                 <div class="flex-row log">
@@ -384,6 +384,7 @@ export default defineComponent({
     }
     function handleClose () {
       drawer.value = false
+      checkedLock.value = false
       logsCont.buildLog = []
       logsCont.containerLog = []
       logsCont.wsUrl = {}

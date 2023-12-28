@@ -126,9 +126,12 @@
                       </el-icon>
                     </template>
                   </el-popover> -->
-                    <span class="run">Running on
-                      <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware_type === 'GPU' ? list.activeOrder.config.hardware : 'CPU'}}</strong>
+                    <span class="run">Running
+                      <strong v-if="list.activeOrder.config.hardware_type === 'GPU'" style="text-transform: uppercase;"> on {{list.activeOrder.config.hardware}}</strong>
                     </span>
+                  </div>
+                  <div class="card-warn flex-row" v-else-if="list.status === 'Deploying'">
+                    <span class="run">{{list.status}}</span>
                   </div>
                   <div class="card-header flex-row">
                     <span>{{list.likes}}</span>
