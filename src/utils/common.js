@@ -199,7 +199,7 @@ async function signOutFun() {
   })
 }
 
-function momentFun(dateItem) {
+function momentFun(dateItem, type) {
   let dateNew = dateItem * 1000
   let dataUnit = ''
   let dataTime = new Date(dateNew) + ''
@@ -220,6 +220,7 @@ function momentFun(dateItem) {
       break
   }
   dateNew = dateNew ?
+    type ? moment(new Date(parseInt(dateNew))).format('YYYY-MM-DD HH:mm:ss') :
     moment(new Date(parseInt(dateNew))).format('YYYY-MM-DD HH:mm:ss') + ` (${dataUnit})` :
     '-'
   return dateNew

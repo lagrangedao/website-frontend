@@ -265,7 +265,8 @@ export default defineComponent({
   },
   props: {
     // listdata: { type: Number, default: 1 },
-    likesValue: { type: Boolean, default: false }
+    likesValue: { type: Boolean, default: false },
+    listValue: { type: Object, default: {} }
   },
   setup (props, context) {
     const store = useStore()
@@ -617,9 +618,10 @@ export default defineComponent({
     async function requestInitData (type) {
       if (route.name !== 'spaceDetail') return
       listLoad.value = true
-      listdata.value = {}
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
+      // listdata.value = {}
+      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+      // if (listRes && listRes.status === 'success') listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
+      if (props.listValue && props.listValue.status === 'success') listdata.value = props.listValue.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
 
       const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
       if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
@@ -791,6 +793,9 @@ export default defineComponent({
     onDeactivated(() => {
       ruleForm.name = ''
       ruleForm.delete = ''
+    })
+    watch(() => props.listValue, () => {
+      if (props.listValue && props.listValue.status === 'success') listdata.value = props.listValue.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
     })
     // watch(() => props.likesValue, () => {
     //   requestInitData()

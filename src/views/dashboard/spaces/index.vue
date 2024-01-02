@@ -44,13 +44,13 @@
                 <el-card class="box-card">
                   <template #header>
                     <div class="card-header">
-                      <span class="left" :class="{'background': ls.status === 'Running' && ls.activeOrder.config.hardware_type === 'GPU'}" v-if="ls.status === 'Running' ||ls.status === 'Deploying'">{{ls.status}}
+                      <span class="left background" v-if="ls.status === 'Running' ||ls.status === 'Deploying'">{{ls.status}}
                         <a v-if="ls.status === 'Running' && ls.activeOrder.config.hardware_type === 'GPU'">on
                           <i>{{ ls.activeOrder.config.hardware}}</i>
                         </a>
                       </span>
                       <span class="right flex-row">{{ls.likes}}</span>
-                      <span class="bottom" v-if="ls.activeOrder && ls.activeOrder.config">{{ls.activeOrder.config.description}}</span>
+                      <!-- <span class="bottom" v-if="ls.activeOrder && ls.activeOrder.config">{{ls.activeOrder.config.description}}</span> -->
                     </div>
                     <h1>{{ls.name}}</h1>
                     <!-- <div class="card-owner flex-row">
@@ -63,7 +63,7 @@
                       <i class="icon"></i>
                       <span class="small" @click.stop="searchChange(ls)">{{ls.full_name || system.$commonFun.hiddAddress(ls.wallet_address)}}</span>
                     </div>
-                    <span>{{system.$commonFun.momentFun(ls.created_at)}}</span>
+                    <span>{{system.$commonFun.momentFun(ls.created_at, 1)}}</span>
                   </div>
                 </el-card>
               </a>
@@ -82,13 +82,13 @@
                 <el-card class="box-card">
                   <template #header>
                     <div class="card-header">
-                      <span class="left" :class="{'background': list.status === 'Running' && list.activeOrder.config.hardware_type === 'GPU'}" v-if="list.status === 'Running' ||list.status === 'Deploying'">{{list.status}}
+                      <span class="left background" v-if="list.status === 'Running' ||list.status === 'Deploying'">{{list.status}}
                         <a v-if="list.status === 'Running' && list.activeOrder.config.hardware_type === 'GPU'">on
                           <i>{{list.activeOrder.config.hardware}}</i>
                         </a>
                       </span>
                       <span class="right flex-row">{{list.likes}}</span>
-                      <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span>
+                      <!-- <span class="bottom" v-if="list.activeOrder && list.activeOrder.config">{{list.activeOrder.config.description}}</span> -->
                     </div>
                     <h1>{{list.name}}</h1>
                     <!-- <div class="card-owner flex-row">
@@ -101,7 +101,7 @@
                       <i class="icon"></i>
                       <span class="small" @click.stop="searchChange(list)">{{list.full_name || system.$commonFun.hiddAddress(list.wallet_address)}}</span>
                     </div>
-                    <span>{{system.$commonFun.momentFun(list.created_at)}}</span>
+                    <span>{{system.$commonFun.momentFun(list.created_at, 1)}}</span>
                   </div>
                 </el-card>
               </a>

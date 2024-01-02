@@ -157,8 +157,8 @@
       <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
       <detail-files @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'files'"></detail-files>
       <detail-community @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'community'"></detail-community>
-      <detail-setting @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'settings'"></detail-setting>
-      <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" v-else></detail-app>
+      <detail-setting @handleValue="handleValue" :likesValue="likesValue" :listValue="listValue.data" v-else-if="activeName === 'settings'"></detail-setting>
+      <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" :listValue="listValue.data" v-else></detail-app>
     </div>
 
     <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style">
@@ -442,6 +442,9 @@ export default defineComponent({
     const renewButton = ref('renew')
     const logsType = ref('build')
     const checkedLock = ref(false)
+    const listValue = reactive({
+      data: {}
+    })
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -511,6 +514,7 @@ export default defineComponent({
       var numRe = new RegExp(numReg)
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
       if (listRes && listRes.status === 'success') {
+        listValue.data = listRes || {}
         allData.space = listRes.data.space
         allData.task = listRes.data.task
         parentValue.value = numRe.test(listRes.data.space.status) ? '' : listRes.data.space.status
@@ -829,6 +833,7 @@ export default defineComponent({
       renewButton,
       logsType,
       checkedLock,
+      listValue,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, logsContAll, handleValue, hardRedeploy,
       handleCurrentChange, handleSizeChange, handleClick, shareTwitter, logsMethod, clearWebsocket, upWebsocket,
       hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer

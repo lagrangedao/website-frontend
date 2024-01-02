@@ -191,7 +191,8 @@ export default defineComponent({
   },
   props: {
     urlChange: { type: String, default: 'app' },
-    likesValue: { type: Boolean, default: false }
+    likesValue: { type: Boolean, default: false },
+    listValue: { type: Object, default: {} }
   },
   setup (props, context) {
     const store = useStore()
@@ -223,6 +224,9 @@ export default defineComponent({
     const logsLoad = ref(false)
     const logsType = ref('build')
     const checkedLock = ref(false)
+    const listCont = reactive({
+      data: {}
+    })
 
     function handleClick (tab, event) {
       router.push({
@@ -260,19 +264,31 @@ export default defineComponent({
       listLoad.value = type ? true : false
       if (type) listdata.jobResult = []
       let code = -1
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        code = listRes.data.space && listRes.data.space.status_code ? listRes.data.space.status_code : -1
+      if (props.listValue && props.listValue.status === 'success') {
+        code = props.listValue.data.space && props.listValue.data.space.status_code ? props.listValue.data.space.status_code : -1
         statusCode.reload = Number(code) > 1 && Number(code) < 6 ? true : false
         if (type) {
           // console.log('load')
           statusCode.code = code
-          listdata.jobResult = await jobList(listRes.data.job)
-          if (listRes.data.space.status === 'Deploying' && listRes.data.job) listdata.jobs_status = await jobStatusList(listRes.data.job)
-          listdata.space = listRes.data.space
-          // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
+          listdata.jobResult = await jobList(props.listValue.data.job)
+          if (props.listValue.data.space && props.listValue.data.space.status === 'Deploying' && props.listValue.data.job) listdata.jobs_status = await jobStatusList(props.listValue.data.job)
+          listdata.space = props.listValue.data.space
+          // props.listValue.data.job = await system.$commonFun.sortBoole(props.listValue.data.job)
         }
       }
+      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+      // if (listRes && listRes.status === 'success') {
+      //   code = listRes.data.space && listRes.data.space.status_code ? listRes.data.space.status_code : -1
+      //   statusCode.reload = Number(code) > 1 && Number(code) < 6 ? true : false
+      //   if (type) {
+      //     // console.log('load')
+      //     statusCode.code = code
+      //     listdata.jobResult = await jobList(listRes.data.job)
+      //     if (listRes.data.space.status === 'Deploying' && listRes.data.job) listdata.jobs_status = await jobStatusList(listRes.data.job)
+      //     listdata.space = listRes.data.space
+      //     // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
+      //   }
+      // }
       context.emit('handleValue', false)
       listLoad.value = false
       // if (statusCode.reload) {
@@ -406,7 +422,7 @@ export default defineComponent({
     })
     onMounted(() => {
       window.scrollTo(0, 0)
-      init(1)
+      // init(1)
     })
     onDeactivated(() => {
     })
@@ -415,10 +431,13 @@ export default defineComponent({
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'app') {
         window.scrollTo(0, 0)
-        init(1)
+        // init(1)
       }
     })
     watch(() => props.likesValue, () => {
+      init(1)
+    })
+    watch(() => props.listValue, () => {
       init(1)
     })
     return {

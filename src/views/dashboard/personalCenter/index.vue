@@ -126,7 +126,7 @@
                       </el-icon>
                     </template>
                   </el-popover> -->
-                    <div class="run" :class="{'background': list.activeOrder.config.hardware_type === 'GPU'}">Running
+                    <div class="run background">Running
                       <span v-if="list.activeOrder.config.hardware_type === 'GPU'"> on
                         <span class="i">{{list.activeOrder.config.hardware}}</span>
                       </span>
@@ -342,9 +342,9 @@ export default defineComponent({
       const time = await throttle()
       if (!time) return false
       loadingText.value = ''
-      console.log('isLogin')
+      // console.log('isLogin')
       system.$commonFun.Init(async addr => {
-        console.log('addr: ', addr, lagLogin.value)
+        // console.log('addr: ', addr, lagLogin.value)
         info.address = addr
         system.$commonFun.web3Init.eth.getBalance(addr).then((balance) => {
           // console.log(balance)

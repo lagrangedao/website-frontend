@@ -518,6 +518,7 @@ export default defineComponent({
       }
     }
     async function nameExist () {
+      ruleForm.rename_tip = ruleForm.rename
       const existRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${ruleForm.rename}/exist`, 'get')
       if (existRes && existRes.status === 'success') ruleForm.rename_err = true
       else ruleForm.rename_err = false
