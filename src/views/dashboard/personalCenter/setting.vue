@@ -63,6 +63,7 @@ export default defineComponent({
     const accessName = computed(() => (store.state.accessName))
     const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
+    const getRouter = computed(() => (store.state.getRouter))
     const searchValue = ref('')
     const value = ref('')
     const info = reactive({
@@ -145,6 +146,7 @@ export default defineComponent({
       if (lStatus) {
         loading.value = false
         listLoad.value = false
+        if (getRouter.value) router.push({ path: getRouter.value })
       }
       return false
       store.dispatch('setNavLogin', false)

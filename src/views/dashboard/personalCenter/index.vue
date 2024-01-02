@@ -126,9 +126,11 @@
                       </el-icon>
                     </template>
                   </el-popover> -->
-                    <span class="run">Running
-                      <strong v-if="list.activeOrder.config.hardware_type === 'GPU'" style="text-transform: uppercase;"> on {{list.activeOrder.config.hardware}}</strong>
-                    </span>
+                    <div class="run" :class="{'background': list.activeOrder.config.hardware_type === 'GPU'}">Running
+                      <span v-if="list.activeOrder.config.hardware_type === 'GPU'"> on
+                        <span class="i">{{list.activeOrder.config.hardware}}</span>
+                      </span>
+                    </div>
                   </div>
                   <div class="card-warn flex-row" v-else-if="list.status === 'Deploying'">
                     <span class="run">{{list.status}}</span>
@@ -269,6 +271,7 @@ export default defineComponent({
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const navLogin = computed(() => { return String(store.state.navLogin) === 'true' })
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
+    const getRouter = computed(() => (store.state.getRouter))
     const searchValue = ref('')
     const value = ref('updated')
     const info = reactive({
@@ -372,8 +375,11 @@ export default defineComponent({
     async function signIn () {
       const chainId = await system.$commonFun.providerInit.request({ method: 'eth_chainId' })
       const [lStatus, signErr] = await system.$commonFun.login()
-      if (lStatus) getdataList()
-      else if (signErr !== '4001') signSetIn()
+      if (lStatus) {
+        // console.log(getRouter.value)
+        if (getRouter.value) router.push({ path: getRouter.value })
+        else getdataList()
+      } else if (signErr !== '4001') signSetIn()
       // else window.location.reload()
       return false
       store.dispatch('setNavLogin', false)
@@ -1321,7 +1327,7 @@ export default defineComponent({
               cursor: pointer;
               .card-warn {
                 position: absolute;
-                left: 0.15rem;
+                left: 0.1rem;
                 top: 0.1rem;
                 @media screen and (max-width: 768px) {
                   left: 0.2rem;
@@ -1335,8 +1341,19 @@ export default defineComponent({
                   color: #e6a23c;
                 }
                 .run {
+                  padding: 0 0.05rem;
                   font-size: 12px;
-                  line-height: 0.25rem;
+                  line-height: 0.2rem;
+                  &.background {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border-radius: 4px;
+                  }
+                  .i {
+                    font-family: "Helvetica-Bold";
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    font-style: oblique;
+                  }
                 }
               }
               .card-header {

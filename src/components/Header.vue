@@ -71,10 +71,10 @@
                   </div>
                 </el-dropdown-item>
                 <!-- <el-dropdown-item command="asProvider">
-                  <div class="profile router-link">- As Provider</div>
+                  <div class="profile router-link">As Provider</div>
                 </el-dropdown-item> -->
                 <el-dropdown-item command="asUser">
-                  <div class="profile router-link b">- As Space Builder</div>
+                  <div class="profile router-link b">As Space Builder</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
               <el-dropdown-menu>
@@ -148,7 +148,7 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
-    const accessName = computed(() => (store.state.accessName))
+    const accessName = computed(() => (store.state.accessName || '-'))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const logo = require("@/assets/images/icons/logo_black.png")
@@ -832,7 +832,7 @@ export default defineComponent({
           display: block;
           width: 100%;
           height: auto;
-          padding: 3px 3px 3px 0;
+          padding: 6px 3px 3px 0;
           &:hover {
             text-decoration: underline;
           }

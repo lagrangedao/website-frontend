@@ -44,9 +44,9 @@
                 <el-card class="box-card">
                   <template #header>
                     <div class="card-header">
-                      <span class="left" v-if="ls.status === 'Running' ||ls.status === 'Deploying'">{{ls.status}}
+                      <span class="left" :class="{'background': ls.status === 'Running' && ls.activeOrder.config.hardware_type === 'GPU'}" v-if="ls.status === 'Running' ||ls.status === 'Deploying'">{{ls.status}}
                         <a v-if="ls.status === 'Running' && ls.activeOrder.config.hardware_type === 'GPU'">on
-                          <strong style="text-transform: uppercase;">{{ ls.activeOrder.config.hardware}}</strong>
+                          <i>{{ ls.activeOrder.config.hardware}}</i>
                         </a>
                       </span>
                       <span class="right flex-row">{{ls.likes}}</span>
@@ -82,9 +82,9 @@
                 <el-card class="box-card">
                   <template #header>
                     <div class="card-header">
-                      <span class="left" v-if="list.status === 'Running' ||list.status === 'Deploying'">{{list.status}}
+                      <span class="left" :class="{'background': list.status === 'Running' && list.activeOrder.config.hardware_type === 'GPU'}" v-if="list.status === 'Running' ||list.status === 'Deploying'">{{list.status}}
                         <a v-if="list.status === 'Running' && list.activeOrder.config.hardware_type === 'GPU'">on
-                          <strong style="text-transform: uppercase;">{{list.activeOrder.config.hardware}}</strong>
+                          <i>{{list.activeOrder.config.hardware}}</i>
                         </a>
                       </span>
                       <span class="right flex-row">{{list.likes}}</span>
@@ -488,18 +488,27 @@ export default defineComponent({
               .card-header {
                 span {
                   position: absolute;
-                  height: 0.25rem;
+                  height: 0.2rem;
                   font-size: 12px;
                   color: #fff;
-                  line-height: 0.25rem;
+                  line-height: 0.2rem;
                   @media screen and (min-width: 1800px) {
                     font-size: 13px;
                   }
                   &.left {
-                    left: 0.15rem;
+                    left: 0.1rem;
                     top: 0.1rem;
-                    font-family: "Helvetica-Bold";
                     opacity: 0.9;
+                    padding: 0 0.05rem;
+                    &.background {
+                      background-color: rgba(255, 255, 255, 0.1);
+                      border-radius: 4px;
+                    }
+                    i {
+                      font-family: "Helvetica-Bold";
+                      font-weight: 600;
+                      text-transform: uppercase;
+                    }
                   }
                   &.right {
                     right: 0.15rem;

@@ -440,7 +440,7 @@ export default defineComponent({
       } else {
         const urlRes = `${process.env.VUE_APP_BASEAPI}space/deployment`
         const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
-        if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+        if (hardhashRes && hardhashRes.status === 'success') system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
       }
     }
 

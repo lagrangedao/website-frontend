@@ -38,7 +38,7 @@
             <el-tooltip v-else-if="parentValue === 'Running'" placement="bottom" content="The Space has been successfully deployed.">{{parentValue}}</el-tooltip>
             <span v-else>{{parentValue}}</span>
             <span v-if="parentValue === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config && allData.space.activeOrder.config.hardware_type && allData.space.activeOrder.config.hardware_type === 'GPU'">&nbsp;on
-              <strong style="text-transform: uppercase;">{{allData.space.activeOrder.config.hardware}}</strong>
+              <i>{{allData.space.activeOrder.config.hardware}}</i>
             </span>
           </div>
           <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours')) && (parentValue && parentValue.toLowerCase() !== 'failed') && parentValue !== 'Stopped' && parentValue !== 'Expired'">
@@ -471,11 +471,13 @@ export default defineComponent({
         for (let j = 0; j < arr.length; j++) {
           if (type === 'log') {
             let spaceCont = space || {}
-            logArr.push({
+            if ((space.status && space.status.toLowerCase() === "running") && (arr[j].status && arr[j].status.toLowerCase() !== "running")) { }
+            else logArr.push({
               job: arr[j],
               space: spaceCont,
               buildLog: [],
-              containerLog: []
+              containerLog: [],
+              ws: null
             })
           } else if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
             let spaceCont = space || {}
@@ -483,7 +485,8 @@ export default defineComponent({
               job: arr[j],
               space: spaceCont,
               buildLog: [],
-              containerLog: []
+              containerLog: [],
+              ws: null
             })
           }
         }
@@ -875,7 +878,6 @@ export default defineComponent({
       }
       .name {
         padding: 0.05rem 0;
-        font-family: "Helvetica-Bold";
         font-size: 18px;
         color: #878c93;
         line-height: 1;
@@ -983,6 +985,7 @@ export default defineComponent({
           border-radius: 0.05rem;
           font-size: 14px;
           line-height: 1;
+          text-transform: capitalize;
           @media screen and (max-width: 1600px) {
             font-size: 13px;
           }
@@ -1039,6 +1042,11 @@ export default defineComponent({
                 opacity: 0.5;
               }
             }
+          }
+          i {
+            font-family: "Helvetica-Bold";
+            font-weight: 600;
+            text-transform: uppercase;
           }
         }
         .logs_style {

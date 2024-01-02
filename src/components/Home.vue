@@ -80,6 +80,9 @@ export default defineComponent({
       fn()
       footer_style()
     })
+    watch(route, (to, from) => {
+      if (to.path !== '/personal_center' || (store.state.accessToken && to.path === '/personal_center')) store.dispatch('setGetRouter', to.path)
+    })
     return {
       positionStyle,
       area,

@@ -249,7 +249,7 @@ export default defineComponent({
             console.log('err', err)
             arr[j].job_result_uri = ''
           }
-          arrJob.push(arr[j])
+          if (arr[j].job_result_uri) arrJob.push(arr[j])
         }
       }
       return arrJob
@@ -265,7 +265,7 @@ export default defineComponent({
         code = listRes.data.space && listRes.data.space.status_code ? listRes.data.space.status_code : -1
         statusCode.reload = Number(code) > 1 && Number(code) < 6 ? true : false
         if (type) {
-          console.log('load')
+          // console.log('load')
           statusCode.code = code
           listdata.jobResult = await jobList(listRes.data.job)
           if (listRes.data.space.status === 'Deploying' && listRes.data.job) listdata.jobs_status = await jobStatusList(listRes.data.job)
@@ -284,6 +284,7 @@ export default defineComponent({
 
     async function jobStatusList (list) {
       let arr = list || []
+      let arrJob = []
       for (let j = 0; j < arr.length; j++) {
         try {
           if (arr[j].job_result_uri) {
@@ -297,8 +298,9 @@ export default defineComponent({
           console.log('err', err)
           arr[j].job_textUri = ''
         }
+        if (arr[j].job_result_uri) arrJob.push(arr[j])
       }
-      return arr
+      return arrJob
     }
 
     function hardRedeploy () {
