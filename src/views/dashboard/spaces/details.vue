@@ -147,6 +147,11 @@
                       Share on Twitter
                     </div>
                   </li>
+                  <li class="flex-row" v-if="metaAddress && metaAddress === route.params.wallet_address && (parentValue === 'Assigning to provider' || parentValue === 'Waiting for transaction' || parentValue === 'Deploying' || parentValue === 'Running')">
+                    <div class="m-width" @click="closeSpace">
+                      Close
+                    </div>
+                  </li>
                 </ul>
               </template>
             </el-popover>
@@ -531,7 +536,7 @@ export default defineComponent({
           logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
           logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
         } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
-      } catch{ forkLoad.value=false }
+      } catch{ forkLoad.value = false }
     }
     async function requestNft () {
       try {
@@ -817,6 +822,18 @@ export default defineComponent({
       system.$commonFun.popupwindow(text);
     }
 
+    async function closeSpace () {
+      forkLoad.value = true
+      try {
+        const closeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${allData.space.uuid}/deployment`, 'delete')
+        if (closeRes && closeRes.status === 'success') {
+          system.$commonFun.messageTip('success', 'The space has be closed')
+          await requestDetail()
+        } else if (closeRes && closeRes.status === 'failed' && closeRes.message) system.$commonFun.messageTip('error', closeRes.message)
+      } catch{ }
+      forkLoad.value = false
+    }
+
     onMounted(() => system.$commonFun.gatewayGain())
     onActivated(() => init())
     onBeforeUnmount(() => {
@@ -866,7 +883,7 @@ export default defineComponent({
       checkedLock,
       listValue, networkC, netEnv,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, logsContAll, handleValue, hardRedeploy,
-      handleCurrentChange, handleSizeChange, handleClick, shareTwitter, logsMethod, clearWebsocket, upWebsocket,
+      handleCurrentChange, handleSizeChange, handleClick, shareTwitter, closeSpace, logsMethod, clearWebsocket, upWebsocket,
       hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer, netChange
     }
   }

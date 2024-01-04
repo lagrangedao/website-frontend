@@ -17,7 +17,12 @@
         </el-table-column>
         <el-table-column prop="message" label="refund/Denied reason" min-width="120">
           <template #default="scope">
-            <span>{{scope.row.refund_reason ||scope.row.denied_reason || '-'}}</span>
+            <el-popover v-if="scope.row.refund_reason ||scope.row.denied_reason" placement="top" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" :content="scope.row.refund_reason ||scope.row.denied_reason">
+              <template #reference>
+                {{scope.row.refund_reason ||scope.row.denied_reason}}
+              </template>
+            </el-popover>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="order" label="space name">
