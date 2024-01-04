@@ -346,19 +346,27 @@ export default defineComponent({
       system.$commonFun.Init(async addr => {
         // console.log('addr: ', addr, lagLogin.value)
         info.address = addr
-        system.$commonFun.web3Init.eth.getBalance(addr).then((balance) => {
-          // console.log(balance)
-          const myBalance = balance
-          const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
-          info.balance = Number(balanceAll).toFixed(4)
-        })
-        const chainId = await system.$commonFun.web3Init.eth.net.getId()
-        const { unit, name } = await system.$commonFun.getUnit(chainId)
-        info.unit = unit
-        info.network = name || chainId
-        // await system.$commonFun.timeout(500)
-        if (lagLogin.value) getdataList()
-        else await signIn()
+        try {
+          system.$commonFun.web3Init.eth.getBalance(addr).then((balance) => {
+            // console.log(balance)
+            const myBalance = balance
+            const balanceAll = system.$commonFun.web3Init.utils.fromWei(myBalance, 'ether')
+            info.balance = Number(balanceAll).toFixed(4)
+          })
+          const chainId = await system.$commonFun.web3Init.eth.net.getId()
+          const { unit, name } = await system.$commonFun.getUnit(chainId)
+          info.unit = unit
+          info.network = name || chainId
+          // await system.$commonFun.timeout(500)
+          if (lagLogin.value) {
+            system.$commonFun.gatewayGain()
+            getdataList()
+          } else await signIn()
+        } catch (err) {
+          // console.log('err:', err)
+          system.$commonFun.messageTip('error', err)
+          router.push({ name: 'main' })
+        }
       })
     }
     async function signSetIn (t) {
@@ -387,45 +395,47 @@ export default defineComponent({
     async function getdataList () {
       loading.value = false
       listLoad.value = true
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
-      if (listRes && listRes.status === 'success') {
-        listdata.spaces = listRes.data.space || []
-        listdata.datasets = listRes.data.dataset || []
-        listdata.received_licenses = listRes.data.received_licenses || []
-        listdata.license_requests_notifications = listRes.data.license_requests_notifications || []
-        listdata.outgoing_pending_license_requests = listRes.data.outgoing_pending_license_requests || []
-        listdata.user = listRes.data.user || {}
-        licenseIndex.value = listRes.data.received_licenses.length
-        dataSetIndex.value = listRes.data.dataset.length
-        spacesIndex.value = listRes.data.space.length
-        store.dispatch('setAccessAvatar', listRes.data.user.avatar && store.state.gateway ? `${store.state.gateway}/ipfs/${listRes.data.user.avatar}` : '')
-        store.dispatch('setAccessName', listRes.data.user.full_name)
-        let spaceList = []
-        let datasetList = []
-        listdata.spaces.forEach(async space => {
-          const current = Math.floor(Date.now() / 1000)
-          const expireTime = await system.$commonFun.expireTimeFun(space.expiration_time)
-          space.expireTime = expireTime.time || current
-          space.expireTimeUnit = expireTime.unit
-          spaceList.push(space.name)
-        })
-        listdata.datasets.forEach(space => datasetList.push(space.name))
-        store.dispatch('setAccessSpace', JSON.stringify(spaceList))
-        store.dispatch('setAccessDataset', JSON.stringify(datasetList))
-      } else {
-        listdata.spaces = []
-        listdata.datasets = []
-        listdata.received_licenses = []
-        listdata.license_requests_notifications = []
-        listdata.outgoing_pending_license_requests = []
-        listdata.user = {}
-        licenseIndex.value = 0
-        spacesIndex.value = 0
-        dataSetIndex.value = 0
-        system.$commonFun.messageTip('error', listRes.error ? listRes.error : 'Failed!')
-      }
-      // await system.$commonFun.timeout(500)
-      listLoad.value = false
+      try {
+        const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
+        if (listRes && listRes.status === 'success') {
+          listdata.spaces = listRes.data.space || []
+          listdata.datasets = listRes.data.dataset || []
+          listdata.received_licenses = listRes.data.received_licenses || []
+          listdata.license_requests_notifications = listRes.data.license_requests_notifications || []
+          listdata.outgoing_pending_license_requests = listRes.data.outgoing_pending_license_requests || []
+          listdata.user = listRes.data.user || {}
+          licenseIndex.value = listRes.data.received_licenses.length
+          dataSetIndex.value = listRes.data.dataset.length
+          spacesIndex.value = listRes.data.space.length
+          store.dispatch('setAccessAvatar', listRes.data.user.avatar && store.state.gateway ? `${store.state.gateway}/ipfs/${listRes.data.user.avatar}` : '')
+          store.dispatch('setAccessName', listRes.data.user.full_name)
+          let spaceList = []
+          let datasetList = []
+          listdata.spaces.forEach(async space => {
+            const current = Math.floor(Date.now() / 1000)
+            const expireTime = await system.$commonFun.expireTimeFun(space.expiration_time)
+            space.expireTime = expireTime.time || current
+            space.expireTimeUnit = expireTime.unit
+            spaceList.push(space.name)
+          })
+          listdata.datasets.forEach(space => datasetList.push(space.name))
+          store.dispatch('setAccessSpace', JSON.stringify(spaceList))
+          store.dispatch('setAccessDataset', JSON.stringify(datasetList))
+        } else {
+          listdata.spaces = []
+          listdata.datasets = []
+          listdata.received_licenses = []
+          listdata.license_requests_notifications = []
+          listdata.outgoing_pending_license_requests = []
+          listdata.user = {}
+          licenseIndex.value = 0
+          spacesIndex.value = 0
+          dataSetIndex.value = 0
+          system.$commonFun.messageTip('error', listRes.error ? listRes.error : 'Failed!')
+        }
+        // await system.$commonFun.timeout(500)
+        listLoad.value = false
+      } catch{ listLoad.value = false }
     }
     function fn () {
       document.addEventListener('visibilitychange', function () {

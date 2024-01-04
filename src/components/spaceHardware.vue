@@ -48,7 +48,7 @@
             </div>
             <div class="fork-btn flex-row" v-if="props.renewButton === 'fork'">
               <div class="fileList">
-                <el-form ref="ruleFormRef" :model="ruleForm" class="demo-ruleForm flex-row" status-icon>
+                <el-form ref="ruleFormRef" :model="ruleForm" v-loading="ruleLoad" class="demo-ruleForm flex-row" status-icon>
                   <el-form-item prop="" class="flex_left">
                     <label class="label" for="owner">
                       Owner
@@ -61,12 +61,19 @@
                       </div>
                     </label>
                   </el-form-item>
-                  <el-form-item prop="name" class="flex_right">
+                  <el-form-item prop="rename" class="flex_right">
                     <label class="label" for="dataname">
-                      Repository name *
+                      Space Name *
                       <div class="flex-row tip">
-                        <el-input @change="nameExist()" v-model="ruleForm.rename" :class="{'err': !ruleForm.rename || ruleForm.rename_err}" placeholder="Space name" />
-                        <div class="flex-row text g" v-if="!ruleForm.rename_err">
+                        <el-input @change="nameExist()" v-model="ruleForm.rename" maxlength="50" show-word-limit :class="{'err': !ruleForm.rename || ruleForm.rename_err}" placeholder="Space name" />
+
+                        <div class="flex-row text r" v-if="!ruleForm.rename_tip">
+                          New space name must not be blank
+                        </div>
+                        <div class="flex-row text r" v-else-if="ruleForm.rule_tip">
+                          {{ruleForm.rule_tip}}
+                        </div>
+                        <div class="flex-row text g" v-else-if="!ruleForm.rename_err">
                           <el-icon>
                             <CircleCheckFilled />
                           </el-icon>
@@ -86,7 +93,7 @@
                 </el-form>
                 <p class="p-5">By default, forks are named the same as their upstream space. You can customize the name to distinguish it further.</p>
               </div>
-              <el-button type="info" :disabled="!ruleForm.rename || ruleForm.rename_err" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
+              <el-button type="info" :disabled="!ruleForm.rename || ruleForm.rename_err || ruleLoad" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
             </div>
           </el-col>
           <el-col :md="24" :lg="18" class="hardware-right">
@@ -301,7 +308,21 @@ export default defineComponent({
       displayPrice: false,
       rename: '',
       rename_err: false,
-      rename_tip: ''
+      rename_tip: '',
+      rule_tip: ''
+    })
+    const validateInput = (rule, value, callback) => {
+      if ((/[^a-zA-Z0-9-._]/g).test(value)) {
+        callback(new Error("The space name can only contain ASCII letters, digits, and the characters ., -, and _."));
+      } else {
+        callback();
+      }
+    }
+    const rules = reactive({
+      rename: [
+        { required: true, message: ' ', trigger: 'blur' },
+        { validator: validateInput, trigger: "blur" }
+      ]
     })
     const hardwareOptions = ref([])
     const hardwareLoad = ref(false)
@@ -309,6 +330,8 @@ export default defineComponent({
     const sleepVisible = ref(false)
     const forkLoad = ref(false)
     const sleepSelect = ref({})
+    const ruleFormRef = ref(null)
+    const ruleLoad = ref(false)
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
     let tokenAddress = process.env.VUE_APP_MUMBAI_USDC_ADDRESS
     let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
@@ -322,7 +345,6 @@ export default defineComponent({
       try {
         if (props.renewButton === 'fork') {
           const forkRes = await forkDuplicate()
-          console.log(forkRes)
           if (forkRes !== 'success') {
             closePart()
             return
@@ -387,7 +409,7 @@ export default defineComponent({
           name: 'spaceDetail',
           params: { wallet_address: metaAddress.value, name: ruleForm.rename ? ruleForm.rename : route.params.name, tabs: 'app' }
         })
-      } else system.$commonFun.messageTip('error', forkRes.message ? forkRes.message : 'Fork failed!')
+      }
       forkLoad.value = false
       return forkRes.status
     }
@@ -518,10 +540,19 @@ export default defineComponent({
       }
     }
     async function nameExist () {
+      ruleLoad.value = true
+      ruleForm.rule_tip = ''
       ruleForm.rename_tip = ruleForm.rename
-      const existRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${ruleForm.rename}/exist`, 'get')
-      if (existRes && existRes.status === 'success') ruleForm.rename_err = true
-      else ruleForm.rename_err = false
+      if (!ruleForm.rename) ruleForm.rename_err = true
+      else if ((/[^a-zA-Z0-9-._]/g).test(ruleForm.rename)) {
+        ruleForm.rule_tip = 'The space name can only contain ASCII letters, digits, and the characters ., -, and _.'
+        ruleForm.rename_err = true
+      } else {
+        const existRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${ruleForm.rename}/exist`, 'get')
+        if (existRes && existRes.status === 'success') ruleForm.rename_err = true
+        else ruleForm.rename_err = false
+      }
+      ruleLoad.value = false
     }
     async function init (params) {
       machinesLoad.value = true
@@ -575,13 +606,14 @@ export default defineComponent({
       system,
       props,
       ruleForm,
+      rules,
       sleepVisible,
       sleepSelect,
       dialogWidth,
       hardwareOptions,
       hardwareLoad,
       machinesLoad,
-      forkLoad,
+      forkLoad, ruleFormRef, ruleLoad,
       sleepChange, hardwareFun, close, forkDuplicate, nameExist
     }
   }
@@ -1100,11 +1132,25 @@ export default defineComponent({
                     border-color: #ff0000;
                   }
                 }
+                &.is-disabled {
+                  .el-input__suffix {
+                    background-color: transparent;
+                  }
+                }
                 .el-input__inner {
                   height: auto;
                   padding: 0.03rem 0.1rem;
                   font-size: inherit;
                   line-height: 2;
+                }
+                .el-input__suffix {
+                  display: flex;
+                  align-items: center;
+                  height: calc(100% - 8px);
+                  right: 1px;
+                  top: 3px;
+                  background-color: #fff;
+                  padding-right: 5px;
                 }
               }
             }

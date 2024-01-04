@@ -76,7 +76,7 @@ export default defineComponent({
       })
     }
     onMounted(() => {
-      system.$commonFun.gatewayGain()
+      system.$commonFun.gatewayGain(1)
       fn()
       footer_style()
     })

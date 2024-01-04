@@ -21,7 +21,7 @@
             <label class="label" for="dataname">
               New name
               <div class="flex-row">
-                <el-input v-model="ruleForm.name" placeholder="New space name" />
+                <el-input v-model="ruleForm.name" maxlength="50" show-word-limit placeholder="New space name" />
               </div>
             </label>
           </el-form-item>
@@ -325,8 +325,10 @@ export default defineComponent({
       ]
     })
     const validateInput = (rule, value, callback) => {
-      if ((/[^a-zA-Z0-9-]/g).test(value)) {
-        callback(new Error("Only regular alphanumeric characters and '-' support"));
+      if ((/[^a-zA-Z0-9-._]/g).test(value)) {
+        callback(new Error("The space name can only contain ASCII letters, digits, and the characters ., -, and _."));
+      } else if (value === route.params.name) {
+        callback(new Error("Space name was not changed"));
       } else {
         callback();
       }
@@ -440,18 +442,20 @@ export default defineComponent({
       await ruleFormRefDelete.value.validate(async (valid, fields) => {
         if (valid) {
           deleteLoad.value = true
-          let formData = new FormData()
-          formData.append('name', route.params.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/delete`, 'post', formData)
-          await system.$commonFun.timeout(500)
-          if (listRes && listRes.status === 'success') {
-            if (listRes.data.space) system.$commonFun.messageTip('success', 'Delete successfully!')
-            else system.$commonFun.messageTip('error', listRes.data.message)
-            router.push({ name: 'personalCenter' })
-          } else system.$commonFun.messageTip('error', 'Delete failed!')
-          ruleForm.name = ''
-          ruleForm.delete = ''
-          deleteLoad.value = false
+          try {
+            let formData = new FormData()
+            formData.append('name', route.params.name)
+            const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/delete`, 'post', formData)
+            await system.$commonFun.timeout(500)
+            if (listRes && listRes.status === 'success') {
+              if (listRes.data.space) system.$commonFun.messageTip('success', 'Delete successfully!')
+              else system.$commonFun.messageTip('error', listRes.data.message)
+              router.push({ name: 'personalCenter' })
+            } else system.$commonFun.messageTip('error', 'Delete failed!')
+            ruleForm.name = ''
+            ruleForm.delete = ''
+            deleteLoad.value = false
+          } catch{ deleteLoad.value = false }
         } else {
           console.log('error submit!', fields)
           return false

@@ -168,8 +168,8 @@ async function performSignin(sig) {
   }
 }
 
-async function gatewayGain() {
-  if (store.state.gateway) return
+async function gatewayGain(type) {
+  if (type && store.state.gateway) return
   try {
     const response = await sendRequest(`${process.env.VUE_APP_BASEAPI}gateway`, 'get')
     if (response && response.data.gateway) store.dispatch('setGateway', response.data.gateway)
@@ -362,7 +362,7 @@ async function walletChain(chainId) {
         text
       ]
     })
-    signOutFun()
+    // signOutFun()
     // const [lStatus, signErr] = await login()
     // if (lStatus) getdataList()
   } catch (err) {

@@ -351,6 +351,7 @@
       <space-hardware v-if="dialogCont.spaceHardFork" @handleHard="handleHard" :listdata="allData.space" :renewButton="renewButton"></space-hardware>
     </el-dialog>
     <space-hardware v-if="dialogCont.spaceHardRenew" @handleHard="handleHard" :listdata="allData.space" :renewButton="renewButton"></space-hardware>
+    <network-change v-if="networkC" :networkC="networkC" :netEnv="netEnv" @netChange="netChange"></network-change>
   </section>
 </template>
 <script>
@@ -361,7 +362,8 @@ import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
 import sharePop from '@/components/share.vue'
 import spaceHardware from '@/components/spaceHardware.vue'
-import { defineComponent, computed, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
+import networkChange from '@/components/networkChange'
+import { defineComponent, computed, onMounted, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import JsonViewer from 'vue-json-viewer'
@@ -378,6 +380,7 @@ export default defineComponent({
     detailCommunity,
     detailSetting,
     spaceHardware,
+    networkChange,
     JsonViewer,
     Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp
   },
@@ -445,6 +448,8 @@ export default defineComponent({
     const listValue = reactive({
       data: {}
     })
+    const networkC = ref(false)
+    const netEnv = ref([])
 
     function handleClick (tab, event) {
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
@@ -512,27 +517,31 @@ export default defineComponent({
     async function requestDetail () {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        listValue.data = listRes || {}
-        allData.space = listRes.data.space
-        allData.task = listRes.data.task
-        parentValue.value = numRe.test(listRes.data.space.status) ? '' : listRes.data.space.status
-        likeValue.value = listRes.data.space.likes || 0
-        const expireTimeCont = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        expireTime.time = expireTimeCont.time
-        expireTime.unit = expireTimeCont.unit
-        logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
-        logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
-      } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
+      try {
+        const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+        if (listRes && listRes.status === 'success') {
+          listValue.data = listRes || {}
+          allData.space = listRes.data.space
+          allData.task = listRes.data.task
+          parentValue.value = numRe.test(listRes.data.space.status) ? '' : listRes.data.space.status
+          likeValue.value = listRes.data.space.likes || 0
+          const expireTimeCont = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
+          expireTime.time = expireTimeCont.time
+          expireTime.unit = expireTimeCont.unit
+          logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
+          logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
+        } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
+      } catch{ forkLoad.value=false }
     }
     async function requestNft () {
-      const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
-      if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
-        nft.contract_address = listNftRes.data.contract_address
-        nft.chain_id = listNftRes.data.chain_id
-        nftTokens.value = listNftRes.data.tokens || []
-      }
+      try {
+        const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
+        if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
+          nft.contract_address = listNftRes.data.contract_address
+          nft.chain_id = listNftRes.data.chain_id
+          nftTokens.value = listNftRes.data.tokens || []
+        }
+      } catch{ }
     }
     async function requestFiles () {
       // const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
@@ -639,12 +648,14 @@ export default defineComponent({
     }
     async function rebootFun () {
       forkLoad.value = true
-      const rebootRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/redeploy`, 'post')
-      if (rebootRes && rebootRes.status === 'success') {
-        await system.$commonFun.timeout(500)
-        window.location.reload()
-      } else if (rebootRes.message) system.$commonFun.messageTip('error', rebootRes.message)
-      forkLoad.value = false
+      try {
+        const rebootRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/redeploy`, 'post')
+        if (rebootRes && rebootRes.status === 'success') {
+          await system.$commonFun.timeout(500)
+          window.location.reload()
+        } else if (rebootRes.message) system.$commonFun.messageTip('error', rebootRes.message)
+        forkLoad.value = false
+      } catch{ forkLoad.value = false }
     }
     async function reqNFT () {
       if (!nft.contract_address || nftTokens.value.length === 0) return
@@ -739,15 +750,33 @@ export default defineComponent({
         })
       })
     }
-    function handleHard (val, refresh) {
-      dialogCont.spaceHardDia = val
-      dialogCont.spaceHardRenew = val
-      dialogCont.spaceHardFork = val
-      if (refresh) {
-        requestAll()
-        likesValue.value = !likesValue.value
+    function handleHard (val, refresh, net) {
+      if (net) {
+        netEnv.value = [{
+          name: 'OpSwan',
+          id: 8598668088
+        },
+        {
+          name: 'Mumbai Testnet',
+          id: 80001
+        }]
+        networkC.value = true
+      } else {
+        dialogCont.spaceHardDia = val
+        dialogCont.spaceHardRenew = val
+        dialogCont.spaceHardFork = val
+        if (refresh) {
+          requestAll()
+          likesValue.value = !likesValue.value
+        }
       }
     }
+
+    async function netChange (dialog, rows) {
+      networkC.value = dialog
+      if (rows) system.$commonFun.walletChain(Number(rows))
+    }
+
     function logDrawer (type) {
       if (type === 'log' && (parentValue.value === 'Created' || parentValue.value === 'Stopped')) return
       drawerType.value = type
@@ -787,6 +816,8 @@ export default defineComponent({
         `#LagrangeDAO #DecentralizedComputing #Web3GitHub`
       system.$commonFun.popupwindow(text);
     }
+
+    onMounted(() => system.$commonFun.gatewayGain())
     onActivated(() => init())
     onBeforeUnmount(() => {
       websocketclose()
@@ -833,10 +864,10 @@ export default defineComponent({
       renewButton,
       logsType,
       checkedLock,
-      listValue,
+      listValue, networkC, netEnv,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, logsContAll, handleValue, hardRedeploy,
       handleCurrentChange, handleSizeChange, handleClick, shareTwitter, logsMethod, clearWebsocket, upWebsocket,
-      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
+      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer, netChange
     }
   }
 })
@@ -1361,6 +1392,71 @@ export default defineComponent({
         background: red;
         transform: skew(-14deg) rotate(-3deg);
         box-shadow: 0 0 16px rgba(0, 0, 0, 0.8);
+      }
+    }
+  }
+  :deep(.net_body) {
+    width: 570px;
+    margin: auto;
+    border-radius: 0.23rem;
+    text-align: left;
+    color: #000;
+    word-break: break-word;
+    @media screen and (max-width: 600px) {
+      width: 94%;
+    }
+    .el-dialog__header {
+      padding: 0.25rem 0.6rem 0.1rem;
+      font-size: 0.2rem;
+      .el-dialog__headerbtn {
+        right: 0.3rem;
+        top: 0.28rem;
+        font-size: 0.2rem;
+        font-weight: 600;
+        color: #000;
+        cursor: pointer;
+        i,
+        svg,
+        path {
+          color: inherit;
+          cursor: inherit;
+        }
+      }
+    }
+
+    .el-dialog__body {
+      padding: 0 0 0.15rem;
+    }
+
+    .el-dialog__footer {
+      padding: 0 0.6rem 0.5rem;
+      text-align: left;
+      .dialog-footer {
+        justify-content: center;
+      }
+      .el-button {
+        width: 60%;
+        max-width: 204px;
+        height: auto;
+        background: linear-gradient(180deg, #fefefe, #f0f0f0);
+        font-family: inherit;
+        font-size: 16px;
+        line-height: 1;
+        color: #000;
+        border-radius: 0.07rem;
+        @media screen and (max-width: 1600px) {
+          font-size: 14px;
+        }
+        &:hover {
+          opacity: 0.9;
+          span {
+            cursor: inherit;
+          }
+        }
+        &.is-disabled {
+          opacity: 0.5;
+          border-color: #e3e6eb;
+        }
       }
     }
   }
