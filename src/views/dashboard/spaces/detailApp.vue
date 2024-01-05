@@ -102,10 +102,10 @@
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Expired'">
           <div>
-            <p>
-              All deployments have expired
-              <span v-if="metaAddress && metaAddress === route.params.wallet_address">, You can
-                <el-button plain @click="hardRedeploy">Redeploy</el-button> it</span>.</p>
+            <p v-if="metaAddress && metaAddress === route.params.wallet_address">
+              All deployments have expired, You can
+              <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
+            <p v-else>All deployments have expired.</p>
           </div>
         </div>
       </el-row>
