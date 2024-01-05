@@ -725,14 +725,9 @@ export default defineComponent({
       logsCont.data[n].containerLog = []
       logsType.value = 'build'
       // 请求logsCont.data[n].space.result_uri地址，获取其中的build_log和container_log
-      if (logsCont.data[n].job.job_result_uri && logsCont.data[n].job.job_result_uri !== 'null') {
-        const response = await fetch(logsCont.data[n].job.job_result_uri)
-        const textUri = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        const logUri = textUri ? JSON.parse(textUri) : {}
-        if (logUri.build_log) await WebSocketFun(logUri.build_log, 1, n)
-        if (logUri.container_log && drawerName.value !== 'log') await WebSocketFun(logUri.container_log, 2, n)
+      if (logsCont.data[n].job) {
+        if (logsCont.data[n].job.build_log) await WebSocketFun(logsCont.data[n].job.build_log, 1, n)
+        if (logsCont.data[n].job.container_log && drawerName.value !== 'log') await WebSocketFun(logsCont.data[n].job.container_log, 2, n)
       } else if (logsCont.data[n].space.jobs_status) {
         await WebSocketFun(logsCont.data[n].space.jobs_status[n].build_log, 1, n)
         if (drawerName.value !== 'log') await WebSocketFun(logsCont.data[n].space.jobs_status[n].container_log, 2, n)
