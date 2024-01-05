@@ -30,7 +30,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
   } catch (err) {
     console.error(err, err.response)
     const time = await throttle()
-    if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.status === 403 ? 'The Token has expired. Please log in again' : err.response.data.msg || err.response.data.message || err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.status === 403 ? 'The token has expired. Please log in again' : err.response.data.msg || err.response.data.message || err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
     }
@@ -194,9 +194,9 @@ async function signOutFun() {
   store.dispatch('setMetaAddress', '')
   store.dispatch('setAccessSpace', '')
   store.dispatch('setAccessDataset', '')
-  router.push({
-    name: 'main'
-  })
+  // router.push({
+  //   name: 'main'
+  // })
 }
 
 function momentFun(dateItem, type) {

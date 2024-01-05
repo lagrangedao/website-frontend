@@ -3,19 +3,31 @@
     <div class="payment-history container-landing">
       <div class="title">{{paymentType.toLowerCase() === 'provider'?'provider Payment history':'user Payment history'}}</div>
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-if="paymentType.toLowerCase() !== 'provider'">
-        <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
+        <el-table-column prop="transaction_hash" label="TRANSACTION HASH" min-width="90">
           <template #default="scope">
-            <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
+            <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank" :title="scope.row.transaction_hash">{{system.$commonFun.hiddAddressSmall(scope.row.transaction_hash)}}</a>
           </template>
         </el-table-column>
-        <el-table-column prop="chain_id" label="chain id" width="110" />
-        <el-table-column prop="token" label="token">
+        <el-table-column prop="chain_id" label="CHAIN ID" width="110" />
+        <el-table-column prop="token" label="TOKEN">
           <template #default="scope">
             <!--            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>-->
             <span>USDC</span>
           </template>
         </el-table-column>
-        <el-table-column prop="message" label="refund/Denied reason" min-width="120">
+        <el-table-column prop="token" label="STARTED AT" min-width="110">
+          <template #default="scope">
+            <span v-if="scope.row.order" :title="system.$commonFun.momentFun(scope.row.order.started_at)">{{system.$commonFun.momentFun(scope.row.order.started_at)}}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="token" label="ENDED AT" min-width="110">
+          <template #default="scope">
+            <span v-if="scope.row.order" :title="system.$commonFun.momentFun(scope.row.order.ended_at)">{{system.$commonFun.momentFun(scope.row.order.ended_at)}}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="message" label="DETAILS" min-width="120">
           <template #default="scope">
             <el-popover v-if="scope.row.refund_reason ||scope.row.denied_reason" placement="top" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" :content="scope.row.refund_reason ||scope.row.denied_reason">
               <template #reference>

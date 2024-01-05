@@ -74,7 +74,7 @@
                   <div class="profile router-link">As Provider</div>
                 </el-dropdown-item> -->
                 <el-dropdown-item command="asUser">
-                  <div class="profile router-link b">As Space Builder</div>
+                  <div class="profile router-link b">Payment History</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
               <el-dropdown-menu>
