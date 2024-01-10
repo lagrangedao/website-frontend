@@ -16,7 +16,7 @@
                         <span v-else>-</span>
                       </small>
                     </template>
-                    <div :class="{'span-cp': job.is_leading_job && job.is_leading_job.toString() === 'true', 'cp-style flex-row': true}">
+                    <div :class="{'span-cp':  listdata.task && listdata.task.leading_job_id === job.uuid, 'cp-style flex-row': true}">
                       CP {{ j + 1 }}
 
                       <svg width="16" height="16" v-if="job.job_result_uri" @click="system.$commonFun.goLink(`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`)" t="1700718365282" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -204,7 +204,8 @@ export default defineComponent({
     const listdata = reactive({
       jobResult: [],
       jobs_status: [],
-      space: {}
+      space: {},
+      task: {},
     })
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
@@ -273,6 +274,7 @@ export default defineComponent({
           listdata.jobResult = await jobList(props.listValue.data.job)
           if (props.listValue.data.space && props.listValue.data.space.status === 'Deploying' && props.listValue.data.job) listdata.jobs_status = await jobStatusList(props.listValue.data.job)
           listdata.space = props.listValue.data.space
+          listdata.task = props.listValue.data.task
           // props.listValue.data.job = await system.$commonFun.sortBoole(props.listValue.data.job)
         }
       }
@@ -428,6 +430,7 @@ export default defineComponent({
     })
     watch(route, (to, from) => {
       listdata.space = {}
+      listdata.task = {}
       if (to.name !== 'spaceDetail') return
       if (to.params.tabs === 'app') {
         window.scrollTo(0, 0)

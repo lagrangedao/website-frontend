@@ -95,15 +95,15 @@
                 </span>
               </template>
             </el-tab-pane>
-            <el-tab-pane name="community">
+            <!-- <el-tab-pane name="community">
               <template #label>
                 <span class="custom-tabs-label flex-row">
                   <i class="icon"></i>
                   <span>Community</span>
-                  <!-- <b>3</b> -->
+                  <b>3</b>
                 </span>
               </template>
-            </el-tab-pane>
+            </el-tab-pane> -->
             <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
               <template #label>
                 <span class="custom-tabs-label flex-row">
@@ -141,6 +141,11 @@
                   </li>
                   <li :class="{'flex-row': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" v-if="metaAddress && metaAddress !== route.params.wallet_address">
                     <div class="m-width" @click="reqNFT">Request License</div>
+                  </li>
+                  <li class="flex-row">
+                    <div class="m-width" @click="handleClick('community')">
+                      Community
+                    </div>
                   </li>
                   <li class="flex-row">
                     <div class="m-width" @click="shareTwitter">
@@ -233,7 +238,7 @@
           <el-tab-pane v-for="(dataJob, j) in logsContAll.data" v-if="logsContAll.data && drawerType === 'detail'" :key="j" :name="j.toString()">
             <template #label>
               <span class="custom-tabs-label font-14 flex-row">
-                <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                <span :class="{'span-cp': allData.task && allData.task.leading_job_id === dataJob.job.uuid}">CP {{j+1}}</span>
               </span>
             </template>
             <div class="over-view">
@@ -288,7 +293,7 @@
           <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data && drawerType === 'log'" :key="j" :name="j.toString()">
             <template #label>
               <span class="custom-tabs-label font-14 flex-row">
-                <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+                <span :class="{'span-cp':  allData.task && allData.task.leading_job_id === dataJob.job.uuid}">CP {{j+1}}</span>
               </span>
             </template>
             <div class="log-all">
@@ -457,7 +462,9 @@ export default defineComponent({
     const netEnv = ref([])
 
     function handleClick (tab, event) {
-      router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
+      const nameTab = tab.props ?.name || tab
+      if (nameTab === 'community') activeName.value = 'community'
+      router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: nameTab } })
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
