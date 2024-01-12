@@ -16,7 +16,7 @@
           <el-backtop :right="20" :bottom="50" />
         </div>
       </el-main>
-      <el-footer v-if="route.name !== 'main'" :class="{'footer_position': positionStyle}">
+      <el-footer v-if="route.name !== 'main' && !(route.name === 'spaceDetail' && (route.params.tabs === 'app' || route.params.tabs === 'files'))" :class="{'footer_position': positionStyle}">
         <v-foot :positionStyle="positionStyle"></v-foot>
       </el-footer>
     </el-container>
@@ -235,21 +235,21 @@ export default defineComponent({
   padding: 0 16px;
   margin: auto;
   box-sizing: border-box;
-  @media screen and (min-width: 640px) {
-    max-width: 640px;
-  }
-  @media screen and (min-width: 768px) {
-    max-width: 768px;
-  }
-  @media screen and (min-width: 1024px) {
-    max-width: 1024px;
-  }
-  @media screen and (min-width: 1200px) {
-    max-width: 1200px;
-  }
-  @media screen and (min-width: 1536px) {
-    max-width: 1536px;
-  }
+  // @media screen and (min-width: 640px) {
+  //   max-width: 640px;
+  // }
+  // @media screen and (min-width: 768px) {
+  //   max-width: 768px;
+  // }
+  // @media screen and (min-width: 1024px) {
+  //   max-width: 1024px;
+  // }
+  // @media screen and (min-width: 1200px) {
+  //   max-width: 1200px;
+  // }
+  // @media screen and (min-width: 1536px) {
+  //   max-width: 1536px;
+  // }
 }
 
 .flex-row {

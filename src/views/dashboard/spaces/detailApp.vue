@@ -478,8 +478,16 @@ export default defineComponent({
     }
   }
 
+  #spaceBody {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
   :deep(.space_body) {
+    width: 100%;
     align-items: stretch;
+    flex-grow: 1;
     min-height: 80px;
     padding: 0;
     margin: auto;
@@ -565,13 +573,15 @@ export default defineComponent({
     .app-tabs {
       position: relative;
       width: 100%;
+      display: flex;
+      flex-direction: column;
       @media screen and (max-width: 768px) {
         padding-top: 0.35rem;
       }
       .heading-cp {
         position: absolute;
         top: 0;
-        right: 0;
+        right: 16px;
         padding: 0.15rem 0 0.15rem 20px;
         background: url(../../../assets/images/icons/start_job.png) no-repeat
           left center;
@@ -584,6 +594,9 @@ export default defineComponent({
         padding: 0;
         margin: 0;
         z-index: 1;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
         .app-button {
           display: none;
           position: absolute;
@@ -593,10 +606,19 @@ export default defineComponent({
         }
         .el-tabs__header {
           max-width: none !important;
-          padding: 0 !important;
+          padding: 0 16px !important;
           margin: 0;
         }
 
+        .el-tabs__content {
+          flex-grow: 1;
+          .el-tab-pane,
+          iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+          }
+        }
         .el-tabs__item {
           height: auto;
           .custom-tabs-label {
@@ -636,36 +658,36 @@ export default defineComponent({
       width: calc(100% - 4px);
       min-height: 315px;
       overflow: auto;
-      @media screen and (min-height: 500px) and (min-width: 769px) {
-        min-height: 315px;
-      }
-      @media screen and (min-height: 600px) and (min-width: 769px) {
-        min-height: 415px;
-      }
-      @media screen and (min-height: 680px) and (min-width: 769px) {
-        min-height: 495px;
-      }
-      @media screen and (min-height: 700px) and (min-width: 769px) {
-        min-height: 595px;
-      }
-      @media screen and (min-height: 750px) and (min-width: 769px) {
-        min-height: 565px;
-      }
-      @media screen and (min-height: 768px) and (min-width: 769px) {
-        min-height: 595px;
-      }
-      @media screen and (min-height: 900px) and (min-width: 769px) {
-        min-height: 685px;
-      }
-      @media screen and (min-height: 1000px) and (min-width: 769px) {
-        min-height: 755px;
-      }
-      @media screen and (min-height: 1100px) and (min-width: 769px) {
-        min-height: 925px;
-      }
-      @media screen and (min-height: 1200px) and (min-width: 769px) {
-        min-height: 985px;
-      }
+      // @media screen and (min-height: 500px) and (min-width: 769px) {
+      //   min-height: 315px;
+      // }
+      // @media screen and (min-height: 600px) and (min-width: 769px) {
+      //   min-height: 415px;
+      // }
+      // @media screen and (min-height: 680px) and (min-width: 769px) {
+      //   min-height: 495px;
+      // }
+      // @media screen and (min-height: 700px) and (min-width: 769px) {
+      //   min-height: 595px;
+      // }
+      // @media screen and (min-height: 750px) and (min-width: 769px) {
+      //   min-height: 565px;
+      // }
+      // @media screen and (min-height: 768px) and (min-width: 769px) {
+      //   min-height: 595px;
+      // }
+      // @media screen and (min-height: 900px) and (min-width: 769px) {
+      //   min-height: 685px;
+      // }
+      // @media screen and (min-height: 1000px) and (min-width: 769px) {
+      //   min-height: 755px;
+      // }
+      // @media screen and (min-height: 1100px) and (min-width: 769px) {
+      //   min-height: 925px;
+      // }
+      // @media screen and (min-height: 1200px) and (min-width: 769px) {
+      //   min-height: 985px;
+      // }
 
       &.space_text {
         padding: 11px;

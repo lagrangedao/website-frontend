@@ -1,7 +1,7 @@
 <template>
-  <section id="space" v-loading="forkLoad" element-loading-text="Please wait...">
-    <div class="space_head container-landing">
-      <div class="content flex-row">
+  <section id="space" :class="{'space-height': route.params.tabs === 'app'}" v-loading="forkLoad" element-loading-text="Please wait...">
+    <div class="space_head" :class="{'space-height flex-row space-flex': route.params.tabs === 'app'}">
+      <div class="content flex-row container-landing">
         <div class="name flex-row">
           <div class="back-logo flex-row" @click="back" v-if="route.params.tabs === 'app'">
             <i class="icon logo_lagrange"></i>
@@ -118,9 +118,9 @@
           </el-tabs>
 
           <div class="logs_style popDown flex-row">
-            <el-popover :width="190" trigger="click" placement="bottom-end" popper-class="popper_style">
+            <el-popover :width="190" :visible="visible" trigger="click" placement="bottom-end" popper-class="popper_style">
               <template #reference>
-                <div class="share_style flex-row">
+                <div class="share_style flex-row" @click="visible = true">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024" data-v-ea893728="">
                     <path fill="currentColor" d="M176 416a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224"></path>
                   </svg>
@@ -164,11 +164,13 @@
         </div>
       </div>
 
-      <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
-      <detail-files @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'files'"></detail-files>
-      <detail-community @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'community'"></detail-community>
-      <detail-setting @handleValue="handleValue" :likesValue="likesValue" :listValue="listValue.data" v-else-if="activeName === 'settings'"></detail-setting>
-      <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" :listValue="listValue.data" v-else></detail-app>
+      <div :class="{'details-cont': route.params.tabs === 'app', 'container-landing': route.params.tabs !== 'app', 'details-style': true}">
+        <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
+        <detail-files @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'files'"></detail-files>
+        <detail-community @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'community'"></detail-community>
+        <detail-setting @handleValue="handleValue" :likesValue="likesValue" :listValue="listValue.data" v-else-if="activeName === 'settings'"></detail-setting>
+        <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" :listValue="listValue.data" v-else></detail-app>
+      </div>
     </div>
 
     <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style">
@@ -460,8 +462,10 @@ export default defineComponent({
     })
     const networkC = ref(false)
     const netEnv = ref([])
+    const visible = ref(false)
 
     function handleClick (tab, event) {
+      visible.value = false
       const nameTab = tab.props ?.name || tab
       if (nameTab === 'community') activeName.value = 'community'
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: nameTab } })
@@ -582,6 +586,7 @@ export default defineComponent({
       if (type) requestAll(type)
     }
     const hardwareOperate = async (type) => {
+      visible.value = false
       if (type === 'renew') dialogCont.spaceHardRenew = true
       else dialogCont.spaceHardFork = true
       renewButton.value = type
@@ -677,6 +682,7 @@ export default defineComponent({
         await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
         return
       }
+      visible.value = false
       forkLoad.value = true
       const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, nft.contract_address)
       const ipfs_uri = await nft_contract.methods.tokenURI(1).call()
@@ -786,6 +792,7 @@ export default defineComponent({
 
     function logDrawer (type) {
       if (type === 'log' && (parentValue.value === 'Created' || parentValue.value === 'Stopped')) return
+      visible.value = false
       drawerType.value = type
       drawer.value = true
       drawerName.value = type === 'detail' ? 'Overview' : '0'
@@ -793,6 +800,7 @@ export default defineComponent({
     }
 
     function shareTwitter () {
+      visible.value = false
       let typeName = 'Space'
       let type = 'space'
       let urlType = `spaces`
@@ -825,6 +833,7 @@ export default defineComponent({
     }
 
     async function closeSpace () {
+      visible.value = false
       forkLoad.value = true
       try {
         const closeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${allData.space.uuid}/deployment`, 'delete')
@@ -883,7 +892,7 @@ export default defineComponent({
       renewButton,
       logsType,
       checkedLock,
-      listValue, networkC, netEnv,
+      listValue, networkC, netEnv, visible,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, logsContAll, handleValue, hardRedeploy,
       handleCurrentChange, handleSizeChange, handleClick, shareTwitter, closeSpace, logsMethod, clearWebsocket, upWebsocket,
       hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer, netChange
@@ -894,6 +903,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 // @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,600;1,700&display=swap");
+.space-height {
+  min-height: 100vh;
+}
 #space {
   background: #fff;
   color: #333;
@@ -906,7 +918,27 @@ export default defineComponent({
     // background-color: #fbfbfc;
     // border-bottom: 1px solid #f1f1f1;
     border-top: 1px solid rgba(229, 231, 235, 0.7);
+    &.space-flex {
+      align-items: flex-start;
+      flex-wrap: wrap;
+      flex-direction: column;
+      .details-style,
+      .details-cont {
+        width: 100%;
+      }
+      .details-cont {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        section {
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+        }
+      }
+    }
     .content {
+      width: 100%;
       align-items: stretch;
       justify-content: space-between;
       flex-wrap: wrap;

@@ -448,8 +448,7 @@ export default defineComponent({
             const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/delete`, 'post', formData)
             await system.$commonFun.timeout(500)
             if (listRes && listRes.status === 'success') {
-              if (listRes.data.space) system.$commonFun.messageTip('success', 'Delete successfully!')
-              else system.$commonFun.messageTip('error', listRes.data.message)
+              system.$commonFun.messageTip(listRes.status, listRes.data.message)
               router.push({ name: 'personalCenter' })
             } else system.$commonFun.messageTip('error', 'Delete failed!')
             ruleForm.name = ''

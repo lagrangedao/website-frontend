@@ -5,7 +5,7 @@
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-if="paymentType.toLowerCase() !== 'provider'">
         <el-table-column prop="transaction_hash" label="TRANSACTION HASH" min-width="90">
           <template #default="scope">
-            <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank" :title="scope.row.transaction_hash">{{system.$commonFun.hiddAddressSmall(scope.row.transaction_hash)}}</a>
+            <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank" :title="scope.row.transaction_hash">{{system.$commonFun.hiddAddress(scope.row.transaction_hash)}}</a>
           </template>
         </el-table-column>
         <el-table-column prop="chain_id" label="CHAIN ID" width="110" />
