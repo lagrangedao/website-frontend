@@ -198,8 +198,10 @@ export default defineComponent({
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
     async function statsInit () {
-      const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${route.params.wallet_address}&&space_name=${route.params.name}`, 'get')
-      if (listStatsRes && listStatsRes.status === 'success') listdata.stats = listStatsRes.data.stats
+      try {
+        const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${route.params.wallet_address}&&space_name=${route.params.name}`, 'get')
+        if (listStatsRes && listStatsRes.status === 'success') listdata.stats = listStatsRes.data.stats
+      } catch (err) { }
     }
     async function init () {
       let gate = false

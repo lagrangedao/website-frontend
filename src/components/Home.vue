@@ -235,21 +235,24 @@ export default defineComponent({
   padding: 0 16px;
   margin: auto;
   box-sizing: border-box;
-  // @media screen and (min-width: 640px) {
-  //   max-width: 640px;
-  // }
-  // @media screen and (min-width: 768px) {
-  //   max-width: 768px;
-  // }
-  // @media screen and (min-width: 1024px) {
-  //   max-width: 1024px;
-  // }
-  // @media screen and (min-width: 1200px) {
-  //   max-width: 1200px;
-  // }
-  // @media screen and (min-width: 1536px) {
-  //   max-width: 1536px;
-  // }
+  @media screen and (min-width: 640px) {
+    max-width: 640px;
+  }
+  @media screen and (min-width: 768px) {
+    max-width: 768px;
+  }
+  @media screen and (min-width: 1024px) {
+    max-width: 1024px;
+  }
+  @media screen and (min-width: 1200px) {
+    max-width: 1200px;
+  }
+  @media screen and (min-width: 1536px) {
+    max-width: 1536px;
+  }
+  &.all {
+    max-width: none;
+  }
 }
 
 .flex-row {

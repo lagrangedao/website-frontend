@@ -1,7 +1,7 @@
 <template>
   <section id="space" :class="{'space-height': route.params.tabs === 'app'}" v-loading="forkLoad" element-loading-text="Please wait...">
     <div class="space_head" :class="{'space-height flex-row space-flex': route.params.tabs === 'app'}">
-      <div class="content flex-row container-landing">
+      <div class="content flex-row container-landing" :class="{'all': route.params.tabs === 'app'}">
         <div class="name flex-row">
           <div class="back-logo flex-row" @click="back" v-if="route.params.tabs === 'app'">
             <i class="icon logo_lagrange"></i>
@@ -12,7 +12,10 @@
             <i class="icon icon_spaces"></i>
             Space: &nbsp;
           </div>
-          <b>{{route.params.name}}</b>
+          <div class="wallet-cont flex-row">{{system.$commonFun.hiddAddress(route.params.wallet_address)}}
+            <span class="m">/</span>
+          </div>
+          <b @click="handleClick('app')">{{route.params.name}}</b>
           <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
           <el-button-group class="ml-4">
             <el-button @click="likeMethod" v-if="likeOwner">
@@ -91,7 +94,7 @@
               <template #label>
                 <span class="custom-tabs-label flex-row">
                   <i class="icon"></i>
-                  <span>Files and versions</span>
+                  <span>Files</span>
                 </span>
               </template>
             </el-tab-pane>
@@ -118,9 +121,9 @@
           </el-tabs>
 
           <div class="logs_style popDown flex-row">
-            <el-popover :width="190" :visible="visible" trigger="click" placement="bottom-end" popper-class="popper_style">
+            <el-popover :width="190" :hide-after="0" trigger="click" placement="bottom-end" popper-class="popper_style">
               <template #reference>
-                <div class="share_style flex-row" @click="visible = true">
+                <div class="share_style flex-row">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024" data-v-ea893728="">
                     <path fill="currentColor" d="M176 416a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224"></path>
                   </svg>
@@ -467,7 +470,7 @@ export default defineComponent({
     function handleClick (tab, event) {
       visible.value = false
       const nameTab = tab.props ?.name || tab
-      if (nameTab === 'community') activeName.value = 'community'
+      activeName.value = nameTab
       router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: nameTab } })
     }
     async function handleSizeChange (val) { }
@@ -909,9 +912,9 @@ export default defineComponent({
 #space {
   background: #fff;
   color: #333;
-  font-size: 18px;
+  font-size: 16px;
   @media screen and (max-width: 1200px) {
-    font-size: 16px;
+    font-size: 14px;
   }
   .space_head {
     // padding: 0;
@@ -965,7 +968,7 @@ export default defineComponent({
       }
       .name {
         padding: 0.05rem 0;
-        font-size: 18px;
+        font-size: 16px;
         color: #878c93;
         line-height: 1;
         @media screen and (max-width: 992px) {
@@ -980,6 +983,13 @@ export default defineComponent({
           font-family: "FIRACODE-BOLD";
           padding: 0.03rem 0.07rem 0 0;
           color: #000;
+          cursor: pointer;
+        }
+        .wallet-cont {
+          color: rgb(156, 163, 175);
+          .m {
+            padding: 0 2px;
+          }
         }
         .icon {
           width: 0.2rem;
@@ -1031,8 +1041,8 @@ export default defineComponent({
           }
         }
         .el-button {
-          height: 28px;
-          padding: 0.05rem 0.1rem;
+          height: 26px;
+          padding: 0.02rem 0.08rem;
           margin: 0.1rem 0;
           font-family: inherit;
           font-size: 14px;
@@ -1298,16 +1308,10 @@ export default defineComponent({
         padding: 0;
         line-height: 1;
         font-family: "Helvetica-light";
-        font-size: 16px;
-        @media screen and (max-width: 1600px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 441px) {
-          font-size: 14px;
-        }
+        font-size: 14px;
         .custom-tabs-label {
           height: 100%;
-          padding: 0 0.15rem;
+          padding: 0 0.1rem;
           &.font-14 {
             font-size: 14px;
           }
@@ -1315,11 +1319,11 @@ export default defineComponent({
             height: 16px;
           }
           .el-icon {
-            margin: -1px 0.07rem 0 0;
+            margin: -1px 0.05rem 0 0;
           }
           .icon_spaces {
             width: 16px;
-            margin: -1px 0.07rem 0 0;
+            margin: -1px 0.05rem 0 0;
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
               left center;
             background-size: auto 100%;
@@ -1328,7 +1332,7 @@ export default defineComponent({
             display: block;
             height: auto;
             padding: 0.03rem;
-            margin: 0 0.07rem;
+            margin: 0 0.05rem;
             background-color: #7405ff;
             color: #fff;
             border-radius: 5px;
