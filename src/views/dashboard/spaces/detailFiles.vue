@@ -937,6 +937,7 @@ export default defineComponent({
         border: 1px solid #e1e1e1;
         font-size: 14px;
         line-height: 1;
+        color: #666;
         border-radius: 0.09rem;
         @media screen and (min-width: 1800px) {
           font-size: 15px;
@@ -944,13 +945,22 @@ export default defineComponent({
         @media screen and (max-width: 1440px) {
           font-size: 13px;
         }
+        .el-dropdown-link {
+          display: flex;
+          align-items: center;
+          .el-icon {
+            width: 16px;
+            height: 16px;
+            margin: 0 4px;
+          }
+        }
       }
       .button {
         padding: 0.07rem 0.12rem;
         margin: 0 0.1rem 0 0;
-        background: #f5f6f8;
-        border: 1px solid #e5e5e6;
-        color: #000;
+        background: linear-gradient(180deg, #fefefe, #f0f0f0);
+        border: 1px solid #e1e1e1;
+        color: #666;
         border-radius: 0.09rem;
         text-decoration: none;
         font-size: 14px;
@@ -963,6 +973,8 @@ export default defineComponent({
         }
         svg {
           margin: 0 4px 0 0;
+          color: #666;
+          fill: #666;
         }
         b {
           padding: 1px 6px;

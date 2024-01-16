@@ -1348,7 +1348,6 @@ export default defineComponent({
           }
         }
         &.is-active {
-          font-family: "Helvetica-Neue";
           color: #000;
           font-weight: 600;
           position: relative;
