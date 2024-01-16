@@ -859,6 +859,7 @@ export default defineComponent({
     watch(route, (to, from) => {
       if (to.name !== 'spaceDetail') return
       if (!metaAddress.value && to.params.tabs === 'settings') activeName.value = 'app'
+      else activeName.value = to.params.tabs
       requestDetail()
       if (to.params.tabs === 'card') {
         window.scrollTo(0, 0)
@@ -912,9 +913,9 @@ export default defineComponent({
 #space {
   background: #fff;
   color: #333;
-  font-size: 16px;
-  @media screen and (max-width: 1200px) {
-    font-size: 14px;
+  font-size: 17px;
+  @media screen and (max-width: 1600px) {
+    font-size: 15px;
   }
   .space_head {
     // padding: 0;
@@ -968,9 +969,12 @@ export default defineComponent({
       }
       .name {
         padding: 0.05rem 0;
-        font-size: 16px;
+        font-size: 17px;
         color: #878c93;
         line-height: 1;
+        @media screen and (max-width: 1600px) {
+          font-size: 16px;
+        }
         @media screen and (max-width: 992px) {
           flex-wrap: wrap;
         }
@@ -981,7 +985,7 @@ export default defineComponent({
         }
         b {
           font-family: "FIRACODE-BOLD";
-          padding: 0.03rem 0.07rem 0 0;
+          padding: 0 0.07rem 0 0;
           color: #000;
           cursor: pointer;
         }
@@ -1293,7 +1297,7 @@ export default defineComponent({
         height: 100%;
         min-height: 35px;
         margin: 0 auto;
-        font-size: 14px;
+        font-size: 15px;
         .el-tabs__nav-scroll,
         .el-tabs__nav {
           height: 100%;
@@ -1308,7 +1312,10 @@ export default defineComponent({
         padding: 0;
         line-height: 1;
         font-family: "Helvetica-light";
-        font-size: 14px;
+        font-size: 16px;
+        @media screen and (max-width: 1600px) {
+          font-size: 15px;
+        }
         .custom-tabs-label {
           height: 100%;
           padding: 0 0.1rem;

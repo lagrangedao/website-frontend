@@ -15,7 +15,7 @@
             <p v-else>{{fileBody.title}}</p>
           </span>
         </div>
-        <div class="flex-row" v-if="labelTab === 'list'">
+        <div class="flex-row" style="align-items: stretch;" v-if="labelTab === 'list'">
           <div class="button flex-row">
             <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-eye">
               <path d="M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.83.88 9.576.43 8.898a1.62 1.62 0 0 1 0-1.798c.45-.677 1.367-1.931 2.637-3.022C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5c-1.473 0-2.825.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z"></path>
@@ -884,10 +884,10 @@ export default defineComponent({
 #space {
   background: #fff;
   color: #333;
-  font-size: 18px;
+  font-size: 16px;
   text-align: left;
-  @media screen and (max-width: 1200px) {
-    font-size: 16px;
+  @media screen and (max-width: 1600px) {
+    font-size: 15px;
   }
   :deep(.space_body) {
     align-items: stretch;
@@ -935,11 +935,11 @@ export default defineComponent({
         padding: 7px 12px;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         border: 1px solid #e1e1e1;
-        font-size: 15px;
+        font-size: 14px;
         line-height: 1;
         border-radius: 0.09rem;
         @media screen and (min-width: 1800px) {
-          font-size: 17px;
+          font-size: 15px;
         }
         @media screen and (max-width: 1440px) {
           font-size: 13px;
@@ -953,6 +953,14 @@ export default defineComponent({
         color: #000;
         border-radius: 0.09rem;
         text-decoration: none;
+        font-size: 14px;
+        line-height: 1;
+        @media screen and (min-width: 1800px) {
+          font-size: 15px;
+        }
+        @media screen and (max-width: 1440px) {
+          font-size: 13px;
+        }
         svg {
           margin: 0 4px 0 0;
         }
@@ -1060,7 +1068,7 @@ export default defineComponent({
             }
           }
           th {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: normal;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             text-transform: uppercase;
@@ -1079,16 +1087,16 @@ export default defineComponent({
         .top_title {
           justify-content: space-between;
           padding: 0.1rem 0.15rem;
-          font-size: 18px;
+          font-size: 14px;
           font-weight: normal;
           background: linear-gradient(180deg, #fefefe, #f0f0f0);
           text-transform: lowercase;
           color: #606060;
-          @media screen and (max-width: 1600px) {
-            font-size: 16px;
+          @media screen and (min-width: 1800px) {
+            font-size: 15px;
           }
           @media screen and (max-width: 768px) {
-            font-size: 15px;
+            font-size: 13px;
           }
           .left {
             .people {
@@ -1181,9 +1189,9 @@ export default defineComponent({
             .el-tabs__item {
               height: auto;
               padding: 0 0.15rem;
-              font-size: 16px;
+              font-size: 14px;
               @media screen and (min-width: 1800px) {
-                font-size: 18px;
+                font-size: 15px;
               }
               &.is-active {
                 &::after {
@@ -1232,9 +1240,9 @@ export default defineComponent({
         .el-form {
           margin: 0.3rem 0 0;
           .el-form-item {
-            font-size: 18px;
+            font-size: 16px;
             @media screen and (max-width: 1600px) {
-              font-size: 16px;
+              font-size: 15px;
             }
             .el-form-item__label {
               font-size: inherit;
@@ -1261,9 +1269,9 @@ export default defineComponent({
             margin: 0 0.15rem 0 0;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             font-family: inherit;
-            font-size: 18px;
+            font-size: 16px;
             @media screen and (max-width: 1600px) {
-              font-size: 16px;
+              font-size: 15px;
             }
           }
         }

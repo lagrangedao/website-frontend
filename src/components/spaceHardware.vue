@@ -407,7 +407,7 @@ export default defineComponent({
         if (type) context.emit('handleHard', false, false)
         router.push({
           name: 'spaceDetail',
-          params: { wallet_address: metaAddress.value, name: ruleForm.rename ? ruleForm.rename : route.params.name, tabs: 'app' }
+          params: { wallet_address: metaAddress.value, name: ruleForm.rename ? ruleForm.rename : route.params.name, tabs: 'card' }
         })
       }
       forkLoad.value = false
@@ -645,17 +645,14 @@ export default defineComponent({
 
       h2 {
         margin: 0 0 0.12rem;
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 600;
         color: #000;
         @media screen and (max-width: 1600px) {
-          font-size: 18px;
-        }
-        @media screen and (max-width: 1440px) {
-          font-size: 17px;
+          font-size: 15px;
         }
         @media screen and (max-width: 768px) {
-          font-size: 15px;
+          font-size: 14px;
         }
 
         svg {
@@ -668,11 +665,8 @@ export default defineComponent({
       .p-2 {
         align-items: flex-start;
         margin: 0 0 0.08rem;
-        font-size: 17px;
+        font-size: 15px;
         @media screen and (max-width: 1600px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 1440px) {
           font-size: 14px;
         }
         @media screen and (max-width: 768px) {
@@ -755,16 +749,13 @@ export default defineComponent({
 
         .title_tip {
           white-space: nowrap;
-          font-size: 18px;
+          font-size: 15px;
           font-weight: 600;
           @media screen and (max-width: 1600px) {
-            font-size: 16px;
-          }
-          @media screen and (max-width: 1440px) {
-            font-size: 15px;
+            font-size: 14px;
           }
           @media screen and (max-width: 768px) {
-            font-size: 14px;
+            font-size: 13px;
           }
 
           p {
@@ -811,11 +802,8 @@ export default defineComponent({
         .time {
           margin: 0.15rem 0;
           white-space: nowrap;
-          font-size: 17px;
+          font-size: 15px;
           @media screen and (max-width: 1600px) {
-            font-size: 15px;
-          }
-          @media screen and (max-width: 1440px) {
             font-size: 14px;
           }
           @media screen and (max-width: 768px) {
@@ -976,7 +964,7 @@ export default defineComponent({
 
             h5 {
               padding: 0.05rem 0;
-              font-size: 16px;
+              font-size: 15px;
               @media screen and (max-width: 1600px) {
                 font-size: 14px;
               }
@@ -1198,12 +1186,12 @@ export default defineComponent({
     color: #000;
 
     .title-hard {
-      font-size: 18px;
+      font-size: 15px;
       @media screen and (max-width: 1600px) {
-        font-size: 16px;
+        font-size: 14px;
       }
       @media screen and (max-width: 768px) {
-        font-size: 14px;
+        font-size: 13px;
       }
 
       span {
@@ -1265,7 +1253,7 @@ export default defineComponent({
 
         h5 {
           padding: 0.05rem 0;
-          font-size: 16px;
+          font-size: 15px;
           @media screen and (max-width: 1600px) {
             font-size: 14px;
           }
@@ -1320,16 +1308,13 @@ export default defineComponent({
 
       .title_tip {
         white-space: nowrap;
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 600;
         @media screen and (max-width: 1600px) {
-          font-size: 16px;
-        }
-        @media screen and (max-width: 1440px) {
-          font-size: 15px;
+          font-size: 14px;
         }
         @media screen and (max-width: 768px) {
-          font-size: 14px;
+          font-size: 13px;
         }
 
         p {
@@ -1372,11 +1357,8 @@ export default defineComponent({
       .time {
         margin: 0.15rem 0;
         white-space: nowrap;
-        font-size: 17px;
+        font-size: 15px;
         @media screen and (max-width: 1600px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 1440px) {
           font-size: 14px;
         }
         @media screen and (max-width: 768px) {
@@ -1419,12 +1401,9 @@ export default defineComponent({
     .p-1 {
       margin: 0.15rem 0;
       color: rgba(107, 114, 128, 1);
-      font-size: 17px;
+      font-size: 15px;
       word-break: break-word;
       @media screen and (max-width: 1600px) {
-        font-size: 15px;
-      }
-      @media screen and (max-width: 1440px) {
         font-size: 14px;
       }
       @media screen and (max-width: 768px) {
@@ -1464,9 +1443,9 @@ export default defineComponent({
           margin: 0 0.15rem 0 0;
           background: linear-gradient(180deg, #fefefe, #f0f0f0);
           font-family: inherit;
-          font-size: 18px;
+          font-size: 15px;
           @media screen and (max-width: 1600px) {
-            font-size: 16px;
+            font-size: 14px;
           }
         }
       }

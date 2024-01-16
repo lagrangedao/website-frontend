@@ -844,10 +844,10 @@ export default defineComponent({
 #space {
   background: #fff;
   color: #333;
-  font-size: 18px;
+  font-size: 15px;
   text-align: left;
   @media screen and (max-width: 1200px) {
-    font-size: 16px;
+    font-size: 14px;
   }
   :deep(.space_body) {
     align-items: stretch;
@@ -867,14 +867,14 @@ export default defineComponent({
       .title {
         padding: 0.2rem 0.2rem 0;
         margin: 0 0 0.2rem;
-        font-size: 17px;
+        font-size: 14px;
         font-weight: 600;
         color: #000;
         @media screen and (max-width: 768px) {
-          font-size: 15px;
+          font-size: 13px;
         }
         @media screen and (min-width: 1800px) {
-          font-size: 18px;
+          font-size: 15px;
         }
       }
       .desc,
@@ -1007,7 +1007,7 @@ export default defineComponent({
         margin: 0 0.2rem 0.2rem;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         font-family: inherit;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 500;
         line-height: 1;
         color: #f85149;
@@ -1073,14 +1073,14 @@ export default defineComponent({
             .cell {
               padding: 0;
               font-family: "FIRACODE-BOLD";
-              font-size: 17px;
+              font-size: 14px;
               color: #000;
               word-break: break-word;
               @media screen and (max-width: 768px) {
-                font-size: 15px;
+                font-size: 13px;
               }
               @media screen and (min-width: 1800px) {
-                font-size: 18px;
+                font-size: 15px;
               }
             }
           }
@@ -1113,7 +1113,7 @@ export default defineComponent({
                   font-size: 13px;
                 }
                 @media screen and (min-width: 1800px) {
-                  font-size: 16px;
+                  font-size: 15px;
                 }
               }
               .el-button {
@@ -1136,13 +1136,13 @@ export default defineComponent({
 
     .el-dialog__header {
       padding: 0.17rem 0.25rem 0.1rem;
-      font-size: 17px;
+      font-size: 14px;
       color: #000;
       @media screen and (max-width: 768px) {
-        font-size: 15px;
+        font-size: 13px;
       }
       @media screen and (min-width: 1800px) {
-        font-size: 18px;
+        font-size: 15px;
       }
     }
 
@@ -1243,7 +1243,7 @@ export default defineComponent({
         margin: 0 0.15rem 0 0;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         font-family: inherit;
-        font-size: 16px;
+        font-size: 15px;
         line-height: 1;
         color: #000;
         border-radius: 0.07rem;
@@ -1311,7 +1311,7 @@ export default defineComponent({
         height: auto;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         font-family: inherit;
-        font-size: 16px;
+        font-size: 15px;
         line-height: 1;
         color: #000;
         border-radius: 0.07rem;

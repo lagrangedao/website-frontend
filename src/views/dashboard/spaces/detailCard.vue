@@ -423,9 +423,9 @@ export default defineComponent({
 #dataset {
   background: #fff;
   color: #333;
-  font-size: 18px;
-  @media screen and (max-width: 1200px) {
-    font-size: 16px;
+  font-size: 15px;
+  @media screen and (max-width: 1600px) {
+    font-size: 14px;
   }
   .mark {
     flex-wrap: wrap;
@@ -510,9 +510,9 @@ export default defineComponent({
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             .el-tabs__item {
               padding: 0.15rem;
-              font-size: 16px;
+              font-size: 14px;
               @media screen and (min-width: 1800px) {
-                font-size: 18px;
+                font-size: 15px;
               }
               &.is-active {
                 &::after {
@@ -532,9 +532,9 @@ export default defineComponent({
               width: 100%;
               height: auto;
               min-height: 140px;
-              font-size: 16px;
+              font-size: 15px;
               @media screen and (max-width: 1600px) {
-                font-size: 15px;
+                font-size: 14px;
               }
               .el-upload__text {
                 font-size: inherit;
@@ -545,9 +545,9 @@ export default defineComponent({
         .el-form {
           margin: 0.3rem 0 0;
           .el-form-item {
-            font-size: 18px;
+            font-size: 15px;
             @media screen and (max-width: 1600px) {
-              font-size: 16px;
+              font-size: 14px;
             }
             .el-form-item__label {
               font-size: inherit;
@@ -571,9 +571,9 @@ export default defineComponent({
             margin: 0 0.15rem 0 0;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             font-family: inherit;
-            font-size: 18px;
+            font-size: 15px;
             @media screen and (max-width: 1600px) {
-              font-size: 16px;
+              font-size: 14px;
             }
           }
         }
@@ -611,13 +611,13 @@ export default defineComponent({
         .title {
           padding: 0;
           margin: 0 0 0.1rem;
-          font-size: 0.2rem;
+          font-size: 0.18rem;
           color: #000000;
           @media screen and (max-width: 1600px) {
-            font-size: 18px;
+            font-size: 16px;
           }
           @media screen and (max-width: 441px) {
-            font-size: 16px;
+            font-size: 14px;
           }
         }
         .sub_title {
@@ -670,10 +670,10 @@ export default defineComponent({
           padding: 0.1rem 0;
           margin: 0 0 0.1rem;
           font-family: "Helvetica-Neue";
-          font-size: 16px;
+          font-size: 15px;
           color: #000;
           border-radius: 0.08rem;
-          @media screen and (max-width: 1440px) {
+          @media screen and (max-width: 1600px) {
             font-size: 14px;
           }
           .icon {
@@ -700,13 +700,13 @@ export default defineComponent({
             background-size: 100%;
           }
           b {
-            font-size: 17px;
+            font-size: 14px;
             color: #000;
             @media screen and (min-width: 1800px) {
-              font-size: 18px;
-            }
-            @media screen and (max-width: 1440px) {
               font-size: 15px;
+            }
+            @media screen and (max-width: 768px) {
+              font-size: 13px;
             }
           }
           small {
@@ -1046,7 +1046,7 @@ export default defineComponent({
                   b {
                     width: calc(100% - 0.6rem);
                     padding: 0;
-                    font-size: 16px;
+                    font-size: 15px;
                     font-weight: normal;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -1054,10 +1054,7 @@ export default defineComponent({
                     text-align: left;
                     line-height: 1.2;
                     color: inherit;
-                    @media screen and (max-width: 1440px) {
-                      font-size: 15px;
-                    }
-                    @media screen and (max-width: 768px) {
+                    @media screen and (max-width: 1600px) {
                       font-size: 14px;
                     }
                     @media screen and (max-width: 441px) {
@@ -1279,13 +1276,13 @@ export default defineComponent({
           font-size: 0.19rem;
           .top_text {
             flex-wrap: wrap;
-            font-size: 0.2rem;
+            font-size: 0.18rem;
             color: #000000;
             @media screen and (max-width: 1600px) {
-              font-size: 18px;
+              font-size: 16px;
             }
             @media screen and (max-width: 1440px) {
-              font-size: 16px;
+              font-size: 15px;
             }
             @media screen and (max-width: 441px) {
               font-size: 14px;
@@ -1335,9 +1332,9 @@ export default defineComponent({
             .span {
               width: 100%;
               color: #606060;
-              font-size: 16px;
-              @media screen and (max-width: 1440px) {
-                font-size: 15px;
+              font-size: 15px;
+              @media screen and (max-width: 1600px) {
+                font-size: 14px;
               }
               @media screen and (max-width: 768px) {
                 font-size: 14px;
@@ -1390,13 +1387,10 @@ export default defineComponent({
         text-align: left;
         p {
           padding: 0.02rem 0;
-          font-size: 18px;
+          font-size: 15px;
           color: #565656;
           line-height: 1.4;
           @media screen and (max-width: 1600px) {
-            font-size: 16px;
-          }
-          @media screen and (max-width: 1440px) {
             font-size: 14px;
           }
           @media screen and (max-width: 600px) {

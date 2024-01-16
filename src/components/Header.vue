@@ -73,9 +73,6 @@
                 <!-- <el-dropdown-item command="asProvider">
                   <div class="profile router-link">As Provider</div>
                 </el-dropdown-item> -->
-                <el-dropdown-item command="asUser">
-                  <div class="profile router-link b">Payment History</div>
-                </el-dropdown-item>
               </el-dropdown-menu>
               <el-dropdown-menu>
                 <el-dropdown-item command="create_dataset">
@@ -83,6 +80,9 @@
                 </el-dropdown-item>
                 <el-dropdown-item command="create_space">
                   <span class="link">+ New Space</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="asUser">
+                  <div class="profile router-link b">Payment History</div>
                 </el-dropdown-item>
                 <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
                 <el-dropdown-item command="settings">
