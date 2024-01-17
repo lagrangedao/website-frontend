@@ -560,6 +560,7 @@ export default defineComponent({
         .el-button {
           height: auto;
           padding: 5px 10px;
+          font-family: inherit;
         }
         a {
           text-decoration: underline;

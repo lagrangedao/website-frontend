@@ -93,7 +93,12 @@
             <el-tab-pane name="files">
               <template #label>
                 <span class="custom-tabs-label flex-row">
-                  <i class="icon"></i>
+                  <!-- <i class="icon"></i> -->
+                  <svg class="mr-1.5 text-gray-400 flex-none icon icon-files" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
+                    viewBox="0 0 24 24">
+                    <path class="uim-tertiary" d="M21 19h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0-4h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0-8h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0 4h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2z" opacity=".5" fill="currentColor"></path>
+                    <path class="uim-primary" d="M9 19a1 1 0 0 1-1-1V6a1 1 0 0 1 2 0v12a1 1 0 0 1-1 1zm-6-4.333a1 1 0 0 1-.64-1.769L3.438 12l-1.078-.898a1 1 0 0 1 1.28-1.538l2 1.667a1 1 0 0 1 0 1.538l-2 1.667a.999.999 0 0 1-.64.231z" fill="currentColor"></path>
+                  </svg>
                   <span>Files</span>
                 </span>
               </template>
@@ -1331,6 +1336,11 @@ export default defineComponent({
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
               left center;
             background-size: auto 100%;
+          }
+          .icon-files {
+            width: 16px;
+            height: auto;
+            margin: -1px 0.05rem 0 0;
           }
           b {
             display: block;
