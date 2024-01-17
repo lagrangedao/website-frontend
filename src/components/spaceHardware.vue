@@ -10,7 +10,7 @@
               </el-descriptions-item>
               <el-descriptions-item label="Memory">{{ props.listdata.activeOrder.config.memory }}</el-descriptions-item>
               <el-descriptions-item label="VCPU">{{ props.listdata.activeOrder.config.vcpu }}</el-descriptions-item>
-              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} USDC per hour
+              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} SWAN per hour
               </el-descriptions-item>
               <el-descriptions-item label="Description">{{ props.listdata.activeOrder.config.description }}
               </el-descriptions-item>
@@ -115,9 +115,9 @@
             <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
               <el-divider content-position="left">{{ item.label }}</el-divider>
               <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o">
-                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))),'is-disabled':ol.hardware_status !== 'available'}"
+                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null),'is-disabled':ol.hardware_status !== 'available'}"
                   @click="sleepChange(ol)">
-                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))">
+                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null)">
                     <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
                       <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
                         fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
@@ -128,7 +128,7 @@
                   <h5>{{ ol.hardware_name }}</h5>
                   <div class="desc-text">{{ ol.hardware_description }}</div>
                   <div class="price">
-                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} USDC per hour</b>
+                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} SWAN per hour</b>
                     <b v-else>No available CP</b>
                   </div>
                 </el-card>
@@ -147,7 +147,7 @@
           <h5>{{ sleepSelect.hardware_name }}</h5>
           <div class="desc-text">{{ sleepSelect.hardware_description }}</div>
           <div class="price">
-            <b>{{ sleepSelect.hardware_price }} USDC per hour</b>
+            <b>{{ sleepSelect.hardware_price }} SWAN per hour</b>
           </div>
         </el-card>
         <div class="sleep_style">
@@ -233,7 +233,6 @@ import { useRouter, useRoute } from 'vue-router'
 import SpacePaymentABI from '@/utils/abi/SpacePaymentV6.json'
 import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
-import tokenUSDCABI from '@/utils/abi/USDC.json'
 import {
   CircleCheckFilled
 } from '@element-plus/icons-vue'
@@ -333,7 +332,7 @@ export default defineComponent({
     const ruleFormRef = ref(null)
     const ruleLoad = ref(false)
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
-    let tokenAddress = process.env.VUE_APP_MUMBAI_USDC_ADDRESS
+    let tokenAddress = process.env.VUE_APP_SATURN_TOKEN_ADDRESS
     let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
     let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
     let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpacePaymentABI, paymentContractAddress)
@@ -364,10 +363,8 @@ export default defineComponent({
             from: store.state.metaAddress, gasLimit: approveGasLimit
           })
 
-        let payMethod = getnetID === 80001 ? paymentContract.methods
-          .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
-          paymentContract.methods
-            .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
+        let payMethod = paymentContract.methods
+          .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
 
         let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
         const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: gasLimit })
@@ -431,7 +428,7 @@ export default defineComponent({
 
     async function networkEstimate () {
       const getID = await system.$commonFun.web3Init.eth.net.getId()
-      const list = [80001, 8598668088]
+      const list = [2024]
       const getPast = await list.some(t => t === getID)
       if (getPast) return true
       else {
@@ -477,7 +474,7 @@ export default defineComponent({
         system.$commonFun.messageTip('warning', 'There are no corresponding resources for the current configuration, unable to renew. Please try again later')
         close()
         return
-      } else if (row.hardware_status.toLowerCase() !== 'available' || (props.listdata.activeOrder && (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))) return false
+      } else if (row.hardware_status.toLowerCase() !== 'available') return false
       const net = await networkEstimate()
       if (!net) return
       ruleForm.usageTime = 24
@@ -531,14 +528,6 @@ export default defineComponent({
       return arr;
     }
 
-    async function paymentEnv () {
-      if (getnetID !== 80001) {
-        tokenAddress = process.env.VUE_APP_OPSWAN_USDC_ADDRESS
-        tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenUSDCABI, tokenAddress);
-        paymentContractAddress = process.env.VUE_APP_OPSWAN_ADDRESS
-        paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
-      }
-    }
     async function nameExist () {
       ruleLoad.value = true
       ruleForm.rule_tip = ''
@@ -593,7 +582,7 @@ export default defineComponent({
       ruleForm.rename = route.params.name
       ruleForm.rename_tip = route.params.name
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
-      paymentEnv()
+      // paymentEnv()
       init()
       nameExist()
     })

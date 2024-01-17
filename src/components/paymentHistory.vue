@@ -11,8 +11,8 @@
         <el-table-column prop="chain_id" label="CHAIN ID" width="110" />
         <el-table-column prop="token" label="TOKEN">
           <template #default="scope">
-            <!--            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>-->
-            <span>USDC</span>
+            <span v-if="scope.row.chain_id === 2024">SWAN</span>
+            <span v-else>USDC</span>
           </template>
         </el-table-column>
         <el-table-column prop="token" label="STARTED AT" min-width="110">
@@ -194,12 +194,6 @@ export default defineComponent({
       } else if (paymentsRes.message) system.$commonFun.messageTip('error', paymentsRes.message)
       paymentLoad.value = false
     }
-    async function paymentEnv () {
-      if (getnetID !== 80001) {
-        paymentContractAddress = process.env.VUE_APP_OPSWAN_ADDRESS
-        paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
-      }
-    }
     function fn () {
       document.addEventListener('visibilitychange', function () {
         prevType.value = !document.hidden
@@ -217,7 +211,7 @@ export default defineComponent({
     })
     onActivated(async () => {
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
-      paymentEnv()
+      // paymentEnv()
       init()
     })
     watch(route, (to, from) => {

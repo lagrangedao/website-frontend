@@ -276,6 +276,12 @@ async function getUnit(id) {
       url = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/address/`
       url_tx = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/tx/`
       break
+    case 2024:
+      unit = 'SWAN'
+      name = 'Saturn Testnet '
+      url = `${process.env.VUE_APP_SATURNBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_SATURNBLOCKURL}/tx/`
+      break
     case 3141:
       unit = 'ETH'
       name = 'Filecoin - Hyperspace testnet '
@@ -326,6 +332,14 @@ async function walletChain(chainId) {
         },
         rpcUrls: [process.env.VUE_APP_MUMBAIRPCURL],
         blockExplorerUrls: [process.env.VUE_APP_MUMBAIPAYMENTURL]
+      }
+      break
+    case 2024:
+      text = {
+        chainId: web3Init.utils.numberToHex(2024),
+        chainName: 'Saturn Testnet',
+        rpcUrls: [process.env.VUE_APP_SATURNURL],
+        blockExplorerUrls: [process.env.VUE_APP_SATURNBLOCKURL]
       }
       break
     case 97:

@@ -669,14 +669,11 @@ export default defineComponent({
     }
     function handleHard (val, refresh, net) {
       if (net) {
-        netEnv.value = [{
-          name: 'OpSwan',
-          id: 8598668088
-        },
-        {
-          name: 'Mumbai Testnet',
-          id: 80001
-        }]
+        netEnv.value = [
+          {
+            name: 'Saturn Testnet',
+            id: 2024
+          }]
         networkC.value = true
       } else if (refresh) {
         context.emit('handleValue', true, 'setting')
