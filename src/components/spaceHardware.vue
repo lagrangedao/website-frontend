@@ -352,13 +352,14 @@ export default defineComponent({
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
         const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
         const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6) // usdc is 6 decimal, ensure the amount will not be more than 6
+        const wei = system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei')
 
         let approveGasLimit = await tokenContract.methods
-          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
+          .approve(paymentContractAddress, wei)
           .estimateGas({ from: store.state.metaAddress })
 
         const approve_tx = await tokenContract.methods
-          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
+          .approve(paymentContractAddress, wei)
           .send({
             from: store.state.metaAddress, gasLimit: approveGasLimit
           })
@@ -370,7 +371,7 @@ export default defineComponent({
         const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
-            await hardwareHash(transactionHash, approveAmount)
+            await hardwareHash(transactionHash, wei)
             closePart()
             context.emit('handleHard', false, true)
           })
@@ -443,8 +444,8 @@ export default defineComponent({
       if (!net) return
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       let fd = new FormData()
-      // fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
-      fd.append('paid', approveAmount) // 授权代币的金额
+      fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
+      // fd.append('paid', approveAmount) // 授权代币的金额
       fd.append('space_name', route.params.name)
       fd.append('cfg_name', sleepSelect.value.hardware_name)
       fd.append('duration', ruleForm.usageTime * 3600)
