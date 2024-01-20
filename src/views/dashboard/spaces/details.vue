@@ -126,9 +126,9 @@
           </el-tabs>
 
           <div class="logs_style popDown flex-row">
-            <el-popover :width="190" :hide-after="0" trigger="click" placement="bottom-end" popper-class="popper_style">
+            <el-popover :width="190" :visible="visible" :hide-after="0" trigger="click" placement="bottom-end" popper-class="popper_style">
               <template #reference>
-                <div class="share_style flex-row">
+                <div class="share_style flex-row" @click.stop="visible=!visible">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024" data-v-ea893728="">
                     <path fill="currentColor" d="M176 416a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224"></path>
                   </svg>
@@ -404,7 +404,10 @@ export default defineComponent({
     JsonViewer,
     Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp
   },
-  setup () {
+  props: {
+    vis: { type: Boolean, default: true }
+  },
+  setup (props) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
@@ -858,7 +861,11 @@ export default defineComponent({
     watch(drawer, (newValue, oldValue) => {
       if (!drawer.value) websocketclose()
     })
+    watch(() => props.vis, () => {
+      visible.value = false
+    })
     watch(route, (to, from) => {
+      visible.value = false
       if (to.name !== 'spaceDetail') return
       if (!metaAddress.value && to.params.tabs === 'settings') activeName.value = 'app'
       else activeName.value = to.params.tabs

@@ -10,7 +10,7 @@
           <div class="top_button">
             <router-link :to="{path: '/create_space'}" class="button">Create new Space</router-link>
             or
-            <a href="https://docs.lagrangedao.org/lagrange-dao/spaces" target="_blank">learn more about Spaces</a>
+            <a href="https://docs.lagrangedao.org/spaces" target="_blank">learn more about Spaces</a>
           </div>
         </div>
       </el-col>

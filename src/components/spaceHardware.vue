@@ -331,6 +331,7 @@ export default defineComponent({
     const sleepSelect = ref({})
     const ruleFormRef = ref(null)
     const ruleLoad = ref(false)
+    const filesList = ref([])
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
     let tokenAddress = process.env.VUE_APP_SATURN_TOKEN_ADDRESS
     let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
@@ -470,6 +471,11 @@ export default defineComponent({
     }
 
     async function sleepChange (row) {
+      if (filesList.value.length === 0) {
+        if (props.renewButton === 'fork') system.$commonFun.messageTip('warning', 'Can not deploy a empty space.')
+        else system.$commonFun.messageTip('warning', 'The space is empty.')
+        return
+      }
       if (props.renewButton === 'fork' && (!ruleForm.rename || ruleForm.rename_err)) return
       if (row.hardware_status.toLowerCase() !== 'available' && props.renewButton === 'renew') {
         system.$commonFun.messageTip('warning', 'There are no corresponding resources for the current configuration, unable to renew. Please try again later')
@@ -577,6 +583,12 @@ export default defineComponent({
       } else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
       machinesLoad.value = false
     }
+    async function requestFiles () {
+      try {
+        const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
+        if (listFilesRes && listFilesRes.status === 'success') filesList.value = listFilesRes.data || []
+      } catch{ }
+    }
 
     let getnetID = NaN
     onMounted(async () => {
@@ -584,6 +596,7 @@ export default defineComponent({
       ruleForm.rename_tip = route.params.name
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
       // paymentEnv()
+      requestFiles()
       init()
       nameExist()
     })

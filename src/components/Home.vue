@@ -1,12 +1,12 @@
 <template>
-  <div class="wrapper" id="wrapper" ref="area">
+  <div class="wrapper" id="wrapper" ref="area" @click="vis=!vis">
     <el-container :class="{'container_height':true}">
       <el-header v-if="!(route.name === 'spaceDetail' && route.params.tabs === 'app')">
         <v-head></v-head>
       </el-header>
       <el-main>
         <div class="content flex-row">
-          <router-view v-slot="{ Component }">
+          <router-view v-slot="{ Component }" :vis="vis">
             <transition name="move" mode="out-in">
               <keep-alive>
                 <component :is="Component" />
@@ -40,6 +40,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const vis = ref(false)
 
     function footer_style () {
       positionStyle.value = false
@@ -90,7 +91,8 @@ export default defineComponent({
       system,
       route,
       router,
-      footer_style
+      footer_style,
+      vis
     }
   },
   components: {
