@@ -472,8 +472,8 @@ export default defineComponent({
 
     async function sleepChange (row) {
       if (filesList.value.length === 0) {
-        if (props.renewButton === 'fork') system.$commonFun.messageTip('warning', 'Can not deploy a empty space.')
-        else system.$commonFun.messageTip('warning', 'The space is empty.')
+        if (props.renewButton === 'fork') system.$commonFun.messageTip('warning', 'Can not deploy a empty space!')
+        else system.$commonFun.messageTip('warning', 'The space is empty!')
         return
       }
       if (props.renewButton === 'fork' && (!ruleForm.rename || ruleForm.rename_err)) return

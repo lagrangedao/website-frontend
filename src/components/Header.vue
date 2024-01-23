@@ -82,7 +82,7 @@
                   <span class="link">+ New Space</span>
                 </el-dropdown-item>
                 <el-dropdown-item command="asUser">
-                  <div class="profile router-link b">Payment History</div>
+                  <div class="profile router-link b is-disabled">Payment History</div>
                 </el-dropdown-item>
                 <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
                 <el-dropdown-item command="settings">
@@ -178,7 +178,7 @@ export default defineComponent({
         store.dispatch('setNavLogin', true)
       } else if (key === '4') window.open('https://docs.lagrangedao.org')
       else if (key === 'asProvider') router.push({ name: 'paymentHistory', query: { type: 'provider' } })
-      else if (key === 'asUser') router.push({ name: 'paymentHistory', query: { type: 'user' } })
+      // else if (key === 'asUser') router.push({ name: 'paymentHistory', query: { type: 'user' } })
       else if (key === 'dataset') router.push({ path: '/dataset' })
       else if (key === 'models') router.push({ path: '/models' })
       else if (key === 'spaces') router.push({ path: '/spaces' })
@@ -838,6 +838,13 @@ export default defineComponent({
           }
         }
         &.b {
+        }
+        &.is-disabled {
+          opacity: 0.5;
+          cursor: no-drop;
+          &:hover {
+            text-decoration: none;
+          }
         }
         cursor: pointer;
         * {
