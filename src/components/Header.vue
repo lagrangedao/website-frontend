@@ -82,7 +82,7 @@
                   <span class="link">+ New Space</span>
                 </el-dropdown-item>
                 <el-dropdown-item command="asUser">
-                  <div class="profile router-link b is-disabled">Payment History</div>
+                  <div class="profile router-link b" :class="{'is-disabled': isEnvironment}">Payment History</div>
                 </el-dropdown-item>
                 <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
                 <el-dropdown-item command="settings">
@@ -166,6 +166,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const isEnvironment = ref(process.env.NODE_ENV === 'production' ? true : false)
 
     async function header_logo () {
       if (metaAddress.value) router.push({ path: '/personal_center' })
@@ -178,7 +179,7 @@ export default defineComponent({
         store.dispatch('setNavLogin', true)
       } else if (key === '4') window.open('https://docs.lagrangedao.org')
       else if (key === 'asProvider') router.push({ name: 'paymentHistory', query: { type: 'provider' } })
-      // else if (key === 'asUser') router.push({ name: 'paymentHistory', query: { type: 'user' } })
+      else if (key === 'asUser' && !isEnvironment.value) router.push({ name: 'paymentHistory', query: { type: 'user' } })
       else if (key === 'dataset') router.push({ path: '/dataset' })
       else if (key === 'models') router.push({ path: '/models' })
       else if (key === 'spaces') router.push({ path: '/spaces' })
@@ -249,7 +250,7 @@ export default defineComponent({
       info,
       wrongVisible,
       bodyWidth,
-      system,
+      system, isEnvironment,
       header_logo, handleSelect, wrongMethod
     }
   }
