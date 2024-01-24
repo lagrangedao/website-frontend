@@ -173,7 +173,13 @@ export default defineComponent({
       font-size: 14px;
       cursor: pointer;
       color: #767676;
-      border-top: 1px solid #e6e6e6;
+      // border-top: 1px solid #e6e6e6;
+      &.hidden {
+        display: none;
+        @media screen and (max-width: 1260px) {
+          display: block;
+        }
+      }
       svg {
         margin-right: 0.08rem;
       }
@@ -194,6 +200,42 @@ export default defineComponent({
       }
       .m-width {
         padding: 0.1rem 0.2rem;
+        .custom-tabs-label {
+          height: 100%;
+          padding: 0;
+          &.font-14 {
+            font-size: 14px;
+          }
+          .icon {
+            height: 16px;
+          }
+          .el-icon {
+            margin: -1px 0.1rem 0 0;
+          }
+          .icon_spaces {
+            width: 16px;
+            margin: -1px 0.1rem 0 0;
+            background: url(../assets/images/icons/icon_2_2.png) no-repeat left
+              center;
+            background-size: auto 100%;
+          }
+          .icon-files {
+            width: 16px;
+            height: auto;
+            margin: -1px 0.1rem 0 0;
+          }
+          b {
+            display: block;
+            height: auto;
+            padding: 0.03rem;
+            margin: 0 0.05rem;
+            background-color: #7405ff;
+            color: #fff;
+            border-radius: 5px;
+            line-height: 1;
+            font-size: 14px;
+          }
+        }
       }
     }
   }
@@ -261,6 +303,9 @@ export default defineComponent({
   display: flex;
   align-items: center;
   // flex-wrap: wrap;
+  .nowrap {
+    flex-wrap: nowrap;
+  }
 }
 </style>
 

@@ -73,12 +73,48 @@
         </div>
 
         <div class="space-right flex-row">
-          <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
+          <el-tabs v-model="activeName" class="demo-tabs" :class="{'hidden': route.params.tabs === 'app'}" id="tabs" ref="target" @tab-click="handleClick">
             <el-tab-pane name="app">
               <template #label>
                 <span class="custom-tabs-label flex-row">
                   <i class="icon icon_spaces"></i>
-                  <span>App</span>
+                  <span style="margin-right: 8px;">App</span>
+                  <el-dropdown trigger="click">
+                    <span class="el-dropdown-link">
+                      <el-icon>
+                        <CaretBottom />
+                      </el-icon>
+                    </span>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item v-for="(job, j) in allData.jobResult" :key="j">
+                          <div class="custom-tabs-label flex-row" @click="appChange(job)">
+                            <el-tooltip placement="top">
+                              <template #content>
+                                <small>
+                                  CP Status:
+                                  <br/>
+                                  <span v-if="job.provider_status">{{ job.provider_status.online ? 'Online' : 'Offline' }}, {{ job.provider_status.status }}</span>
+                                  <span v-else>-</span>
+                                </small>
+                              </template>
+                              <div :class="{'span-cp':  allData.task && allData.task.leading_job_id === job.uuid, 'cp-style flex-row': true}">
+                                CP {{ j + 1 }}
+
+                                <svg style="margin-left: 15px;" width="16" height="16" v-if="job.job_result_uri" @click="system.$commonFun.goLink(`${job.job_result_uri}#space_id=${allData.space.task_uuid}`)" t="1700718365282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                  xmlns="http://www.w3.org/2000/svg" p-id="2324">
+                                  <path d="M875.333052 552.332591c-17.381879 0-31.476899 14.083763-31.582299 31.472805l0 0.155543c0 0 0 0 0 0.047072l0 220.847897c0 17.896602-14.440897 32.358989-32.264844 32.358989L172.891675 837.214896c-17.815761 0-32.241308-14.45727-32.241308-32.358989L140.650367 254.650771c0-17.894555 14.439874-32.383548 32.241308-32.383548l298.973232 0c17.445324-0.034792 31.535227-14.177907 31.535227-31.652907 0-17.483186-14.104229-31.651884-31.535227-31.651884L168.641885 158.962431c-50.360991 0-91.178629 40.925085-91.178629 91.38943l0 558.753837c0 50.471508 40.820708 91.415013 91.178629 91.415013l647.092791 0c50.357921 0 91.180676-40.943504 91.180676-91.415013L906.915351 583.844282C906.844743 566.42454 892.720048 552.332591 875.333052 552.332591z"
+                                    fill="#333333" p-id="2325"></path>
+                                  <path d="M937.013857 335.824535l-206.523657-207.157083-8.005324-6.593162c-4.556783-2.381234-10.184967-3.292999-15.497972-3.292999-18.075681 0-32.732495 14.697747-32.732495 32.803103 0 5.333472 3.105734 13.644765 5.498224 18.213827l141.602042 142.967132L675.756621 312.765353c-221.524303 27.526937-302.548664 144.17668-322.964646 415.066297-0.028653 18.86158 14.633279 33.57877 32.703843 33.57877 14.392802 0 27.443026-12.673647 31.812543-25.645077 20.424168-243.485477 77.827553-337.180416 259.588223-357.409133l144.467299 0.053212L684.120103 516.049223l-5.925966 7.506974c-2.264577 4.474918-3.140527 10.106172-3.140527 15.269775 0 18.081821 14.656815 32.803103 32.708959 32.803103 4.581342 0 12.685927-2.552126 16.746406-4.373611l212.502835-211.896015 9.101285-9.135054L937.013857 335.824535z"
+                                    fill="#333333" p-id="2326"></path>
+                                </svg>
+                              </div>
+                            </el-tooltip>
+                          </div>
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
                 </span>
               </template>
             </el-tab-pane>
@@ -136,6 +172,46 @@
               </template>
               <template #default>
                 <ul class="demo-rich-conent">
+                  <li class="flex-row" :class="{'hidden': route.params.tabs === 'app'}">
+                    <div class="m-width" @click="handleClick('app')">
+                      <span class="custom-tabs-label flex-row">
+                        <i class="icon icon_spaces"></i>
+                        <span>App</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li class="flex-row" :class="{'hidden': route.params.tabs === 'app'}">
+                    <div class="m-width" @click="handleClick('card')">
+                      <span class="custom-tabs-label flex-row">
+                        <i class="icon icon_spaces"></i>
+                        <span>Space card</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li class="flex-row" :class="{'hidden': route.params.tabs === 'app'}">
+                    <div class="m-width" @click="handleClick('files')">
+                      <span class="custom-tabs-label flex-row">
+                        <!-- <i class="icon"></i> -->
+                        <svg class="mr-1.5 text-gray-400 flex-none icon icon-files" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
+                          viewBox="0 0 24 24">
+                          <path class="uim-tertiary" d="M21 19h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0-4h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0-8h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0 4h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2z" opacity=".5" fill="currentColor"></path>
+                          <path class="uim-primary" d="M9 19a1 1 0 0 1-1-1V6a1 1 0 0 1 2 0v12a1 1 0 0 1-1 1zm-6-4.333a1 1 0 0 1-.64-1.769L3.438 12l-1.078-.898a1 1 0 0 1 1.28-1.538l2 1.667a1 1 0 0 1 0 1.538l-2 1.667a.999.999 0 0 1-.64.231z" fill="currentColor"></path>
+                        </svg>
+                        <span>Files</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li class="flex-row" :class="{'hidden': route.params.tabs === 'app'}">
+                    <div class="m-width" @click="handleClick('settings')" v-if="metaAddress && metaAddress === route.params.wallet_address">
+                      <span class="custom-tabs-label flex-row">
+                        <!-- <i class="icon icon_spaces"></i> -->
+                        <el-icon class="icon">
+                          <Setting />
+                        </el-icon>
+                        <span>Settings</span>
+                      </span>
+                    </div>
+                  </li>
                   <li class="flex-row">
                     <div class="m-width" @click="logDrawer('detail')">
                       Space Detail
@@ -177,7 +253,7 @@
         <detail-files @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'files'"></detail-files>
         <detail-community @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'community'"></detail-community>
         <detail-setting @handleValue="handleValue" :likesValue="likesValue" :listValue="listValue.data" v-else-if="activeName === 'settings'"></detail-setting>
-        <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" :listValue="listValue.data" v-else></detail-app>
+        <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" :listValue="listValue.data" :jobResult="allData.jobResult" :cpList="listValue.cpList" v-else></detail-app>
       </div>
     </div>
 
@@ -388,7 +464,7 @@ import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import JsonViewer from 'vue-json-viewer'
 import {
-  Setting, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp
+  Setting, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp, ArrowDown, CaretBottom
 } from '@element-plus/icons-vue'
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
@@ -402,7 +478,7 @@ export default defineComponent({
     spaceHardware,
     networkChange,
     JsonViewer,
-    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp
+    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp, ArrowDown, CaretBottom
   },
   props: {
     vis: { type: Boolean, default: true }
@@ -458,6 +534,7 @@ export default defineComponent({
       job: null,
       files: [],
       task: {},
+      jobResult: [],
       paymentStatus: 'Created'
     })
     const dialogCont = reactive({
@@ -469,7 +546,8 @@ export default defineComponent({
     const logsType = ref('build')
     const checkedLock = ref(false)
     const listValue = reactive({
-      data: {}
+      data: {},
+      cpList: {}
     })
     const networkC = ref(false)
     const netEnv = ref([])
@@ -485,19 +563,26 @@ export default defineComponent({
     async function handleCurrentChange (val) { }
     async function jobList (list) {
       let arr = list || []
+      let arrJob = []
       for (let j = 0; j < arr.length; j++) {
-        try {
-          const response = await fetch(arr[j].job_source_uri)
-          const textUri = await new Promise(async resolve => {
-            resolve(response.text())
-          })
-          arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
-        } catch (err) {
-          console.log('err space detail job:', err)
-          arr[j].job_textUri = {}
+        // 如果status为running才显示
+        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
+          try {
+            if (arr[j].job_result_uri) {
+              const response = await fetch(arr[j].job_result_uri)
+              const textUri = await new Promise(async resolve => {
+                resolve(response.text())
+              })
+              arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+            } else arr[j].job_result_uri = ''
+          } catch (err) {
+            console.log('err', err)
+            arr[j].job_result_uri = ''
+          }
+          if (arr[j].job_result_uri) arrJob.push(arr[j])
         }
       }
-      return arr
+      return arrJob
     }
     async function jobWSList (list, space, type) {
       let logArr = []
@@ -557,8 +642,13 @@ export default defineComponent({
           expireTime.unit = expireTimeCont.unit
           logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
           logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
+          allData.jobResult = await jobList(listRes.data.job)
+          if (allData.jobResult && allData.jobResult.length > 0) listValue.cpList = allData.jobResult[0]
         } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
       } catch{ forkLoad.value = false }
+    }
+    function appChange (row) {
+      listValue.cpList = row
     }
     async function requestNft () {
       try {
@@ -908,7 +998,7 @@ export default defineComponent({
       listValue, networkC, netEnv, visible,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, logsContAll, handleValue, hardRedeploy,
       handleCurrentChange, handleSizeChange, handleClick, shareTwitter, closeSpace, logsMethod, clearWebsocket, upWebsocket,
-      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer, netChange
+      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer, netChange, appChange
     }
   }
 })
@@ -922,9 +1012,9 @@ export default defineComponent({
 #space {
   background: #fff;
   color: #333;
-  font-size: 17px;
+  font-size: 16px;
   @media screen and (max-width: 1600px) {
-    font-size: 15px;
+    font-size: 14px;
   }
   .space_head {
     // padding: 0;
@@ -1220,7 +1310,7 @@ export default defineComponent({
         border: 2px solid #f1f1f2;
         line-height: 1;
         @media screen and (min-width: 1800px) {
-          font-size: 15px;
+          font-size: 14px;
         }
         @media screen and (max-width: 1440px) {
           font-size: 12px;
@@ -1250,7 +1340,7 @@ export default defineComponent({
         border-radius: 0.08rem;
         cursor: pointer;
         @media screen and (min-width: 1800px) {
-          font-size: 15px;
+          font-size: 14px;
         }
         &:hover {
           background-color: #f5f6f8;
@@ -1300,13 +1390,18 @@ export default defineComponent({
       @media screen and (max-width: 1260px) {
         width: 100%;
       }
+      &.hidden {
+        @media screen and (max-width: 1260px) {
+          display: none;
+        }
+      }
       .el-tabs__header {
         display: flex;
         align-items: stretch;
         height: 100%;
         min-height: 35px;
         margin: 0 auto;
-        font-size: 15px;
+        font-size: 14px;
         .el-tabs__nav-scroll,
         .el-tabs__nav {
           height: 100%;
@@ -1323,7 +1418,7 @@ export default defineComponent({
         font-family: "Helvetica-light";
         font-size: 16px;
         @media screen and (max-width: 1600px) {
-          font-size: 15px;
+          font-size: 14px;
         }
         .custom-tabs-label {
           height: 100%;
@@ -1743,7 +1838,7 @@ export default defineComponent({
             .log {
               p {
                 margin: 0 32px 0 6px;
-                font-size: 15px;
+                font-size: 14px;
                 font-weight: 600;
               }
             }
@@ -1851,7 +1946,7 @@ export default defineComponent({
               font-size: 16px;
             }
             @media screen and (max-width: 768px) {
-              font-size: 15px;
+              font-size: 14px;
             }
             .left {
               font-size: 16px;
@@ -1968,7 +2063,7 @@ export default defineComponent({
           .log {
             p {
               margin: 0 32px 0 6px;
-              font-size: 15px;
+              font-size: 14px;
               font-weight: 600;
             }
           }

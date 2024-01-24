@@ -3,40 +3,10 @@
     <div id="spaceBody">
       <el-row class="space_body flex-row" v-loading="listLoad">
         <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0 && listdata.space.status === 'Running'">
-          <el-tabs>
-            <el-tab-pane v-for="(job, j) in listdata.jobResult" :key="j">
-              <template #label>
-                <div class="custom-tabs-label flex-row">
-                  <el-tooltip placement="top">
-                    <template #content>
-                      <small>
-                        CP Status:
-                        <br/>
-                        <span v-if="job.provider_status">{{ job.provider_status.online ? 'Online' : 'Offline' }}, {{ job.provider_status.status }}</span>
-                        <span v-else>-</span>
-                      </small>
-                    </template>
-                    <div :class="{'span-cp':  listdata.task && listdata.task.leading_job_id === job.uuid, 'cp-style flex-row': true}">
-                      CP {{ j + 1 }}
-
-                      <svg width="16" height="16" v-if="job.job_result_uri" @click="system.$commonFun.goLink(`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`)" t="1700718365282" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                        p-id="2324">
-                        <path d="M875.333052 552.332591c-17.381879 0-31.476899 14.083763-31.582299 31.472805l0 0.155543c0 0 0 0 0 0.047072l0 220.847897c0 17.896602-14.440897 32.358989-32.264844 32.358989L172.891675 837.214896c-17.815761 0-32.241308-14.45727-32.241308-32.358989L140.650367 254.650771c0-17.894555 14.439874-32.383548 32.241308-32.383548l298.973232 0c17.445324-0.034792 31.535227-14.177907 31.535227-31.652907 0-17.483186-14.104229-31.651884-31.535227-31.651884L168.641885 158.962431c-50.360991 0-91.178629 40.925085-91.178629 91.38943l0 558.753837c0 50.471508 40.820708 91.415013 91.178629 91.415013l647.092791 0c50.357921 0 91.180676-40.943504 91.180676-91.415013L906.915351 583.844282C906.844743 566.42454 892.720048 552.332591 875.333052 552.332591z"
-                          fill="#333333" p-id="2325"></path>
-                        <path d="M937.013857 335.824535l-206.523657-207.157083-8.005324-6.593162c-4.556783-2.381234-10.184967-3.292999-15.497972-3.292999-18.075681 0-32.732495 14.697747-32.732495 32.803103 0 5.333472 3.105734 13.644765 5.498224 18.213827l141.602042 142.967132L675.756621 312.765353c-221.524303 27.526937-302.548664 144.17668-322.964646 415.066297-0.028653 18.86158 14.633279 33.57877 32.703843 33.57877 14.392802 0 27.443026-12.673647 31.812543-25.645077 20.424168-243.485477 77.827553-337.180416 259.588223-357.409133l144.467299 0.053212L684.120103 516.049223l-5.925966 7.506974c-2.264577 4.474918-3.140527 10.106172-3.140527 15.269775 0 18.081821 14.656815 32.803103 32.708959 32.803103 4.581342 0 12.685927-2.552126 16.746406-4.373611l212.502835-211.896015 9.101285-9.135054L937.013857 335.824535z"
-                          fill="#333333" p-id="2326"></path>
-                      </svg>
-                    </div>
-                  </el-tooltip>
-                </div>
-              </template>
-              <iframe v-if="job.job_result_uri" :src="`${job.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
-              <div v-else>
-                <el-alert :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
-              </div>
-            </el-tab-pane>
-          </el-tabs>
-          <div class="heading-cp">Your Heading CP</div>
+          <iframe v-if="listdata.cpList.job_result_uri" :src="`${listdata.cpList.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
+          <div v-else>
+            <el-alert :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
+          </div>
         </div>
         <div class="deployment" v-if="listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
@@ -192,7 +162,9 @@ export default defineComponent({
   props: {
     urlChange: { type: String, default: 'app' },
     likesValue: { type: Boolean, default: false },
-    listValue: { type: Object, default: {} }
+    listValue: { type: Object, default: {} },
+    cpList: { type: Object, default: {} },
+    jobResult: { type: Array, default: [] }
   },
   setup (props, context) {
     const store = useStore()
@@ -206,6 +178,7 @@ export default defineComponent({
       jobs_status: [],
       space: {},
       task: {},
+      cpList: {}
     })
     const bodyWidth = ref(document.body.clientWidth < 992)
     const system = getCurrentInstance().appContext.config.globalProperties
@@ -269,35 +242,16 @@ export default defineComponent({
         code = props.listValue.data.space && props.listValue.data.space.status_code ? props.listValue.data.space.status_code : -1
         statusCode.reload = Number(code) > 1 && Number(code) < 6 ? true : false
         if (type) {
-          // console.log('load')
           statusCode.code = code
-          listdata.jobResult = await jobList(props.listValue.data.job)
+          listdata.jobResult = props.jobResult
+          listdata.cpList = props.cpList
           if (props.listValue.data.space && props.listValue.data.space.status === 'Deploying' && props.listValue.data.job) listdata.jobs_status = await jobStatusList(props.listValue.data.job)
           listdata.space = props.listValue.data.space
           listdata.task = props.listValue.data.task
-          // props.listValue.data.job = await system.$commonFun.sortBoole(props.listValue.data.job)
         }
       }
-      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      // if (listRes && listRes.status === 'success') {
-      //   code = listRes.data.space && listRes.data.space.status_code ? listRes.data.space.status_code : -1
-      //   statusCode.reload = Number(code) > 1 && Number(code) < 6 ? true : false
-      //   if (type) {
-      //     // console.log('load')
-      //     statusCode.code = code
-      //     listdata.jobResult = await jobList(listRes.data.job)
-      //     if (listRes.data.space.status === 'Deploying' && listRes.data.job) listdata.jobs_status = await jobStatusList(listRes.data.job)
-      //     listdata.space = listRes.data.space
-      //     // listRes.data.job = await system.$commonFun.sortBoole(listRes.data.job)
-      //   }
-      // }
       context.emit('handleValue', false)
       listLoad.value = false
-      // if (statusCode.reload) {
-      //   await system.$commonFun.timeout(1000)
-      //   if (Number(code) === Number(statusCode.code)) init()
-      //   else init(1)
-      // }
     }
 
     async function jobStatusList (list) {
@@ -443,6 +397,12 @@ export default defineComponent({
     watch(() => props.listValue, () => {
       init(1)
     })
+    watch(() => props.jobResult, () => {
+      listdata.jobResult = props.jobResult
+    })
+    watch(() => props.cpList, () => {
+      listdata.cpList = props.cpList
+    })
     return {
       metaAddress,
       lagLogin,
@@ -574,8 +534,12 @@ export default defineComponent({
     .app-tabs {
       position: relative;
       width: 100%;
+      padding: 0;
+      margin: 0;
+      z-index: 1;
       display: flex;
       flex-direction: column;
+      flex-grow: 1;
       @media screen and (max-width: 768px) {
         padding-top: 0.35rem;
       }
@@ -656,7 +620,9 @@ export default defineComponent({
     }
 
     .space_iframe {
-      width: calc(100% - 4px);
+      width: 100%;
+      height: 100%;
+      border: 0;
       min-height: 315px;
       overflow: auto;
       // @media screen and (min-height: 500px) and (min-width: 769px) {
