@@ -162,9 +162,9 @@
           </el-tabs>
 
           <div class="logs_style popDown flex-row">
-            <el-popover :width="190" :visible="visible" :hide-after="0" trigger="click" placement="bottom-end" popper-class="popper_style">
+            <el-popover :width="190" :hide-after="0" trigger="hover" placement="bottom-end" popper-class="popper_style">
               <template #reference>
-                <div class="share_style flex-row" @click.stop="visible=!visible">
+                <div class="share_style flex-row">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024" data-v-ea893728="">
                     <path fill="currentColor" d="M176 416a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224"></path>
                   </svg>
@@ -172,7 +172,7 @@
               </template>
               <template #default>
                 <ul class="demo-rich-conent">
-                  <li class="flex-row" :class="{'hidden': route.params.tabs === 'app'}">
+                  <li class="flex-row hidden" v-show="route.params.tabs === 'app'">
                     <div class="m-width" @click="handleClick('app')">
                       <span class="custom-tabs-label flex-row">
                         <i class="icon icon_spaces"></i>
@@ -180,7 +180,7 @@
                       </span>
                     </div>
                   </li>
-                  <li class="flex-row" :class="{'hidden': route.params.tabs === 'app'}">
+                  <li class="flex-row hidden" v-show="route.params.tabs === 'app'">
                     <div class="m-width" @click="handleClick('card')">
                       <span class="custom-tabs-label flex-row">
                         <i class="icon icon_spaces"></i>
@@ -188,7 +188,7 @@
                       </span>
                     </div>
                   </li>
-                  <li class="flex-row" :class="{'hidden': route.params.tabs === 'app'}">
+                  <li class="flex-row hidden" v-show="route.params.tabs === 'app'">
                     <div class="m-width" @click="handleClick('files')">
                       <span class="custom-tabs-label flex-row">
                         <!-- <i class="icon"></i> -->
@@ -201,7 +201,7 @@
                       </span>
                     </div>
                   </li>
-                  <li class="flex-row" :class="{'hidden': route.params.tabs === 'app'}">
+                  <li class="flex-row hidden" v-show="route.params.tabs === 'app'">
                     <div class="m-width" @click="handleClick('settings')" v-if="metaAddress && metaAddress === route.params.wallet_address">
                       <span class="custom-tabs-label flex-row">
                         <!-- <i class="icon icon_spaces"></i> -->
