@@ -79,7 +79,7 @@
                 <span class="custom-tabs-label flex-row">
                   <i class="icon icon_spaces"></i>
                   <span style="margin-right: 8px;">App</span>
-                  <el-dropdown trigger="click" v-if="allData.jobResult && allData.jobResult.length>0">
+                  <el-dropdown popper-class="cp_style" v-if="allData.jobResult && allData.jobResult.length>0 && route.params.tabs === 'app'">
                     <span class="el-dropdown-link">
                       <el-icon>
                         <CaretBottom />
@@ -88,8 +88,8 @@
                     <template #dropdown>
                       <el-dropdown-menu>
                         <el-dropdown-item v-for="(job, j) in allData.jobResult" :key="j">
-                          <div class="custom-tabs-label flex-row" @click="appChange(job)">
-                            <el-tooltip placement="top">
+                          <div class="custom-tabs-label flex-row" :class="{'is-active': allData.jobIndex === j}" @click="appChange(job, j)">
+                            <el-tooltip placement="left-start">
                               <template #content>
                                 <small>
                                   CP Status:
@@ -162,7 +162,7 @@
           </el-tabs>
 
           <div class="logs_style popDown flex-row">
-            <el-popover :width="190" :hide-after="0" trigger="hover" placement="bottom-end" popper-class="popper_style">
+            <el-popover :hide-after="0" :offset="5" :show-arrow="false" trigger="hover" placement="bottom-end" popper-class="popper_style">
               <template #reference>
                 <div class="share_style flex-row">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024" data-v-ea893728="">
@@ -535,6 +535,7 @@ export default defineComponent({
       files: [],
       task: {},
       jobResult: [],
+      jobIndex: 0,
       paymentStatus: 'Created'
     })
     const dialogCont = reactive({
@@ -643,11 +644,13 @@ export default defineComponent({
           logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
           logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
           allData.jobResult = await jobList(listRes.data.job)
+          allData.jobIndex = 0
           if (allData.jobResult && allData.jobResult.length > 0) listValue.cpList = allData.jobResult[0]
         } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
       } catch{ forkLoad.value = false }
     }
-    function appChange (row) {
+    function appChange (row, index) {
+      allData.jobIndex = index
       listValue.cpList = row
     }
     async function requestNft () {
@@ -1039,6 +1042,11 @@ export default defineComponent({
           flex-grow: 1;
         }
       }
+      .content {
+        @media screen and (max-width: 1260px) {
+          justify-content: flex-start;
+        }
+      }
     }
     .content {
       width: 100%;
@@ -1369,7 +1377,7 @@ export default defineComponent({
       .logs_style {
         position: relative;
         padding: 0.05rem 0.05rem;
-        margin: 0.05rem 0 0;
+        margin: 0 0 0 0.05rem;
         background-color: linear-gradient(to bottom, #fff, #f3f4f6);
         color: #878c93;
         border: 1px solid rgba(229, 231, 235, 1);
@@ -2126,6 +2134,22 @@ export default defineComponent({
           p {
             word-break: break-word;
           }
+        }
+      }
+    }
+  }
+}
+
+.cp_style {
+  .el-dropdown-menu {
+    .el-dropdown-menu__item {
+      padding: 0;
+      .custom-tabs-label {
+        padding: 5px 15px;
+        &.is-active,
+        &:hover {
+          font-weight: 600;
+          color: #7405ff;
         }
       }
     }
