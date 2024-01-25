@@ -79,7 +79,7 @@
                 <span class="custom-tabs-label flex-row">
                   <i class="icon icon_spaces"></i>
                   <span style="margin-right: 8px;">App</span>
-                  <el-dropdown trigger="click">
+                  <el-dropdown trigger="click" v-if="allData.jobResult && allData.jobResult.length>0">
                     <span class="el-dropdown-link">
                       <el-icon>
                         <CaretBottom />
@@ -212,7 +212,7 @@
                       </span>
                     </div>
                   </li>
-                  <li class="flex-row">
+                  <li class="flex-row" :class="{'hidden-border': route.params.tabs === 'app'}">
                     <div class="m-width" @click="logDrawer('detail')">
                       Space Detail
                     </div>
@@ -1431,6 +1431,11 @@ export default defineComponent({
           }
           .el-icon {
             margin: -1px 0.05rem 0 0;
+            svg {
+              width: 100%;
+              height: auto;
+              margin: 0;
+            }
           }
           .icon_spaces {
             width: 16px;

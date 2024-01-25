@@ -180,6 +180,11 @@ export default defineComponent({
           display: block;
         }
       }
+      &.hidden-border {
+        @media screen and (max-width: 1260px) {
+          border-top: 1px solid #e6e6e6;
+        }
+      }
       svg {
         margin-right: 0.08rem;
       }
@@ -211,6 +216,11 @@ export default defineComponent({
           }
           .el-icon {
             margin: -1px 0.1rem 0 0;
+            svg {
+              width: 100%;
+              height: auto;
+              margin: 0;
+            }
           }
           .icon_spaces {
             width: 16px;
