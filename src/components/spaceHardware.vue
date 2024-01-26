@@ -25,7 +25,8 @@
               <div class="title_tip flex-row pause_margin">
                 <p class="flex-row">
                   Pause Space
-                  <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                  <svg @click="system.$commonFun.goLink('https://docs.lagrangedao.org/spaces/space-settings/instance-type')" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em"
+                    height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                     <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
                     <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
                     <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
@@ -136,8 +137,77 @@
             </el-row>
           </el-col>
         </el-row>
+        <el-row class="space_hardware persistent-storage" :gutter="30">
+          <el-col :md="24" :lg="6" class="hardware-left">
+            <div class="sleep_style">
+              <div class="title_tip flex-row pause_margin">
+                <p class="flex-row">
+                  Persistent Storage
+                  <!-- <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
+                    <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
+                    <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
+                  </svg> -->
+                </p>
+                <span class="new">new</span>
+              </div>
+              <p class="p-4">Choose a storage tier for your Space.</p>
+            </div>
+          </el-col>
+          <el-col :md="24" :lg="18" class="hardware-right">
+            <el-row :gutter="25" class="space_hardware_list">
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
+                <el-card class="box-card active">
+                  <!-- is-disabled active -->
+                  <h5>Small</h5>
+                  <div class="desc-text">
+                    <ul class="mb-4 flex-row">
+                      <li>20 GB</li>
+                      <li class="text-gray-300">&nbsp; · &nbsp;</li>
+                      <li>Persistent</li>
+                    </ul>
+                  </div>
+                  <div class="price">
+                    <b>1 SWAN per hour</b>
+                  </div>
+                </el-card>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
+                <el-card class="box-card is-disabled">
+                  <h5>Medium</h5>
+                  <div class="desc-text">
+                    <ul class="mb-4 flex-row">
+                      <li>100 GB</li>
+                      <li class="text-gray-300">&nbsp; · &nbsp;</li>
+                      <li>Persistent</li>
+                    </ul>
+                  </div>
+                  <div class="price">
+                    <b>5 SWAN per hour</b>
+                  </div>
+                </el-card>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
+                <el-card class="box-card is-disabled">
+                  <h5>Large</h5>
+                  <div class="desc-text">
+                    <ul class="mb-4 flex-row">
+                      <li>500 GB</li>
+                      <li class="text-gray-300">&nbsp; · &nbsp;</li>
+                      <li>Persistent</li>
+                    </ul>
+                  </div>
+                  <div class="price">
+                    <b>25 SWAN per hour</b>
+                  </div>
+                </el-card>
+              </el-col>
+            </el-row>
+          </el-col>
+        </el-row>
       </div>
     </div>
+
     <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" :title="props.renewButton === 'renew'?'Confirm duration update':'Confirm hardware update'" :width="dialogWidth">
       <div v-loading="hardwareLoad">
         <div class="title-hard">The {{props.renewButton === 'renew'?'current':''}} hardware of
@@ -503,6 +573,10 @@ export default defineComponent({
         {
           label: 'GPU',
           list: []
+        },
+        {
+          label: 'AI GPU',
+          list: []
         }
       ]
       // arrayList.sort((a, b) => a['hardware_name'].localeCompare(b['hardware_name']))
@@ -510,6 +584,7 @@ export default defineComponent({
         hard.regionOption = await regionList(hard.region)
         hard.regionValue = hard.region && hard.region[0] ? hard.region[0] : ''
         if (hard.hardware_type.toLowerCase() === 'cpu') listArr[0].list.push(hard)
+        else if (hard.hardware_id > 31) listArr[2].list.push(hard)
         else listArr[1].list.push(hard)
       })
       return listArr
@@ -641,7 +716,12 @@ export default defineComponent({
       padding: 0.3rem 0.2rem;
       color: #000;
       line-height: 1.5;
-
+      &.persistent-storage {
+        .hardware-right {
+          border: 0;
+          overflow: hidden;
+        }
+      }
       .el-col {
         position: relative;
       }
@@ -769,6 +849,7 @@ export default defineComponent({
             width: 12px;
             height: 12px;
             margin: 0 0.08rem;
+            cursor: pointer;
           }
 
           .el-divider {
@@ -796,10 +877,21 @@ export default defineComponent({
               }
             }
           }
+
+          .new {
+            padding: 2px 6px;
+            margin: 0 0 0 6px;
+            background-color: rgba(124, 58, 237, 0.1);
+            font-size: 12px;
+            border-radius: 4px;
+            color: rgba(124, 58, 237, 1);
+            text-transform: uppercase;
+            line-height: 1;
+          }
         }
 
         .pause_margin {
-          margin: 0.2rem 0 0.3rem;
+          margin: 0.2rem 0;
         }
 
         .time {
@@ -1328,6 +1420,7 @@ export default defineComponent({
           width: 12px;
           height: 12px;
           margin: 0 0.08rem;
+          cursor: pointer;
         }
 
         .el-switch {

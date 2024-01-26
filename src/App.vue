@@ -19,6 +19,13 @@ export default defineComponent({
     }
 })
 </script>
-<style>
+<style lang="scss">
 @import "./assets/css/style.css";
+.black-color {
+  color: #000 !important;
+}
+.weight-6 {
+  font-weight: 600;
+  color: #000 !important;
+}
 </style>
