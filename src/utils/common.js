@@ -338,6 +338,11 @@ async function walletChain(chainId) {
       text = {
         chainId: web3Init.utils.numberToHex(2024),
         chainName: 'Saturn Testnet',
+        nativeCurrency: {
+          name: 'sETH',
+          symbol: 'sETH', // 2-6 characters long
+          decimals: 18
+        },
         rpcUrls: [process.env.VUE_APP_SATURNURL],
         blockExplorerUrls: [process.env.VUE_APP_SATURNBLOCKURL]
       }
