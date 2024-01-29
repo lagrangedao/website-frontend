@@ -97,11 +97,11 @@
               <el-button type="info" :disabled="!ruleForm.rename || ruleForm.rename_err || ruleLoad" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
             </div>
           </el-col>
-          <el-col :md="24" :lg="18" class="hardware-right">
-            <!-- <div class="price_switch flex-row">
-                Display price:
-                <el-switch v-model="ruleForm.displayPrice" size="small" active-text="per month" inactive-text="per hour" />
-              </div> -->
+          <el-col :md="24" :lg="18" class="hardware-right m-bottom">
+            <div class="price_switch flex-row">
+              Display Available Hardware:
+              <el-switch v-model="ruleForm.displayAvailable" @change="availableChange" style="--el-switch-on-color: #c37af9;" size="small" />
+            </div>
             <h2 class="flex-row">
               <svg class="mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M9.92865 7.42863H10.643C10.7377 7.42863 10.8285 7.39098 10.8955 7.32405C10.9625 7.25705 11.0001 7.16619 11.0001 7.07148C11.0001 6.97676 10.9625 6.88591 10.8955 6.81891C10.8285 6.75198 10.7377 6.71433 10.643 6.71433H9.92865V5.28575H10.643C10.7377 5.28575 10.8285 5.24812 10.8955 5.18114C10.9625 5.11417 11.0001 5.02333 11.0001 4.9286C11.0001 4.83388 10.9625 4.74304 10.8955 4.67607C10.8285 4.60909 10.7377 4.57146 10.643 4.57146H9.92865V2.78573C9.92865 2.59628 9.85336 2.4146 9.71943 2.28065C9.5855 2.1467 9.40378 2.07144 9.21435 2.07144H7.42862V1.35715C7.42862 1.26242 7.39098 1.17158 7.32405 1.10461C7.25705 1.03763 7.16619 1 7.07148 1C6.97676 1 6.88591 1.03763 6.81891 1.10461C6.75198 1.17158 6.71433 1.26242 6.71433 1.35715V2.07144H5.28575V1.35715C5.28575 1.26242 5.24812 1.17158 5.18114 1.10461C5.11417 1.03763 5.02333 1 4.9286 1C4.83388 1 4.74304 1.03763 4.67607 1.10461C4.60909 1.17158 4.57146 1.26242 4.57146 1.35715V2.07144H2.78573C2.59628 2.07144 2.4146 2.1467 2.28065 2.28065C2.14669 2.4146 2.07144 2.59628 2.07144 2.78573V4.57146H1.35714C1.26242 4.57146 1.17158 4.60909 1.10461 4.67607C1.03763 4.74304 1 4.83388 1 4.9286C1 5.02333 1.03763 5.11417 1.10461 5.18114C1.17158 5.24812 1.26242 5.28575 1.35714 5.28575H2.07144V6.71433H1.35714C1.26242 6.71433 1.17158 6.75198 1.10461 6.81891C1.03763 6.88591 1 6.97676 1 7.07148C1 7.16619 1.03763 7.25705 1.10461 7.32405C1.17158 7.39098 1.26242 7.42863 1.35714 7.42863H2.07144V9.21435C2.07144 9.40378 2.14669 9.5855 2.28065 9.71943C2.4146 9.85336 2.59628 9.92865 2.78573 9.92865H4.57146V10.6429C4.57146 10.7377 4.60909 10.8285 4.67607 10.8955C4.74304 10.9624 4.83388 11.0001 4.9286 11.0001C5.02333 11.0001 5.11417 10.9624 5.18114 10.8955C5.24812 10.8285 5.28575 10.7377 5.28575 10.6429V9.92865H6.71433V10.6429C6.71433 10.7377 6.75198 10.8285 6.81891 10.8955C6.88591 10.9624 6.97676 11.0001 7.07148 11.0001C7.16619 11.0001 7.25705 10.9624 7.32405 10.8955C7.39098 10.8285 7.42862 10.7377 7.42862 10.6429V9.92865H9.21435C9.40378 9.92865 9.5855 9.85336 9.71943 9.71943C9.85336 9.5855 9.92865 9.40378 9.92865 9.21435V7.42863Z"
@@ -115,7 +115,7 @@
 
             <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
               <el-divider content-position="left">{{ item.label }}</el-divider>
-              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o">
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o" :class="{'is-hidden': ruleForm.displayAvailable ? !(ruleForm.displayAvailable && ol.hardware_status === 'available'):false}">
                 <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null),'is-disabled':ol.hardware_status !== 'available'}"
                   @click="sleepChange(ol)">
                   <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null)">
@@ -374,7 +374,7 @@ export default defineComponent({
         }
       ],
       pauseSpace: false,
-      displayPrice: false,
+      displayAvailable: true,
       rename: '',
       rename_err: false,
       rename_tip: '',
@@ -664,7 +664,9 @@ export default defineComponent({
         if (listFilesRes && listFilesRes.status === 'success') filesList.value = listFilesRes.data || []
       } catch{ }
     }
-
+    async function availableChange () {
+      // console.log(ruleForm.displayAvailable)
+    }
     let getnetID = NaN
     onMounted(async () => {
       ruleForm.rename = route.params.name
@@ -692,7 +694,7 @@ export default defineComponent({
       hardwareLoad,
       machinesLoad,
       forkLoad, ruleFormRef, ruleLoad,
-      sleepChange, hardwareFun, close, forkDuplicate, nameExist
+      sleepChange, hardwareFun, close, forkDuplicate, nameExist, availableChange
     }
   }
 })
@@ -713,10 +715,12 @@ export default defineComponent({
 
     :deep(.space_hardware) {
       position: relative;
-      padding: 0.3rem 0.2rem;
+      padding: 0.3rem 0.2rem 0;
       color: #000;
       line-height: 1.5;
       &.persistent-storage {
+        padding: 0.3rem 0.2rem;
+        border-top: 1px solid #e4e4e4;
         .hardware-right {
           border: 0;
           overflow: hidden;
@@ -817,8 +821,11 @@ export default defineComponent({
 
       .hardware-right {
         max-height: 430px;
-        border-left: 1px solid #dcdfe6;
+        // border-left: 1px solid #dcdfe6;
         overflow-y: scroll;
+        &.m-bottom {
+          padding-bottom: 0.2rem;
+        }
       }
 
       .hardware-left {
@@ -930,8 +937,8 @@ export default defineComponent({
 
       .price_switch {
         position: absolute;
-        top: 0.2rem;
-        right: 0.6rem;
+        top: 0;
+        right: 0.2rem;
         font-size: 14px;
         color: #333;
         z-index: 9;
@@ -988,6 +995,10 @@ export default defineComponent({
       .space_hardware_list {
         @media screen and (max-width: 1200px) {
           padding: 0;
+        }
+
+        .is-hidden {
+          display: none;
         }
 
         .el-card {
