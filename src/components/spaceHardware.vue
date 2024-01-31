@@ -97,7 +97,7 @@
               <el-button type="info" :disabled="!ruleForm.rename || ruleForm.rename_err || ruleLoad" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
             </div>
           </el-col>
-          <el-col :md="24" :lg="18" class="hardware-right m-bottom">
+          <el-col :md="24" :lg="18" class="hardware-right m-bottom" v-loading="machinesLoad">
             <div class="price_switch flex-row">
               Display Available Hardware:
               <el-switch v-model="ruleForm.displayAvailable" @change="availableChange" style="--el-switch-on-color: #c37af9;" size="small" />
@@ -395,7 +395,7 @@ export default defineComponent({
     })
     const hardwareOptions = ref([])
     const hardwareLoad = ref(false)
-    const machinesLoad = ref(false)
+    const machinesLoad = ref(true)
     const sleepVisible = ref(false)
     const forkLoad = ref(false)
     const sleepSelect = ref({})
@@ -432,14 +432,14 @@ export default defineComponent({
         const approve_tx = await tokenContract.methods
           .approve(paymentContractAddress, wei)
           .send({
-            from: store.state.metaAddress, gasLimit: approveGasLimit
+            from: store.state.metaAddress, gasLimit: Math.floor(approveGasLimit * 1.5)
           })
 
         let payMethod = paymentContract.methods
           .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
 
         let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
-        const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: gasLimit })
+        const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: Math.floor(gasLimit * 1.5) })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
             await hardwareHash(transactionHash, wei)
@@ -591,7 +591,7 @@ export default defineComponent({
     }
 
     async function regionList (list) {
-      if (!list || !Array.isArray(list) || list.length === 0) {
+      if (!list || !Array.isArray(list) || (list && list.length === 0)) {
         return [];
       }
 
@@ -627,35 +627,38 @@ export default defineComponent({
     }
     async function init (params) {
       machinesLoad.value = true
-      if (props.renewButton === 'renew') {
-        if (props.listdata.activeOrder === null || props.listdata.activeOrder.config === null) return
-        ruleForm.usageTime = 24
-        sleepSelect.value = {
-          hardware_description: props.listdata.activeOrder.config.description,
-          hardware_id: props.listdata.activeOrder.config.hardware_id,
-          hardware_name: props.listdata.activeOrder.config.name,
-          hardware_price: props.listdata.activeOrder.config.price_per_hour,
-          hardware_status: "available",
-          hardware_type: props.listdata.activeOrder.config.hardware_type,
-          region: []
-        }
-        sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
-        ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
-        sleepVisible.value = true
-        return
-      }
-      const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
-      if (machinesRes && machinesRes.status === 'success') {
+      try {
         if (props.renewButton === 'renew') {
-          if (props.listdata.activeOrder === null) return
-          for (let hard = 0; hard < machinesRes.data.hardware.length; hard++) {
-            if (machinesRes.data.hardware[hard].hardware_name === props.listdata.activeOrder.config.name) {
-              sleepChange(machinesRes.data.hardware[hard])
-              break
-            }
+          if (props.listdata.activeOrder === null || props.listdata.activeOrder.config === null) return
+          ruleForm.usageTime = 24
+          sleepSelect.value = {
+            hardware_description: props.listdata.activeOrder.config.description,
+            hardware_id: props.listdata.activeOrder.config.hardware_id,
+            hardware_name: props.listdata.activeOrder.config.name,
+            hardware_price: props.listdata.activeOrder.config.price_per_hour,
+            hardware_status: "available",
+            hardware_type: props.listdata.activeOrder.config.hardware_type,
+            region: []
           }
-        } else hardwareOptions.value = await listArray(machinesRes.data.hardware)
-      } else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
+          sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
+          ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
+          sleepVisible.value = true
+          return
+        }
+        const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
+        if (machinesRes && machinesRes.status === 'success') {
+          if (props.renewButton === 'renew') {
+            if (props.listdata.activeOrder === null) return
+            console.log('machinesRes:', machinesRes.data.hardware.length)
+            for (let hard = 0; hard < machinesRes.data.hardware.length; hard++) {
+              if (machinesRes.data.hardware[hard].hardware_name === props.listdata.activeOrder.config.name) {
+                sleepChange(machinesRes.data.hardware[hard])
+                break
+              }
+            }
+          } else hardwareOptions.value = await listArray(machinesRes.data.hardware)
+        } else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
+      } catch{ }
       machinesLoad.value = false
     }
     async function requestFiles () {

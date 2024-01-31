@@ -148,6 +148,7 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const accessToken = computed(() => (store.state.accessToken || ''))
     const accessName = computed(() => (store.state.accessName || '-'))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
@@ -198,6 +199,7 @@ export default defineComponent({
       else store.dispatch('setNavLogin', false)
     }
     async function activeMenu (row) {
+      if (metaAddress.value) getToken()
       const nameMenu = row || route.name
       if (nameMenu.indexOf('dataset') > -1) activeIndex.value = 'dataset'
       else if (nameMenu.indexOf('model') > -1) activeIndex.value = 'models'
@@ -226,6 +228,11 @@ export default defineComponent({
       activeMenu()
       const info = await balanceMethod()
       wrongVisible.value = true
+    }
+    async function getToken () {
+      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}api_token`, 'get')
+      if (listRes && listRes.status !== 'success') handleSelect('sign_out')
+      return ''
     }
     onMounted(() => {
       activeMenu()

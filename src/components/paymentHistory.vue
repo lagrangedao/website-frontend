@@ -42,7 +42,7 @@
             <span>{{scope.row.order.space_name}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="amount" label="amount" />
+        <el-table-column prop="amount" label="amount" min-width="95" />
         <el-table-column prop="status" label="status" width="135">
           <template #default="scope">
             <div>
