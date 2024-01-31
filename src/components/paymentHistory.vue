@@ -66,6 +66,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import SpaceHardwareABI from '@/utils/abi/SpacePaymentV6.json'
 import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
+import BiddingABI from '@/utils/abi/Bidding.json'
+import TaskABI from '@/utils/abi/Task.json'
 export default defineComponent({
   name: 'footer_page',
   setup () {
@@ -80,6 +82,9 @@ export default defineComponent({
     const prevType = ref(true)
     let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
     let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
+    let biddingContractAddress = process.env.VUE_APP_OPSWAN_BIDDING_ADDRESS
+    let biddingContract = new system.$commonFun.web3Init.eth.Contract(BiddingABI, biddingContractAddress)
+
 
     async function reviewFun (row) {
       paymentLoad.value = true
@@ -110,14 +115,19 @@ export default defineComponent({
       }
       paymentLoad.value = true
       try {
+        // get task contract address
+        let taskContractAddress = await biddingContract.methods.tasks(String(row.job.uuid)).call()
+        let taskContract = new system.$commonFun.web3Init.eth.Contract(TaskABI, taskContractAddress)
+
         if (type) {
           console.log('task_uuid:', row.job.uuid)
-          let gasLimit = await paymentContract.methods
-            .claimReward(String(row.job.uuid))
+
+          let gasLimit = await taskContract.methods
+            .claimReward()
             .estimateGas({ from: store.state.metaAddress })
 
-          const tx = await paymentContract.methods
-            .claimReward(String(row.job.uuid))
+          const tx = await taskContract.methods
+            .claimReward()
             .send({ from: store.state.metaAddress, gasLimit: gasLimit })
             .on('transactionHash', async (transactionHash) => {
               console.log('claim transactionHash:', transactionHash)
@@ -126,12 +136,12 @@ export default defineComponent({
             .on('error', () => paymentLoad.value = false)
         } else {
           console.log('refund id:', row.transaction_hash)
-          let gasLimit = await paymentContract.methods
-            .claimRefund(String(row.transaction_hash))
+          let gasLimit = await taskContract.methods
+            .claimRefund()
             .estimateGas({ from: store.state.metaAddress })
 
-          const tx = await paymentContract.methods
-            .claimRefund(String(row.transaction_hash))
+          const tx = await taskContract.methods
+            .claimRefund()
             .send({ from: store.state.metaAddress, gasLimit: gasLimit })
             .on('transactionHash', async (transactionHash) => {
               console.log('refund transactionHash:', transactionHash)
