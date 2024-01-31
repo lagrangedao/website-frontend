@@ -307,7 +307,7 @@
                         <el-descriptions-item label="Type">{{allData.space.activeOrder.config.hardware_type}}</el-descriptions-item>
                         <el-descriptions-item label="Memory">{{allData.space.activeOrder.config.memory}}</el-descriptions-item>
                         <el-descriptions-item label="VCPU">{{allData.space.activeOrder.config.vcpu}}</el-descriptions-item>
-                        <el-descriptions-item label="Price">{{allData.space.activeOrder.config.price_per_hour}} LAG per hour</el-descriptions-item>
+                        <el-descriptions-item label="Price">{{allData.space.activeOrder.config.price_per_hour}} SWAN per hour</el-descriptions-item>
                         <el-descriptions-item label="Description">{{allData.space.activeOrder.config.description}}</el-descriptions-item>
                         <el-descriptions-item label="Expiration Time">{{system.$commonFun.momentFun(allData.space.expiration_time) || '-'}}</el-descriptions-item>
                       </el-descriptions>
