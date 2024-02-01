@@ -205,6 +205,10 @@ a:focus {
     margin: auto;
 }
 
+.landing-app {
+    width: 100%;
+}
+
 .el-popper {
     word-break: break-word;
     text-align: left;

@@ -10,7 +10,7 @@
               </el-descriptions-item>
               <el-descriptions-item label="Memory">{{ props.listdata.activeOrder.config.memory }}</el-descriptions-item>
               <el-descriptions-item label="VCPU">{{ props.listdata.activeOrder.config.vcpu }}</el-descriptions-item>
-              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} USDC per hour
+              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} SWAN per hour
               </el-descriptions-item>
               <el-descriptions-item label="Description">{{ props.listdata.activeOrder.config.description }}
               </el-descriptions-item>
@@ -25,7 +25,8 @@
               <div class="title_tip flex-row pause_margin">
                 <p class="flex-row">
                   Pause Space
-                  <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                  <svg @click="system.$commonFun.goLink('https://docs.lagrangedao.org/spaces/space-settings/instance-type')" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em"
+                    height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
                     <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
                     <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
                     <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
@@ -48,37 +49,59 @@
             </div>
             <div class="fork-btn flex-row" v-if="props.renewButton === 'fork'">
               <div class="fileList">
-                <el-form ref="ruleFormRef" :model="ruleForm" class="demo-ruleForm flex-row" status-icon>
+                <el-form ref="ruleFormRef" :model="ruleForm" v-loading="ruleLoad" class="demo-ruleForm flex-row" status-icon>
                   <el-form-item prop="" class="flex_left">
                     <label class="label" for="owner">
-                      Owner *
+                      Owner
+                      <span>*</span>
                       <div class="flex-row">
-                        <el-select v-model="metaAddress" placeholder="">
-                          <el-option :label="metaAddress" :value="metaAddress" />
+                        <el-select v-model="metaSmallAddress" placeholder="" disabled>
+                          <el-option :label="metaSmallAddress" :value="metaSmallAddress" />
                         </el-select>
                         <span class="text-2xl text-gray-400 self-end pb-2">/</span>
                       </div>
                     </label>
                   </el-form-item>
-                  <el-form-item prop="name" class="flex_right">
+                  <el-form-item prop="rename" class="flex_right">
                     <label class="label" for="dataname">
-                      Repository name *
-                      <div class="flex-row">
-                        <el-input v-model="ruleForm.rename" placeholder="Space name" />
+                      Space Name *
+                      <div class="flex-row tip">
+                        <el-input @change="nameExist()" v-model="ruleForm.rename" maxlength="50" show-word-limit :class="{'err': !ruleForm.rename || ruleForm.rename_err}" placeholder="Space name" />
+
+                        <div class="flex-row text r" v-if="!ruleForm.rename_tip">
+                          New space name must not be blank
+                        </div>
+                        <div class="flex-row text r" v-else-if="ruleForm.rule_tip">
+                          {{ruleForm.rule_tip}}
+                        </div>
+                        <div class="flex-row text g" v-else-if="!ruleForm.rename_err">
+                          <el-icon>
+                            <CircleCheckFilled />
+                          </el-icon>
+                          {{ruleForm.rename_tip}} is available.
+                        </div>
+                        <div class="flex-row text r" v-else>
+                          <el-icon>
+                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 1024 1024" data-v-ea893728="">
+                              <path fill="currentColor" d="M928.99 755.83 574.6 203.25c-12.89-20.16-36.76-32.58-62.6-32.58s-49.71 12.43-62.6 32.58L95.01 755.83c-12.91 20.12-12.9 44.91.01 65.03 12.92 20.12 36.78 32.51 62.59 32.49h708.78c25.82.01 49.68-12.37 62.59-32.49 12.91-20.12 12.92-44.91.01-65.03M554.67 768h-85.33v-85.33h85.33zm0-426.67v298.66h-85.33V341.32z"></path>
+                            </svg>
+                          </el-icon>
+                          The space {{ruleForm.rename_tip}} already exists on this account.
+                        </div>
                       </div>
                     </label>
                   </el-form-item>
                 </el-form>
                 <p class="p-5">By default, forks are named the same as their upstream space. You can customize the name to distinguish it further.</p>
               </div>
-              <el-button type="info" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
+              <el-button type="info" :disabled="!ruleForm.rename || ruleForm.rename_err || ruleLoad" @click="forkDuplicate('fork')">Just Fork, choose config later</el-button>
             </div>
           </el-col>
-          <el-col :md="24" :lg="18" class="hardware-right">
-            <!-- <div class="price_switch flex-row">
-                Display price:
-                <el-switch v-model="ruleForm.displayPrice" size="small" active-text="per month" inactive-text="per hour" />
-              </div> -->
+          <el-col :md="24" :lg="18" class="hardware-right m-bottom">
+            <div class="price_switch flex-row">
+              Display Available Hardware:
+              <el-switch v-model="ruleForm.displayAvailable" @change="availableChange" style="--el-switch-on-color: #c37af9;" size="small" />
+            </div>
             <h2 class="flex-row">
               <svg class="mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M9.92865 7.42863H10.643C10.7377 7.42863 10.8285 7.39098 10.8955 7.32405C10.9625 7.25705 11.0001 7.16619 11.0001 7.07148C11.0001 6.97676 10.9625 6.88591 10.8955 6.81891C10.8285 6.75198 10.7377 6.71433 10.643 6.71433H9.92865V5.28575H10.643C10.7377 5.28575 10.8285 5.24812 10.8955 5.18114C10.9625 5.11417 11.0001 5.02333 11.0001 4.9286C11.0001 4.83388 10.9625 4.74304 10.8955 4.67607C10.8285 4.60909 10.7377 4.57146 10.643 4.57146H9.92865V2.78573C9.92865 2.59628 9.85336 2.4146 9.71943 2.28065C9.5855 2.1467 9.40378 2.07144 9.21435 2.07144H7.42862V1.35715C7.42862 1.26242 7.39098 1.17158 7.32405 1.10461C7.25705 1.03763 7.16619 1 7.07148 1C6.97676 1 6.88591 1.03763 6.81891 1.10461C6.75198 1.17158 6.71433 1.26242 6.71433 1.35715V2.07144H5.28575V1.35715C5.28575 1.26242 5.24812 1.17158 5.18114 1.10461C5.11417 1.03763 5.02333 1 4.9286 1C4.83388 1 4.74304 1.03763 4.67607 1.10461C4.60909 1.17158 4.57146 1.26242 4.57146 1.35715V2.07144H2.78573C2.59628 2.07144 2.4146 2.1467 2.28065 2.28065C2.14669 2.4146 2.07144 2.59628 2.07144 2.78573V4.57146H1.35714C1.26242 4.57146 1.17158 4.60909 1.10461 4.67607C1.03763 4.74304 1 4.83388 1 4.9286C1 5.02333 1.03763 5.11417 1.10461 5.18114C1.17158 5.24812 1.26242 5.28575 1.35714 5.28575H2.07144V6.71433H1.35714C1.26242 6.71433 1.17158 6.75198 1.10461 6.81891C1.03763 6.88591 1 6.97676 1 7.07148C1 7.16619 1.03763 7.25705 1.10461 7.32405C1.17158 7.39098 1.26242 7.42863 1.35714 7.42863H2.07144V9.21435C2.07144 9.40378 2.14669 9.5855 2.28065 9.71943C2.4146 9.85336 2.59628 9.92865 2.78573 9.92865H4.57146V10.6429C4.57146 10.7377 4.60909 10.8285 4.67607 10.8955C4.74304 10.9624 4.83388 11.0001 4.9286 11.0001C5.02333 11.0001 5.11417 10.9624 5.18114 10.8955C5.24812 10.8285 5.28575 10.7377 5.28575 10.6429V9.92865H6.71433V10.6429C6.71433 10.7377 6.75198 10.8285 6.81891 10.8955C6.88591 10.9624 6.97676 11.0001 7.07148 11.0001C7.16619 11.0001 7.25705 10.9624 7.32405 10.8955C7.39098 10.8285 7.42862 10.7377 7.42862 10.6429V9.92865H9.21435C9.40378 9.92865 9.5855 9.85336 9.71943 9.71943C9.85336 9.5855 9.92865 9.40378 9.92865 9.21435V7.42863Z"
@@ -92,10 +115,10 @@
 
             <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
               <el-divider content-position="left">{{ item.label }}</el-divider>
-              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o">
-                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000))),'is-disabled':ol.hardware_status !== 'available'}"
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o" :class="{'is-hidden': ruleForm.displayAvailable ? !(ruleForm.displayAvailable && ol.hardware_status === 'available'):false}">
+                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null),'is-disabled':ol.hardware_status !== 'available'}"
                   @click="sleepChange(ol)">
-                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null || (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))">
+                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null)">
                     <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
                       <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
                         fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
@@ -106,8 +129,76 @@
                   <h5>{{ ol.hardware_name }}</h5>
                   <div class="desc-text">{{ ol.hardware_description }}</div>
                   <div class="price">
-                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} USDC per hour</b>
+                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} SWAN per hour</b>
                     <b v-else>No available CP</b>
+                  </div>
+                </el-card>
+              </el-col>
+            </el-row>
+          </el-col>
+        </el-row>
+        <el-row class="space_hardware persistent-storage" :gutter="30">
+          <el-col :md="24" :lg="6" class="hardware-left">
+            <div class="sleep_style">
+              <div class="title_tip flex-row pause_margin">
+                <p class="flex-row">
+                  Persistent Storage
+                  <!-- <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                    <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
+                    <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
+                    <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
+                  </svg> -->
+                </p>
+                <span class="new">new</span>
+              </div>
+              <p class="p-4">Choose a storage tier for your Space.</p>
+            </div>
+          </el-col>
+          <el-col :md="24" :lg="18" class="hardware-right">
+            <el-row :gutter="25" class="space_hardware_list">
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
+                <el-card class="box-card active">
+                  <!-- is-disabled active -->
+                  <h5>Small</h5>
+                  <div class="desc-text">
+                    <ul class="mb-4 flex-row">
+                      <li>20 GB</li>
+                      <li class="text-gray-300">&nbsp; · &nbsp;</li>
+                      <li>Persistent</li>
+                    </ul>
+                  </div>
+                  <div class="price">
+                    <b>1 SWAN per hour</b>
+                  </div>
+                </el-card>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
+                <el-card class="box-card is-disabled">
+                  <h5>Medium</h5>
+                  <div class="desc-text">
+                    <ul class="mb-4 flex-row">
+                      <li>100 GB</li>
+                      <li class="text-gray-300">&nbsp; · &nbsp;</li>
+                      <li>Persistent</li>
+                    </ul>
+                  </div>
+                  <div class="price">
+                    <b>5 SWAN per hour</b>
+                  </div>
+                </el-card>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
+                <el-card class="box-card is-disabled">
+                  <h5>Large</h5>
+                  <div class="desc-text">
+                    <ul class="mb-4 flex-row">
+                      <li>500 GB</li>
+                      <li class="text-gray-300">&nbsp; · &nbsp;</li>
+                      <li>Persistent</li>
+                    </ul>
+                  </div>
+                  <div class="price">
+                    <b>25 SWAN per hour</b>
                   </div>
                 </el-card>
               </el-col>
@@ -116,6 +207,7 @@
         </el-row>
       </div>
     </div>
+
     <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" :title="props.renewButton === 'renew'?'Confirm duration update':'Confirm hardware update'" :width="dialogWidth">
       <div v-loading="hardwareLoad">
         <div class="title-hard">The {{props.renewButton === 'renew'?'current':''}} hardware of
@@ -125,7 +217,7 @@
           <h5>{{ sleepSelect.hardware_name }}</h5>
           <div class="desc-text">{{ sleepSelect.hardware_description }}</div>
           <div class="price">
-            <b>{{ sleepSelect.hardware_price }} USDC per hour</b>
+            <b>{{ sleepSelect.hardware_price }} SWAN per hour</b>
           </div>
         </el-card>
         <div class="sleep_style">
@@ -211,14 +303,15 @@ import { useRouter, useRoute } from 'vue-router'
 import SpacePaymentABI from '@/utils/abi/SpacePaymentV6.json'
 import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import tokenABI from '@/utils/abi/tokenLLL.json'
-import tokenUSDCABI from '@/utils/abi/USDC.json'
 import {
-  InfoFilled
+  CircleCheckFilled
 } from '@element-plus/icons-vue'
 
 export default defineComponent({
   name: 'Space Hardware',
-  components: {},
+  components: {
+    CircleCheckFilled
+  },
   props: {
     listdata: { type: Object, default: {} },
     renewButton: { type: String, default: 'setting' }
@@ -227,7 +320,7 @@ export default defineComponent({
     const store = useStore()
     const system = getCurrentInstance().appContext.config.globalProperties
     const metaAddress = computed(() => store.state.metaAddress)
-    const metaSmallAddress = system.$commonFun.hiddAddress(metaAddress.value)
+    const metaSmallAddress = system.$commonFun.hiddAddressSmall(metaAddress.value)
     const accessName = computed(() => (store.state.accessName))
     const bodyWidth = ref(document.body.clientWidth < 992)
     const route = useRoute()
@@ -281,8 +374,24 @@ export default defineComponent({
         }
       ],
       pauseSpace: false,
-      displayPrice: false,
-      rename: ''
+      displayAvailable: true,
+      rename: '',
+      rename_err: false,
+      rename_tip: '',
+      rule_tip: ''
+    })
+    const validateInput = (rule, value, callback) => {
+      if ((/[^a-zA-Z0-9-._]/g).test(value)) {
+        callback(new Error("The space name can only contain ASCII letters, digits, and the characters ., -, and _."));
+      } else {
+        callback();
+      }
+    }
+    const rules = reactive({
+      rename: [
+        { required: true, message: ' ', trigger: 'blur' },
+        { validator: validateInput, trigger: "blur" }
+      ]
     })
     const hardwareOptions = ref([])
     const hardwareLoad = ref(false)
@@ -290,8 +399,11 @@ export default defineComponent({
     const sleepVisible = ref(false)
     const forkLoad = ref(false)
     const sleepSelect = ref({})
+    const ruleFormRef = ref(null)
+    const ruleLoad = ref(false)
+    const filesList = ref([])
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
-    let tokenAddress = process.env.VUE_APP_MUMBAI_USDC_ADDRESS
+    let tokenAddress = process.env.VUE_APP_SATURN_TOKEN_ADDRESS
     let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
     let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
     let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpacePaymentABI, paymentContractAddress)
@@ -311,27 +423,26 @@ export default defineComponent({
         const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
         const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
         const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6) // usdc is 6 decimal, ensure the amount will not be more than 6
+        const wei = system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei')
 
         let approveGasLimit = await tokenContract.methods
-          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
+          .approve(paymentContractAddress, wei)
           .estimateGas({ from: store.state.metaAddress })
 
         const approve_tx = await tokenContract.methods
-          .approve(paymentContractAddress, system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei'))
+          .approve(paymentContractAddress, wei)
           .send({
             from: store.state.metaAddress, gasLimit: approveGasLimit
           })
 
-        let payMethod = getnetID === 80001 ? paymentContract.methods
-          .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime) :
-          paymentContract.methods
-            .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
+        let payMethod = paymentContract.methods
+          .lockRevenue(props.listdata.uuid, sleepSelect.value.hardware_id, ruleForm.usageTime)
 
         let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
         const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: gasLimit })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
-            await hardwareHash(transactionHash, approveAmount)
+            await hardwareHash(transactionHash, wei)
             closePart()
             context.emit('handleHard', false, true)
           })
@@ -351,16 +462,23 @@ export default defineComponent({
 
     async function forkDuplicate (type) {
       forkLoad.value = true
-      const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/duplicate`, 'post', {})
+      if (!ruleForm.rename) {
+        ruleForm.rename_err = true
+        forkLoad.value = false
+        return false
+      } else ruleForm.rename_err = false
+      const fd = new FormData();
+      fd.append('new_name', ruleForm.rename);
+      const forkRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/fork`, 'post', fd)
       if (forkRes && forkRes.status === 'success') {
-        const rename = await renameMethod()
+        // const rename = await renameMethod()
         system.$commonFun.messageTip('success', forkRes.message ? forkRes.message : 'Fork successfully!')
         if (type) context.emit('handleHard', false, false)
         router.push({
           name: 'spaceDetail',
-          params: { wallet_address: metaAddress.value, name: rename ? ruleForm.rename : route.params.name, tabs: 'app' }
+          params: { wallet_address: metaAddress.value, name: ruleForm.rename ? ruleForm.rename : route.params.name, tabs: 'card' }
         })
-      } else system.$commonFun.messageTip('error', forkRes.message ? forkRes.message : 'Fork failed!')
+      }
       forkLoad.value = false
       return forkRes.status
     }
@@ -382,7 +500,7 @@ export default defineComponent({
 
     async function networkEstimate () {
       const getID = await system.$commonFun.web3Init.eth.net.getId()
-      const list = [80001, 8598668088]
+      const list = [2024]
       const getPast = await list.some(t => t === getID)
       if (getPast) return true
       else {
@@ -397,8 +515,8 @@ export default defineComponent({
       if (!net) return
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       let fd = new FormData()
-      // fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
-      fd.append('paid', approveAmount) // 授权代币的金额
+      fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(approveAmount), 'ether')) // 授权代币的金额
+      // fd.append('paid', approveAmount) // 授权代币的金额
       fd.append('space_name', route.params.name)
       fd.append('cfg_name', sleepSelect.value.hardware_name)
       fd.append('duration', ruleForm.usageTime * 3600)
@@ -413,7 +531,7 @@ export default defineComponent({
       } else {
         const urlRes = `${process.env.VUE_APP_BASEAPI}space/deployment`
         const hardhashRes = await system.$commonFun.sendRequest(urlRes, 'post', fd)
-        if (hardhashRes) system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
+        if (hardhashRes && hardhashRes.status === 'success') system.$commonFun.messageTip(hardhashRes.status, hardhashRes.message)
       }
     }
 
@@ -423,11 +541,17 @@ export default defineComponent({
     }
 
     async function sleepChange (row) {
+      if (filesList.value.length === 0) {
+        if (props.renewButton === 'fork') system.$commonFun.messageTip('warning', 'Can not deploy a empty space!')
+        else system.$commonFun.messageTip('warning', 'The space is empty!')
+        return
+      }
+      if (props.renewButton === 'fork' && (!ruleForm.rename || ruleForm.rename_err)) return
       if (row.hardware_status.toLowerCase() !== 'available' && props.renewButton === 'renew') {
         system.$commonFun.messageTip('warning', 'There are no corresponding resources for the current configuration, unable to renew. Please try again later')
         close()
         return
-      } else if (row.hardware_status.toLowerCase() !== 'available' || (props.listdata.activeOrder && (props.listdata.activeOrder.ended_at !== null && props.listdata.activeOrder.ended_at > Math.floor(Date.now() / 1000)))) return false
+      } else if (row.hardware_status.toLowerCase() !== 'available') return false
       const net = await networkEstimate()
       if (!net) return
       ruleForm.usageTime = 24
@@ -449,6 +573,10 @@ export default defineComponent({
         {
           label: 'GPU',
           list: []
+        },
+        {
+          label: 'AI GPU',
+          list: []
         }
       ]
       // arrayList.sort((a, b) => a['hardware_name'].localeCompare(b['hardware_name']))
@@ -456,6 +584,7 @@ export default defineComponent({
         hard.regionOption = await regionList(hard.region)
         hard.regionValue = hard.region && hard.region[0] ? hard.region[0] : ''
         if (hard.hardware_type.toLowerCase() === 'cpu') listArr[0].list.push(hard)
+        else if (hard.hardware_id > 31) listArr[2].list.push(hard)
         else listArr[1].list.push(hard)
       })
       return listArr
@@ -481,13 +610,20 @@ export default defineComponent({
       return arr;
     }
 
-    async function paymentEnv () {
-      if (getnetID !== 80001) {
-        tokenAddress = process.env.VUE_APP_OPSWAN_USDC_ADDRESS
-        tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenUSDCABI, tokenAddress);
-        paymentContractAddress = process.env.VUE_APP_OPSWAN_ADDRESS
-        paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
+    async function nameExist () {
+      ruleLoad.value = true
+      ruleForm.rule_tip = ''
+      ruleForm.rename_tip = ruleForm.rename
+      if (!ruleForm.rename) ruleForm.rename_err = true
+      else if ((/[^a-zA-Z0-9-._]/g).test(ruleForm.rename)) {
+        ruleForm.rule_tip = 'The space name can only contain ASCII letters, digits, and the characters ., -, and _.'
+        ruleForm.rename_err = true
+      } else {
+        const existRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${ruleForm.rename}/exist`, 'get')
+        if (existRes && existRes.status === 'success') ruleForm.rename_err = true
+        else ruleForm.rename_err = false
       }
+      ruleLoad.value = false
     }
     async function init (params) {
       machinesLoad.value = true
@@ -522,13 +658,24 @@ export default defineComponent({
       } else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
       machinesLoad.value = false
     }
-
+    async function requestFiles () {
+      try {
+        const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
+        if (listFilesRes && listFilesRes.status === 'success') filesList.value = listFilesRes.data || []
+      } catch{ }
+    }
+    async function availableChange () {
+      // console.log(ruleForm.displayAvailable)
+    }
     let getnetID = NaN
     onMounted(async () => {
-      ruleForm.rename = ''
+      ruleForm.rename = route.params.name
+      ruleForm.rename_tip = route.params.name
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
-      paymentEnv()
+      // paymentEnv()
+      requestFiles()
       init()
+      nameExist()
     })
     return {
       route,
@@ -539,14 +686,15 @@ export default defineComponent({
       system,
       props,
       ruleForm,
+      rules,
       sleepVisible,
       sleepSelect,
       dialogWidth,
       hardwareOptions,
       hardwareLoad,
       machinesLoad,
-      forkLoad,
-      sleepChange, hardwareFun, close, forkDuplicate
+      forkLoad, ruleFormRef, ruleLoad,
+      sleepChange, hardwareFun, close, forkDuplicate, nameExist, availableChange
     }
   }
 })
@@ -567,27 +715,31 @@ export default defineComponent({
 
     :deep(.space_hardware) {
       position: relative;
-      padding: 0.3rem 0.2rem;
+      padding: 0.3rem 0.2rem 0;
       color: #000;
       line-height: 1.5;
-
+      &.persistent-storage {
+        padding: 0.3rem 0.2rem;
+        border-top: 1px solid #e4e4e4;
+        .hardware-right {
+          border: 0;
+          overflow: hidden;
+        }
+      }
       .el-col {
         position: relative;
       }
 
       h2 {
         margin: 0 0 0.12rem;
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 600;
         color: #000;
         @media screen and (max-width: 1600px) {
-          font-size: 18px;
-        }
-        @media screen and (max-width: 1440px) {
-          font-size: 17px;
+          font-size: 15px;
         }
         @media screen and (max-width: 768px) {
-          font-size: 15px;
+          font-size: 14px;
         }
 
         svg {
@@ -600,11 +752,8 @@ export default defineComponent({
       .p-2 {
         align-items: flex-start;
         margin: 0 0 0.08rem;
-        font-size: 17px;
+        font-size: 15px;
         @media screen and (max-width: 1600px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 1440px) {
           font-size: 14px;
         }
         @media screen and (max-width: 768px) {
@@ -672,8 +821,11 @@ export default defineComponent({
 
       .hardware-right {
         max-height: 430px;
-        border-left: 1px solid #dcdfe6;
+        // border-left: 1px solid #dcdfe6;
         overflow-y: scroll;
+        &.m-bottom {
+          padding-bottom: 0.2rem;
+        }
       }
 
       .hardware-left {
@@ -687,16 +839,13 @@ export default defineComponent({
 
         .title_tip {
           white-space: nowrap;
-          font-size: 18px;
+          font-size: 15px;
           font-weight: 600;
           @media screen and (max-width: 1600px) {
-            font-size: 16px;
-          }
-          @media screen and (max-width: 1440px) {
-            font-size: 15px;
+            font-size: 14px;
           }
           @media screen and (max-width: 768px) {
-            font-size: 14px;
+            font-size: 13px;
           }
 
           p {
@@ -707,6 +856,7 @@ export default defineComponent({
             width: 12px;
             height: 12px;
             margin: 0 0.08rem;
+            cursor: pointer;
           }
 
           .el-divider {
@@ -734,20 +884,28 @@ export default defineComponent({
               }
             }
           }
+
+          .new {
+            padding: 2px 6px;
+            margin: 0 0 0 6px;
+            background-color: rgba(124, 58, 237, 0.1);
+            font-size: 12px;
+            border-radius: 4px;
+            color: rgba(124, 58, 237, 1);
+            text-transform: uppercase;
+            line-height: 1;
+          }
         }
 
         .pause_margin {
-          margin: 0.2rem 0 0.3rem;
+          margin: 0.2rem 0;
         }
 
         .time {
           margin: 0.15rem 0;
           white-space: nowrap;
-          font-size: 17px;
+          font-size: 15px;
           @media screen and (max-width: 1600px) {
-            font-size: 15px;
-          }
-          @media screen and (max-width: 1440px) {
             font-size: 14px;
           }
           @media screen and (max-width: 768px) {
@@ -779,8 +937,8 @@ export default defineComponent({
 
       .price_switch {
         position: absolute;
-        top: 0.2rem;
-        right: 0.6rem;
+        top: 0;
+        right: 0.2rem;
         font-size: 14px;
         color: #333;
         z-index: 9;
@@ -837,6 +995,10 @@ export default defineComponent({
       .space_hardware_list {
         @media screen and (max-width: 1200px) {
           padding: 0;
+        }
+
+        .is-hidden {
+          display: none;
         }
 
         .el-card {
@@ -908,7 +1070,7 @@ export default defineComponent({
 
             h5 {
               padding: 0.05rem 0;
-              font-size: 16px;
+              font-size: 15px;
               @media screen and (max-width: 1600px) {
                 font-size: 14px;
               }
@@ -967,7 +1129,7 @@ export default defineComponent({
       }
     }
 
-    .fork-btn {
+    :deep(.fork-btn) {
       // position: absolute;
       // bottom: 0;
       // left: 0;
@@ -984,6 +1146,7 @@ export default defineComponent({
       }
       .fileList {
         .demo-ruleForm {
+          align-items: stretch;
           margin: 0;
           .el-form-item {
             margin-bottom: 6px;
@@ -992,6 +1155,32 @@ export default defineComponent({
             }
             &.flex_left {
               max-width: 120px;
+              .el-form-item__content {
+                .el-input {
+                  .el-input__inner {
+                    width: 100px;
+                  }
+                }
+              }
+            }
+            &.flex_right {
+              .tip {
+                flex-wrap: wrap;
+                .text {
+                  padding: 0.06rem 0 0;
+                  font-size: 12px;
+                  line-height: 1;
+                  &.g {
+                    color: #047857;
+                  }
+                  &.r {
+                    color: #f56c6c;
+                  }
+                  i {
+                    margin: 0 5px 0 0;
+                  }
+                }
+              }
             }
             .el-form-item__content {
               width: 100%;
@@ -1032,10 +1221,30 @@ export default defineComponent({
               }
               .el-input {
                 font-size: inherit;
+                &.err {
+                  .el-input__inner {
+                    border-color: #ff0000;
+                  }
+                }
+                &.is-disabled {
+                  .el-input__suffix {
+                    background-color: transparent;
+                  }
+                }
                 .el-input__inner {
                   height: auto;
                   padding: 0.03rem 0.1rem;
                   font-size: inherit;
+                  line-height: 2;
+                }
+                .el-input__suffix {
+                  display: flex;
+                  align-items: center;
+                  height: calc(100% - 8px);
+                  right: 1px;
+                  top: 3px;
+                  background-color: #fff;
+                  padding-right: 5px;
                 }
               }
             }
@@ -1083,12 +1292,12 @@ export default defineComponent({
     color: #000;
 
     .title-hard {
-      font-size: 18px;
+      font-size: 15px;
       @media screen and (max-width: 1600px) {
-        font-size: 16px;
+        font-size: 14px;
       }
       @media screen and (max-width: 768px) {
-        font-size: 14px;
+        font-size: 13px;
       }
 
       span {
@@ -1150,7 +1359,7 @@ export default defineComponent({
 
         h5 {
           padding: 0.05rem 0;
-          font-size: 16px;
+          font-size: 15px;
           @media screen and (max-width: 1600px) {
             font-size: 14px;
           }
@@ -1205,16 +1414,13 @@ export default defineComponent({
 
       .title_tip {
         white-space: nowrap;
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 600;
         @media screen and (max-width: 1600px) {
-          font-size: 16px;
-        }
-        @media screen and (max-width: 1440px) {
-          font-size: 15px;
+          font-size: 14px;
         }
         @media screen and (max-width: 768px) {
-          font-size: 14px;
+          font-size: 13px;
         }
 
         p {
@@ -1225,6 +1431,7 @@ export default defineComponent({
           width: 12px;
           height: 12px;
           margin: 0 0.08rem;
+          cursor: pointer;
         }
 
         .el-switch {
@@ -1257,11 +1464,8 @@ export default defineComponent({
       .time {
         margin: 0.15rem 0;
         white-space: nowrap;
-        font-size: 17px;
+        font-size: 15px;
         @media screen and (max-width: 1600px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 1440px) {
           font-size: 14px;
         }
         @media screen and (max-width: 768px) {
@@ -1304,12 +1508,9 @@ export default defineComponent({
     .p-1 {
       margin: 0.15rem 0;
       color: rgba(107, 114, 128, 1);
-      font-size: 17px;
+      font-size: 15px;
       word-break: break-word;
       @media screen and (max-width: 1600px) {
-        font-size: 15px;
-      }
-      @media screen and (max-width: 1440px) {
         font-size: 14px;
       }
       @media screen and (max-width: 768px) {
@@ -1349,9 +1550,9 @@ export default defineComponent({
           margin: 0 0.15rem 0 0;
           background: linear-gradient(180deg, #fefefe, #f0f0f0);
           font-family: inherit;
-          font-size: 18px;
+          font-size: 15px;
           @media screen and (max-width: 1600px) {
-            font-size: 16px;
+            font-size: 14px;
           }
         }
       }

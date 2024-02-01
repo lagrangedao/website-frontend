@@ -30,7 +30,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
   } catch (err) {
     console.error(err, err.response)
     const time = await throttle()
-    if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.status === 403 ? 'The Token has expired. Please log in again' : err.response.statusText || err.response.data.msg || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
+    if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.status === 403 ? 'The token has expired. Please log in again' : err.response.data.msg || err.response.data.message || err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
     }
@@ -168,8 +168,8 @@ async function performSignin(sig) {
   }
 }
 
-async function gatewayGain() {
-  if (store.state.gateway) return
+async function gatewayGain(type) {
+  if (type && store.state.gateway) return
   try {
     const response = await sendRequest(`${process.env.VUE_APP_BASEAPI}gateway`, 'get')
     if (response && response.data.gateway) store.dispatch('setGateway', response.data.gateway)
@@ -194,12 +194,12 @@ async function signOutFun() {
   store.dispatch('setMetaAddress', '')
   store.dispatch('setAccessSpace', '')
   store.dispatch('setAccessDataset', '')
-  router.push({
-    name: 'main'
-  })
+  // router.push({
+  //   name: 'main'
+  // })
 }
 
-function momentFun(dateItem) {
+function momentFun(dateItem, type) {
   let dateNew = dateItem * 1000
   let dataUnit = ''
   let dataTime = new Date(dateNew) + ''
@@ -220,6 +220,7 @@ function momentFun(dateItem) {
       break
   }
   dateNew = dateNew ?
+    type ? moment(new Date(parseInt(dateNew))).format('YYYY-MM-DD HH:mm:ss') :
     moment(new Date(parseInt(dateNew))).format('YYYY-MM-DD HH:mm:ss') + ` (${dataUnit})` :
     '-'
   return dateNew
@@ -275,6 +276,12 @@ async function getUnit(id) {
       url = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/address/`
       url_tx = `${process.env.VUE_APP_MUMBAIPAYMENTURL}/tx/`
       break
+    case 2024:
+      unit = 'SWAN'
+      name = 'Saturn Testnet '
+      url = `${process.env.VUE_APP_SATURNBLOCKURL}/address/`
+      url_tx = `${process.env.VUE_APP_SATURNBLOCKURL}/tx/`
+      break
     case 3141:
       unit = 'ETH'
       name = 'Filecoin - Hyperspace testnet '
@@ -327,6 +334,14 @@ async function walletChain(chainId) {
         blockExplorerUrls: [process.env.VUE_APP_MUMBAIPAYMENTURL]
       }
       break
+    case 2024:
+      text = {
+        chainId: web3Init.utils.numberToHex(2024),
+        chainName: 'Saturn Testnet',
+        rpcUrls: [process.env.VUE_APP_SATURNURL],
+        blockExplorerUrls: [process.env.VUE_APP_SATURNBLOCKURL]
+      }
+      break
     case 97:
       text = {
         chainId: web3Init.utils.numberToHex(97),
@@ -361,7 +376,7 @@ async function walletChain(chainId) {
         text
       ]
     })
-    signOutFun()
+    // signOutFun()
     // const [lStatus, signErr] = await login()
     // if (lStatus) getdataList()
   } catch (err) {
@@ -408,6 +423,11 @@ function copyContent(text, tipCont) {
 
 function hiddAddress(val) {
   if (val) return `${val.substring(0, 5)}...${val.substring(val.length - 5)}`
+  else return '-'
+}
+
+function hiddAddressSmall(val) {
+  if (val) return `${val.substring(0, 2)}...${val.substring(val.length - 5)}`
   else return '-'
 }
 
@@ -506,7 +526,7 @@ function cmOptions(owner) {
 // const Web3 = require('web3');
 let web3Init
 const providerInit = window.ethereum && window.ethereum.providers ? window.ethereum.providers.find((provider) => provider.isMetaMask) : window.ethereum
-console.log(window.ethereum)
+// console.log(window.ethereum)
 if (typeof window.ethereum === 'undefined') {
   window.open('https://metamask.io/download.html')
   // alert("Consider installing MetaMask!");
@@ -542,6 +562,7 @@ export default {
   walletChain,
   changeIDLogin,
   hiddAddress,
+  hiddAddressSmall,
   NumFormat,
   calculateDiffTime,
   expiredTime,

@@ -590,6 +590,7 @@ export default defineComponent({
 </style>
 <style lang="scss">
 .license_style {
+  min-width: auto !important;
   .el-select-dropdown__item {
     height: auto;
     padding: 8px 3%;

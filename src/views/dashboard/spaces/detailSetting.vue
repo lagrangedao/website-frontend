@@ -21,7 +21,7 @@
             <label class="label" for="dataname">
               New name
               <div class="flex-row">
-                <el-input v-model="ruleForm.name" placeholder="New space name" />
+                <el-input v-model="ruleForm.name" maxlength="50" show-word-limit placeholder="New space name" />
               </div>
             </label>
           </el-form-item>
@@ -265,7 +265,8 @@ export default defineComponent({
   },
   props: {
     // listdata: { type: Number, default: 1 },
-    likesValue: { type: Boolean, default: false }
+    likesValue: { type: Boolean, default: false },
+    listValue: { type: Object, default: {} }
   },
   setup (props, context) {
     const store = useStore()
@@ -324,8 +325,10 @@ export default defineComponent({
       ]
     })
     const validateInput = (rule, value, callback) => {
-      if ((/[^a-zA-Z0-9-]/g).test(value)) {
-        callback(new Error("Only regular alphanumeric characters and '-' support"));
+      if ((/[^a-zA-Z0-9-._]/g).test(value)) {
+        callback(new Error("The space name can only contain ASCII letters, digits, and the characters ., -, and _."));
+      } else if (value === route.params.name) {
+        callback(new Error("Space name was not changed"));
       } else {
         callback();
       }
@@ -439,18 +442,19 @@ export default defineComponent({
       await ruleFormRefDelete.value.validate(async (valid, fields) => {
         if (valid) {
           deleteLoad.value = true
-          let formData = new FormData()
-          formData.append('name', route.params.name)
-          const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/delete`, 'post', formData)
-          await system.$commonFun.timeout(500)
-          if (listRes && listRes.status === 'success') {
-            if (listRes.data.space) system.$commonFun.messageTip('success', 'Delete successfully!')
-            else system.$commonFun.messageTip('error', listRes.data.message)
-            router.push({ name: 'personalCenter' })
-          } else system.$commonFun.messageTip('error', 'Delete failed!')
-          ruleForm.name = ''
-          ruleForm.delete = ''
-          deleteLoad.value = false
+          try {
+            let formData = new FormData()
+            formData.append('name', route.params.name)
+            const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/delete`, 'post', formData)
+            await system.$commonFun.timeout(500)
+            if (listRes && listRes.status === 'success') {
+              system.$commonFun.messageTip(listRes.status, listRes.data.message)
+              router.push({ name: 'personalCenter' })
+            } else system.$commonFun.messageTip('error', 'Delete failed!')
+            ruleForm.name = ''
+            ruleForm.delete = ''
+            deleteLoad.value = false
+          } catch{ deleteLoad.value = false }
         } else {
           console.log('error submit!', fields)
           return false
@@ -617,9 +621,10 @@ export default defineComponent({
     async function requestInitData (type) {
       if (route.name !== 'spaceDetail') return
       listLoad.value = true
-      listdata.value = {}
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
+      // listdata.value = {}
+      // const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+      // if (listRes && listRes.status === 'success') listdata.value = listRes.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
+      if (props.listValue && props.listValue.status === 'success') listdata.value = props.listValue.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
 
       const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
       if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
@@ -664,14 +669,11 @@ export default defineComponent({
     }
     function handleHard (val, refresh, net) {
       if (net) {
-        netEnv.value = [{
-          name: 'OpSwan',
-          id: 8598668088
-        },
-        {
-          name: 'Mumbai Testnet',
-          id: 80001
-        }]
+        netEnv.value = [
+          {
+            name: 'Saturn Testnet',
+            id: 2024
+          }]
         networkC.value = true
       } else if (refresh) {
         context.emit('handleValue', true, 'setting')
@@ -792,6 +794,9 @@ export default defineComponent({
       ruleForm.name = ''
       ruleForm.delete = ''
     })
+    watch(() => props.listValue, () => {
+      if (props.listValue && props.listValue.status === 'success') listdata.value = props.listValue.data.space || { name: route.params.name, is_public: '1', created_at: "", updated_at: "", activeOrder: null, status: 'Created' }
+    })
     // watch(() => props.likesValue, () => {
     //   requestInitData()
     // })
@@ -836,10 +841,10 @@ export default defineComponent({
 #space {
   background: #fff;
   color: #333;
-  font-size: 18px;
+  font-size: 15px;
   text-align: left;
   @media screen and (max-width: 1200px) {
-    font-size: 16px;
+    font-size: 14px;
   }
   :deep(.space_body) {
     align-items: stretch;
@@ -859,14 +864,14 @@ export default defineComponent({
       .title {
         padding: 0.2rem 0.2rem 0;
         margin: 0 0 0.2rem;
-        font-size: 17px;
+        font-size: 14px;
         font-weight: 600;
         color: #000;
         @media screen and (max-width: 768px) {
-          font-size: 15px;
+          font-size: 13px;
         }
         @media screen and (min-width: 1800px) {
-          font-size: 18px;
+          font-size: 15px;
         }
       }
       .desc,
@@ -999,7 +1004,7 @@ export default defineComponent({
         margin: 0 0.2rem 0.2rem;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         font-family: inherit;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 500;
         line-height: 1;
         color: #f85149;
@@ -1065,14 +1070,14 @@ export default defineComponent({
             .cell {
               padding: 0;
               font-family: "FIRACODE-BOLD";
-              font-size: 17px;
+              font-size: 14px;
               color: #000;
               word-break: break-word;
               @media screen and (max-width: 768px) {
-                font-size: 15px;
+                font-size: 13px;
               }
               @media screen and (min-width: 1800px) {
-                font-size: 18px;
+                font-size: 15px;
               }
             }
           }
@@ -1105,7 +1110,7 @@ export default defineComponent({
                   font-size: 13px;
                 }
                 @media screen and (min-width: 1800px) {
-                  font-size: 16px;
+                  font-size: 15px;
                 }
               }
               .el-button {
@@ -1128,13 +1133,13 @@ export default defineComponent({
 
     .el-dialog__header {
       padding: 0.17rem 0.25rem 0.1rem;
-      font-size: 17px;
+      font-size: 14px;
       color: #000;
       @media screen and (max-width: 768px) {
-        font-size: 15px;
+        font-size: 13px;
       }
       @media screen and (min-width: 1800px) {
-        font-size: 18px;
+        font-size: 15px;
       }
     }
 
@@ -1235,7 +1240,7 @@ export default defineComponent({
         margin: 0 0.15rem 0 0;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         font-family: inherit;
-        font-size: 16px;
+        font-size: 15px;
         line-height: 1;
         color: #000;
         border-radius: 0.07rem;
@@ -1303,7 +1308,7 @@ export default defineComponent({
         height: auto;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         font-family: inherit;
-        font-size: 16px;
+        font-size: 15px;
         line-height: 1;
         color: #000;
         border-radius: 0.07rem;

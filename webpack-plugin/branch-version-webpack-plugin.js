@@ -24,9 +24,9 @@ function getBranchVersionInfo() {
     let message = execSync('git show -s --format=%s').toString().trim();
     return `
     Current branch name: ${vName}\n
-    Hash：${commitHash}\n
-    Date：${date}\n
-    Description：${message}
+    Hash: ${commitHash}\n
+    Date: ${date}\n
+    Description: ${message}
   `;
 }
 // 创建分支版本类

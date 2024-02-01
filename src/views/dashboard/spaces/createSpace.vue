@@ -23,7 +23,7 @@
                         <label class="label" for="dataname">
                             Space name
                             <div class="flex flex-row">
-                                <el-input v-model="ruleForm.name" maxlength="80" show-word-limit placeholder="New Space name" title="Only regular alphanumeric characters, '-', '.' and '_' supported" />
+                                <el-input v-model="ruleForm.name" maxlength="50" show-word-limit placeholder="New Space name" title="Only regular alphanumeric characters, '-', '.' and '_' supported" />
                             </div>
                         </label>
                     </el-form-item>
@@ -155,8 +155,8 @@ export default defineComponent({
             oldOptions: []
         })
         const validateInput = (rule, value, callback) => {
-            if ((/[^a-zA-Z0-9-]/g).test(value)) {
-                callback(new Error("Only regular alphanumeric characters and '-' support"));
+            if ((/[^a-zA-Z0-9-._]/g).test(value)) {
+                callback(new Error("The space name can only contain ASCII letters, digits, and the characters ., -, and _."));
             } else {
                 callback();
             }
@@ -527,6 +527,7 @@ export default defineComponent({
 </style>
 <style lang="scss">
 .license_style {
+  min-width: auto !important;
   .el-select-dropdown__item {
     height: auto;
     padding: 8px 3%;

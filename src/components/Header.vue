@@ -70,12 +70,9 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item command="asProvider">
-                  <div class="profile router-link">- As Provider</div>
-                </el-dropdown-item>
-                <el-dropdown-item command="asUser">
-                  <div class="profile router-link b">- As Space Builder</div>
-                </el-dropdown-item>
+                <!-- <el-dropdown-item command="asProvider">
+                  <div class="profile router-link">As Provider</div>
+                </el-dropdown-item> -->
               </el-dropdown-menu>
               <el-dropdown-menu>
                 <el-dropdown-item command="create_dataset">
@@ -83,6 +80,9 @@
                 </el-dropdown-item>
                 <el-dropdown-item command="create_space">
                   <span class="link">+ New Space</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="asUser">
+                  <div class="profile router-link b" :class="{'is-disabled': isEnvironment}">Payment History</div>
                 </el-dropdown-item>
                 <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
                 <el-dropdown-item command="settings">
@@ -148,7 +148,7 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
-    const accessName = computed(() => (store.state.accessName))
+    const accessName = computed(() => (store.state.accessName || '-'))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
     const logo = require("@/assets/images/icons/logo_black.png")
@@ -166,6 +166,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const isEnvironment = ref(process.env.NODE_ENV === 'production' ? true : false)
 
     async function header_logo () {
       if (metaAddress.value) router.push({ path: '/personal_center' })
@@ -178,7 +179,7 @@ export default defineComponent({
         store.dispatch('setNavLogin', true)
       } else if (key === '4') window.open('https://docs.lagrangedao.org')
       else if (key === 'asProvider') router.push({ name: 'paymentHistory', query: { type: 'provider' } })
-      else if (key === 'asUser') router.push({ name: 'paymentHistory', query: { type: 'user' } })
+      else if (key === 'asUser' && !isEnvironment.value) router.push({ name: 'paymentHistory', query: { type: 'user' } })
       else if (key === 'dataset') router.push({ path: '/dataset' })
       else if (key === 'models') router.push({ path: '/models' })
       else if (key === 'spaces') router.push({ path: '/spaces' })
@@ -249,7 +250,7 @@ export default defineComponent({
       info,
       wrongVisible,
       bodyWidth,
-      system,
+      system, isEnvironment,
       header_logo, handleSelect, wrongMethod
     }
   }
@@ -832,12 +833,19 @@ export default defineComponent({
           display: block;
           width: 100%;
           height: auto;
-          padding: 3px 3px 3px 22px;
+          padding: 6px 3px 3px 0;
           &:hover {
             text-decoration: underline;
           }
         }
         &.b {
+        }
+        &.is-disabled {
+          opacity: 0.5;
+          cursor: no-drop;
+          &:hover {
+            text-decoration: none;
+          }
         }
         cursor: pointer;
         * {

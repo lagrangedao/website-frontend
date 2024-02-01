@@ -1,7 +1,7 @@
 <template>
-  <section id="space" v-loading="forkLoad" element-loading-text="Please wait...">
-    <div class="space_head container-landing">
-      <div class="content flex-row">
+  <section id="space" :class="{'space-height': route.params.tabs === 'app'}" v-loading="forkLoad" element-loading-text="Please wait...">
+    <div class="space_head" :class="{'space-height flex-row space-flex': route.params.tabs === 'app'}">
+      <div class="content flex-row container-landing" :class="{'all': route.params.tabs === 'app'}">
         <div class="name flex-row">
           <div class="back-logo flex-row" @click="back" v-if="route.params.tabs === 'app'">
             <i class="icon logo_lagrange"></i>
@@ -12,7 +12,10 @@
             <i class="icon icon_spaces"></i>
             Space: &nbsp;
           </div>
-          <b>{{route.params.name}}</b>
+          <div class="wallet-cont flex-row">{{system.$commonFun.hiddAddress(route.params.wallet_address)}}
+            <span class="m">/</span>
+          </div>
+          <b @click="handleClick('app')">{{route.params.name}}</b>
           <i class="icon icon_copy" @click="system.$commonFun.copyContent(route.params.name, 'Copied')"></i>
           <el-button-group class="ml-4">
             <el-button @click="likeMethod" v-if="likeOwner">
@@ -38,7 +41,7 @@
             <el-tooltip v-else-if="parentValue === 'Running'" placement="bottom" content="The Space has been successfully deployed.">{{parentValue}}</el-tooltip>
             <span v-else>{{parentValue}}</span>
             <span v-if="parentValue === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config && allData.space.activeOrder.config.hardware_type && allData.space.activeOrder.config.hardware_type === 'GPU'">&nbsp;on
-              <strong style="text-transform: uppercase;">{{allData.space.activeOrder.config.hardware}}</strong>
+              <i>{{allData.space.activeOrder.config.hardware}}</i>
             </span>
           </div>
           <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours')) && (parentValue && parentValue.toLowerCase() !== 'failed') && parentValue !== 'Stopped' && parentValue !== 'Expired'">
@@ -70,12 +73,38 @@
         </div>
 
         <div class="space-right flex-row">
-          <el-tabs v-model="activeName" class="demo-tabs" id="tabs" ref="target" @tab-click="handleClick">
+          <el-tabs v-model="activeName" class="demo-tabs" :class="{'hidden': route.params.tabs === 'app'}" id="tabs" ref="target" @tab-click="handleClick">
             <el-tab-pane name="app">
               <template #label>
                 <span class="custom-tabs-label flex-row">
                   <i class="icon icon_spaces"></i>
-                  <span>App</span>
+                  <span style="margin-right: 8px;">App</span>
+                  <el-dropdown popper-class="cp_style" v-if="allData.jobResult && allData.jobResult.length>0 && route.params.tabs === 'app'">
+                    <span class="el-dropdown-link">
+                      <el-icon>
+                        <CaretBottom />
+                      </el-icon>
+                    </span>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item v-for="(job, j) in allData.jobResult" :key="j">
+                          <div class="custom-tabs-label flex-row" :class="{'is-active': allData.jobIndex === j}" @click="appChange(job, j)">
+                            <div :class="{'span-cp':  allData.task && allData.task.leading_job_id === job.uuid, 'cp-style flex-row': true}">
+                              CP {{ j + 1 }}
+
+                              <svg style="margin-left: 15px;" width="16" height="16" v-if="job.job_result_uri" @click="system.$commonFun.goLink(`${job.job_result_uri}#space_id=${allData.space.task_uuid}`)" t="1700718365282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg" p-id="2324">
+                                <path d="M875.333052 552.332591c-17.381879 0-31.476899 14.083763-31.582299 31.472805l0 0.155543c0 0 0 0 0 0.047072l0 220.847897c0 17.896602-14.440897 32.358989-32.264844 32.358989L172.891675 837.214896c-17.815761 0-32.241308-14.45727-32.241308-32.358989L140.650367 254.650771c0-17.894555 14.439874-32.383548 32.241308-32.383548l298.973232 0c17.445324-0.034792 31.535227-14.177907 31.535227-31.652907 0-17.483186-14.104229-31.651884-31.535227-31.651884L168.641885 158.962431c-50.360991 0-91.178629 40.925085-91.178629 91.38943l0 558.753837c0 50.471508 40.820708 91.415013 91.178629 91.415013l647.092791 0c50.357921 0 91.180676-40.943504 91.180676-91.415013L906.915351 583.844282C906.844743 566.42454 892.720048 552.332591 875.333052 552.332591z"
+                                  fill="#333333" p-id="2325"></path>
+                                <path d="M937.013857 335.824535l-206.523657-207.157083-8.005324-6.593162c-4.556783-2.381234-10.184967-3.292999-15.497972-3.292999-18.075681 0-32.732495 14.697747-32.732495 32.803103 0 5.333472 3.105734 13.644765 5.498224 18.213827l141.602042 142.967132L675.756621 312.765353c-221.524303 27.526937-302.548664 144.17668-322.964646 415.066297-0.028653 18.86158 14.633279 33.57877 32.703843 33.57877 14.392802 0 27.443026-12.673647 31.812543-25.645077 20.424168-243.485477 77.827553-337.180416 259.588223-357.409133l144.467299 0.053212L684.120103 516.049223l-5.925966 7.506974c-2.264577 4.474918-3.140527 10.106172-3.140527 15.269775 0 18.081821 14.656815 32.803103 32.708959 32.803103 4.581342 0 12.685927-2.552126 16.746406-4.373611l212.502835-211.896015 9.101285-9.135054L937.013857 335.824535z"
+                                  fill="#333333" p-id="2326"></path>
+                              </svg>
+                            </div>
+                          </div>
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
                 </span>
               </template>
             </el-tab-pane>
@@ -90,20 +119,25 @@
             <el-tab-pane name="files">
               <template #label>
                 <span class="custom-tabs-label flex-row">
-                  <i class="icon"></i>
-                  <span>Files and versions</span>
+                  <!-- <i class="icon"></i> -->
+                  <svg class="mr-1.5 text-gray-400 flex-none icon icon-files" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
+                    viewBox="0 0 24 24">
+                    <path class="uim-tertiary" d="M21 19h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0-4h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0-8h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0 4h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2z" opacity=".5" fill="currentColor"></path>
+                    <path class="uim-primary" d="M9 19a1 1 0 0 1-1-1V6a1 1 0 0 1 2 0v12a1 1 0 0 1-1 1zm-6-4.333a1 1 0 0 1-.64-1.769L3.438 12l-1.078-.898a1 1 0 0 1 1.28-1.538l2 1.667a1 1 0 0 1 0 1.538l-2 1.667a.999.999 0 0 1-.64.231z" fill="currentColor"></path>
+                  </svg>
+                  <span>Files</span>
                 </span>
               </template>
             </el-tab-pane>
-            <el-tab-pane name="community">
+            <!-- <el-tab-pane name="community">
               <template #label>
                 <span class="custom-tabs-label flex-row">
                   <i class="icon"></i>
                   <span>Community</span>
-                  <!-- <b>3</b> -->
+                  <b>3</b>
                 </span>
               </template>
-            </el-tab-pane>
+            </el-tab-pane> -->
             <el-tab-pane name="settings" v-if="metaAddress && metaAddress === route.params.wallet_address">
               <template #label>
                 <span class="custom-tabs-label flex-row">
@@ -118,7 +152,7 @@
           </el-tabs>
 
           <div class="logs_style popDown flex-row">
-            <el-popover :width="190" trigger="click" placement="bottom-end" popper-class="popper_style">
+            <el-popover :hide-after="0" :offset="5" :show-arrow="false" trigger="hover" placement="bottom-start" popper-class="popper_style">
               <template #reference>
                 <div class="share_style flex-row">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024" data-v-ea893728="">
@@ -128,23 +162,80 @@
               </template>
               <template #default>
                 <ul class="demo-rich-conent">
-                  <li class="flex-row">
+                  <li class="flex-row hidden weight-6" v-show="route.params.tabs === 'app'">
+                    <div class="m-width" @click="handleClick('app')">
+                      <span class="custom-tabs-label flex-row">
+                        <i class="icon icon_spaces"></i>
+                        <span>App</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li class="flex-row hidden" v-show="route.params.tabs === 'app'">
+                    <div class="m-width" @click="handleClick('card')">
+                      <span class="custom-tabs-label flex-row">
+                        <i class="icon icon_spaces"></i>
+                        <span>Space card</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li class="flex-row hidden" v-show="route.params.tabs === 'app'">
+                    <div class="m-width" @click="handleClick('files')">
+                      <span class="custom-tabs-label flex-row">
+                        <!-- <i class="icon"></i> -->
+                        <svg class="mr-1.5 text-gray-400 flex-none icon icon-files" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
+                          viewBox="0 0 24 24">
+                          <path class="uim-tertiary" d="M21 19h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0-4h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0-8h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2zm0 4h-8a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2z" opacity=".5" fill="currentColor"></path>
+                          <path class="uim-primary" d="M9 19a1 1 0 0 1-1-1V6a1 1 0 0 1 2 0v12a1 1 0 0 1-1 1zm-6-4.333a1 1 0 0 1-.64-1.769L3.438 12l-1.078-.898a1 1 0 0 1 1.28-1.538l2 1.667a1 1 0 0 1 0 1.538l-2 1.667a.999.999 0 0 1-.64.231z" fill="currentColor"></path>
+                        </svg>
+                        <span>Files</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li class="flex-row hidden" v-show="route.params.tabs === 'app'">
+                    <div class="m-width" @click="handleClick('settings')" v-if="metaAddress && metaAddress === route.params.wallet_address">
+                      <span class="custom-tabs-label flex-row">
+                        <!-- <i class="icon icon_spaces"></i> -->
+                        <el-icon class="icon">
+                          <Setting />
+                        </el-icon>
+                        <span>Settings</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li class="flex-row black-color" :class="{'hidden-border': route.params.tabs === 'app'}">
                     <div class="m-width" @click="logDrawer('detail')">
                       Space Detail
                     </div>
                   </li>
-                  <li :class="{'flex-row': true, 'is-disabled':parentValue !== 'Running' ||!((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))}" v-if="metaAddress && metaAddress === route.params.wallet_address">
+                  <li :class="{'flex-row black-color': true, 'is-disabled':parentValue !== 'Running' ||!((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))}" v-if="metaAddress && metaAddress === route.params.wallet_address">
                     <div class="m-width">
                       <el-tooltip v-if="parentValue !== 'Running' || !((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))" placement="bottom" content="The space expiration time can be renewed only when it is less than 24 hours">Renew</el-tooltip>
                       <span v-else @click="hardwareOperate('renew')">Renew</span>
                     </div>
                   </li>
-                  <li :class="{'flex-row': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" v-if="metaAddress && metaAddress !== route.params.wallet_address">
+                  <li :class="{'flex-row black-color': true, 'is-disabled': !nft.contract_address || nftTokens.length === 0 }" v-if="metaAddress && metaAddress !== route.params.wallet_address">
                     <div class="m-width" @click="reqNFT">Request License</div>
                   </li>
-                  <li class="flex-row">
+                  <li class="flex-row black-color">
+                    <div class="m-width" @click="handleClick('community')">
+                      Community
+                    </div>
+                  </li>
+                  <li class="flex-row black-color">
                     <div class="m-width" @click="shareTwitter">
                       Share on Twitter
+                    </div>
+                  </li>
+                  <li class="flex-row black-color" v-if="metaAddress && metaAddress === route.params.wallet_address && (parentValue === 'Assigning to provider' || parentValue === 'Waiting for transaction' || parentValue === 'Deploying' || parentValue === 'Running')">
+                    <div class="m-width" @click="closeSpace">
+                      Close
+                    </div>
+                  </li>
+                  <li class="flex-row black-color" v-show="route.params.tabs === 'app'">
+                    <div class="m-width" @click="handleClick('Profile')">
+                      <span class="custom-tabs-label flex-row">
+                        <span>My Profile</span>
+                      </span>
                     </div>
                   </li>
                 </ul>
@@ -154,14 +245,16 @@
         </div>
       </div>
 
-      <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
-      <detail-files @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'files'"></detail-files>
-      <detail-community @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'community'"></detail-community>
-      <detail-setting @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'settings'"></detail-setting>
-      <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" v-else></detail-app>
+      <div :class="{'details-cont': route.params.tabs === 'app', 'container-landing': route.params.tabs !== 'app', 'details-style': true}">
+        <detail-card @handleValue="handleValue" :likesValue="likesValue" :urlChange="activeName" v-if="activeName === 'card'"></detail-card>
+        <detail-files @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'files'"></detail-files>
+        <detail-community @handleValue="handleValue" :likesValue="likesValue" v-else-if="activeName === 'community'"></detail-community>
+        <detail-setting @handleValue="handleValue" :likesValue="likesValue" :listValue="listValue.data" v-else-if="activeName === 'settings'"></detail-setting>
+        <detail-app @handleValue="handleValue" @hardRedeploy="hardRedeploy" :likesValue="likesValue" :urlChange="activeName" :listValue="listValue.data" :jobResult="allData.jobResult" :cpList="listValue.cpList" v-else></detail-app>
+      </div>
     </div>
 
-    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'370px'" :destroy-on-close="true" custom-class="drawer_style">
+    <el-drawer v-model="drawer" :with-header="false" :direction="direction" :size="'70%'" :destroy-on-close="true" custom-class="drawer_style">
       <template #default>
         <div class="close flex-row" @click="drawer=false">
           <el-icon>
@@ -227,8 +320,8 @@
           </el-tab-pane>
           <el-tab-pane v-for="(dataJob, j) in logsContAll.data" v-if="logsContAll.data && drawerType === 'detail'" :key="j" :name="j.toString()">
             <template #label>
-              <span class="custom-tabs-label flex-row">
-                <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+              <span class="custom-tabs-label font-14 flex-row">
+                <span :class="{'span-cp': allData.task && allData.task.leading_job_id === dataJob.job.uuid}">CP {{j+1}}</span>
               </span>
             </template>
             <div class="over-view">
@@ -282,8 +375,8 @@
           </el-tab-pane>
           <el-tab-pane v-for="(dataJob, j) in logsCont.data" v-if="logsCont.data && drawerType === 'log'" :key="j" :name="j.toString()">
             <template #label>
-              <span class="custom-tabs-label flex-row">
-                <span :class="{'span-cp': dataJob.job.is_leading_job && dataJob.job.is_leading_job.toString() === 'true'}">CP {{j+1}}</span>
+              <span class="custom-tabs-label font-14 flex-row">
+                <span :class="{'span-cp':  allData.task && allData.task.leading_job_id === dataJob.job.uuid}">CP {{j+1}}</span>
               </span>
             </template>
             <div class="log-all">
@@ -351,6 +444,7 @@
       <space-hardware v-if="dialogCont.spaceHardFork" @handleHard="handleHard" :listdata="allData.space" :renewButton="renewButton"></space-hardware>
     </el-dialog>
     <space-hardware v-if="dialogCont.spaceHardRenew" @handleHard="handleHard" :listdata="allData.space" :renewButton="renewButton"></space-hardware>
+    <network-change v-if="networkC" :networkC="networkC" :netEnv="netEnv" @netChange="netChange"></network-change>
   </section>
 </template>
 <script>
@@ -361,12 +455,13 @@ import detailCommunity from './detailCommunity.vue'
 import detailSetting from './detailSetting.vue'
 import sharePop from '@/components/share.vue'
 import spaceHardware from '@/components/spaceHardware.vue'
-import { defineComponent, computed, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
+import networkChange from '@/components/networkChange'
+import { defineComponent, computed, onMounted, onActivated, onBeforeUnmount, watch, ref, reactive, getCurrentInstance, nextTick } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import JsonViewer from 'vue-json-viewer'
 import {
-  Setting, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp
+  Setting, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp, ArrowDown, CaretBottom
 } from '@element-plus/icons-vue'
 const DATA_NFT_ABI = require('@/utils/abi/DataNFT.json')
 export default defineComponent({
@@ -378,10 +473,14 @@ export default defineComponent({
     detailCommunity,
     detailSetting,
     spaceHardware,
+    networkChange,
     JsonViewer,
-    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp
+    Setting, sharePop, ArrowLeft, WarningFilled, CloseBold, Close, Timer, ArrowUp, ArrowDown, CaretBottom
   },
-  setup () {
+  props: {
+    vis: { type: Boolean, default: true }
+  },
+  setup (props) {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
@@ -432,6 +531,8 @@ export default defineComponent({
       job: null,
       files: [],
       task: {},
+      jobResult: [],
+      jobIndex: 0,
       paymentStatus: 'Created'
     })
     const dialogCont = reactive({
@@ -442,27 +543,47 @@ export default defineComponent({
     const renewButton = ref('renew')
     const logsType = ref('build')
     const checkedLock = ref(false)
+    const listValue = reactive({
+      data: {},
+      cpList: {}
+    })
+    const networkC = ref(false)
+    const netEnv = ref([])
+    const visible = ref(false)
 
     function handleClick (tab, event) {
-      router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name } })
+      visible.value = false
+      if (tab === 'Profile') router.push({ path: '/personal_center' })
+      else {
+        const nameTab = tab.props ?.name || tab
+        activeName.value = nameTab
+        router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: nameTab } })
+      }
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
     async function jobList (list) {
       let arr = list || []
+      let arrJob = []
       for (let j = 0; j < arr.length; j++) {
-        try {
-          const response = await fetch(arr[j].job_source_uri)
-          const textUri = await new Promise(async resolve => {
-            resolve(response.text())
-          })
-          arr[j].job_textUri = textUri ? JSON.parse(textUri).data : {}
-        } catch (err) {
-          console.log('err space detail job:', err)
-          arr[j].job_textUri = {}
+        // 如果status为running才显示
+        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
+          try {
+            if (arr[j].job_result_uri) {
+              const response = await fetch(arr[j].job_result_uri)
+              const textUri = await new Promise(async resolve => {
+                resolve(response.text())
+              })
+              arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
+            } else arr[j].job_result_uri = ''
+          } catch (err) {
+            console.log('err', err)
+            arr[j].job_result_uri = ''
+          }
+          if (arr[j].job_result_uri) arrJob.push(arr[j])
         }
       }
-      return arr
+      return arrJob
     }
     async function jobWSList (list, space, type) {
       let logArr = []
@@ -471,11 +592,13 @@ export default defineComponent({
         for (let j = 0; j < arr.length; j++) {
           if (type === 'log') {
             let spaceCont = space || {}
-            logArr.push({
+            if ((space.status && space.status.toLowerCase() === "running") && (arr[j].status && arr[j].status.toLowerCase() !== "running")) { }
+            else logArr.push({
               job: arr[j],
               space: spaceCont,
               buildLog: [],
-              containerLog: []
+              containerLog: [],
+              ws: null
             })
           } else if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
             let spaceCont = space || {}
@@ -483,7 +606,8 @@ export default defineComponent({
               job: arr[j],
               space: spaceCont,
               buildLog: [],
-              containerLog: []
+              containerLog: [],
+              ws: null
             })
           }
         }
@@ -506,26 +630,38 @@ export default defineComponent({
     async function requestDetail () {
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
-      if (listRes && listRes.status === 'success') {
-        allData.space = listRes.data.space
-        allData.task = listRes.data.task
-        parentValue.value = numRe.test(listRes.data.space.status) ? '' : listRes.data.space.status
-        likeValue.value = listRes.data.space.likes || 0
-        const expireTimeCont = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
-        expireTime.time = expireTimeCont.time
-        expireTime.unit = expireTimeCont.unit
-        logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
-        logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
-      } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
+      try {
+        const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+        if (listRes && listRes.status === 'success') {
+          listValue.data = listRes || {}
+          allData.space = listRes.data.space
+          allData.task = listRes.data.task
+          parentValue.value = numRe.test(listRes.data.space.status) ? '' : listRes.data.space.status
+          likeValue.value = listRes.data.space.likes || 0
+          const expireTimeCont = await system.$commonFun.expireTimeFun(listRes.data.space.expiration_time)
+          expireTime.time = expireTimeCont.time
+          expireTime.unit = expireTimeCont.unit
+          logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
+          logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
+          allData.jobResult = await jobList(listRes.data.job)
+          allData.jobIndex = 0
+          if (allData.jobResult && allData.jobResult.length > 0) listValue.cpList = allData.jobResult[0]
+        } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
+      } catch{ forkLoad.value = false }
+    }
+    function appChange (row, index) {
+      allData.jobIndex = index
+      listValue.cpList = row
     }
     async function requestNft () {
-      const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
-      if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
-        nft.contract_address = listNftRes.data.contract_address
-        nft.chain_id = listNftRes.data.chain_id
-        nftTokens.value = listNftRes.data.tokens || []
-      }
+      try {
+        const listNftRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/nft`, 'get')
+        if (listNftRes && listNftRes.status === 'success' && listNftRes.data) {
+          nft.contract_address = listNftRes.data.contract_address
+          nft.chain_id = listNftRes.data.chain_id
+          nftTokens.value = listNftRes.data.tokens || []
+        }
+      } catch{ }
     }
     async function requestFiles () {
       // const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
@@ -554,6 +690,7 @@ export default defineComponent({
       if (type) requestAll(type)
     }
     const hardwareOperate = async (type) => {
+      visible.value = false
       if (type === 'renew') dialogCont.spaceHardRenew = true
       else dialogCont.spaceHardFork = true
       renewButton.value = type
@@ -632,12 +769,14 @@ export default defineComponent({
     }
     async function rebootFun () {
       forkLoad.value = true
-      const rebootRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/redeploy`, 'post')
-      if (rebootRes && rebootRes.status === 'success') {
-        await system.$commonFun.timeout(500)
-        window.location.reload()
-      } else if (rebootRes.message) system.$commonFun.messageTip('error', rebootRes.message)
-      forkLoad.value = false
+      try {
+        const rebootRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/redeploy`, 'post')
+        if (rebootRes && rebootRes.status === 'success') {
+          await system.$commonFun.timeout(500)
+          window.location.reload()
+        } else if (rebootRes.message) system.$commonFun.messageTip('error', rebootRes.message)
+        forkLoad.value = false
+      } catch{ forkLoad.value = false }
     }
     async function reqNFT () {
       if (!nft.contract_address || nftTokens.value.length === 0) return
@@ -647,6 +786,7 @@ export default defineComponent({
         await system.$commonFun.messageTip('error', 'Please switch to the network: ' + name)
         return
       }
+      visible.value = false
       forkLoad.value = true
       const nft_contract = new system.$commonFun.web3Init.eth.Contract(DATA_NFT_ABI, nft.contract_address)
       const ipfs_uri = await nft_contract.methods.tokenURI(1).call()
@@ -663,19 +803,23 @@ export default defineComponent({
     }
     async function likeMethod () {
       forkLoad.value = true
-      if (likeOwner.value) {
-        const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
-      } else {
-        const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
-      }
+      try {
+        if (likeOwner.value) {
+          const unlikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/unlike`, 'post', {})
+        } else {
+          const likeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'post', {})
+        }
+      } catch{ }
       likesValue.value = !likesValue.value
       requestAll()
       likesData()
     }
     const likesData = async () => {
       forkLoad.value = true
-      const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
-      if (getLikeRes) likeOwner.value = getLikeRes.data.liked
+      try {
+        const getLikeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/like`, 'get')
+        if (getLikeRes) likeOwner.value = getLikeRes.data.liked
+      } catch{ }
       forkLoad.value = false
     }
     async function logsMethod (type, name, index) {
@@ -690,6 +834,7 @@ export default defineComponent({
       }
     }
     const drawerClick = async (tab, event) => {
+      checkedLock.value = false
       await websocketclose()
       if (drawerName.value === 'Overview') return
       let n = Number(drawerName.value)
@@ -697,14 +842,9 @@ export default defineComponent({
       logsCont.data[n].containerLog = []
       logsType.value = 'build'
       // 请求logsCont.data[n].space.result_uri地址，获取其中的build_log和container_log
-      if (logsCont.data[n].job.job_result_uri && logsCont.data[n].job.job_result_uri !== 'null') {
-        const response = await fetch(logsCont.data[n].job.job_result_uri)
-        const textUri = await new Promise(async resolve => {
-          resolve(response.text())
-        })
-        const logUri = textUri ? JSON.parse(textUri) : {}
-        if (logUri.build_log) await WebSocketFun(logUri.build_log, 1, n)
-        if (logUri.container_log && drawerName.value !== 'log') await WebSocketFun(logUri.container_log, 2, n)
+      if (logsCont.data[n].job) {
+        if (logsCont.data[n].job.build_log) await WebSocketFun(logsCont.data[n].job.build_log, 1, n)
+        if (logsCont.data[n].job.container_log && drawerName.value !== 'log') await WebSocketFun(logsCont.data[n].job.container_log, 2, n)
       } else if (logsCont.data[n].space.jobs_status) {
         await WebSocketFun(logsCont.data[n].space.jobs_status[n].build_log, 1, n)
         if (drawerName.value !== 'log') await WebSocketFun(logsCont.data[n].space.jobs_status[n].container_log, 2, n)
@@ -727,17 +867,33 @@ export default defineComponent({
         })
       })
     }
-    function handleHard (val, refresh) {
-      dialogCont.spaceHardDia = val
-      dialogCont.spaceHardRenew = val
-      dialogCont.spaceHardFork = val
-      if (refresh) {
-        requestAll()
-        likesValue.value = !likesValue.value
+    function handleHard (val, refresh, net) {
+      if (net) {
+        netEnv.value = [
+          {
+            name: 'Saturn Testnet',
+            id: 2024
+          }]
+        networkC.value = true
+      } else {
+        dialogCont.spaceHardDia = val
+        dialogCont.spaceHardRenew = val
+        dialogCont.spaceHardFork = val
+        if (refresh) {
+          requestAll()
+          likesValue.value = !likesValue.value
+        }
       }
     }
+
+    async function netChange (dialog, rows) {
+      networkC.value = dialog
+      if (rows) system.$commonFun.walletChain(Number(rows))
+    }
+
     function logDrawer (type) {
       if (type === 'log' && (parentValue.value === 'Created' || parentValue.value === 'Stopped')) return
+      visible.value = false
       drawerType.value = type
       drawer.value = true
       drawerName.value = type === 'detail' ? 'Overview' : '0'
@@ -745,6 +901,7 @@ export default defineComponent({
     }
 
     function shareTwitter () {
+      visible.value = false
       let typeName = 'Space'
       let type = 'space'
       let urlType = `spaces`
@@ -775,6 +932,21 @@ export default defineComponent({
         `#LagrangeDAO #DecentralizedComputing #Web3GitHub`
       system.$commonFun.popupwindow(text);
     }
+
+    async function closeSpace () {
+      visible.value = false
+      forkLoad.value = true
+      try {
+        const closeRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${allData.space.uuid}/deployment`, 'delete')
+        if (closeRes && closeRes.status === 'success') {
+          system.$commonFun.messageTip('success', 'The space has be closed')
+          await requestDetail()
+        } else if (closeRes && closeRes.status === 'failed' && closeRes.message) system.$commonFun.messageTip('error', closeRes.message)
+      } catch{ }
+      forkLoad.value = false
+    }
+
+    onMounted(() => system.$commonFun.gatewayGain())
     onActivated(() => init())
     onBeforeUnmount(() => {
       websocketclose()
@@ -782,9 +954,14 @@ export default defineComponent({
     watch(drawer, (newValue, oldValue) => {
       if (!drawer.value) websocketclose()
     })
+    watch(() => props.vis, () => {
+      visible.value = false
+    })
     watch(route, (to, from) => {
+      visible.value = false
       if (to.name !== 'spaceDetail') return
       if (!metaAddress.value && to.params.tabs === 'settings') activeName.value = 'app'
+      else activeName.value = to.params.tabs
       requestDetail()
       if (to.params.tabs === 'card') {
         window.scrollTo(0, 0)
@@ -821,29 +998,58 @@ export default defineComponent({
       renewButton,
       logsType,
       checkedLock,
+      listValue, networkC, netEnv, visible,
       parentValue, likeOwner, likeValue, likesValue, drawer, direction, expireTime, logsCont, logsContAll, handleValue, hardRedeploy,
-      handleCurrentChange, handleSizeChange, handleClick, shareTwitter, logsMethod, clearWebsocket, upWebsocket,
-      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer
+      handleCurrentChange, handleSizeChange, handleClick, shareTwitter, closeSpace, logsMethod, clearWebsocket, upWebsocket,
+      hardwareOperate, back, rebootFun, reqNFT, likeMethod, drawerClick, handleHard, logDrawer, netChange, appChange
     }
   }
 })
 </script>
 
 <style lang="scss" scoped>
-@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,600;1,700&display=swap");
+// @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,600;1,700&display=swap");
+.space-height {
+  min-height: 100vh;
+}
 #space {
   background: #fff;
   color: #333;
-  font-size: 18px;
-  @media screen and (max-width: 1200px) {
-    font-size: 16px;
+  font-size: 16px;
+  @media screen and (max-width: 1600px) {
+    font-size: 14px;
   }
   .space_head {
     // padding: 0;
     // background-color: #fbfbfc;
     // border-bottom: 1px solid #f1f1f1;
     border-top: 1px solid rgba(229, 231, 235, 0.7);
+    &.space-flex {
+      align-items: flex-start;
+      flex-wrap: wrap;
+      flex-direction: column;
+      .details-style,
+      .details-cont {
+        width: 100%;
+      }
+      .details-cont {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        section {
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+        }
+      }
+      .content {
+        @media screen and (max-width: 1260px) {
+          justify-content: flex-start;
+        }
+      }
+    }
     .content {
+      width: 100%;
       align-items: stretch;
       justify-content: space-between;
       flex-wrap: wrap;
@@ -870,10 +1076,12 @@ export default defineComponent({
       }
       .name {
         padding: 0.05rem 0;
-        font-family: "Helvetica-Bold";
-        font-size: 18px;
+        font-size: 17px;
         color: #878c93;
         line-height: 1;
+        @media screen and (max-width: 1600px) {
+          font-size: 16px;
+        }
         @media screen and (max-width: 992px) {
           flex-wrap: wrap;
         }
@@ -884,8 +1092,15 @@ export default defineComponent({
         }
         b {
           font-family: "FIRACODE-BOLD";
-          padding: 0.03rem 0.07rem 0 0;
+          padding: 0 0.07rem 0 0;
           color: #000;
+          cursor: pointer;
+        }
+        .wallet-cont {
+          color: rgb(156, 163, 175);
+          .m {
+            padding: 0 2px;
+          }
         }
         .icon {
           width: 0.2rem;
@@ -937,8 +1152,8 @@ export default defineComponent({
           }
         }
         .el-button {
-          height: 28px;
-          padding: 0.05rem 0.1rem;
+          height: 26px;
+          padding: 0.02rem 0.08rem;
           margin: 0.1rem 0;
           font-family: inherit;
           font-size: 14px;
@@ -978,6 +1193,7 @@ export default defineComponent({
           border-radius: 0.05rem;
           font-size: 14px;
           line-height: 1;
+          text-transform: capitalize;
           @media screen and (max-width: 1600px) {
             font-size: 13px;
           }
@@ -1034,6 +1250,11 @@ export default defineComponent({
                 opacity: 0.5;
               }
             }
+          }
+          i {
+            font-family: "Helvetica-Bold";
+            font-weight: 600;
+            text-transform: uppercase;
           }
         }
         .logs_style {
@@ -1097,7 +1318,7 @@ export default defineComponent({
         border: 2px solid #f1f1f2;
         line-height: 1;
         @media screen and (min-width: 1800px) {
-          font-size: 15px;
+          font-size: 14px;
         }
         @media screen and (max-width: 1440px) {
           font-size: 12px;
@@ -1127,7 +1348,7 @@ export default defineComponent({
         border-radius: 0.08rem;
         cursor: pointer;
         @media screen and (min-width: 1800px) {
-          font-size: 15px;
+          font-size: 14px;
         }
         &:hover {
           background-color: #f5f6f8;
@@ -1156,7 +1377,7 @@ export default defineComponent({
       .logs_style {
         position: relative;
         padding: 0.05rem 0.05rem;
-        margin: 0.05rem 0 0;
+        margin: 0 0 0 0.05rem;
         background-color: linear-gradient(to bottom, #fff, #f3f4f6);
         color: #878c93;
         border: 1px solid rgba(229, 231, 235, 1);
@@ -1176,6 +1397,11 @@ export default defineComponent({
       margin: 0;
       @media screen and (max-width: 1260px) {
         width: 100%;
+      }
+      &.hidden {
+        @media screen and (max-width: 1260px) {
+          display: none;
+        }
       }
       .el-tabs__header {
         display: flex;
@@ -1200,32 +1426,42 @@ export default defineComponent({
         font-family: "Helvetica-light";
         font-size: 16px;
         @media screen and (max-width: 1600px) {
-          font-size: 15px;
-        }
-        @media screen and (max-width: 441px) {
           font-size: 14px;
         }
         .custom-tabs-label {
           height: 100%;
-          padding: 0 0.15rem;
+          padding: 0 0.1rem;
+          &.font-14 {
+            font-size: 14px;
+          }
           .icon {
             height: 16px;
           }
           .el-icon {
-            margin: -1px 0.07rem 0 0;
+            margin: -1px 0.05rem 0 0;
+            svg {
+              width: 100%;
+              height: auto;
+              margin: 0;
+            }
           }
           .icon_spaces {
             width: 16px;
-            margin: -1px 0.07rem 0 0;
+            margin: -1px 0.05rem 0 0;
             background: url(../../../assets/images/icons/icon_2_2.png) no-repeat
               left center;
             background-size: auto 100%;
+          }
+          .icon-files {
+            width: 16px;
+            height: auto;
+            margin: -1px 0.05rem 0 0;
           }
           b {
             display: block;
             height: auto;
             padding: 0.03rem;
-            margin: 0 0.07rem;
+            margin: 0 0.05rem;
             background-color: #7405ff;
             color: #fff;
             border-radius: 5px;
@@ -1234,7 +1470,6 @@ export default defineComponent({
           }
         }
         &.is-active {
-          font-family: "Helvetica-Neue";
           color: #000;
           font-weight: 600;
           position: relative;
@@ -1343,6 +1578,71 @@ export default defineComponent({
       }
     }
   }
+  :deep(.net_body) {
+    width: 570px;
+    margin: auto;
+    border-radius: 0.23rem;
+    text-align: left;
+    color: #000;
+    word-break: break-word;
+    @media screen and (max-width: 600px) {
+      width: 94%;
+    }
+    .el-dialog__header {
+      padding: 0.25rem 0.6rem 0.1rem;
+      font-size: 0.2rem;
+      .el-dialog__headerbtn {
+        right: 0.3rem;
+        top: 0.28rem;
+        font-size: 0.2rem;
+        font-weight: 600;
+        color: #000;
+        cursor: pointer;
+        i,
+        svg,
+        path {
+          color: inherit;
+          cursor: inherit;
+        }
+      }
+    }
+
+    .el-dialog__body {
+      padding: 0 0 0.15rem;
+    }
+
+    .el-dialog__footer {
+      padding: 0 0.6rem 0.5rem;
+      text-align: left;
+      .dialog-footer {
+        justify-content: center;
+      }
+      .el-button {
+        width: 60%;
+        max-width: 204px;
+        height: auto;
+        background: linear-gradient(180deg, #fefefe, #f0f0f0);
+        font-family: inherit;
+        font-size: 16px;
+        line-height: 1;
+        color: #000;
+        border-radius: 0.07rem;
+        @media screen and (max-width: 1600px) {
+          font-size: 14px;
+        }
+        &:hover {
+          opacity: 0.9;
+          span {
+            cursor: inherit;
+          }
+        }
+        &.is-disabled {
+          opacity: 0.5;
+          border-color: #e3e6eb;
+        }
+      }
+    }
+  }
 }
 </style>
 <style lang="scss">
@@ -1351,6 +1651,11 @@ export default defineComponent({
   text-align: left;
   font-size: 14px;
   line-height: 1.5;
+  &.app {
+    .el-drawer__body {
+      overflow: hidden;
+    }
+  }
   .close {
     width: 20px;
     height: 20px;
@@ -1546,7 +1851,7 @@ export default defineComponent({
             .log {
               p {
                 margin: 0 32px 0 6px;
-                font-size: 15px;
+                font-size: 14px;
                 font-weight: 600;
               }
             }
@@ -1591,9 +1896,11 @@ export default defineComponent({
           }
           .box-card {
             position: relative;
-            max-height: 260px;
+            max-height: calc(100% - 60px);
             margin: 11px 0 0;
             background-color: transparent;
+            font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
+              Monaco, Consolas, Liberation Mono, Courier New, monospace;
             white-space: nowrap;
             overflow-y: auto;
             box-shadow: none;
@@ -1652,7 +1959,7 @@ export default defineComponent({
               font-size: 16px;
             }
             @media screen and (max-width: 768px) {
-              font-size: 15px;
+              font-size: 14px;
             }
             .left {
               font-size: 16px;
@@ -1707,7 +2014,7 @@ export default defineComponent({
       }
       .el-tabs__item {
         height: auto;
-        padding: 0.18rem 0;
+        padding: 0.2rem 0;
         margin: 0 0.45rem 0 0;
         font-size: 20px;
         line-height: 1;
@@ -1723,6 +2030,9 @@ export default defineComponent({
         }
         .custom-tabs-label {
           line-height: 1;
+          &.font-14 {
+            font-size: 14px;
+          }
           i {
             margin: 0 5px 0 0;
             font-size: 16px;
@@ -1752,7 +2062,7 @@ export default defineComponent({
       line-height: 40px;
     }
     .log_app {
-      height: 360px;
+      height: calc(100% - 10px);
       padding: 0;
       margin: 10px 0 0;
       .logBody {
@@ -1766,7 +2076,7 @@ export default defineComponent({
           .log {
             p {
               margin: 0 32px 0 6px;
-              font-size: 15px;
+              font-size: 14px;
               font-weight: 600;
             }
           }
@@ -1807,9 +2117,11 @@ export default defineComponent({
           }
         }
         .box-card {
-          max-height: 315px;
+          max-height: calc(100% - 60px);
           margin: 20px 0 0;
           background: transparent;
+          font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
+            Monaco, Consolas, Liberation Mono, Courier New, monospace;
           font-size: 14px;
           color: #525252;
           // white-space: nowrap;
@@ -1822,6 +2134,22 @@ export default defineComponent({
           p {
             word-break: break-word;
           }
+        }
+      }
+    }
+  }
+}
+
+.cp_style {
+  .el-dropdown-menu {
+    .el-dropdown-menu__item {
+      padding: 0;
+      .custom-tabs-label {
+        padding: 5px 15px;
+        &.is-active,
+        &:hover {
+          font-weight: 600;
+          color: #7405ff;
         }
       }
     }

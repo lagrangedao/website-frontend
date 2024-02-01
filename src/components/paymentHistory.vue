@@ -3,21 +3,38 @@
     <div class="payment-history container-landing">
       <div class="title">{{paymentType.toLowerCase() === 'provider'?'provider Payment history':'user Payment history'}}</div>
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-if="paymentType.toLowerCase() !== 'provider'">
-        <el-table-column prop="transaction_hash" label="transaction hash" min-width="120">
+        <el-table-column prop="transaction_hash" label="TRANSACTION HASH" min-width="90">
           <template #default="scope">
-            <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank">{{scope.row.transaction_hash}}</a>
+            <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank" :title="scope.row.transaction_hash">{{system.$commonFun.hiddAddress(scope.row.transaction_hash)}}</a>
           </template>
         </el-table-column>
-        <el-table-column prop="chain_id" label="chain id" width="110" />
-        <el-table-column prop="token" label="token">
+        <el-table-column prop="chain_id" label="CHAIN ID" width="110" />
+        <el-table-column prop="token" label="TOKEN">
           <template #default="scope">
-            <!--            <span>{{scope.row.chain_id === 80001 ? 'PUSDC': 'SUSDC'}}</span>-->
-            <span>USDC</span>
+            <span v-if="scope.row.chain_id === 2024">SWAN</span>
+            <span v-else>USDC</span>
           </template>
         </el-table-column>
-        <el-table-column prop="message" label="refund/Denied reason" min-width="120">
+        <el-table-column prop="token" label="STARTED AT" min-width="110">
           <template #default="scope">
-            <span>{{scope.row.refund_reason ||scope.row.denied_reason || '-'}}</span>
+            <span v-if="scope.row.order" :title="system.$commonFun.momentFun(scope.row.order.started_at)">{{system.$commonFun.momentFun(scope.row.order.started_at)}}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="token" label="ENDED AT" min-width="110">
+          <template #default="scope">
+            <span v-if="scope.row.order" :title="system.$commonFun.momentFun(scope.row.order.ended_at)">{{system.$commonFun.momentFun(scope.row.order.ended_at)}}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="message" label="DETAILS" min-width="120">
+          <template #default="scope">
+            <el-popover v-if="scope.row.refund_reason ||scope.row.denied_reason" placement="top" :width="200" popper-style="word-break: break-word; text-align: left;" trigger="hover" :content="scope.row.refund_reason ||scope.row.denied_reason">
+              <template #reference>
+                {{scope.row.refund_reason ||scope.row.denied_reason}}
+              </template>
+            </el-popover>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="order" label="space name">
@@ -30,7 +47,7 @@
           <template #default="scope">
             <div>
               <span v-if="scope.row.chain_id === 80001 && scope.row.order.updated_at < 1700508000 && scope.row.status.toLowerCase() === 'refundable'">Pending</span>
-              <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable'" plain @click="refundFun(scope.row)">Refund</el-button>
+              <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable' || scope.row.status.toLowerCase() === 'refund'" plain @click="refundFun(scope.row)">Refund</el-button>
               <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button>
               <span v-else>{{scope.row.status}}</span>
             </div>
@@ -177,12 +194,6 @@ export default defineComponent({
       } else if (paymentsRes.message) system.$commonFun.messageTip('error', paymentsRes.message)
       paymentLoad.value = false
     }
-    async function paymentEnv () {
-      if (getnetID !== 80001) {
-        paymentContractAddress = process.env.VUE_APP_OPSWAN_ADDRESS
-        paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceTokenABI, paymentContractAddress)
-      }
-    }
     function fn () {
       document.addEventListener('visibilitychange', function () {
         prevType.value = !document.hidden
@@ -200,7 +211,7 @@ export default defineComponent({
     })
     onActivated(async () => {
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
-      paymentEnv()
+      // paymentEnv()
       init()
     })
     watch(route, (to, from) => {
@@ -290,7 +301,7 @@ export default defineComponent({
           }
         }
         th {
-          font-size: 16px;
+          font-size: 15px;
           font-weight: normal;
           background: linear-gradient(180deg, #fefefe, #f0f0f0);
           text-transform: uppercase;

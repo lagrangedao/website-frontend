@@ -1,12 +1,12 @@
 <template>
-  <div class="wrapper" id="wrapper" ref="area">
+  <div class="wrapper" id="wrapper" ref="area" @click="vis=!vis">
     <el-container :class="{'container_height':true}">
       <el-header v-if="!(route.name === 'spaceDetail' && route.params.tabs === 'app')">
         <v-head></v-head>
       </el-header>
       <el-main>
         <div class="content flex-row">
-          <router-view v-slot="{ Component }">
+          <router-view v-slot="{ Component }" :vis="vis">
             <transition name="move" mode="out-in">
               <keep-alive>
                 <component :is="Component" />
@@ -16,7 +16,7 @@
           <el-backtop :right="20" :bottom="50" />
         </div>
       </el-main>
-      <el-footer v-if="route.name !== 'main'" :class="{'footer_position': positionStyle}">
+      <el-footer v-if="route.name !== 'main' && !(route.name === 'spaceDetail' && (route.params.tabs === 'app' || route.params.tabs === 'files'))" :class="{'footer_position': positionStyle}">
         <v-foot :positionStyle="positionStyle"></v-foot>
       </el-footer>
     </el-container>
@@ -40,6 +40,7 @@ export default defineComponent({
     const system = getCurrentInstance().appContext.config.globalProperties
     const route = useRoute()
     const router = useRouter()
+    const vis = ref(false)
 
     function footer_style () {
       positionStyle.value = false
@@ -76,9 +77,12 @@ export default defineComponent({
       })
     }
     onMounted(() => {
-      system.$commonFun.gatewayGain()
+      system.$commonFun.gatewayGain(1)
       fn()
       footer_style()
+    })
+    watch(route, (to, from) => {
+      if (to.path !== '/personal_center' || (store.state.accessToken && to.path === '/personal_center')) store.dispatch('setGetRouter', to.path)
     })
     return {
       positionStyle,
@@ -87,7 +91,8 @@ export default defineComponent({
       system,
       route,
       router,
-      footer_style
+      footer_style,
+      vis
     }
   },
   components: {
@@ -168,7 +173,18 @@ export default defineComponent({
       font-size: 14px;
       cursor: pointer;
       color: #767676;
-      border-top: 1px solid #e6e6e6;
+      // border-top: 1px solid #e6e6e6;
+      &.hidden {
+        display: none;
+        @media screen and (max-width: 1260px) {
+          display: block;
+        }
+      }
+      &.hidden-border {
+        @media screen and (max-width: 1260px) {
+          border-top: 1px solid #e6e6e6;
+        }
+      }
       svg {
         margin-right: 0.08rem;
       }
@@ -189,6 +205,47 @@ export default defineComponent({
       }
       .m-width {
         padding: 0.1rem 0.2rem;
+        .custom-tabs-label {
+          height: 100%;
+          padding: 0;
+          &.font-14 {
+            font-size: 14px;
+          }
+          .icon {
+            height: 16px;
+          }
+          .el-icon {
+            margin: -1px 0.1rem 0 0;
+            svg {
+              width: 100%;
+              height: auto;
+              margin: 0;
+            }
+          }
+          .icon_spaces {
+            width: 16px;
+            margin: -1px 0.1rem 0 0;
+            background: url(../assets/images/icons/icon_2_2.png) no-repeat left
+              center;
+            background-size: auto 100%;
+          }
+          .icon-files {
+            width: 16px;
+            height: auto;
+            margin: -1px 0.1rem 0 0;
+          }
+          b {
+            display: block;
+            height: auto;
+            padding: 0.03rem;
+            margin: 0 0.05rem;
+            background-color: #7405ff;
+            color: #fff;
+            border-radius: 5px;
+            line-height: 1;
+            font-size: 14px;
+          }
+        }
       }
     }
   }
@@ -247,12 +304,18 @@ export default defineComponent({
   @media screen and (min-width: 1536px) {
     max-width: 1536px;
   }
+  &.all {
+    max-width: none;
+  }
 }
 
 .flex-row {
   display: flex;
   align-items: center;
   // flex-wrap: wrap;
+  .nowrap {
+    flex-wrap: nowrap;
+  }
 }
 </style>
 

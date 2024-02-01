@@ -1,7 +1,7 @@
 <template>
   <section id="space">
     <el-row class="space_body flex-row">
-      <header class=" flex-row">
+      <header class="flex-row">
         <div class="title flex-row">
           <a @click="getListFolderMain('')">{{route.params.name}}</a>
           {{labelTab === 'upload'||fileRow.fileTitle?'/':''}}
@@ -15,23 +15,39 @@
             <p v-else>{{fileBody.title}}</p>
           </span>
         </div>
-        <el-dropdown trigger="click" @command="handleCommand" v-if="labelTab === 'list' && metaAddress === route.params.wallet_address">
-          <span class="el-dropdown-link">
-            <el-icon class="el-icon--right">
-              <Plus />
-            </el-icon>
-            Contribute
-            <el-icon class="el-icon--right">
-              <caret-bottom />
-            </el-icon>
-          </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="create">Create a new file</el-dropdown-item>
-              <el-dropdown-item command="upload">Upload files</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+        <div class="flex-row" style="align-items: stretch;" v-if="labelTab === 'list'">
+          <div class="button flex-row">
+            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-eye">
+              <path d="M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.83.88 9.576.43 8.898a1.62 1.62 0 0 1 0-1.798c.45-.677 1.367-1.931 2.637-3.022C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5c-1.473 0-2.825.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z"></path>
+            </svg>
+            Viewed
+            <b>{{system.$commonFun.NumFormat(fileRow.stats.views) || 0}}</b>
+          </div>
+          <div class="button flex-row">
+            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
+              <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
+            </svg>
+            Fork
+            <b>{{system.$commonFun.NumFormat(fileRow.stats.forks) || 0}}</b>
+          </div>
+          <el-dropdown trigger="click" @command="handleCommand" v-if="metaAddress === route.params.wallet_address">
+            <span class="el-dropdown-link">
+              <el-icon class="el-icon--right">
+                <Plus />
+              </el-icon>
+              Contribute
+              <el-icon class="el-icon--right">
+                <caret-bottom />
+              </el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="create">Create a new file</el-dropdown-item>
+                <el-dropdown-item command="upload">Upload files</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </header>
       <div class="fileList">
         <el-table v-if="labelTab === 'list'" :data="fileRow.filedata" :table-layout="tableLayout" v-loading="listLoad" style="width: 100%">
@@ -258,7 +274,8 @@ export default defineComponent({
       fileAlldata: [],
       fileResdata: [],
       filedata: [],
-      fileTitle: []
+      fileTitle: [],
+      stats: {}
     })
     const listLoad = ref(false)
     const uploadLoad = ref(false)
@@ -335,10 +352,17 @@ export default defineComponent({
       }
       return true
     }
+    async function statsInit () {
+      try {
+        const listStatsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}stats/space?public_address=${route.params.wallet_address}&&space_name=${route.params.name}`, 'get')
+        if (listStatsRes && listStatsRes.status === 'success') fileRow.stats = listStatsRes.data.stats
+      } catch (err) { }
+    }
     async function init () {
       if (route.name !== 'spaceDetail') return
       listLoad.value = true
       fileRow.fileTitle = []
+      await statsInit()
       const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
       if (listRes && listRes.status === 'success') {
         fileRow.fileResdata = listRes.data || []
@@ -421,6 +445,8 @@ export default defineComponent({
         textEditor.value = await new Promise(async resolve => {
           resolve(response.text())
         })
+        await system.$commonFun.timeout(500)
+        textEditor.value = ''
       } catch (err) {
         console.log('err space create.md:', err)
       }
@@ -609,6 +635,7 @@ export default defineComponent({
       fileRow.fileResdata = []
       fileRow.filedata = []
       fileRow.fileTitle = []
+      fileRow.stats = {}
       totalSize.value = 0
     }
     async function fileEdit (row) {
@@ -857,10 +884,10 @@ export default defineComponent({
 #space {
   background: #fff;
   color: #333;
-  font-size: 18px;
+  font-size: 16px;
   text-align: left;
-  @media screen and (max-width: 1200px) {
-    font-size: 16px;
+  @media screen and (max-width: 1600px) {
+    font-size: 15px;
   }
   :deep(.space_body) {
     align-items: stretch;
@@ -908,14 +935,53 @@ export default defineComponent({
         padding: 7px 12px;
         background: linear-gradient(180deg, #fefefe, #f0f0f0);
         border: 1px solid #e1e1e1;
-        font-size: 15px;
+        font-size: 14px;
         line-height: 1;
+        color: #666;
         border-radius: 0.09rem;
         @media screen and (min-width: 1800px) {
-          font-size: 17px;
+          font-size: 15px;
         }
         @media screen and (max-width: 1440px) {
           font-size: 13px;
+        }
+        .el-dropdown-link {
+          display: flex;
+          align-items: center;
+          .el-icon {
+            width: 16px;
+            height: 16px;
+            margin: 0 4px;
+          }
+        }
+      }
+      .button {
+        padding: 0.07rem 0.12rem;
+        margin: 0 0.1rem 0 0;
+        background: linear-gradient(180deg, #fefefe, #f0f0f0);
+        border: 1px solid #e1e1e1;
+        color: #666;
+        border-radius: 0.09rem;
+        text-decoration: none;
+        font-size: 14px;
+        line-height: 1;
+        @media screen and (min-width: 1800px) {
+          font-size: 15px;
+        }
+        @media screen and (max-width: 1440px) {
+          font-size: 13px;
+        }
+        svg {
+          margin: 0 4px 0 0;
+          color: #666;
+          fill: #666;
+        }
+        b {
+          padding: 1px 6px;
+          margin: 0 0 0 2px;
+          background-color: #f0f0f0;
+          font-weight: normal;
+          border-radius: 24px;
         }
       }
     }
@@ -1014,7 +1080,7 @@ export default defineComponent({
             }
           }
           th {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: normal;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             text-transform: uppercase;
@@ -1033,16 +1099,16 @@ export default defineComponent({
         .top_title {
           justify-content: space-between;
           padding: 0.1rem 0.15rem;
-          font-size: 18px;
+          font-size: 14px;
           font-weight: normal;
           background: linear-gradient(180deg, #fefefe, #f0f0f0);
           text-transform: lowercase;
           color: #606060;
-          @media screen and (max-width: 1600px) {
-            font-size: 16px;
+          @media screen and (min-width: 1800px) {
+            font-size: 15px;
           }
           @media screen and (max-width: 768px) {
-            font-size: 15px;
+            font-size: 13px;
           }
           .left {
             .people {
@@ -1135,9 +1201,9 @@ export default defineComponent({
             .el-tabs__item {
               height: auto;
               padding: 0 0.15rem;
-              font-size: 16px;
+              font-size: 14px;
               @media screen and (min-width: 1800px) {
-                font-size: 18px;
+                font-size: 15px;
               }
               &.is-active {
                 &::after {
@@ -1186,9 +1252,9 @@ export default defineComponent({
         .el-form {
           margin: 0.3rem 0 0;
           .el-form-item {
-            font-size: 18px;
+            font-size: 16px;
             @media screen and (max-width: 1600px) {
-              font-size: 16px;
+              font-size: 15px;
             }
             .el-form-item__label {
               font-size: inherit;
@@ -1215,9 +1281,9 @@ export default defineComponent({
             margin: 0 0.15rem 0 0;
             background: linear-gradient(180deg, #fefefe, #f0f0f0);
             font-family: inherit;
-            font-size: 18px;
+            font-size: 16px;
             @media screen and (max-width: 1600px) {
-              font-size: 16px;
+              font-size: 15px;
             }
           }
         }
