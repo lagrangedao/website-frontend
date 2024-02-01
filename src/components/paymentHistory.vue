@@ -80,8 +80,6 @@ import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
-import SpaceHardwareABI from '@/utils/abi/SpacePaymentV6.json'
-import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import BiddingABI from '@/utils/abi/Bidding.json'
 import TaskABI from '@/utils/abi/Task.json'
 export default defineComponent({
@@ -96,8 +94,6 @@ export default defineComponent({
     const paymentLoad = ref(false)
     const paymentType = ref(route.query.type || 'user')
     const prevType = ref(true)
-    let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
-    let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
     let biddingContractAddress = process.env.VUE_APP_OPSWAN_BIDDING_ADDRESS
     let biddingContract = new system.$commonFun.web3Init.eth.Contract(BiddingABI, biddingContractAddress)
 
