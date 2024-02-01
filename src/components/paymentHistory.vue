@@ -128,12 +128,10 @@ export default defineComponent({
       paymentLoad.value = true
       try {
         // get task contract address
-        let taskContractAddress = await biddingContract.methods.tasks(String(row.job.uuid)).call()
+        let taskContractAddress = await biddingContract.methods.tasks(String(row.task_uuid)).call()
         let taskContract = new system.$commonFun.web3Init.eth.Contract(TaskABI, taskContractAddress)
 
         if (type) {
-          console.log('task_uuid:', row.job.uuid)
-
           let gasLimit = await taskContract.methods
             .claimReward()
             .estimateGas({ from: store.state.metaAddress })
