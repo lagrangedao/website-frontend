@@ -138,7 +138,7 @@ export default defineComponent({
 
           const tx = await taskContract.methods
             .claimReward()
-            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+            .send({ from: store.state.metaAddress, gasLimit: Math.floor(gasLimit * 1.5) })
             .on('transactionHash', async (transactionHash) => {
               console.log('claim transactionHash:', transactionHash)
               claimStatus(row, transactionHash)
@@ -152,7 +152,7 @@ export default defineComponent({
 
           const tx = await taskContract.methods
             .claimRefund()
-            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+            .send({ from: store.state.metaAddress, gasLimit: Math.floor(gasLimit * 1.5) })
             .on('transactionHash', async (transactionHash) => {
               console.log('refund transactionHash:', transactionHash)
               refundStatus(row, transactionHash)
@@ -170,6 +170,7 @@ export default defineComponent({
       let formData = new FormData()
       formData.append('tx_hash', row.transaction_hash)
       formData.append('chain_id', row.chain_id)
+      formData.append('refund_tx_hash', transactionHash)
       const refundRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/refund`, 'post', formData)
       if (!refundRes || refundRes.status !== 'success') if (refundRes.message) system.$commonFun.messageTip('error', refundRes.message)
       init()
