@@ -230,8 +230,13 @@ export default defineComponent({
       wrongVisible.value = true
     }
     async function getToken () {
-      const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}api_token`, 'get')
-      if (listRes && listRes.status !== 'success') handleSelect('sign_out')
+      try {
+        const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}api_token`, 'get')
+        if (listRes && listRes.status !== 'success') {
+          handleSelect('sign_out')
+          if (route.name === 'paymentHistory') router.push({ name: 'main' })
+        }
+      } catch{ }
       return ''
     }
     onMounted(() => {

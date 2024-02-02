@@ -43,6 +43,11 @@
           </template>
         </el-table-column>
         <el-table-column prop="amount" label="amount" min-width="95" />
+        <el-table-column prop="refund_tx_hash" label="refund hash" min-width="90">
+          <template #default="scope">
+            <a :href="`${scope.row.url_tx}${scope.row.refund_tx_hash}`" target="_blank" :title="scope.row.refund_tx_hash">{{system.$commonFun.hiddAddress(scope.row.refund_tx_hash)}}</a>
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="status" width="135">
           <template #default="scope">
             <div>
