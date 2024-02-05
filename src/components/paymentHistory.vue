@@ -134,6 +134,11 @@ export default defineComponent({
       try {
         // get task contract address
         let taskContractAddress = await biddingContract.methods.tasks(String(row.task_uuid)).call()
+        if (taskContractAddress.indexOf('0x0') > -1) {
+          system.$commonFun.messageTip('error', 'Cannot get task contract, Please try again later!')
+          paymentLoad.value = false
+          return
+        }
         let taskContract = new system.$commonFun.web3Init.eth.Contract(TaskABI, taskContractAddress)
 
         if (type) {
