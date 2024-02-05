@@ -220,10 +220,10 @@ export default defineComponent({
       fn()
     })
     onActivated(async () => {
-      if (process.env.NODE_ENV === 'production') {
-        router.push({ name: 'main' })
-        return
-      }
+      // if (process.env.NODE_ENV === 'production') {
+      //   router.push({ name: 'main' })
+      //   return
+      // }
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
       // paymentEnv()
       init()
