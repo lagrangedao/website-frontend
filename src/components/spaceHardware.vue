@@ -583,8 +583,8 @@ export default defineComponent({
         hard.regionOption = await regionList(hard.region)
         hard.regionValue = hard.region && hard.region[0] ? hard.region[0] : ''
         if (hard.hardware_type.toLowerCase() === 'cpu') listArr[0].list.push(hard)
-        else if (hard.hardware_id > 31) listArr[2].list.push(hard)
-        else listArr[1].list.push(hard)
+        else if (hard.hardware_type.toLowerCase() === 'gpu') listArr[1].list.push(hard)
+        else listArr[2].list.push(hard)
       })
       return listArr
     }
