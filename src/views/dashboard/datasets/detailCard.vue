@@ -63,7 +63,8 @@
               <el-row :gutter="12" v-if="urlReadme && userGateway">
                 <el-col :xs="6" :sm="6" :md="6" :lg="12" :xl="12" v-if="isPreview && metaAddress && metaAddress === route.params.wallet_address">
                   <a class=" flex-row">
-                    <span class="a_button flex-row" v-if="urlReadme && isPreview" @click="editFun">
+                    <!-- @click="editFun" -->
+                    <span class="a_button is-disabled flex-row" v-if="urlReadme && isPreview">
                       <el-icon>
                         <EditPen />
                       </el-icon>
@@ -249,6 +250,7 @@ export default defineComponent({
     }
     async function editCommitFun (type) {
       // console.log(urlReadmeName.value)
+      if (!userGateway.value) return
       listLoad.value = true
       let newFile = new File([type === 'create' ? textEditor.value : textEditorChange.value], type === 'create' ? 'README.md' : urlReadmeName.value)
       let fd = new FormData()
@@ -798,6 +800,10 @@ export default defineComponent({
                   i {
                     margin-right: 3px;
                     font-size: 15px;
+                  }
+                  &.is-disabled {
+                    opacity: 0.7;
+                    cursor: no-drop;
                   }
                 }
                 .icon {

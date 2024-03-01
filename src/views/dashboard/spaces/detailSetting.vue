@@ -101,7 +101,7 @@
               </template>
             </el-popover>
           </div>
-          <el-button size="large" v-else class="generateDOI" :class="{'is-disabled': !userGateway}" @click="generateThisNFT">Generate SNFT</el-button>
+          <el-button size="large" v-else class="generateDOI is-disabled" :class="{'is-disabled': !userGateway}" @click="generateThisNFT">Generate SNFT</el-button>
         </div>
       </div>
       <div class="fileList" v-loading="doiLoad" v-if="nftdata.copy_nft && nftdata.copy_nft.length>0">
@@ -705,6 +705,7 @@ export default defineComponent({
     }
 
     async function generateThisNFT () {
+      return
       if (!userGateway.value) return
       const net = await networkEstimate()
       if (!net) return
