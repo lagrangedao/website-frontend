@@ -1,9 +1,26 @@
 <template>
-  <div class="services-main m-width flex-row">
+  <div class="services-main m-width flex-row center">
     <div class="main">
-      <img :src="imagesIcon" class="img" />
-      <h2>Be right back.</h2>
-      <p>We are making update to the Lagrange Services.</p>
+      <el-row justify="space-between">
+        <el-col :xs="24" :sm="11" :md="7" :lg="7" :xl="7" class="flex-row center">
+          <img :src="imagesIcon" class="img" />
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="16" :lg="16" :xl="16" class="cont">
+          <h2>Lagrange Maintenance Notification</h2>
+          <p>lagrangedao.org is currently undergoing maintenance. During this period, all Space related operations will be unavailable, including:</p>
+          <ul>
+            <li>- Creating new Spaces</li>
+            <li>- Uploding and editing Spaces</li>
+            <li>- Forking Spaces</li>
+            <li>- Deploying Spaces</li>
+          </ul>
+          <p>Join our official
+            <a href="https://discord.gg/8vaB6rKSAu" target="_blank">Discord</a> if you have any urgent needs or questions.</p>
+          <div class="homepage flex-row">
+            <router-link :to="{name: 'main'}">Back to Homepage</router-link>
+          </div>
+        </el-col>
+      </el-row>
     </div>
   </div>
 </template>
@@ -32,31 +49,75 @@ export default defineComponent({
 })
 </script>
 <style lang="scss" scoped>
-.services-main {
+.flex-row {
   display: flex;
   align-items: center;
+}
+.services-main {
   justify-content: center;
   width: 100%;
-  height: 100vh;
-  background-color: #010101;
+  min-height: calc(100vh - 1rem);
+  padding: 0.5rem 0;
+  background-color: #ffffff;
+  font-family: "Helvetica-light";
   font-size: 18px;
-  color: #fff;
+  color: #878c93;
+  text-align: left;
+  line-height: 1.3;
   overflow-y: auto;
   @media screen and (max-width: 1024px) {
   }
   .main {
+    width: 61%;
+    min-width: 300px;
+    font-size: 0.2rem;
     .img {
-      width: 90%;
-      max-width: 450px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 350px;
     }
-    h2 {
-      font-size: 0.4rem;
-      font-weight: normal;
-    }
-    p {
-      margin: 0.15rem auto 0.3rem;
-      font-size: 0.18rem;
+    .cont {
+      margin: 0.5rem 0;
+      h2 {
+        margin: 0 0 0.3rem;
+        font-family: "Helvetica-light";
+        font-size: 0.41rem;
+        font-weight: 600;
+        color: #000;
+      }
+      p {
+        margin: 0 0 0.22rem;
+        a {
+          color: #9969c4;
+          text-decoration: underline;
+        }
+      }
+      ul {
+        margin: 0 0 0.22rem;
+        li {
+          margin: 2px 0;
+          color: #9969c4;
+        }
+      }
+      .homepage {
+        justify-content: flex-start;
+        a {
+          display: inline-block;
+          padding: 0.12rem 0.16rem;
+          margin: 0;
+          background: linear-gradient(180deg, #fefefe, #f0f0f0);
+          font-size: 0.21rem;
+          font-weight: 500;
+          border: 1px solid #9969c4;
+          border-radius: 0.08rem;
+          color: #606060;
+          transition: all 0.2s;
+          line-height: 1;
+          &:hover {
+            // background: linear-gradient(180deg, #bc92e1, #9969c4);
+            color: #9969c4;
+          }
+        }
+      }
     }
   }
 }

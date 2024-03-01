@@ -47,7 +47,7 @@ const services = () =>
 
 const routes = [{
         path: '/',
-        redirect: '/main'
+        redirect: '/maintenance'
     },
     {
         path: '/',
@@ -244,7 +244,7 @@ const routes = [{
         ]
     },
     {
-        path: '/services',
+        path: '/maintenance',
         name: 'services',
         component: services,
         meta: {

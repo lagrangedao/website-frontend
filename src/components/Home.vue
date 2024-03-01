@@ -2,6 +2,15 @@
   <div class="wrapper" id="wrapper" ref="area" @click="vis=!vis">
     <el-container :class="{'container_height':true}">
       <el-header v-if="!(route.name === 'spaceDetail' && route.params.tabs === 'app')">
+        <el-alert center class="alert-body">
+          <template #title>
+            <div :class="{'news-content flex-row center':true}">
+              <span class="font-18 lang-max">Lagrange is currently undergoing maintenance as we update our service. Learn more
+                <router-link :to="{name: 'services'}">here</router-link>
+              </span>
+            </div>
+          </template>
+        </el-alert>
         <v-head></v-head>
       </el-header>
       <el-main>
@@ -130,6 +139,71 @@ export default defineComponent({
     height: auto;
     padding: 0;
     // background-color: #180e1a;
+    :deep(.alert-body) {
+      padding: 0;
+      background-color: transparent;
+      color: #fff;
+      border-radius: 0;
+      line-height: 1;
+      .el-alert__content {
+        display: flex;
+        width: 100%;
+        padding: 0;
+        .el-alert__title {
+          width: 100%;
+          line-height: 1;
+          .news-content {
+            padding: 8px 0;
+            background-color: #c37af9;
+            @media screen and (max-width: 992px) {
+              padding: 10px 0;
+            }
+            @media screen and (max-width: 768px) {
+              padding: 10px 0;
+            }
+            span {
+              text-align: center;
+              a {
+                text-decoration: underline;
+                color: inherit;
+                cursor: pointer;
+              }
+            }
+          }
+        }
+      }
+      .el-icon {
+        top: 50%;
+        margin-top: -7px;
+        width: 14px;
+        height: 14px;
+        color: inherit;
+        @media screen and (min-width: 1920px) {
+          margin-top: -8px;
+          width: 16px;
+          height: 16px;
+        }
+        @media screen and (min-width: 2160px) {
+          margin-top: -9px;
+          width: 18px;
+          height: 18px;
+        }
+        @media screen and (max-width: 992px) {
+          margin-top: -8px;
+          width: 16px;
+          height: 16px;
+        }
+        @media screen and (max-width: 600px) {
+          margin-top: -9px;
+          width: 18px;
+          height: 18px;
+        }
+        svg {
+          width: inherit;
+          height: inherit;
+        }
+      }
+    }
   }
   .el-main {
     padding: 0;
@@ -314,6 +388,21 @@ export default defineComponent({
   align-items: center;
   // flex-wrap: wrap;
   .nowrap {
+    flex-wrap: nowrap;
+  }
+  &.space-between {
+    justify-content: space-between;
+  }
+  &.center {
+    justify-content: center;
+  }
+  &.flex-start {
+    justify-content: flex-start;
+  }
+  &.flex-end {
+    justify-content: flex-end;
+  }
+  &.nowrap {
     flex-wrap: nowrap;
   }
 }
