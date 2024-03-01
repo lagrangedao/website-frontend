@@ -277,9 +277,9 @@ export default defineComponent({
         fileLi.forEach((element, i) => {
           let el = element.name.split('/').slice(3)
           if (el.join('/').toLowerCase() === 'readme.md') {
-            urlReadme.value = `${userGateway.value}/ipfs/${element.cid}`
+            urlReadme.value = userGateway.value ? `${userGateway.value}/ipfs/${element.cid}` : element.url
             urlReadmeName.value = el.join('/')
-            if (userGateway.value) getTitle(urlReadme.value)
+            if (userGateway.value || element.url) getTitle(urlReadme.value)
           }
         })
       }
