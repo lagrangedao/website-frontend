@@ -528,6 +528,13 @@ function cmOptions(owner) {
   }
 }
 
+async function replaceMethod(str) {
+  const oldChar = 'acl.multichain.storage'
+  const newChar = 'acl.swanipfs.com'
+  if (str.indexOf(oldChar) > -1) str = str.replace(oldChar, newChar)
+  return str
+}
+
 // const Web3 = require('web3');
 let web3Init
 const providerInit = window.ethereum && window.ethereum.providers ? window.ethereum.providers.find((provider) => provider.isMetaMask) : window.ethereum
@@ -577,5 +584,6 @@ export default {
   cmOptions,
   expireTimeFun,
   gatewayGain,
-  providerInit
+  providerInit,
+  replaceMethod
 }

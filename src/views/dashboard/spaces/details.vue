@@ -571,7 +571,8 @@ export default defineComponent({
           try {
             if (arr[j].job_real_uri) arr[j].job_result_uri = arr[j].job_real_uri
             else if (arr[j].job_result_uri) {
-              const response = await fetch(arr[j].job_result_uri)
+              let uri_link = await system.$commonFun.replaceMethod(arr[j].job_result_uri)
+              const response = await fetch(uri_link)
               const textUri = await new Promise(async resolve => {
                 resolve(response.text())
               })
