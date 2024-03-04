@@ -229,7 +229,7 @@
               <el-divider/>
             </div>
             <div class="time flex-row">
-              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.toLowerCase() === 'gpu' ? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.indexOf('GPU') > -1? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
           </div>
           <div v-if="props.renewButton !== 'renew'">
@@ -269,7 +269,7 @@
                 <el-option v-for="item in ruleForm.sleepTimeOption" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </div>
-            <p class="p-1 p-small" v-if="sleepSelect.hardware_type.toLowerCase() === 'gpu' && ruleForm.sleepTime < 20">
+            <p class="p-1 p-small" v-if="sleepSelect.hardware_type.indexOf('GPU') > -1 && ruleForm.sleepTime < 20">
               For GPU tasks, we recommend that you choose a longer wait time to ensure that the CP can complete the task within your desired time frame</p>
           </div>
           <el-divider/>
@@ -559,7 +559,7 @@ export default defineComponent({
       sleepSelect.value.regionOption = await regionList(row.region)
       if (props.renewButton === 'renew') sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
       else sleepSelect.value.regionValue = row.region && row.region[0] ? "Global" : ''
-      ruleForm.sleepTime = sleepSelect.value.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
+      ruleForm.sleepTime = sleepSelect.value.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
       if (props.renewButton === 'renew') hardwareLoad.value = false
       sleepVisible.value = true
     }
@@ -641,7 +641,7 @@ export default defineComponent({
             region: []
           }
           sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
-          ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type.toLowerCase() === 'gpu' ? '20' : '5'
+          ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
           sleepVisible.value = true
           return
         }

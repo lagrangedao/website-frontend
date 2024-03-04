@@ -40,7 +40,7 @@
             <el-tooltip v-else-if="parentValue === 'Deploying'" placement="bottom" content="The Space is currently being deployed to the provider.">{{parentValue}}</el-tooltip>
             <el-tooltip v-else-if="parentValue === 'Running'" placement="bottom" content="The Space has been successfully deployed.">{{parentValue}}</el-tooltip>
             <span v-else>{{parentValue}}</span>
-            <span v-if="parentValue === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config && allData.space.activeOrder.config.hardware_type && allData.space.activeOrder.config.hardware_type === 'GPU'">&nbsp;on
+            <span v-if="parentValue === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config && allData.space.activeOrder.config.hardware_type && allData.space.activeOrder.config.hardware_type.indexOf('GPU') > -1">&nbsp;on
               <i>{{allData.space.activeOrder.config.hardware}}</i>
             </span>
           </div>

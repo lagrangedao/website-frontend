@@ -45,7 +45,7 @@
                   <template #header>
                     <div class="card-header">
                       <span class="left background" v-if="ls.status === 'Running' ||ls.status === 'Deploying'">{{ls.status}}
-                        <a v-if="ls.status === 'Running' && ls.activeOrder.config.hardware_type === 'GPU'">on
+                        <a v-if="ls.status === 'Running' && ls.activeOrder.config.hardware_type.indexOf('GPU') > -1">on
                           <i>{{ ls.activeOrder.config.hardware}}</i>
                         </a>
                       </span>
@@ -83,7 +83,7 @@
                   <template #header>
                     <div class="card-header">
                       <span class="left background" v-if="list.status === 'Running' ||list.status === 'Deploying'">{{list.status}}
-                        <a v-if="list.status === 'Running' && list.activeOrder.config.hardware_type === 'GPU'">on
+                        <a v-if="list.status === 'Running' && list.activeOrder.config.hardware_type.indexOf('GPU') > -1">on
                           <i>{{list.activeOrder.config.hardware}}</i>
                         </a>
                       </span>
