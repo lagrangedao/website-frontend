@@ -42,8 +42,8 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="create" disabled>Create a new file</el-dropdown-item>
-                <el-dropdown-item command="upload" disabled>Upload files</el-dropdown-item>
+                <el-dropdown-item command="create">Create a new file</el-dropdown-item>
+                <el-dropdown-item command="upload">Upload files</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
