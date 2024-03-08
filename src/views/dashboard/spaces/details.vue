@@ -566,8 +566,7 @@ export default defineComponent({
       let arr = list || []
       let arrJob = []
       for (let j = 0; j < arr.length; j++) {
-        // 如果status为running才显示
-        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
+        if (arr[j] && arr[j].status) {
           try {
             if (arr[j].job_real_uri) arr[j].job_result_uri = arr[j].job_real_uri
             else if (arr[j].job_result_uri) {
