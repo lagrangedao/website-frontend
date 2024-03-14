@@ -60,8 +60,8 @@
               <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
           </div> -->
           <div class="deploy-cont">
-            <p v-if="listdata.cpList.error_msg" class="pre" v-html="listdata.cpList.error_msg"></p>
-            <p v-else-if="listdata.task.error_msg" class="pre" v-html="listdata.task.error_msg"></p>
+            <p v-if="listdata.cpList.error_msg" class="pre font" v-html="listdata.cpList.error_msg"></p>
+            <p v-else-if="listdata.task.error_msg" class="pre font" v-html="listdata.task.error_msg"></p>
 
             <div class="log-all">
               <div class="flex-row log-title">
@@ -449,10 +449,15 @@ export default defineComponent({
 
     .deployment {
       width: 98%;
-      margin: 0.2rem auto 0.4rem;
+      max-width: 1536px;
+      margin: 0.3rem auto 0.4rem;
       .deploy-cont {
-        max-width: 1536px;
         margin: auto;
+        .font {
+          font-family: "FIRACODE-LIGHT";
+          font-size: 15px;
+          color: rgb(107, 114, 128);
+        }
       }
 
       .title {
@@ -510,7 +515,7 @@ export default defineComponent({
 
       p {
         // padding-top: 0.3rem;
-        line-height: 2;
+        line-height: 1.6;
         &.m {
           padding-top: 0;
         }
@@ -518,6 +523,7 @@ export default defineComponent({
           white-space: pre-line;
           font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
             Monaco, Consolas, Liberation Mono, Courier New, monospace;
+          color: rgb(31, 41, 55);
         }
         .el-button {
           height: auto;
