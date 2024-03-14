@@ -59,26 +59,29 @@
               please
               <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
           </div> -->
-          <div>
-            <el-alert v-if="listdata.cpList.error_msg" :title="listdata.cpList.error_msg" type="error" :closable="false" />
+          <div class="deploy-cont">
+            <p v-if="listdata.cpList.error_msg" class="pre" v-html="listdata.cpList.error_msg"></p>
+            <p v-else-if="listdata.task.error_msg" class="pre" v-html="listdata.task.error_msg"></p>
 
             <div class="log-all">
               <div class="flex-row log-title">
                 <div class="flex-row">
                   <div class="flex-row log">
-                    <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="16px" height="16px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                      <path fill="currentColor" d="M4 6h18v2H4zm0 6h18v2H4zm0 6h12v2H4zm17 0l7 5l-7 5V18z"></path>
-                    </svg>
-                    <p class="text-base font-semibold">Logs</p>
+                    <p class="text-base font-semibold">Container logs:</p>
                   </div>
-                  <h4 class="font-16 weight-6" :class="{'is-active': errorLogsType === 'build'}" @click="errorLogsType='build'">build</h4>
-                  <h4 class="font-16 weight-6" :class="{'is-active': errorLogsType !== 'build'}" @click="errorLogsType='container'">container</h4>
                 </div>
               </div>
               <div class="box-card mianscroll font-14">
-                <p>{{errorLogsType === 'build' ? listdata.cpList.error_log_build : listdata.cpList.error_log_container}}</p>
+                <p class="pre" v-if="listdata.cpList.error_log_container">{{listdata.cpList.error_log_container}}</p>
+                <p class="pre" v-else-if="listdata.cpList.error_log_build">{{ listdata.cpList.error_log_build }}</p>
+                <p class="pre" v-else>No logs</p>
               </div>
             </div>
+          </div>
+        </div>
+        <div class="deployment" v-else-if="listdata.space.status && listdata.space.status.toLowerCase() === 'closed'">
+          <div>
+            <p class="m">The space owner has closed the running space.</p>
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Expired'">
@@ -447,6 +450,10 @@ export default defineComponent({
     .deployment {
       width: 98%;
       margin: 0.2rem auto 0.4rem;
+      .deploy-cont {
+        max-width: 1536px;
+        margin: auto;
+      }
 
       .title {
         margin: 0.1rem 0 0.25rem;
@@ -507,6 +514,11 @@ export default defineComponent({
         &.m {
           padding-top: 0;
         }
+        &.pre {
+          white-space: pre-line;
+          font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
+            Monaco, Consolas, Liberation Mono, Courier New, monospace;
+        }
         .el-button {
           height: auto;
           padding: 5px 10px;
@@ -523,7 +535,7 @@ export default defineComponent({
 
       .log-all {
         height: 100%;
-        padding: 20px 0;
+        padding: 40px 0 20px;
         margin: 0;
         .log-title {
           justify-content: space-between;
@@ -533,8 +545,8 @@ export default defineComponent({
           }
           .log {
             p {
-              margin: 0 32px 0 6px;
-              font-size: 14px;
+              margin: 0;
+              font-size: 16px;
               font-weight: 600;
             }
           }
@@ -582,13 +594,21 @@ export default defineComponent({
           max-height: calc(100% - 60px);
           margin: 11px 0 0;
           background-color: transparent;
+          background-image: linear-gradient(
+            rgb(249, 250, 251),
+            rgb(255, 255, 255)
+          );
           font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
             Monaco, Consolas, Liberation Mono, Courier New, monospace;
           white-space: nowrap;
           overflow-y: auto;
           box-shadow: none;
-          border: 0;
+          border: 1px solid rgb(243, 244, 246);
+          border-radius: 8px;
           padding: 0;
+          .pre {
+            padding: 16px;
+          }
           .el-card__body {
             padding: 0;
           }
