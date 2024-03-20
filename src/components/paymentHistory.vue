@@ -53,8 +53,8 @@
             <div>
               <span v-if="scope.row.chain_id === 80001 && scope.row.order.updated_at < 1700508000 && scope.row.status.toLowerCase() === 'refundable'">Pending</span>
               <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable' || scope.row.status.toLowerCase() === 'refund'" plain @click="refundFun(scope.row)">Refund</el-button>
-              <!-- <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button> -->
-              <span v-else-if="scope.row.status.toLowerCase() === 'reviewable'">Completed</span>
+              <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button>
+              <!-- <span v-else-if="scope.row.status.toLowerCase() === 'reviewable'">Completed</span> -->
               <span v-else>{{scope.row.status}}</span>
             </div>
           </template>
