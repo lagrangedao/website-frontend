@@ -566,7 +566,7 @@ export default defineComponent({
       let arr = list || []
       let arrJob = []
       for (let j = 0; j < arr.length; j++) {
-        if (arr[j] && arr[j].status) {
+        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
           try {
             if (arr[j].job_real_uri) arr[j].job_result_uri = arr[j].job_real_uri
             else if (arr[j].job_result_uri) {
