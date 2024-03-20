@@ -45,7 +45,7 @@
                   <template #header>
                     <div class="card-header">
                       <span class="left background" v-if="ls.status === 'Running' ||ls.status === 'Deploying'">{{ls.status}}
-                        <a v-if="ls.status === 'Running' && ls.activeOrder.config.hardware_type === 'GPU'">on
+                        <a v-if="ls.status === 'Running' && ls.activeOrder.config.hardware_type.indexOf('GPU') > -1">on
                           <i>{{ ls.activeOrder.config.hardware}}</i>
                         </a>
                       </span>
@@ -83,7 +83,7 @@
                   <template #header>
                     <div class="card-header">
                       <span class="left background" v-if="list.status === 'Running' ||list.status === 'Deploying'">{{list.status}}
-                        <a v-if="list.status === 'Running' && list.activeOrder.config.hardware_type === 'GPU'">on
+                        <a v-if="list.status === 'Running' && list.activeOrder.config.hardware_type.indexOf('GPU') > -1">on
                           <i>{{list.activeOrder.config.hardware}}</i>
                         </a>
                       </span>
@@ -352,10 +352,10 @@ export default defineComponent({
           margin: 0.32rem 0 0.16rem;
           .search_name {
             max-width: 3.4rem;
-            margin: 0;
+            margin: 0 0 0.16rem;
             .el-input__inner {
               padding-left: 0.35rem;
-              margin: 0 0 0.16rem;
+              margin: 0;
               background: url(../../../assets/images/icons/icon_13_1.png)
                 no-repeat 0.1rem center;
               background-size: 15px;

@@ -216,7 +216,8 @@ export default defineComponent({
         // 如果status为running才显示
         if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
           try {
-            if (arr[j].job_result_uri) {
+            if (arr[j].job_real_uri) arr[j].job_result_uri = arr[j].job_real_uri
+            else if (arr[j].job_result_uri) {
               const response = await fetch(arr[j].job_result_uri)
               const textUri = await new Promise(async resolve => {
                 resolve(response.text())
@@ -259,7 +260,8 @@ export default defineComponent({
       let arrJob = []
       for (let j = 0; j < arr.length; j++) {
         try {
-          if (arr[j].job_result_uri) {
+          if (arr[j].job_real_uri) arr[j].job_textUri = arr[j].job_real_uri
+          else if (arr[j].job_result_uri) {
             const response = await fetch(arr[j].job_result_uri)
             const textUri = await new Promise(async (resolve, reject) => {
               resolve(response.text())

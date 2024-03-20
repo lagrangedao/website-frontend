@@ -76,6 +76,7 @@
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
               <a v-else-if="userGateway" :href="`${userGateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${userGateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <a v-else-if="scope.row._originPath.url" :href="`${scope.row._originPath.url}`" target="_blank">{{scope.row._originPath.url}}</a>
               <span v-else>-</span>
             </template>
           </el-table-column>
@@ -426,6 +427,7 @@ export default defineComponent({
       listLoad.value = false
     }
     async function handleCommand (command) {
+      if (!userGateway.value) return
       uploadLoad.value = command === 'create'
       labelTab.value = command
       await pathPush()

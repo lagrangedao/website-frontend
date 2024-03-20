@@ -40,7 +40,7 @@
             <el-tooltip v-else-if="parentValue === 'Deploying'" placement="bottom" content="The Space is currently being deployed to the provider.">{{parentValue}}</el-tooltip>
             <el-tooltip v-else-if="parentValue === 'Running'" placement="bottom" content="The Space has been successfully deployed.">{{parentValue}}</el-tooltip>
             <span v-else>{{parentValue}}</span>
-            <span v-if="parentValue === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config && allData.space.activeOrder.config.hardware_type && allData.space.activeOrder.config.hardware_type === 'GPU'">&nbsp;on
+            <span v-if="parentValue === 'Running' && allData.space.activeOrder && allData.space.activeOrder.config && allData.space.activeOrder.config.hardware_type && allData.space.activeOrder.config.hardware_type.indexOf('GPU') > -1">&nbsp;on
               <i>{{allData.space.activeOrder.config.hardware}}</i>
             </span>
           </div>
@@ -209,7 +209,7 @@
                   </li>
                   <li :class="{'flex-row black-color': true, 'is-disabled':parentValue !== 'Running' ||!((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))}" v-if="metaAddress && metaAddress === route.params.wallet_address">
                     <div class="m-width">
-                      <el-tooltip v-if="parentValue !== 'Running' || !((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))" placement="bottom" content="The space expiration time can be renewed only when it is less than 24 hours">Renew</el-tooltip>
+                      <el-tooltip v-if="parentValue !== 'Running' || !((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours'))" placement="bottom" content="The space expiration time can be renewed only when it is less than 72 hours">Renew</el-tooltip>
                       <span v-else @click="hardwareOperate('renew')">Renew</span>
                     </div>
                   </li>
@@ -307,7 +307,7 @@
                         <el-descriptions-item label="Type">{{allData.space.activeOrder.config.hardware_type}}</el-descriptions-item>
                         <el-descriptions-item label="Memory">{{allData.space.activeOrder.config.memory}}</el-descriptions-item>
                         <el-descriptions-item label="VCPU">{{allData.space.activeOrder.config.vcpu}}</el-descriptions-item>
-                        <el-descriptions-item label="Price">{{allData.space.activeOrder.config.price_per_hour}} LAG per hour</el-descriptions-item>
+                        <el-descriptions-item label="Price">{{allData.space.activeOrder.config.price_per_hour}} SWAN per hour</el-descriptions-item>
                         <el-descriptions-item label="Description">{{allData.space.activeOrder.config.description}}</el-descriptions-item>
                         <el-descriptions-item label="Expiration Time">{{system.$commonFun.momentFun(allData.space.expiration_time) || '-'}}</el-descriptions-item>
                       </el-descriptions>
@@ -347,6 +347,9 @@
                     </el-descriptions-item>
                     <el-descriptions-item label="Multi address" v-if="dataJob.job.provider_status">
                       {{dataJob.job.provider_status.multi_address}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Region" v-if="dataJob.job.provider_status">
+                      {{dataJob.job.provider_status.region}}
                     </el-descriptions-item>
                   </el-descriptions>
                 </el-col>
@@ -569,7 +572,8 @@ export default defineComponent({
         // 如果status为running才显示
         if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
           try {
-            if (arr[j].job_result_uri) {
+            if (arr[j].job_real_uri) arr[j].job_result_uri = arr[j].job_real_uri
+            else if (arr[j].job_result_uri) {
               const response = await fetch(arr[j].job_result_uri)
               const textUri = await new Promise(async resolve => {
                 resolve(response.text())

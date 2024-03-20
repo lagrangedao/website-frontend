@@ -3,7 +3,7 @@
     <div class="payment-history container-landing">
       <div class="title">{{paymentType.toLowerCase() === 'provider'?'provider Payment history':'user Payment history'}}</div>
       <el-table v-loading="paymentLoad" :data="paymentData" stripe style="width: 100%" v-if="paymentType.toLowerCase() !== 'provider'">
-        <el-table-column prop="transaction_hash" label="TRANSACTION HASH" min-width="90">
+        <el-table-column prop="transaction_hash" label="TRANSACTION HASH" min-width="110">
           <template #default="scope">
             <a :href="`${scope.row.url_tx}${scope.row.transaction_hash}`" target="_blank" :title="scope.row.transaction_hash">{{system.$commonFun.hiddAddress(scope.row.transaction_hash)}}</a>
           </template>
@@ -42,13 +42,19 @@
             <span>{{scope.row.order.space_name}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="amount" label="amount" />
+        <el-table-column prop="amount" label="amount" min-width="95" />
+        <el-table-column prop="refund_tx_hash" label="refund hash" min-width="110">
+          <template #default="scope">
+            <a :href="`${scope.row.url_tx}${scope.row.refund_tx_hash}`" target="_blank" :title="scope.row.refund_tx_hash">{{system.$commonFun.hiddAddress(scope.row.refund_tx_hash)}}</a>
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="status" width="135">
           <template #default="scope">
             <div>
               <span v-if="scope.row.chain_id === 80001 && scope.row.order.updated_at < 1700508000 && scope.row.status.toLowerCase() === 'refundable'">Pending</span>
               <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'accepted' || scope.row.status.toLowerCase() === 'refundable' || scope.row.status.toLowerCase() === 'refund'" plain @click="refundFun(scope.row)">Refund</el-button>
-              <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button>
+              <!-- <el-button type="primary" v-else-if="scope.row.status.toLowerCase() === 'reviewable'" plain @click="reviewFun(scope.row)">Claim Review</el-button> -->
+              <span v-else-if="scope.row.status.toLowerCase() === 'reviewable' || scope.row.status.toLowerCase() === 'claiming'">Completed</span>
               <span v-else>{{scope.row.status}}</span>
             </div>
           </template>
@@ -80,8 +86,6 @@ import { defineComponent, computed, onMounted, onActivated, watch, ref, reactive
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
-import SpaceHardwareABI from '@/utils/abi/SpacePaymentV6.json'
-import SpaceTokenABI from '@/utils/abi/SpacePaymentV6.json'
 import BiddingABI from '@/utils/abi/Bidding.json'
 import TaskABI from '@/utils/abi/Task.json'
 export default defineComponent({
@@ -96,8 +100,6 @@ export default defineComponent({
     const paymentLoad = ref(false)
     const paymentType = ref(route.query.type || 'user')
     const prevType = ref(true)
-    let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
-    let paymentContract = new system.$commonFun.web3Init.eth.Contract(SpaceHardwareABI, paymentContractAddress)
     let biddingContractAddress = process.env.VUE_APP_OPSWAN_BIDDING_ADDRESS
     let biddingContract = new system.$commonFun.web3Init.eth.Contract(BiddingABI, biddingContractAddress)
 
@@ -132,19 +134,22 @@ export default defineComponent({
       paymentLoad.value = true
       try {
         // get task contract address
-        let taskContractAddress = await biddingContract.methods.tasks(String(row.job.uuid)).call()
+        let taskContractAddress = await biddingContract.methods.tasks(String(row.task_uuid)).call()
+        if (taskContractAddress.indexOf('0x0') > -1) {
+          system.$commonFun.messageTip('error', 'Cannot get task contract, Please try again later!')
+          paymentLoad.value = false
+          return
+        }
         let taskContract = new system.$commonFun.web3Init.eth.Contract(TaskABI, taskContractAddress)
 
         if (type) {
-          console.log('task_uuid:', row.job.uuid)
-
           let gasLimit = await taskContract.methods
             .claimReward()
             .estimateGas({ from: store.state.metaAddress })
 
           const tx = await taskContract.methods
             .claimReward()
-            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+            .send({ from: store.state.metaAddress, gasLimit: Math.floor(gasLimit * 1.5) })
             .on('transactionHash', async (transactionHash) => {
               console.log('claim transactionHash:', transactionHash)
               claimStatus(row, transactionHash)
@@ -158,7 +163,7 @@ export default defineComponent({
 
           const tx = await taskContract.methods
             .claimRefund()
-            .send({ from: store.state.metaAddress, gasLimit: gasLimit })
+            .send({ from: store.state.metaAddress, gasLimit: Math.floor(gasLimit * 1.5) })
             .on('transactionHash', async (transactionHash) => {
               console.log('refund transactionHash:', transactionHash)
               refundStatus(row, transactionHash)
@@ -176,6 +181,7 @@ export default defineComponent({
       let formData = new FormData()
       formData.append('tx_hash', row.transaction_hash)
       formData.append('chain_id', row.chain_id)
+      formData.append('refund_tx_hash', transactionHash)
       const refundRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}user/refund`, 'post', formData)
       if (!refundRes || refundRes.status !== 'success') if (refundRes.message) system.$commonFun.messageTip('error', refundRes.message)
       init()
@@ -220,6 +226,10 @@ export default defineComponent({
       fn()
     })
     onActivated(async () => {
+      // if (process.env.NODE_ENV === 'production') {
+      //   router.push({ name: 'main' })
+      //   return
+      // }
       getnetID = await system.$commonFun.web3Init.eth.net.getId()
       // paymentEnv()
       init()

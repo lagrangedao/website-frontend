@@ -82,7 +82,8 @@
                   <span class="link">+ New Space</span>
                 </el-dropdown-item>
                 <el-dropdown-item command="asUser">
-                  <div class="profile router-link b" :class="{'is-disabled': isEnvironment}">Payment History</div>
+                  <!-- :class="{'is-disabled': isEnvironment}" -->
+                  <div class="profile router-link b">Payment History</div>
                 </el-dropdown-item>
                 <!--<el-dropdown-item command="create_organizations"> Create Organizations</el-dropdown-item> -->
                 <el-dropdown-item command="settings">
@@ -148,6 +149,7 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
+    const accessToken = computed(() => (store.state.accessToken || ''))
     const accessName = computed(() => (store.state.accessName || '-'))
     const accessAvatar = computed(() => (store.state.accessAvatar))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
@@ -179,7 +181,7 @@ export default defineComponent({
         store.dispatch('setNavLogin', true)
       } else if (key === '4') window.open('https://docs.lagrangedao.org')
       else if (key === 'asProvider') router.push({ name: 'paymentHistory', query: { type: 'provider' } })
-      else if (key === 'asUser' && !isEnvironment.value) router.push({ name: 'paymentHistory', query: { type: 'user' } })
+      else if (key === 'asUser') router.push({ name: 'paymentHistory', query: { type: 'user' } })
       else if (key === 'dataset') router.push({ path: '/dataset' })
       else if (key === 'models') router.push({ path: '/models' })
       else if (key === 'spaces') router.push({ path: '/spaces' })
@@ -198,6 +200,7 @@ export default defineComponent({
       else store.dispatch('setNavLogin', false)
     }
     async function activeMenu (row) {
+      if (metaAddress.value) getToken()
       const nameMenu = row || route.name
       if (nameMenu.indexOf('dataset') > -1) activeIndex.value = 'dataset'
       else if (nameMenu.indexOf('model') > -1) activeIndex.value = 'models'
@@ -226,6 +229,16 @@ export default defineComponent({
       activeMenu()
       const info = await balanceMethod()
       wrongVisible.value = true
+    }
+    async function getToken () {
+      try {
+        const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}api_token`, 'get')
+        if (listRes && listRes.status !== 'success') {
+          handleSelect('sign_out')
+          if (route.name === 'paymentHistory') router.push({ name: 'main' })
+        }
+      } catch{ }
+      return ''
     }
     onMounted(() => {
       activeMenu()
