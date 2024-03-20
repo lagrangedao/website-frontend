@@ -90,7 +90,7 @@
         </el-table-column>
         <el-table-column prop="hardware_price" label="Rrice" align="right">
           <template #default="scope">
-            <span>{{scope.row.hardware_price || '-'}} LAG per hour</span>
+            <span>{{scope.row.hardware_price || '-'}} SWAN per hour</span>
           </template>
         </el-table-column>
       </el-table>

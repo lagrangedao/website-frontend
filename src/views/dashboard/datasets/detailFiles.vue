@@ -60,6 +60,7 @@
             <template #default="scope">
               <span v-if="scope.row.isDir">-</span>
               <a v-else-if="userGateway" :href="`${userGateway}/ipfs/${scope.row._originPath.cid}`" target="_blank">{{`${userGateway}/ipfs/${scope.row._originPath.cid}`}}</a>
+              <a v-else-if="scope.row._originPath.url" :href="`${scope.row._originPath.url}`" target="_blank">{{scope.row._originPath.url}}</a>
               <span v-else>-</span>
             </template>
           </el-table-column>
@@ -142,7 +143,8 @@
               </div>
               <!-- <v-md-editor v-model="fileTextEditor" height="450px"></v-md-editor> -->
               <el-button-group class="ml-4 worktop flex-row">
-                <el-button @click="commitEditFun('edit')" v-if="metaAddress === route.params.wallet_address" :disabled="!fileBody.title">Commit changes</el-button>
+                <!-- :disabled="!fileBody.title" -->
+                <el-button :disabled="true" @click="commitEditFun('edit')" v-if="metaAddress === route.params.wallet_address">Commit changes</el-button>
                 <el-button @click="cancelFun">Cancel</el-button>
               </el-button-group>
             </div>
@@ -205,7 +207,8 @@
                 </el-form-item>
               </el-form>
               <el-button-group class="ml-4">
-                <el-button @click="commitEditFun('create')" :disabled="!textInfo.name">Commit new file</el-button>
+                <!-- :disabled="!textInfo.name" -->
+                <el-button @click="commitEditFun('create')" :disabled="true">Commit new file</el-button>
                 <el-button @click="cancelFun">Cancel</el-button>
               </el-button-group>
             </el-tab-pane>
@@ -393,6 +396,7 @@ export default defineComponent({
       listLoad.value = false
     }
     async function handleCommand (command) {
+      if (!userGateway.value) return
       uploadLoad.value = command === 'create'
       labelTab.value = command
       await pathPush()
@@ -496,6 +500,7 @@ export default defineComponent({
       stateUpload.files = uploadFiles
     }
     async function commitFun () {
+      if (!userGateway.value) return
       if (fileList.value.length === 0) return
       await ruleFormRef.value.validate(async (valid, fields) => {
         if (valid) {
@@ -557,6 +562,8 @@ export default defineComponent({
       })
     }
     async function commitEditFun (type) {
+      return
+      if (!userGateway.value) return
       if (type === 'edit') fileChange(type)
       else await ruleEditName.value.validate(async (valid, fields) => {
         if (valid) {
