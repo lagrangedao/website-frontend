@@ -127,7 +127,7 @@
                     </template>
                   </el-popover> -->
                     <div class="run background">Running
-                      <span v-if="list.activeOrder.config.hardware_type === 'GPU'"> on
+                      <span v-if="list.activeOrder.config.hardware_type.indexOf('GPU') > -1"> on
                         <span class="i">{{list.activeOrder.config.hardware}}</span>
                       </span>
                     </div>

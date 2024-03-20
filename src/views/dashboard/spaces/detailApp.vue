@@ -50,24 +50,38 @@
             <p class="m">Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. </p>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Stopped'">
-          <div>
+        <div class="deployment" v-else-if="listdata.space.status && (listdata.space.status.toLowerCase() === 'failed' || listdata.space.status === 'Stopped')">
+          <!-- <div>
             <p class="m">All deployments has been not available before the space expires.</p>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">
               The Remaining tokens will be refunded shortly. You can view and request a refund in
               <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
               please
               <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
+          </div> -->
+          <div class="deploy-cont">
+            <p v-if="listdata.cpList.error_msg" class="pre font" v-html="listdata.cpList.error_msg"></p>
+            <p v-else-if="listdata.task.error_msg" class="pre font" v-html="listdata.task.error_msg"></p>
+
+            <div class="log-all">
+              <div class="flex-row log-title">
+                <div class="flex-row">
+                  <div class="flex-row log">
+                    <p class="text-base font-semibold">Container logs:</p>
+                  </div>
+                </div>
+              </div>
+              <div class="box-card mianscroll font-14">
+                <p class="pre" v-if="listdata.cpList.error_log_container">{{listdata.cpList.error_log_container}}</p>
+                <p class="pre" v-else-if="listdata.cpList.error_log_build">{{ listdata.cpList.error_log_build }}</p>
+                <p class="pre" v-else>No logs</p>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status && listdata.space.status.toLowerCase() === 'failed'">
+        <div class="deployment" v-else-if="listdata.space.status && listdata.space.status.toLowerCase() === 'closed'">
           <div>
-            <p class="m">All deployments has been not available before the space expires.</p>
-            <p v-if="metaAddress && metaAddress === route.params.wallet_address">
-              The Remaining tokens will be refunded shortly. You can view and request a refund in
-              <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>
-              please
-              <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
+            <p class="m">The space owner has closed the running space.</p>
           </div>
         </div>
         <div class="deployment" v-else-if="listdata.space.status === 'Expired'">
@@ -197,6 +211,7 @@ export default defineComponent({
     const direction = ref('btt')
     const logsLoad = ref(false)
     const logsType = ref('build')
+    const errorLogsType = ref('build')
     const checkedLock = ref(false)
     const listCont = reactive({
       data: {}
@@ -207,30 +222,6 @@ export default defineComponent({
         name: 'spaceDetail',
         params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name }
       })
-    }
-
-    async function jobList (list) {
-      let arr = list || []
-      let arrJob = []
-      for (let j = 0; j < arr.length; j++) {
-        // 如果status为running才显示
-        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
-          try {
-            if (arr[j].job_result_uri) {
-              const response = await fetch(arr[j].job_result_uri)
-              const textUri = await new Promise(async resolve => {
-                resolve(response.text())
-              })
-              arr[j].job_result_uri = JSON.parse(textUri).job_result_uri
-            } else arr[j].job_result_uri = ''
-          } catch (err) {
-            console.log('err', err)
-            arr[j].job_result_uri = ''
-          }
-          if (arr[j].job_result_uri) arrJob.push(arr[j])
-        }
-      }
-      return arrJob
     }
 
     async function init (type) {
@@ -259,7 +250,8 @@ export default defineComponent({
       let arrJob = []
       for (let j = 0; j < arr.length; j++) {
         try {
-          if (arr[j].job_result_uri) {
+          if (arr[j].job_real_uri) arr[j].job_textUri = arr[j].job_real_uri
+          else if (arr[j].job_result_uri) {
             const response = await fetch(arr[j].job_result_uri)
             const textUri = await new Promise(async (resolve, reject) => {
               resolve(response.text())
@@ -415,7 +407,8 @@ export default defineComponent({
       logsCont,
       checkedLock,
       drawer, direction, logsLoad, logsType, clearWebsocket, upWebsocket,
-      init, handleClick, hardRedeploy, logMethod, handleClose, logsMethod
+      init, handleClick, hardRedeploy, logMethod, errorLogsType,
+      handleClose, logsMethod
     }
   }
 })
@@ -456,7 +449,16 @@ export default defineComponent({
 
     .deployment {
       width: 98%;
-      margin: 0.2rem auto 0.4rem;
+      max-width: 1536px;
+      margin: 0.3rem auto 0.4rem;
+      .deploy-cont {
+        margin: auto;
+        .font {
+          font-family: "FIRACODE-LIGHT";
+          font-size: 15px;
+          color: rgb(107, 114, 128);
+        }
+      }
 
       .title {
         margin: 0.1rem 0 0.25rem;
@@ -513,9 +515,15 @@ export default defineComponent({
 
       p {
         // padding-top: 0.3rem;
-        line-height: 2;
+        line-height: 1.6;
         &.m {
           padding-top: 0;
+        }
+        &.pre {
+          white-space: pre-line;
+          font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
+            Monaco, Consolas, Liberation Mono, Courier New, monospace;
+          color: rgb(31, 41, 55);
         }
         .el-button {
           height: auto;
@@ -527,6 +535,88 @@ export default defineComponent({
           color: inherit;
           &:hover {
             color: #c37af9;
+          }
+        }
+      }
+
+      .log-all {
+        height: 100%;
+        padding: 40px 0 20px;
+        margin: 0;
+        .log-title {
+          justify-content: space-between;
+          padding: 0 4% 0 0;
+          @media screen and (max-width: 768px) {
+            padding: 0 2% 0 0;
+          }
+          .log {
+            p {
+              margin: 0;
+              font-size: 16px;
+              font-weight: 600;
+            }
+          }
+          h4 {
+            padding: 0.5px 6px;
+            margin: 0 12px 0 0;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: capitalize;
+            border-radius: 6px;
+            cursor: pointer;
+            &.is-active,
+            &:hover {
+              background-color: rgb(229, 231, 235);
+            }
+          }
+          .clear {
+            align-items: stretch;
+            font-size: 12px;
+            color: #000;
+            .close-btn {
+              padding: 5px 8px;
+              margin: 0 0 0 5px;
+            }
+            .el-checkbox {
+              display: flex;
+              height: auto;
+              .el-checkbox__inner {
+                // background-color: #e5e7eb;
+                border-color: #e5e7eb;
+              }
+              .el-checkbox__label {
+                padding-left: 5px;
+                line-height: 1.2;
+                color: #000;
+              }
+            }
+          }
+        }
+        .mian {
+          position: relative;
+        }
+        .box-card {
+          position: relative;
+          max-height: calc(100% - 60px);
+          margin: 11px 0 0;
+          background-color: transparent;
+          background-image: linear-gradient(
+            rgb(249, 250, 251),
+            rgb(255, 255, 255)
+          );
+          font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
+            Monaco, Consolas, Liberation Mono, Courier New, monospace;
+          white-space: nowrap;
+          overflow-y: auto;
+          box-shadow: none;
+          border: 1px solid rgb(243, 244, 246);
+          border-radius: 8px;
+          padding: 0;
+          .pre {
+            padding: 16px;
+          }
+          .el-card__body {
+            padding: 0;
           }
         }
       }

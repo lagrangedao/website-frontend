@@ -93,7 +93,7 @@
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item class="flex_form">
-                        <el-button size="large" @click="submitForm('ruleFormRef')">Create Space</el-button>
+                        <el-button size="large" :disabled="!userGateway?true: false" @click="submitForm('ruleFormRef')">Create Space</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -136,6 +136,7 @@ export default defineComponent({
     setup () {
         const store = useStore()
         const metaAddress = computed(() => (store.state.metaAddress))
+        const userGateway = computed(() => (store.state.gateway))
         const metaAddressEllipsis = computed(() => {
             let val = store.state.metaAddress || ''
             return `${val.substring(0, 6)}...${val.substring(val.length - 4)}`
@@ -196,6 +197,7 @@ export default defineComponent({
             return true;
         }
         const submitForm = async (formEl) => {
+            if (!userGateway.value) return
             if (!formEl) return
             await ruleFormRef.value.validate(async (valid, fields) => {
                 if (valid) {
@@ -286,6 +288,7 @@ export default defineComponent({
         })
         return {
             metaAddress,
+            userGateway,
             metaAddressEllipsis,
             navLogin,
             lagLogin,
