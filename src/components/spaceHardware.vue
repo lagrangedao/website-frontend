@@ -229,7 +229,7 @@
               <el-divider/>
             </div>
             <div class="time flex-row">
-              <el-input-number v-model="ruleForm.usageTime" :min="0.1" :max="sleepSelect.hardware_type.indexOf('GPU') > -1? 168:336" :step="0.1" controls-position="right" /> &nbsp; hours
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.indexOf('GPU') > -1? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
             </div>
           </div>
           <div v-if="props.renewButton !== 'renew'">
