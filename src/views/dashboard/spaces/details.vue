@@ -348,6 +348,9 @@
                     <el-descriptions-item label="Multi address" v-if="dataJob.job.provider_status">
                       {{dataJob.job.provider_status.multi_address}}
                     </el-descriptions-item>
+                    <el-descriptions-item label="Region" v-if="dataJob.job.provider_status">
+                      {{dataJob.job.provider_status.region}}
+                    </el-descriptions-item>
                   </el-descriptions>
                 </el-col>
               </el-row>
