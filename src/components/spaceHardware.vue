@@ -128,7 +128,12 @@
                         <div class="auto-list">
                           <el-row :gutter="14">
                             <el-col :xs="24" :sm="9" :md="6" :lg="6" :xl="6">
-                              <div class="t">7x GTX 4090 Ti</div>
+                              <div class="t flex-row">
+                                {{cp.resources[0].gpu.gpus.length}}x
+                                <el-select v-model="cp.resources[0].gpu.name" placeholder="">
+                                  <el-option v-for="item in cp.resources[0].gpu.gpus" :key="item.model" :label="item.model" :value="item.model" />
+                                </el-select>
+                              </div>
                               <p>{{cp.resources?cp.resources[0].gpu.cuda_version:''}}</p>
                             </el-col>
                             <el-col :xs="24" :sm="15" :md="18" :lg="18" :xl="18">
@@ -1382,9 +1387,22 @@ export default defineComponent({
                     .el-col {
                       color: #000000;
                       .t {
+                        justify-content: space-between;
                         font-size: 0.22rem;
                         font-weight: bolder;
                         line-height: 1.5;
+                        .el-select {
+                          width: calc(100% - 40px);
+                          font-size: 14px;
+                          .el-input {
+                            font-size: inherit;
+                            border: 0;
+                            .el-input__inner {
+                              font-size: inherit;
+                              border: 0;
+                            }
+                          }
+                        }
                       }
                       .m-t {
                         font-size: 0.16rem;
