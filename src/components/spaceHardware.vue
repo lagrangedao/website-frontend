@@ -100,7 +100,8 @@
           <el-col :md="24" :lg="18" class="hardware-right m-bottom" v-loading="machinesLoad">
             <div class="price_switch flex-row">
               Display Available Hardware:
-              <el-switch v-model="ruleForm.displayAvailable" @change="availableChange" style="--el-switch-on-color: #c37af9;" size="small" />
+              <el-switch v-model="ruleForm.displayAvailable" @change="availableChange" style="--el-switch-on-color: #c37af9;" size="small" /> &nbsp;&nbsp;&nbsp;AUTO:
+              <el-switch v-model="ruleForm.autoAvailable" @change="autoChange" style="--el-switch-on-color: #c37af9;" size="small" />
             </div>
             <h2 class="flex-row">
               <svg class="mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12">
@@ -113,28 +114,85 @@
             </h2>
             <p class="p-2 flex-row">Choose a hardware for your Space.</p>
 
-            <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
-              <el-divider content-position="left">{{ item.label }}</el-divider>
-              <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o" :class="{'is-hidden': ruleForm.displayAvailable ? !(ruleForm.displayAvailable && ol.hardware_status === 'available'):false}">
-                <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null),'is-disabled':ol.hardware_status !== 'available'}"
-                  @click="sleepChange(ol)">
-                  <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null)">
-                    <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
-                      <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
-                        fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
-                      <path d="M813.696 813.696c166.613333-166.613333 166.613333-436.778667 0-603.392-166.613333-166.613333-436.778667-166.613333-603.392 0A64 64 0 0 0 300.8 300.8a298.666667 298.666667 0 1 1 422.4 422.4 64 64 0 0 0 90.496 90.496z" fill="#7405ff"
-                        p-id="2342"></path>
-                    </svg>
-                  </div>
-                  <h5>{{ ol.hardware_name }}</h5>
-                  <div class="desc-text">{{ ol.hardware_description }}</div>
-                  <div class="price">
-                    <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} SWAN per hour</b>
-                    <b v-else>No available CP</b>
-                  </div>
-                </el-card>
-              </el-col>
-            </el-row>
+            <div v-show="ruleForm.autoAvailable">
+              <el-row :gutter="25" class="space_hardware_list">
+                <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-for="(cp, c) in hardwareCPs" :key="c">
+                  <!-- :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null),'is-disabled':ol.hardware_status !== 'available'}" -->
+                  <el-card class="box-card box-auto" @click="cpsChange(cp)">
+                    <div class="auto-content flex-row">
+                      <div class="auto-logo"></div>
+                      <div class="auto-right">
+                        <div class="auto-name flex-row">
+                          <span>{{cp.name}}</span> {{cp.region}}
+                        </div>
+                        <div class="auto-list">
+                          <el-row :gutter="14">
+                            <el-col :xs="24" :sm="9" :md="6" :lg="6" :xl="6">
+                              <div class="t">7x GTX 4090 Ti</div>
+                              <p>{{cp.resources?cp.resources[0].gpu.cuda_version:''}}</p>
+                            </el-col>
+                            <el-col :xs="24" :sm="15" :md="18" :lg="18" :xl="18">
+                              <ul class="flex-row" v-if="cp.resources">
+                                <li>
+                                  <div class="m-t flex-row">CPU
+                                    <i class="icon-cpu"></i>
+                                  </div>
+                                  <p>{{cp.resources[0].vcpu.free}}/{{cp.resources[0].vcpu.total}} vcpu</p>
+                                </li>
+                                <li>
+                                  <div class="m-t flex-row">MEMORY</div>
+                                  <p>{{cp.resources[0].memory.free}}{{cp.resources[0].memory.unit}}/{{cp.resources[0].memory.total}}{{cp.resources[0].memory.unit}}</p>
+                                </li>
+                                <li>
+                                  <div class="m-t flex-row">STORAGE</div>
+                                  <p>{{cp.resources[0].storage.free}}{{cp.resources[0].storage.unit}}/{{cp.resources[0].storage.total}}{{cp.resources[0].storage.unit}}</p>
+                                </li>
+                                <li>
+                                  <div class="m-t flex-row">Community
+                                    <i class="icon-community"></i>
+                                  </div>
+                                  <p>Compiletion
+                                    <span>{{cp.success_rate/100}}%</span>
+                                  </p>
+                                </li>
+                              </ul>
+                            </el-col>
+                          </el-row>
+                        </div>
+                      </div>
+                      <div class="auto-price">
+                        <span>5 SWAN/hr</span>
+                        <div class="button">CONFIRM</div>
+                      </div>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </div>
+            <div v-show="!ruleForm.autoAvailable">
+              <el-row :gutter="25" class="space_hardware_list" v-for="(item, index) in hardwareOptions" :key="index">
+                <el-divider content-position="left">{{ item.label }}</el-divider>
+                <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="(ol, o) in item.list" :key="o" :class="{'is-hidden': ruleForm.displayAvailable ? !(ruleForm.displayAvailable && ol.hardware_status === 'available'):false}">
+                  <el-card class="box-card" :class="{'active': props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null),'is-disabled':ol.hardware_status !== 'available'}"
+                    @click="sleepChange(ol)">
+                    <div class="abo" v-if="props.renewButton === 'setting' && props.listdata.activeOrder && props.listdata.activeOrder.config && props.listdata.activeOrder.config.name === ol.hardware_name && (props.listdata.activeOrder.ended_at === null)">
+                      <svg t="1678084765267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2340" width="200" height="200">
+                        <path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m0 128a298.666667 298.666667 0 1 0 0 597.333334 298.666667 298.666667 0 0 0 0-597.333334z"
+                          fill="#7405ff" fill-opacity=".05" p-id="2341"></path>
+                        <path d="M813.696 813.696c166.613333-166.613333 166.613333-436.778667 0-603.392-166.613333-166.613333-436.778667-166.613333-603.392 0A64 64 0 0 0 300.8 300.8a298.666667 298.666667 0 1 1 422.4 422.4 64 64 0 0 0 90.496 90.496z" fill="#7405ff"
+                          p-id="2342"></path>
+                      </svg>
+                    </div>
+                    <h5>{{ ol.hardware_name }}</h5>
+                    <div class="desc-text">{{ ol.hardware_description }}</div>
+                    <div class="price">
+                      <b v-if="ol.hardware_status.toLowerCase() === 'available'">{{ ol.hardware_price }} SWAN per hour</b>
+                      <b v-else>No available CP</b>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </div>
           </el-col>
         </el-row>
         <el-row class="space_hardware persistent-storage" :gutter="30">
@@ -210,69 +268,182 @@
 
     <el-dialog custom-class="sleep_body" @close="close" v-model="sleepVisible" :title="props.renewButton === 'renew'?'Confirm duration update':'Confirm hardware update'" :width="dialogWidth">
       <div v-loading="hardwareLoad">
-        <div class="title-hard">The {{props.renewButton === 'renew'?'current':''}} hardware of
-          <span>{{ accessName || system.$commonFun.hiddAddress(metaAddress) }}/{{ route.params.name }}</span> {{props.renewButton === 'renew'?'is':'will be switched to'}}:
+        <div class="auto-card" v-show="!ruleForm.autoAvailable">
+          <div class="title-hard">The {{props.renewButton === 'renew'?'current':''}} hardware of
+            <span>{{ accessName || system.$commonFun.hiddAddress(metaAddress) }}/{{ route.params.name }}</span> {{props.renewButton === 'renew'?'is':'will be switched to'}}:
+          </div>
+          <el-card class="box-card">
+            <h5>{{ sleepSelect.hardware_name }}</h5>
+            <div class="desc-text">{{ sleepSelect.hardware_description }}</div>
+            <div class="price">
+              <b>{{ sleepSelect.hardware_price }} SWAN per hour</b>
+            </div>
+          </el-card>
         </div>
-        <el-card class="box-card">
-          <h5>{{ sleepSelect.hardware_name }}</h5>
-          <div class="desc-text">{{ sleepSelect.hardware_description }}</div>
-          <div class="price">
-            <b>{{ sleepSelect.hardware_price }} SWAN per hour</b>
-          </div>
-        </el-card>
-        <div class="sleep_style">
-          <div>
-            <div class="title_tip flex-row">
-              <div class="flex-row">
-                {{props.renewButton === 'renew'? 'Extend Time' : 'Usage Time'}}
-              </div>
-              <el-divider/>
-            </div>
-            <div class="time flex-row">
-              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.indexOf('GPU') > -1? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+        <div class="auto-area" v-show="ruleForm.autoAvailable">
+          <div class="piece flex-row space-between nowrap">
+            <div class="flex-row center">
+              <small class="font-12">Docker lmage</small>
+              <el-input v-model="ruleForm.image_name" placeholder="Example: mydockerimage:1.01">
+                <template #prepend>
+                  <div class="width-icon">
+                    <svg t="1699606466208" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3074" width="200" height="200">
+                      <path d="M799.26272 469.056a133.696 133.696 0 0 1 0-161.92l12.096-13.632 12.096 11.712a156.864 156.864 0 0 1 66.624 101.44 154.496 154.496 0 0 1 135.296 19.2 147.2 147.2 0 0 1-159.488 84.224c-83.2 200.064-261.888 320-527.104 321.92a321.472 321.472 0 0 1-300.8-150.208 278.976 278.976 0 0 1-34.304-185.6h88.768V392.96h105.024V291.52h209.984V192H532.63872v200.96h105.088v103.424a289.856 289.856 0 0 0 161.536-27.328z m-611.904-52.672H193.43872v74.176h-6.08V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.128v74.176h-8.128V416.384z m-12.096 0h6.08v74.176h-6.08V416.384z m-14.144 0h6.08v74.176h-6.08V416.384z m-8.064-5.824v87.808h90.88V410.56h-90.88z m181.76-93.632h6.016v72.128h-6.016V316.864z m-14.144 0h6.08v72.128h-6.08V316.864z m-14.144 0h8.064v72.128H263.83872V316.864z m-14.144 0h8.064v72.128h-8.064V316.864z m-14.144 0h8.128v72.128h-8.128V316.864z m-12.096 0h6.08v72.128h-6.08V316.864z m-8.064-7.872V396.8h90.88V309.056h-90.88z m76.8 107.328h5.952v74.176h-6.016V416.384z m-14.144 0h6.016v74.176h-6.08V416.384z m-14.144 0h8v74.176H263.83872V416.384z m-14.144 0h8v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.128V416.384z m-12.096 0h6.016v74.176h-6.08V416.384z m-8.128-5.824v87.808h90.88V410.56h-90.88z m179.712 5.824h8.064v74.176h-8.064V416.384z m-12.096 0h6.016v74.176h-6.016V416.384z m-14.144 0h6.08v74.176h-6.08V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176H340.63872V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-6.016-5.824v87.808h90.88V410.56h-90.88z m74.688-93.696h8.064v72.192h-8.064V316.864z m-12.096 0h6.016v72.192h-6.016V316.864z m-14.144 0h6.08v72.192h-6.08V316.864z m-14.144 0h8.064v72.192h-8.064V316.864z m-14.144 0h8.064v72.192H340.63872V316.864z m-14.144 0h8.064v72.192h-8.064V316.864z m-6.016-7.808V396.8h90.88V309.056h-90.88zM500.63872 416.384h7.808v74.176H500.63872V416.384z m-14.144 0H494.23872v74.176h-8V416.384z m-12.096 0h5.76v74.176h-6.016V416.384z m-14.144 0h5.76v74.176h-6.016V416.384z m-14.144 0h7.808v74.176h-8.064V416.384z m-14.144 0h7.808v74.176h-8.064V416.384z m-6.336-5.824v87.808h88.896V410.56H425.63072zM500.63872 316.864h7.808v72.192H500.63872V316.864z m-14.144 0H494.23872v72.192h-8V316.864z m-12.096 0h5.76v72.192h-6.016V316.864z m-14.144 0h5.76v72.192h-6.016V316.864z m-14.144 0h7.808v72.192h-8.064V316.864z m-14.144 0h7.808v72.192h-8.064V316.864z m-6.336-7.808V396.8h88.896V309.056H425.63072zM500.63872 215.424h7.808v72.192H500.63872V215.424z m-14.144 0H494.23872v72.192h-8V215.424z m-12.096 0h5.76v72.192h-6.016V215.424z m-14.144 0h5.76v72.192h-6.016V215.424z m-14.144 0h7.808v72.192h-8.064V215.424z m-14.144 0h7.808v72.192h-8.064V215.424z m-6.336-7.808v87.808h88.896V207.616H425.63072z m179.776 208.768h6.016v74.176h-6.016V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-12.096 0H571.03872v74.176h-6.016V416.384z m-14.144 0h6.016v74.176h-6.016V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-8.064-5.824v87.808h90.88V410.56h-90.88zM300.44672 638.848A22.336 22.336 0 0 0 283.03872 646.4a25.6 25.6 0 0 0-7.04 17.536 22.208 22.208 0 0 0 7.04 16.576 24.96 24.96 0 0 0 34.304 0 22.208 22.208 0 0 0 7.04-16.576A23.744 23.744 0 0 0 321.43872 651.52a28.672 28.672 0 0 0-9.088-8.768 22.208 22.208 0 0 0-11.904-3.904z m0 7.808a8.384 8.384 0 0 1 6.08 1.92 6.4 6.4 0 0 0-4.032 5.824q0 5.824 8.064 5.824a6.4 6.4 0 0 0 6.08-3.904 16.832 16.832 0 0 1 2.048 7.808 15.808 15.808 0 0 1-18.176 17.536 17.664 17.664 0 1 1-0.064-35.264z m66.624 167.808a226.112 226.112 0 0 1-115.2-109.248 359.296 359.296 0 0 1-82.816 11.712H82.33472a364.8 364.8 0 0 0 256.448 97.536h28.288z"
+                        fill="#1296db" p-id="3075"></path>
+                    </svg>
+                  </div>
+                </template>
+              </el-input>
             </div>
           </div>
-          <div v-if="props.renewButton !== 'renew'">
-            <div class="title_tip flex-row">
-              <div class="flex-row">
-                Region
-              </div>
-              <el-divider/>
-            </div>
-            <div class="time flex-row">
-              <el-select v-model="sleepSelect.regionValue" :disabled="props.renewButton === 'renew'?true:false" class="m-region" placeholder="Region">
-                <el-option v-for="item in sleepSelect.regionOption" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </div>
-          </div>
-          <div v-if="props.renewButton !== 'renew'">
-            <div class="title_tip flex-row">
-              <div class="flex-row">
-                Start time settings
-                <el-popover placement="top-start" :width="200" trigger="hover" content="If the task isn't successfully taken by the CP within the specified time, we will consider it as failed and refund your tokens.">
-                  <template #reference>
-                    <div>
-                      <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
-                        <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
-                        <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
-                        <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
-                      </svg>
+
+          <el-row :gutter="8">
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+              <div class="background-main">
+                <div class="flex-row">
+                  <h3 class="flex-row">
+                    <div class="flex-row center font-18">
+                      <div class="width-icon">
+                        <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="SpeedIcon">
+                          <path d="m20.38 8.57-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 0 0 3.35 19a2 2 0 0 0 1.72 1h13.85a2 2 0 0 0 1.74-1 10 10 0 0 0-.27-10.44zm-9.79 6.84a2 2 0 0 0 2.83 0l5.66-8.49-8.49 5.66a2 2 0 0 0 0 2.83z"></path>
+                        </svg>
+                      </div>
+                      <span>CPU</span>
                     </div>
-                  </template>
-                </el-popover>
+                    <el-input-number :min="1" :max="sleepSelect.resources[0].vcpu.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.cpuValue" placeholder="Storage" class="input-with-select font-16" />
+                  </h3>
+                </div>
+                <div class="slider-demo-block">
+                  <el-slider v-model="ruleForm.cpuValue" :min="1" :max="sleepSelect.resources[0].vcpu.free" />
+                </div>
               </div>
-              <el-divider/>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+              <div class="background-main">
+                <div class="flex-row">
+                  <h3 class="flex-row">
+                    <div class="flex-row center font-18">
+                      <div class="width-icon">
+                        <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="SpeedIcon">
+                          <path d="m20.38 8.57-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 0 0 3.35 19a2 2 0 0 0 1.72 1h13.85a2 2 0 0 0 1.74-1 10 10 0 0 0-.27-10.44zm-9.79 6.84a2 2 0 0 0 2.83 0l5.66-8.49-8.49 5.66a2 2 0 0 0 0 2.83z"></path>
+                        </svg>
+                      </div>
+                      <span>GPU</span>
+                    </div>
+                    <el-checkbox v-model="ruleForm.gpuCheck" />
+                  </h3>
+                </div>
+                <div v-show="ruleForm.gpuCheck">
+                  <div class="flex-row center font-16">
+                    <el-select v-model="ruleForm.gpuSelect.value" placeholder="Select">
+                      <el-option v-for="s in ruleForm.gpuSelect.options" :key="s.value" :label="s.label" :value="s.value">
+                        <span class="font-16">{{s.label}}</span>
+                      </el-option>
+                    </el-select>
+                  </div>
+                </div>
+              </div>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+              <div class="background-main">
+                <div class="flex-row">
+                  <h3 class="flex-row">
+                    <div class="flex-row center font-18">
+                      <div class="width-icon">
+                        <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="MemoryIcon">
+                          <path d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2zm8-2V9h-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h-2V3H9v2H7c-1.1 0-2 .9-2 2v2H3v2h2v2H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h2v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2zm-4 6H7V7h10v10z"></path>
+                        </svg>
+                      </div>
+                      <span>Memory</span>
+                    </div>
+                    <el-input-number :min="1" :max="sleepSelect.resources[0].memory.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.memoryValue" placeholder="Storage" class="input-with-select font-16" />
+                    <small>GB</small>
+                  </h3>
+                </div>
+                <div class="slider-demo-block">
+                  <el-slider v-model="ruleForm.memoryValue" :min="1" :max="sleepSelect.resources[0].memory.free" />
+                </div>
+              </div>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+              <div class="background-main">
+                <div class="flex-row">
+                  <h3 class="flex-row">
+                    <div class="flex-row center font-18">
+                      <div class="width-icon">
+                        <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="StorageIcon">
+                          <path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"></path>
+                        </svg>
+                      </div>
+                      <span>Ephemeral Storage</span>
+                    </div>
+                    <el-input-number :min="1" :max="sleepSelect.resources[0].storage.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.storageValue" placeholder="Storage" class="input-with-select font-16" />
+                    <small>GB</small>
+                  </h3>
+                </div>
+                <div class="slider-demo-block">
+                  <el-slider v-model="ruleForm.storageValue" :min="1" :max="sleepSelect.resources[0].storage.free" />
+                </div>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+        <div class="sleep_style">
+          <div :class="{'flex-row flex-cont':ruleForm.autoAvailable}">
+            <div class="flex-child">
+              <div class="title_tip flex-row">
+                <div class="flex-row">
+                  {{props.renewButton === 'renew'? 'Extend Time' : 'Usage Time'}}
+                </div>
+                <el-divider/>
+              </div>
+              <div class="time flex-row">
+                <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type && sleepSelect.hardware_type.indexOf('GPU') > -1? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+              </div>
             </div>
-            <div class="time flex-row">
-              Start after
-              <el-select v-model="ruleForm.sleepTime" class="m-2" placeholder="Select" size="small">
-                <el-option v-for="item in ruleForm.sleepTimeOption" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
+            <div class="flex-child" v-if="props.renewButton !== 'renew'">
+              <div class="title_tip flex-row">
+                <div class="flex-row">
+                  Region
+                </div>
+                <el-divider/>
+              </div>
+              <div class="time flex-row">
+                <span v-if="ruleForm.autoAvailable" class="a">{{ruleForm.region}}</span>
+                <el-select v-else v-model="sleepSelect.regionValue" :disabled="props.renewButton === 'renew'?true:false" class="m-region" placeholder="Region">
+                  <el-option v-for="item in sleepSelect.regionOption" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+              </div>
             </div>
-            <p class="p-1 p-small" v-if="sleepSelect.hardware_type.indexOf('GPU') > -1 && ruleForm.sleepTime < 20">
-              For GPU tasks, we recommend that you choose a longer wait time to ensure that the CP can complete the task within your desired time frame</p>
+            <div class="flex-child" v-if="props.renewButton !== 'renew'">
+              <div class="title_tip flex-row">
+                <div class="flex-row">
+                  Start time settings
+                  <el-popover placement="top-start" :width="200" trigger="hover" content="If the task isn't successfully taken by the CP within the specified time, we will consider it as failed and refund your tokens.">
+                    <template #reference>
+                      <div>
+                        <svg class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32">
+                          <path d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3z" fill="currentColor"></path>
+                          <path d="M16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z" fill="currentColor"></path>
+                          <path d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z" fill="currentColor"></path>
+                        </svg>
+                      </div>
+                    </template>
+                  </el-popover>
+                </div>
+                <el-divider/>
+              </div>
+              <div class="time flex-row">
+                Start after
+                <el-select v-model="ruleForm.sleepTime" class="m-2" placeholder="Select" size="small">
+                  <el-option v-for="item in ruleForm.sleepTimeOption" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+              </div>
+              <p class="p-1 p-small" v-if="sleepSelect.hardware_type && sleepSelect.hardware_type.indexOf('GPU') > -1 && ruleForm.sleepTime < 20">
+                For GPU tasks, we recommend that you choose a longer wait time to ensure that the CP can complete the task within your desired time frame</p>
+            </div>
           </div>
-          <el-divider/>
+          <el-divider v-if="!ruleForm.autoAvailable" />
           <p class="p-1">Make sure to follow
             <router-link to="">this guide</router-link>
             to ensure your Space takes advantage of the improved hardware.
@@ -285,9 +456,10 @@
       </div>
 
       <template #footer>
-        <span class="dialog-footer">
+        <span class="dialog-footer" :class="{'flex-row':ruleForm.autoAvailable}">
+          <div class="footer-price" v-if="ruleForm.autoAvailable">111 SWAN</div>
           <el-button-group class="flex-row">
-            <el-button @click="hardwareFun" :disabled="hardwareLoad">{{props.renewButton === 'renew'?'Renew':'Confirm new hardware'}}</el-button>
+            <el-button @click="hardwareFun" :disabled="hardwareLoad">{{props.renewButton === 'renew'?'Renew':ruleForm.autoAvailable?'Confirm hardware':'Confirm new hardware'}}</el-button>
             <el-button @click="close" :disabled="hardwareLoad">Cancel</el-button>
           </el-button-group>
         </span>
@@ -374,10 +546,28 @@ export default defineComponent({
       ],
       pauseSpace: false,
       displayAvailable: true,
+      autoAvailable: true,
       rename: '',
       rename_err: false,
       rename_tip: '',
-      rule_tip: ''
+      rule_tip: '',
+      docker: '',
+      cpuValue: 1,
+      memoryValue: 1,
+      storageValue: 1,
+      gpuCheck: false,
+      gpuSelect: {
+        value: 'nvidia 3080 Ti',
+        options: [
+          {
+            value: 'nvidia 3080 Ti',
+            label: 'nvidia 3080 Ti'
+          }
+        ]
+      },
+      max: 72,
+      region: 'Sfrdgfdgdfh/USASFDADSFDSFDSF',
+      image_name: sessionStorage.getItem('imageName') || ''
     })
     const validateInput = (rule, value, callback) => {
       if ((/[^a-zA-Z0-9-._]/g).test(value)) {
@@ -401,6 +591,7 @@ export default defineComponent({
     const ruleFormRef = ref(null)
     const ruleLoad = ref(false)
     const filesList = ref([])
+    const hardwareCPs = ref([])
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
     let tokenAddress = process.env.VUE_APP_SATURN_TOKEN_ADDRESS
     let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
@@ -412,6 +603,28 @@ export default defineComponent({
       if (!net) return
       hardwareLoad.value = true
       try {
+        if (ruleForm.autoAvailable) {
+          system.$commonFun.web3Init.eth.sendTransaction({
+            from: store.state.metaAddress,
+            to: '0xB5aeb540B4895cd024c1625E146684940A849ED9',
+            value: '1000000000000000'
+          })
+            .on('transactionHash', function (hash) {
+              console.log('transactionHash:', transactionHash)
+            })
+            .on('receipt', function (receipt) {
+              console.log('receipt:', receipt)
+            })
+            .on('confirmation', function (confirmationNumber, receipt) {
+              console.log('confirmation:', confirmationNumber, receipt)
+            })
+            .on('err', () => {
+              console.log('err', err)
+              if (err && err.message) system.$commonFun.messageTip('error', err.message)
+              closePart()
+            })
+          return
+        }
         if (props.renewButton === 'fork') {
           const forkRes = await forkDuplicate()
           if (forkRes !== 'success') {
@@ -559,8 +772,17 @@ export default defineComponent({
       sleepSelect.value.regionOption = await regionList(row.region)
       if (props.renewButton === 'renew') sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
       else sleepSelect.value.regionValue = row.region && row.region[0] ? "Global" : ''
-      ruleForm.sleepTime = sleepSelect.value.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
+      ruleForm.sleepTime = sleepSelect.value.hardware_type && sleepSelect.value.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
       if (props.renewButton === 'renew') hardwareLoad.value = false
+      sleepVisible.value = true
+    }
+
+    async function cpsChange (row) {
+      const net = await networkEstimate()
+      if (!net) return
+      ruleForm.usageTime = 24
+      sleepSelect.value = row
+      ruleForm.sleepTime = sleepSelect.value.hardware_type && sleepSelect.value.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
       sleepVisible.value = true
     }
 
@@ -641,10 +863,11 @@ export default defineComponent({
             region: []
           }
           sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
-          ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
+          ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type && props.listdata.activeOrder.config.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
           sleepVisible.value = true
           return
         }
+
         const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
         if (machinesRes && machinesRes.status === 'success') {
           if (props.renewButton === 'renew') {
@@ -661,6 +884,61 @@ export default defineComponent({
       } catch{ }
       machinesLoad.value = false
     }
+    async function getCps () {
+
+
+      // const cpsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cps`, 'get')
+      const cpsRes = {
+        "total": 1,
+        "list": [
+          {
+            "node_id": "1234567890",
+            "name": "test",
+            "uuid": "e807f1fcf82d132f9bb018ca6738a19f",
+            "region": "Central and Western District-HK",
+            "success_rate": 10000, // base 10000 means 100%
+            "resources": [
+              {
+                "machine_id": "4ff8a54daede41f49d54486a06260488",
+                "cpu_model": "amd64",
+                "cpu": {
+                  "total": 32,
+                  "free": 1
+                },
+                "vcpu": {
+                  "total": 32,
+                  "free": 1
+                },
+                "memory": {
+                  "total": 1003,
+                  "free": 979,
+                  "unit": "GB"
+                },
+                "storage": {
+                  "total": 1649,
+                  "free": 1599,
+                  "unit": "GB"
+                },
+                "gpu": {
+                  "cuda_version": "11020",
+                  "driver_version": "460.84",
+                  "gpus": {
+                    "NVIDIA 3090": {
+                      "total": 2,
+                      "free": 1
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+
+      hardwareCPs.value = cpsRes.list
+
+
+    }
     async function requestFiles () {
       try {
         const listFilesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}/files`, 'get')
@@ -668,6 +946,9 @@ export default defineComponent({
       } catch{ }
     }
     async function availableChange () {
+      // console.log(ruleForm.displayAvailable)
+    }
+    async function autoChange () {
       // console.log(ruleForm.displayAvailable)
     }
     let getnetID = NaN
@@ -678,6 +959,7 @@ export default defineComponent({
       // paymentEnv()
       requestFiles()
       init()
+      getCps()
       nameExist()
     })
     return {
@@ -696,8 +978,8 @@ export default defineComponent({
       hardwareOptions,
       hardwareLoad,
       machinesLoad,
-      forkLoad, ruleFormRef, ruleLoad,
-      sleepChange, hardwareFun, close, forkDuplicate, nameExist, availableChange
+      forkLoad, ruleFormRef, ruleLoad, hardwareCPs,
+      sleepChange, hardwareFun, close, forkDuplicate, nameExist, availableChange, autoChange, cpsChange
     }
   }
 })
@@ -1034,6 +1316,107 @@ export default defineComponent({
 
             &:hover {
               box-shadow: none;
+            }
+          }
+
+          &.box-auto {
+            padding: 0.15rem 0.25rem;
+            .auto-content {
+              .auto-logo {
+                width: 0.4rem;
+                height: 0.4rem;
+                padding: 0.1rem;
+                background: url(../assets/images/icons/logo_small.png) no-repeat
+                  center;
+                background-color: #000;
+                background-size: 0.4rem;
+                border-radius: 0.1rem;
+              }
+              .auto-right {
+                width: calc(100% - 0.84rem - 100px);
+                margin: 0 0.22rem 0.1rem;
+                .auto-name {
+                  margin: 0 0 0.1rem;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #7f7f7f;
+                  line-height: 1;
+                  span {
+                    padding: 0.06rem 0.1rem;
+                    margin: 0 0.1rem 0 0;
+                    background-color: #7405ff;
+                    font-size: 13px;
+                    border-radius: 0.2rem;
+                    color: #fff;
+                    text-transform: uppercase;
+                  }
+                }
+                .auto-list {
+                  .el-row {
+                    .el-col {
+                      color: #000000;
+                      .t {
+                        font-size: 0.22rem;
+                        font-weight: bolder;
+                        line-height: 1.5;
+                      }
+                      .m-t {
+                        font-size: 0.16rem;
+                        white-space: nowrap;
+                        .icon-cpu {
+                          width: 0.55rem;
+                          height: 0.26rem;
+                          background: url(../assets/images/icons/icon-cpu.png)
+                            no-repeat left center;
+                          background-size: 100%;
+                          margin: 0 0 0 4px;
+                        }
+                        .icon-community {
+                          width: 0.55rem;
+                          height: 0.26rem;
+                          background: url(../assets/images/icons/icon-community.png)
+                            no-repeat left center;
+                          background-size: auto 100%;
+                          margin: 0 0 0 4px;
+                        }
+                      }
+                      p {
+                        margin: 3px 0 0;
+                        font-size: 13px;
+                        span {
+                          color: #09b53e;
+                        }
+                      }
+                      ul {
+                        width: 100%;
+                        justify-content: space-between;
+                        li {
+                          margin: 0 1% 0 0;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              .auto-price {
+                width: 100px;
+                font-weight: bolder;
+                text-align: center;
+                line-height: 1;
+                span {
+                  font-size: 0.186rem;
+                  color: #c27af8;
+                }
+                .button {
+                  width: 100%;
+                  padding: 0.1rem 0;
+                  margin: 0.12rem 0 0;
+                  background-color: #c27af8;
+                  color: #fff;
+                  text-transform: uppercase;
+                  border-radius: 30px;
+                }
+              }
             }
           }
 
@@ -1412,8 +1795,236 @@ export default defineComponent({
       }
     }
 
+    .auto-area {
+      .width-icon {
+        display: block;
+        width: 24px;
+        height: 24px;
+        color: #666;
+        fill: #666;
+        &.small {
+          width: 20px;
+          height: 20px;
+        }
+        &.min-small {
+          width: 16px !important;
+          height: 16px;
+        }
+        &.minimum-small {
+          width: 14px;
+          height: 14px;
+        }
+        &.big {
+          width: 35px;
+          height: 35px;
+        }
+        svg {
+          width: inherit;
+          height: inherit;
+        }
+      }
+      .piece {
+        margin: 0 0 0.22rem;
+        .center {
+          position: relative;
+          width: 100%;
+          margin: 0 8px 0 0;
+          border: 1px solid #dfdfdf;
+          border-radius: 4px;
+          small {
+            position: absolute;
+            top: -6px;
+            left: 10px;
+            padding: 0 4px;
+            background-color: #fff;
+            font-size: 12px;
+            color: #606060;
+            z-index: 9;
+            line-height: 1;
+          }
+        }
+        .el-input-number {
+          width: 100%;
+          .el-input__inner {
+            text-align: left;
+          }
+          .el-input-number__increase,
+          .el-input-number__decrease {
+            height: 20px;
+            background-color: transparent;
+            box-shadow: none;
+            border: 0;
+          }
+        }
+        .el-input {
+          .el-input__wrapper,
+          .el-input__inner {
+            height: 40px;
+            padding: 0 14px;
+            box-shadow: none;
+            border: 0;
+          }
+          .el-input-group__prepend,
+          .el-input-group__append {
+            padding: 0 14px;
+            background-color: transparent;
+            box-shadow: none;
+            border: 0;
+            &.el-input-group__prepend {
+              padding-right: 0;
+            }
+            &.el-input-group__append {
+              padding-left: 0;
+            }
+          }
+        }
+      }
+      .background-main {
+        height: calc(100% - 0.48rem);
+        padding: 0.13rem 0.17rem;
+        margin: 0 0 0.22rem;
+        background-color: #f5f5f5;
+        border-radius: 0.1rem;
+        .el-divider--horizontal {
+          margin: 0.08rem 0;
+        }
+        h3 {
+          font-size: 0.16rem;
+          font-weight: normal;
+          span {
+            padding: 0 0 0 0.08rem;
+            line-height: 24px;
+            word-break: break-word;
+          }
+          .el-select {
+            width: auto;
+            max-width: 85px;
+            margin: 0 0 0 0.16rem;
+          }
+        }
+        h4 {
+          padding: 0 0 16px;
+          text-transform: capitalize;
+          span {
+            color: #7405ff;
+            line-height: 20px;
+            cursor: pointer;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+        .slider-demo-block {
+          margin: 0.08rem 0.05rem 0;
+          .el-slider {
+            .el-slider__runway {
+              height: 4px;
+              background-color: #606060;
+              .el-slider__bar {
+                height: 4px;
+                background-color: #7405ff;
+              }
+              .el-slider__button {
+                width: 12px;
+                height: 12px;
+                margin-bottom: 2px;
+                background-color: #7405ff;
+                border: 0;
+              }
+            }
+          }
+        }
+        .el-input-number,
+        .el-checkbox {
+          width: auto;
+          margin: 0 0 0 0.2rem;
+          .el-input-number__increase,
+          .el-input-number__decrease {
+            display: none;
+            width: 25px;
+            background-color: transparent;
+            border: 0;
+          }
+          .el-input {
+            font-size: 14px;
+            color: inherit;
+            .el-input__inner {
+              width: 80px;
+              height: 27px;
+              padding: 0 28px 0 10px;
+              margin: 0 0.08rem 0 0;
+              background-color: #fff;
+              box-shadow: none;
+              border: 2px solid #d1d1d1;
+              border-radius: 0.06rem;
+              box-sizing: border-box;
+              text-align: left;
+            }
+          }
+        }
+        .center {
+          position: relative;
+          small {
+            position: absolute;
+            top: 8px;
+            left: 6px;
+            max-width: calc(100% - 20px);
+            padding: 0 4px;
+            background-color: #f5f5f5;
+            color: #606060;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 9;
+          }
+        }
+        .el-select {
+          width: 100%;
+          margin: 0.08rem 0 0;
+          .el-input {
+            font-size: inherit;
+            .el-input__wrapper {
+              height: 40px;
+              background-color: transparent;
+              box-shadow: none;
+              border: 1px solid #dfdfdf;
+              box-sizing: border-box;
+              .el-input__inner {
+                color: #000;
+              }
+            }
+          }
+        }
+        .el-checkbox {
+          color: inherit;
+          .el-checkbox__input {
+            padding: 0 16px 0 0;
+            background-color: transparent;
+            border-color: #606060;
+          }
+          .el-checkbox__input.is-checked .el-checkbox__inner {
+            background-color: #7405ff;
+            border-color: #7405ff;
+          }
+          .el-checkbox__label {
+            color: inherit;
+          }
+        }
+      }
+    }
+
     .sleep_style {
       margin: 0.28rem 0 0;
+
+      .flex-cont {
+        align-items: flex-start;
+        .flex-child {
+          width: 100%;
+          &:nth-child(3n + 2) {
+            margin: 0 2%;
+          }
+        }
+      }
 
       .title_tip {
         white-space: nowrap;
@@ -1473,6 +2084,10 @@ export default defineComponent({
         }
         @media screen and (max-width: 768px) {
           font-size: 13px;
+        }
+
+        .a {
+          margin: 0.05rem 0 0;
         }
 
         .el-select {
@@ -1546,6 +2161,15 @@ export default defineComponent({
     text-align: left;
 
     .dialog-footer {
+      &.flex-row {
+        justify-content: space-between;
+        .footer-price {
+          margin: 0 0.1rem 0 0.7rem;
+          font-size: 0.2rem;
+          font-weight: bolder;
+          color: #c27af8;
+        }
+      }
       .el-button-group {
         margin: 0;
 
