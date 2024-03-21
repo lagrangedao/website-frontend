@@ -126,11 +126,11 @@
                           <span>{{cp.name}}</span> {{cp.region}}
                         </div>
                         <div class="auto-list">
-                          <el-row :gutter="14">
+                          <el-row :gutter="14" v-if="cp.resources">
                             <el-col :xs="24" :sm="9" :md="6" :lg="6" :xl="6">
-                              <div class="t flex-row">
+                              <div class="t flex-row nowrap" v-if="cp.resources[0].gpu.gpus">
                                 {{cp.resources[0].gpu.gpus.length}}x
-                                <el-select v-model="cp.resources[0].gpu.name" placeholder="">
+                                <el-select v-model="cp.resources[0].gpu.gpus[0].model" placeholder="">
                                   <el-option v-for="item in cp.resources[0].gpu.gpus" :key="item.model" :label="item.model" :value="item.model" />
                                 </el-select>
                               </div>
@@ -140,7 +140,7 @@
                               <ul class="flex-row" v-if="cp.resources">
                                 <li>
                                   <div class="m-t flex-row">CPU
-                                    <i class="icon-cpu"></i>
+                                    <i class="iconCPU" :class="{'icon-amd': cp.resources[0].cpu_model.indexOf('md')>-1, 'icon-intel': cp.resources[0].cpu_model.indexOf('ntel')>-1}"></i>
                                   </div>
                                   <p>{{cp.resources[0].vcpu.free}}/{{cp.resources[0].vcpu.total}} vcpu</p>
                                 </li>
@@ -166,7 +166,7 @@
                         </div>
                       </div>
                       <div class="auto-price">
-                        <span>5 SWAN/hr</span>
+                        <span>{{hardwarePrices.data.memory + hardwarePrices.data.cpu + hardwarePrices.data.storage }} SWAN/hr</span>
                         <div class="button">CONFIRM</div>
                       </div>
                     </div>
@@ -289,16 +289,26 @@
           <div class="piece flex-row space-between nowrap">
             <div class="flex-row center">
               <small class="font-12">Docker lmage</small>
-              <el-input v-model="ruleForm.image_name" placeholder="Example: mydockerimage:1.01">
-                <template #prepend>
-                  <div class="width-icon">
-                    <svg t="1699606466208" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3074" width="200" height="200">
-                      <path d="M799.26272 469.056a133.696 133.696 0 0 1 0-161.92l12.096-13.632 12.096 11.712a156.864 156.864 0 0 1 66.624 101.44 154.496 154.496 0 0 1 135.296 19.2 147.2 147.2 0 0 1-159.488 84.224c-83.2 200.064-261.888 320-527.104 321.92a321.472 321.472 0 0 1-300.8-150.208 278.976 278.976 0 0 1-34.304-185.6h88.768V392.96h105.024V291.52h209.984V192H532.63872v200.96h105.088v103.424a289.856 289.856 0 0 0 161.536-27.328z m-611.904-52.672H193.43872v74.176h-6.08V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.128v74.176h-8.128V416.384z m-12.096 0h6.08v74.176h-6.08V416.384z m-14.144 0h6.08v74.176h-6.08V416.384z m-8.064-5.824v87.808h90.88V410.56h-90.88z m181.76-93.632h6.016v72.128h-6.016V316.864z m-14.144 0h6.08v72.128h-6.08V316.864z m-14.144 0h8.064v72.128H263.83872V316.864z m-14.144 0h8.064v72.128h-8.064V316.864z m-14.144 0h8.128v72.128h-8.128V316.864z m-12.096 0h6.08v72.128h-6.08V316.864z m-8.064-7.872V396.8h90.88V309.056h-90.88z m76.8 107.328h5.952v74.176h-6.016V416.384z m-14.144 0h6.016v74.176h-6.08V416.384z m-14.144 0h8v74.176H263.83872V416.384z m-14.144 0h8v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.128V416.384z m-12.096 0h6.016v74.176h-6.08V416.384z m-8.128-5.824v87.808h90.88V410.56h-90.88z m179.712 5.824h8.064v74.176h-8.064V416.384z m-12.096 0h6.016v74.176h-6.016V416.384z m-14.144 0h6.08v74.176h-6.08V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176H340.63872V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-6.016-5.824v87.808h90.88V410.56h-90.88z m74.688-93.696h8.064v72.192h-8.064V316.864z m-12.096 0h6.016v72.192h-6.016V316.864z m-14.144 0h6.08v72.192h-6.08V316.864z m-14.144 0h8.064v72.192h-8.064V316.864z m-14.144 0h8.064v72.192H340.63872V316.864z m-14.144 0h8.064v72.192h-8.064V316.864z m-6.016-7.808V396.8h90.88V309.056h-90.88zM500.63872 416.384h7.808v74.176H500.63872V416.384z m-14.144 0H494.23872v74.176h-8V416.384z m-12.096 0h5.76v74.176h-6.016V416.384z m-14.144 0h5.76v74.176h-6.016V416.384z m-14.144 0h7.808v74.176h-8.064V416.384z m-14.144 0h7.808v74.176h-8.064V416.384z m-6.336-5.824v87.808h88.896V410.56H425.63072zM500.63872 316.864h7.808v72.192H500.63872V316.864z m-14.144 0H494.23872v72.192h-8V316.864z m-12.096 0h5.76v72.192h-6.016V316.864z m-14.144 0h5.76v72.192h-6.016V316.864z m-14.144 0h7.808v72.192h-8.064V316.864z m-14.144 0h7.808v72.192h-8.064V316.864z m-6.336-7.808V396.8h88.896V309.056H425.63072zM500.63872 215.424h7.808v72.192H500.63872V215.424z m-14.144 0H494.23872v72.192h-8V215.424z m-12.096 0h5.76v72.192h-6.016V215.424z m-14.144 0h5.76v72.192h-6.016V215.424z m-14.144 0h7.808v72.192h-8.064V215.424z m-14.144 0h7.808v72.192h-8.064V215.424z m-6.336-7.808v87.808h88.896V207.616H425.63072z m179.776 208.768h6.016v74.176h-6.016V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-12.096 0H571.03872v74.176h-6.016V416.384z m-14.144 0h6.016v74.176h-6.016V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-8.064-5.824v87.808h90.88V410.56h-90.88zM300.44672 638.848A22.336 22.336 0 0 0 283.03872 646.4a25.6 25.6 0 0 0-7.04 17.536 22.208 22.208 0 0 0 7.04 16.576 24.96 24.96 0 0 0 34.304 0 22.208 22.208 0 0 0 7.04-16.576A23.744 23.744 0 0 0 321.43872 651.52a28.672 28.672 0 0 0-9.088-8.768 22.208 22.208 0 0 0-11.904-3.904z m0 7.808a8.384 8.384 0 0 1 6.08 1.92 6.4 6.4 0 0 0-4.032 5.824q0 5.824 8.064 5.824a6.4 6.4 0 0 0 6.08-3.904 16.832 16.832 0 0 1 2.048 7.808 15.808 15.808 0 0 1-18.176 17.536 17.664 17.664 0 1 1-0.064-35.264z m66.624 167.808a226.112 226.112 0 0 1-115.2-109.248 359.296 359.296 0 0 1-82.816 11.712H82.33472a364.8 364.8 0 0 0 256.448 97.536h28.288z"
-                        fill="#1296db" p-id="3075"></path>
-                    </svg>
-                  </div>
-                </template>
-              </el-input>
+              <div class="flex flex-row nowrap m-body">
+                <div class="width-icon">
+                  <svg t="1699606466208" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3074" width="200" height="200">
+                    <path d="M799.26272 469.056a133.696 133.696 0 0 1 0-161.92l12.096-13.632 12.096 11.712a156.864 156.864 0 0 1 66.624 101.44 154.496 154.496 0 0 1 135.296 19.2 147.2 147.2 0 0 1-159.488 84.224c-83.2 200.064-261.888 320-527.104 321.92a321.472 321.472 0 0 1-300.8-150.208 278.976 278.976 0 0 1-34.304-185.6h88.768V392.96h105.024V291.52h209.984V192H532.63872v200.96h105.088v103.424a289.856 289.856 0 0 0 161.536-27.328z m-611.904-52.672H193.43872v74.176h-6.08V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.128v74.176h-8.128V416.384z m-12.096 0h6.08v74.176h-6.08V416.384z m-14.144 0h6.08v74.176h-6.08V416.384z m-8.064-5.824v87.808h90.88V410.56h-90.88z m181.76-93.632h6.016v72.128h-6.016V316.864z m-14.144 0h6.08v72.128h-6.08V316.864z m-14.144 0h8.064v72.128H263.83872V316.864z m-14.144 0h8.064v72.128h-8.064V316.864z m-14.144 0h8.128v72.128h-8.128V316.864z m-12.096 0h6.08v72.128h-6.08V316.864z m-8.064-7.872V396.8h90.88V309.056h-90.88z m76.8 107.328h5.952v74.176h-6.016V416.384z m-14.144 0h6.016v74.176h-6.08V416.384z m-14.144 0h8v74.176H263.83872V416.384z m-14.144 0h8v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.128V416.384z m-12.096 0h6.016v74.176h-6.08V416.384z m-8.128-5.824v87.808h90.88V410.56h-90.88z m179.712 5.824h8.064v74.176h-8.064V416.384z m-12.096 0h6.016v74.176h-6.016V416.384z m-14.144 0h6.08v74.176h-6.08V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176H340.63872V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-6.016-5.824v87.808h90.88V410.56h-90.88z m74.688-93.696h8.064v72.192h-8.064V316.864z m-12.096 0h6.016v72.192h-6.016V316.864z m-14.144 0h6.08v72.192h-6.08V316.864z m-14.144 0h8.064v72.192h-8.064V316.864z m-14.144 0h8.064v72.192H340.63872V316.864z m-14.144 0h8.064v72.192h-8.064V316.864z m-6.016-7.808V396.8h90.88V309.056h-90.88zM500.63872 416.384h7.808v74.176H500.63872V416.384z m-14.144 0H494.23872v74.176h-8V416.384z m-12.096 0h5.76v74.176h-6.016V416.384z m-14.144 0h5.76v74.176h-6.016V416.384z m-14.144 0h7.808v74.176h-8.064V416.384z m-14.144 0h7.808v74.176h-8.064V416.384z m-6.336-5.824v87.808h88.896V410.56H425.63072zM500.63872 316.864h7.808v72.192H500.63872V316.864z m-14.144 0H494.23872v72.192h-8V316.864z m-12.096 0h5.76v72.192h-6.016V316.864z m-14.144 0h5.76v72.192h-6.016V316.864z m-14.144 0h7.808v72.192h-8.064V316.864z m-14.144 0h7.808v72.192h-8.064V316.864z m-6.336-7.808V396.8h88.896V309.056H425.63072zM500.63872 215.424h7.808v72.192H500.63872V215.424z m-14.144 0H494.23872v72.192h-8V215.424z m-12.096 0h5.76v72.192h-6.016V215.424z m-14.144 0h5.76v72.192h-6.016V215.424z m-14.144 0h7.808v72.192h-8.064V215.424z m-14.144 0h7.808v72.192h-8.064V215.424z m-6.336-7.808v87.808h88.896V207.616H425.63072z m179.776 208.768h6.016v74.176h-6.016V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-12.096 0H571.03872v74.176h-6.016V416.384z m-14.144 0h6.016v74.176h-6.016V416.384z m-14.144 0h8.064v74.176h-8.064V416.384z m-8.064-5.824v87.808h90.88V410.56h-90.88zM300.44672 638.848A22.336 22.336 0 0 0 283.03872 646.4a25.6 25.6 0 0 0-7.04 17.536 22.208 22.208 0 0 0 7.04 16.576 24.96 24.96 0 0 0 34.304 0 22.208 22.208 0 0 0 7.04-16.576A23.744 23.744 0 0 0 321.43872 651.52a28.672 28.672 0 0 0-9.088-8.768 22.208 22.208 0 0 0-11.904-3.904z m0 7.808a8.384 8.384 0 0 1 6.08 1.92 6.4 6.4 0 0 0-4.032 5.824q0 5.824 8.064 5.824a6.4 6.4 0 0 0 6.08-3.904 16.832 16.832 0 0 1 2.048 7.808 15.808 15.808 0 0 1-18.176 17.536 17.664 17.664 0 1 1-0.064-35.264z m66.624 167.808a226.112 226.112 0 0 1-115.2-109.248 359.296 359.296 0 0 1-82.816 11.712H82.33472a364.8 364.8 0 0 0 256.448 97.536h28.288z"
+                      fill="#1296db" p-id="3075"></path>
+                  </svg>
+                </div>
+                <el-select v-model="ruleForm.image_name" placeholder="">
+                  <el-option v-for="item in ruleForm.imageNameOption" :key="item.tag" :label="item.tag" :value="item.tag" />
+                </el-select>
+              </div>
+            </div>
+          </div>
+
+          <div class="piece flex-row space-between nowrap">
+            <div class="flex-row center">
+              <small class="font-12">ssh key</small>
+              <div class="flex flex-row nowrap m-body">
+                <el-input v-model="ruleForm.ssh_key" placeholder="SSH Key" />
+              </div>
             </div>
           </div>
 
@@ -315,7 +325,7 @@
                       </div>
                       <span>CPU</span>
                     </div>
-                    <el-input-number :min="1" :max="sleepSelect.resources[0].vcpu.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.cpuValue" placeholder="Storage" class="input-with-select font-16" />
+                    <el-input-number :min="1" :max="sleepSelect.resources[0].vcpu.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.cpuValue" placeholder="CPU" class="input-with-select font-16" />
                   </h3>
                 </div>
                 <div class="slider-demo-block">
@@ -336,13 +346,17 @@
                       <span>GPU</span>
                     </div>
                     <el-checkbox v-model="ruleForm.gpuCheck" />
+                    <el-input-number v-show="ruleForm.gpuCheck" :min="1" :max="ruleForm.gpuCheckFree" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.gpuValue" placeholder="GPU" class="input-with-select font-16" />
                   </h3>
                 </div>
                 <div v-show="ruleForm.gpuCheck">
-                  <div class="flex-row center font-16">
-                    <el-select v-model="ruleForm.gpuSelect.value" placeholder="Select">
-                      <el-option v-for="s in ruleForm.gpuSelect.options" :key="s.value" :label="s.label" :value="s.value">
-                        <span class="font-16">{{s.label}}</span>
+                  <div class="slider-demo-block">
+                    <el-slider v-model="ruleForm.gpuValue" :min="1" :max="ruleForm.gpuCheckFree" />
+                  </div>
+                  <div class="flex-row center font-16" v-if="sleepSelect.resources[0].gpu">
+                    <el-select v-model="ruleForm.gpuSelect.value" placeholder="Select" @change="gpuChange">
+                      <el-option v-for="s in sleepSelect.resources[0].gpu.gpus" :key="s.model" :disabled="s.free>0?false:true" :label="s.model" :value="s.free">
+                        <span class="font-16">{{s.model}}</span>
                       </el-option>
                     </el-select>
                   </div>
@@ -361,7 +375,7 @@
                       </div>
                       <span>Memory</span>
                     </div>
-                    <el-input-number :min="1" :max="sleepSelect.resources[0].memory.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.memoryValue" placeholder="Storage" class="input-with-select font-16" />
+                    <el-input-number :min="1" :max="sleepSelect.resources[0].memory.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.memoryValue" placeholder="Memory" class="input-with-select font-16" />
                     <small>GB</small>
                   </h3>
                 </div>
@@ -382,7 +396,7 @@
                       </div>
                       <span>Ephemeral Storage</span>
                     </div>
-                    <el-input-number :min="1" :max="sleepSelect.resources[0].storage.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.storageValue" placeholder="Storage" class="input-with-select font-16" />
+                    <el-input-number :min="1" :max="sleepSelect.resources[0].storage.free" :step-strictly="true" :precision="0" controls-position="right" v-model="ruleForm.storageValue" placeholder="Ephemeral Storage" class="input-with-select font-16" />
                     <small>GB</small>
                   </h3>
                 </div>
@@ -414,7 +428,7 @@
                 <el-divider/>
               </div>
               <div class="time flex-row">
-                <span v-if="ruleForm.autoAvailable" class="a">{{ruleForm.region}}</span>
+                <span v-if="ruleForm.autoAvailable" class="a">{{sleepSelect.region}}</span>
                 <el-select v-else v-model="sleepSelect.regionValue" :disabled="props.renewButton === 'renew'?true:false" class="m-region" placeholder="Region">
                   <el-option v-for="item in sleepSelect.regionOption" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
@@ -462,9 +476,14 @@
 
       <template #footer>
         <span class="dialog-footer" :class="{'flex-row':ruleForm.autoAvailable}">
-          <div class="footer-price" v-if="ruleForm.autoAvailable">111 SWAN</div>
+          <div class="footer-price flex-row" v-if="ruleForm.autoAvailable">
+            Total
+            <p class="flex-row">{{(hardwarePrices.data.gpu*ruleForm.gpuValue + hardwarePrices.data.memory*ruleForm.memoryValue + hardwarePrices.data.cpu*ruleForm.cpuValue + hardwarePrices.data.storage*ruleForm.storageValue)*ruleForm.usageTime}}
+              <small>SWAN</small>
+            </p>
+          </div>
           <el-button-group class="flex-row">
-            <el-button @click="hardwareFun" :disabled="hardwareLoad">{{props.renewButton === 'renew'?'Renew':ruleForm.autoAvailable?'Confirm hardware':'Confirm new hardware'}}</el-button>
+            <el-button @click="hardwareFun" :disabled="hardwareLoad || (ruleForm.autoAvailable&&!ruleForm.ssh_key)">{{props.renewButton === 'renew'?'Renew':ruleForm.autoAvailable?'Confirm hardware':'Confirm new hardware'}}</el-button>
             <el-button @click="close" :disabled="hardwareLoad">Cancel</el-button>
           </el-button-group>
         </span>
@@ -560,19 +579,18 @@ export default defineComponent({
       cpuValue: 1,
       memoryValue: 1,
       storageValue: 1,
+      gpuValue: 1,
       gpuCheck: false,
       gpuSelect: {
-        value: 'nvidia 3080 Ti',
-        options: [
-          {
-            value: 'nvidia 3080 Ti',
-            label: 'nvidia 3080 Ti'
-          }
-        ]
+        value: '',
+        options: []
       },
+      gpuCheckFree: 1,
       max: 72,
-      region: 'Sfrdgfdgdfh/USASFDADSFDSFDSF',
-      image_name: sessionStorage.getItem('imageName') || ''
+      region: '',
+      image_name: '',
+      imageNameOption: [],
+      ssh_key: '',
     })
     const validateInput = (rule, value, callback) => {
       if ((/[^a-zA-Z0-9-._]/g).test(value)) {
@@ -598,7 +616,13 @@ export default defineComponent({
     const filesList = ref([])
     const hardwareCPs = ref([])
     const hardwarePrices = reactive({
-      data: {}
+      data: {
+        "gpu": 5,
+        "memory": 3,
+        "cpu": 2,
+        "storage": 1,
+        "unit": "SWAN/hour"
+      }
     })
     const dialogWidth = ref(document.body.clientWidth < 992 ? '90%' : '800px')
     let tokenAddress = process.env.VUE_APP_SATURN_TOKEN_ADDRESS
@@ -612,25 +636,59 @@ export default defineComponent({
       hardwareLoad.value = true
       try {
         if (ruleForm.autoAvailable) {
+          const paid = (hardwarePrices.data.gpu * ruleForm.gpuValue + hardwarePrices.data.memory * ruleForm.memoryValue + hardwarePrices.data.cpu * ruleForm.cpuValue + hardwarePrices.data.storage * ruleForm.storageValue) * ruleForm.usageTime
+
+          console.log(paid)
+          if (paid <= 0) {
+            hardwareLoad.value = false
+            return
+          }
+
+
           system.$commonFun.web3Init.eth.sendTransaction({
             from: store.state.metaAddress,
             to: '0xB5aeb540B4895cd024c1625E146684940A849ED9',
-            value: '1000000000000000'
+            value: String(paid)
           })
-            .on('transactionHash', function (hash) {
-              console.log('transactionHash:', transactionHash)
+            .on('transactionHash', async function (hash) {
+              console.log('transactionHash:', hash)
+              const getID = await system.$commonFun.web3Init.eth.net.getId()
+              const fd = {
+                "region": sleepSelect.value.region,
+                "node_id": sleepSelect.value.node_id,
+                "config": {
+                  "vcpu": ruleForm.cpuValue,
+                  "memory": ruleForm.memoryValue,
+                  "storage": ruleForm.storageValue,
+                  "gpu": ruleForm.gpuValue,
+                  "gpu_model": ruleForm.gpuSelect.value,
+                  "image": ruleForm.image_name,
+                  "ssh_key": ruleForm.ssh_key
+                },
+                "duration": ruleForm.usageTime * 3600,
+                "paid": String(paid),
+                "tx_hash": hash,
+                "chain_id": getID,
+                "type": 1,
+                "start_in": ruleForm.sleepTime * 60
+              }
+              const jobsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${props.listdata.uuid}/jobs`, 'post', fd)
+              if (route.query.uuid) router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'app' }, query: { uuid: route.query.uuid || '' } })
+              else router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: 'app' } })
+              closePart()
             })
             .on('receipt', function (receipt) {
               console.log('receipt:', receipt)
             })
             .on('confirmation', function (confirmationNumber, receipt) {
-              console.log('confirmation:', confirmationNumber, receipt)
+              // console.log('confirmation:', confirmationNumber, receipt)
             })
             .on('err', () => {
               console.log('err', err)
               if (err && err.message) system.$commonFun.messageTip('error', err.message)
               closePart()
             })
+
           return
         }
         if (props.renewButton === 'fork') {
@@ -790,6 +848,14 @@ export default defineComponent({
       if (!net) return
       ruleForm.usageTime = 24
       sleepSelect.value = row
+      if (sleepSelect.value.resources && sleepSelect.value.resources[0].gpu && sleepSelect.value.resources[0].gpu.gpus) {
+        for (let i = 0; i < sleepSelect.value.resources[0].gpu.gpus.length; i++) {
+          if (sleepSelect.value.resources[0].gpu.gpus[i].free > 0) {
+            ruleForm.gpuSelect.value = sleepSelect.value.resources[0].gpu.gpus[i].model
+            break;
+          }
+        }
+      }
       ruleForm.sleepTime = sleepSelect.value.hardware_type && sleepSelect.value.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
       sleepVisible.value = true
     }
@@ -893,81 +959,19 @@ export default defineComponent({
       machinesLoad.value = false
     }
     async function getCps () {
-
       try {
-        // const cpsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cps`, 'get')
-        const cpsRes = {
-          data: {
-            "total": 1,
-            "list": [
-              {
-                "node_id": "1234567890",
-                "name": "test",
-                "uuid": "e807f1fcf82d132f9bb018ca6738a19f",
-                "region": "Central and Western District-HK",
-                "success_rate": 10000, // base 10000 means 100%
-                "resources": [
-                  {
-                    "machine_id": "4ff8a54daede41f49d54486a06260488",
-                    "cpu_model": "amd64",
-                    "cpu": {
-                      "total": 32,
-                      "free": 1
-                    },
-                    "vcpu": {
-                      "total": 32,
-                      "free": 1
-                    },
-                    "memory": {
-                      "total": 1003,
-                      "free": 979,
-                      "unit": "GB"
-                    },
-                    "storage": {
-                      "total": 1649,
-                      "free": 1599,
-                      "unit": "GB"
-                    },
-                    "gpu": {
-                      "cuda_version": "11020",
-                      "driver_version": "460.84",
-                      "gpus": [{
-                        "model": "NVIDIA 3090",
-                        "total": 2,
-                        "free": 1
-                      }]
-                    }
-                  }
-                ]
-              }
-            ]
-          }
+        const cpsRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cps`, 'get')
+        if (cpsRes && cpsRes.status === "success" && cpsRes.data) {
+          hardwareCPs.value = cpsRes.data.list || []
+          ruleForm.gpuCheckFree = hardwareCPs.value.resources ? hardwareCPs.value.resources[0].gpu.gpus[0].free : 1
         }
-
-        hardwareCPs.value = cpsRes.data.list
-
       } catch { }
-
     }
     async function getPrices () {
-
       try {
-        // const pricesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}config/prices`, 'get')
-        const pricesRes = {
-          data: {
-            "gpu": 5,
-            "memory": 3,
-            "cpu": 2,
-            "storage": 1,
-            "unit": "SWAN/hour"
-
-          }
-        }
-
-        hardwarePrices.data = pricesRes.data
-
+        const pricesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}config/prices`, 'get')
+        if (pricesRes && pricesRes.status === "success") hardwarePrices.data = pricesRes.data || []
       } catch { }
-
     }
     async function requestFiles () {
       try {
@@ -975,11 +979,23 @@ export default defineComponent({
         if (listFilesRes && listFilesRes.status === 'success') filesList.value = listFilesRes.data || []
       } catch{ }
     }
+    async function getImagesName () {
+      try {
+        const imagesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}/config/images`, 'get')
+        if (imagesRes && imagesRes.status === "success" && imagesRes.data) ruleForm.imageNameOption = imagesRes.data.list || []
+        if (sessionStorage.getItem('sshKey')) ruleForm.ssh_key = sessionStorage.getItem('sshKey')
+        if (sessionStorage.getItem('imageName')) ruleForm.image_name = sessionStorage.getItem('imageName')
+        else if (ruleForm.imageNameOption && ruleForm.imageNameOption.length > 0) ruleForm.image_name = ruleForm.imageNameOption[0].tag
+      } catch { }
+    }
     async function availableChange () {
       // console.log(ruleForm.displayAvailable)
     }
     async function autoChange () {
       // console.log(ruleForm.displayAvailable)
+    }
+    const gpuChange = (value) => {
+      ruleForm.gpuCheckFree = value
     }
     let getnetID = NaN
     onMounted(async () => {
@@ -992,6 +1008,7 @@ export default defineComponent({
       getCps()
       getPrices()
       nameExist()
+      getImagesName()
     })
     return {
       route,
@@ -1010,7 +1027,7 @@ export default defineComponent({
       hardwareLoad,
       machinesLoad,
       forkLoad, ruleFormRef, ruleLoad, hardwareCPs, hardwarePrices,
-      sleepChange, hardwareFun, close, forkDuplicate, nameExist, availableChange, autoChange, cpsChange
+      sleepChange, hardwareFun, close, forkDuplicate, nameExist, availableChange, autoChange, cpsChange, gpuChange
     }
   }
 })
@@ -1351,7 +1368,7 @@ export default defineComponent({
           }
 
           &.box-auto {
-            padding: 0.15rem 0.25rem;
+            padding: 0.15rem 0.2rem;
             .auto-content {
               .auto-logo {
                 width: 0.4rem;
@@ -1364,8 +1381,8 @@ export default defineComponent({
                 border-radius: 0.1rem;
               }
               .auto-right {
-                width: calc(100% - 0.84rem - 100px);
-                margin: 0 0.22rem 0.1rem;
+                width: calc(100% - 0.64rem - 100px);
+                margin: 0 0.12rem 0.1rem;
                 .auto-name {
                   margin: 0 0 0.1rem;
                   font-size: 14px;
@@ -1387,19 +1404,23 @@ export default defineComponent({
                     .el-col {
                       color: #000000;
                       .t {
-                        justify-content: space-between;
-                        font-size: 0.22rem;
+                        font-size: 0.2rem;
                         font-weight: bolder;
                         line-height: 1.5;
+                        white-space: nowrap;
                         .el-select {
-                          width: calc(100% - 40px);
-                          font-size: 14px;
+                          width: 100%;
+                          font-size: 0.2rem;
                           .el-input {
                             font-size: inherit;
                             border: 0;
                             .el-input__inner {
+                              padding: 0 16px 0 6px;
                               font-size: inherit;
                               border: 0;
+                            }
+                            .el-input__suffix {
+                              right: 0;
                             }
                           }
                         }
@@ -1407,13 +1428,20 @@ export default defineComponent({
                       .m-t {
                         font-size: 0.16rem;
                         white-space: nowrap;
-                        .icon-cpu {
+                        .iconCPU {
                           width: 0.55rem;
                           height: 0.26rem;
-                          background: url(../assets/images/icons/icon-cpu.png)
-                            no-repeat left center;
-                          background-size: 100%;
                           margin: 0 0 0 4px;
+                          &.icon-amd {
+                            background: url(../assets/images/icons/icon-amd.png)
+                              no-repeat left center;
+                            background-size: 100%;
+                          }
+                          &.icon-intel {
+                            background: url(../assets/images/icons/icon-intel.png)
+                              no-repeat left center;
+                            background-size: 100%;
+                          }
                         }
                         .icon-community {
                           width: 0.55rem;
@@ -1886,6 +1914,13 @@ export default defineComponent({
             z-index: 9;
             line-height: 1;
           }
+          .m-body {
+            width: 100%;
+            padding: 0 0.15rem;
+            .el-select {
+              width: 100%;
+            }
+          }
         }
         .el-input-number {
           width: 100%;
@@ -2208,10 +2243,25 @@ export default defineComponent({
       &.flex-row {
         justify-content: space-between;
         .footer-price {
-          margin: 0 0.1rem 0 0.7rem;
-          font-size: 0.2rem;
+          margin: 0;
+          font-size: 0.18rem;
           font-weight: bolder;
-          color: #c27af8;
+          color: #343434;
+          p {
+            align-items: baseline;
+            padding: 0.08rem 0.15rem;
+            margin: 0 0 0 0.2rem;
+            font-size: 0.3rem;
+            font-weight: 600;
+            color: #7405ff;
+            border: 1px solid #d1d1d1;
+            border-radius: 0.08rem;
+            line-height: 1;
+            small {
+              margin: 0 0 0 2px;
+              font-size: 0.17rem;
+            }
+          }
         }
       }
       .el-button-group {

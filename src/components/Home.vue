@@ -1,12 +1,13 @@
 <template>
   <div class="wrapper" id="wrapper" ref="area" @click="vis=!vis">
     <el-container :class="{'container_height':true}">
-      <el-header v-if="!(route.name === 'spaceDetail' && route.params.tabs === 'app')">
+      <el-header v-show="!(route.name === 'spaceDetail' && route.params.tabs === 'app' && getNotFund.toString() === 'false')">
         <v-head></v-head>
       </el-header>
       <el-main>
         <div class="content flex-row">
-          <router-view v-slot="{ Component }" :vis="vis">
+          <not-found v-if="getNotFund.toString() === 'true'"></not-found>
+          <router-view v-else v-slot="{ Component }" :vis="vis">
             <transition name="move" mode="out-in">
               <keep-alive>
                 <component :is="Component" />
@@ -24,8 +25,9 @@
 </template>
 
 <script>
-import vHead from './Header.vue';
-import vFoot from './Footer.vue';
+import vHead from './Header.vue'
+import vFoot from './Footer.vue'
+import notFound from './404.vue'
 import elementResizeDetectorMaker from "element-resize-detector"
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
@@ -33,6 +35,7 @@ import { useRouter, useRoute } from 'vue-router'
 export default defineComponent({
   setup () {
     const store = useStore()
+    const getNotFund = computed(() => store.state.getNotFund)
     const positionStyle = ref(false)
     const area = ref(null)
     const prevType = ref(true)
@@ -77,15 +80,18 @@ export default defineComponent({
       })
     }
     onMounted(() => {
+      store.dispatch('setNotFund', false)
       system.$commonFun.gatewayGain(1)
       fn()
       footer_style()
     })
     watch(route, (to, from) => {
+      store.dispatch('setNotFund', false)
       if (to.path !== '/personal_center' || (store.state.accessToken && to.path === '/personal_center')) store.dispatch('setGetRouter', to.path)
     })
     return {
       positionStyle,
+      getNotFund,
       area,
       bodyWidth,
       system,
@@ -96,6 +102,7 @@ export default defineComponent({
     }
   },
   components: {
+    notFound,
     vHead,
     vFoot
   }

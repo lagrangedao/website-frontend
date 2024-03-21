@@ -113,7 +113,7 @@
         </div>
         <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesIsShow}" v-loading="listLoad">
           <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list,sIndex) in listdata.spaces" :key="sIndex">
-            <a :href="`/spaces/${list.wallet_address}/${list.name}/app`" v-show="!listdata.spacesIsShow ? sIndex<9: true">
+            <a :href="`/spaces/${list.wallet_address}/${list.name}/app${list.is_public === 0 ? '?uuid='+list.uuid:''}`" v-show="!listdata.spacesIsShow ? sIndex<9: true">
               <el-card class="box-card is-hover">
                 <template #header>
                   <div class="card-warn flex-row" v-if="list.status === 'Running' && list.activeOrder && list.activeOrder.config && list.activeOrder.config.hardware_type">

@@ -2,15 +2,17 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body flex-row" v-loading="listLoad">
-        <!-- <div class="deployment" v-if="listdata.space.sdk === 'VM'"> -->
-        <div class="deployment" v-if="listdata.space.sdk === 'Docker'">
+        <div class="deployment" v-if="listdata.space && listdata.space.sdk === 'VM'">
           <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon scroll-to-error>
             <el-form-item prop="image_name">
               <label class="label" for="image_name">
                 images name
-                <div class="flex flex-row">
+                <div class="flex flex-row" v-if="listdata.cpList && listdata.cpList.config && listdata.space&& (listdata.space.status === 'Running'||listdata.space.status === 'Deploying'||listdata.space.status === 'Assigning to provider'||listdata.space.status === 'Waiting for transaction')">
+                  <el-input readonly disabled v-model="listdata.cpList.config.image" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
+                </div>
+                <div class="flex flex-row" v-else>
                   <el-select v-model="ruleForm.image_name" placeholder="">
-                    <el-option v-for="item in ruleForm.imageNameOption" :key="item.name" :label="item.name" :value="item.name" />
+                    <el-option v-for="item in ruleForm.imageNameOption" :key="item.tag" :label="item.tag" :value="item.tag" />
                   </el-select>
                 </div>
               </label>
@@ -18,7 +20,10 @@
             <el-form-item prop="ssh_key">
               <label class="label" for="ssh_key">
                 ssh key
-                <div class="flex flex-row">
+                <div class="flex flex-row" v-if="listdata.cpList && listdata.cpList.config && listdata.space&& (listdata.space.status === 'Running'||listdata.space.status === 'Deploying'||listdata.space.status === 'Assigning to provider'||listdata.space.status === 'Waiting for transaction')">
+                  <el-input readonly disabled v-model="listdata.cpList.config.ssh_key" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
+                </div>
+                <div class="flex flex-row" v-else>
                   <el-input v-model="ruleForm.ssh_key" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
                 </div>
               </label>
@@ -41,17 +46,17 @@
               </label>
             </el-form-item>
             <el-form-item>
-              <el-button size="large" @click="submitForm('ruleFormRef')">Deploy</el-button>
+              <el-button @click="submitForm('ruleFormRef')" size="large" :disabled="listdata.space.status === 'Running'||listdata.space.status === 'Deploying'||listdata.space.status === 'Assigning to provider'||listdata.space.status === 'Waiting for transaction'?true:false">Deploy</el-button>
             </el-form-item>
           </el-form>
         </div>
-        <div class="app-tabs" v-else-if="listdata.jobResult && listdata.jobResult.length>0 && listdata.space.status === 'Running'">
+        <div class="app-tabs" v-else-if="listdata.jobResult && listdata.jobResult.length>0 && (listdata.space&&listdata.space.status === 'Running')">
           <iframe v-if="listdata.cpList.job_result_uri" :src="`${listdata.cpList.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
           <div v-else>
             <el-alert :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Deploying'">
+        <div class="deployment" v-else-if="listdata.space&&listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
           <el-table :data="listdata.jobs_status" border style="width: 100%">
             <el-table-column prop="bidder_id" label="CP Node ID" min-width="140">
@@ -79,7 +84,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
+        <div class="deployment" v-else-if="listdata.space&&listdata.space.status === 'Assigning to provider'">
           <div>
             <p class="m">The server is awaiting the CP to initiate the task.</p>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">If your waiting time is prolonged, you might consider
@@ -88,12 +93,12 @@
               <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>.</p>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
+        <div class="deployment" v-else-if="listdata.space&&listdata.space.status === 'Waiting for transaction'">
           <div>
             <p class="m">Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. </p>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status && (listdata.space.status.toLowerCase() === 'failed' || listdata.space.status === 'Stopped')">
+        <div class="deployment" v-else-if="listdata.space && listdata.space.status && (listdata.space.status.toLowerCase() === 'failed' || listdata.space.status === 'Stopped')">
           <!-- <div>
             <p class="m">All deployments has been not available before the space expires.</p>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">
@@ -103,8 +108,8 @@
               <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
           </div> -->
           <div class="deploy-cont">
-            <p v-if="listdata.cpList.error_msg" class="pre font" v-html="listdata.cpList.error_msg"></p>
-            <p v-else-if="listdata.task.error_msg" class="pre font" v-html="listdata.task.error_msg"></p>
+            <p v-if="listdata.cpList && listdata.cpList.error_msg" class="pre font" v-html="listdata.cpList.error_msg"></p>
+            <p v-else-if="listdata.task && listdata.task.error_msg" class="pre font" v-html="listdata.task.error_msg"></p>
 
             <div class="log-all">
               <div class="flex-row log-title">
@@ -122,12 +127,12 @@
             </div>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status && listdata.space.status.toLowerCase() === 'closed'">
+        <div class="deployment" v-else-if="listdata.space && listdata.space.status && listdata.space.status.toLowerCase() === 'closed'">
           <div>
             <p class="m">The space owner has closed the running space.</p>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Expired'">
+        <div class="deployment" v-else-if="listdata.space&&listdata.space.status === 'Expired'">
           <div>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">
               All deployments have expired, You can
@@ -280,24 +285,10 @@ export default defineComponent({
     }
     async function getImagesName () {
       try {
-        // const imagesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}/config/images`, 'get')
-        const imagesRes = {
-          data: {
-            "total": 1,
-            "list": [
-              {
-                "name": "name1111",
-                "version": "version",
-                "tag": "tag"
-              }
-            ]
-          }
-        }
-
-        ruleForm.imageNameOption = imagesRes.data.list || []
-        if (ruleForm.imageNameOption && ruleForm.imageNameOption.length > 0) ruleForm.image_name = ruleForm.imageNameOption[0].name
+        const imagesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}/config/images`, 'get')
+        if (imagesRes && imagesRes.status === "success" && imagesRes.data) ruleForm.imageNameOption = imagesRes.data.list || []
+        if (ruleForm.imageNameOption && ruleForm.imageNameOption.length > 0) ruleForm.image_name = ruleForm.imageNameOption[0].tag
       } catch { }
-
     }
     async function init (type) {
       if (route.params.tabs !== 'app') return
@@ -315,8 +306,7 @@ export default defineComponent({
           listdata.space = props.listValue.data.space
           listdata.task = props.listValue.data.task
 
-          // if (listdata.space.sdk === 'VM') await getImagesName()
-          if (listdata.space.sdk === 'Docker') await getImagesName()
+          if (listdata.space && listdata.space.sdk === 'VM') await getImagesName()
         }
       }
       context.emit('handleValue', false)
@@ -457,6 +447,7 @@ export default defineComponent({
       await ruleFormRef.value.validate(async (valid, fields) => {
         if (valid) {
           sessionStorage.setItem('imageName', ruleForm.image_name)
+          sessionStorage.setItem('sshKey', ruleForm.ssh_key)
           hardRedeploy()
         } else {
           console.log('error submit!', fields)
@@ -816,8 +807,12 @@ export default defineComponent({
               @media screen and (max-width: 1024px) {
                 font-size: 17px;
               }
+              &.is-disabled {
+                cursor: no-drop;
+                opacity: 0.3;
+              }
               span {
-                cursor: pointer;
+                cursor: inherit;
               }
             }
           }
