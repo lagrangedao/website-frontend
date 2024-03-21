@@ -2,12 +2,13 @@ import store from '../store'
 import {
   ElMessage
 } from 'element-plus'
-import router from '../router';
+import router from '../router'
 let lastTime = 0
 
 async function sendRequest(apilink, type, jsonObject, api_token) {
   // signOutFun()
   // axios.defaults.timeout = 60000
+  store.dispatch('setNotFund', false)
   axios.defaults.headers.common['Authorization'] = `Bearer ${api_token?api_token:store.state.accessToken}`
   try {
     let response
@@ -29,17 +30,16 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
     }
   } catch (err) {
     console.error(err, err.response)
+    // store.dispatch('setNotFund', err.response && err.response.status === 404 ? true : false)
     const time = await throttle()
     if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.status === 403 ? 'The token has expired. Please log in again' : err.response.data.msg || err.response.data.message || err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
       signOutFun()
-    }
-    // else if (err.response && err.response.status === 404) {
-    //   router.push({
-    //     name: 'main'
-    //   })
-    // } 
-    else if (err.response) {
+      // } else if (err.response && err.response.status === 404) {
+      //   router.push({
+      //     name: 'main'
+      //   })
+    } else if (err.response) {
       // The request has been sent, but the status code of the server response is not within the range of 2xx
       // console.log(err.response.data)
       // console.log(err.response.status)

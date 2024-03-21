@@ -194,7 +194,7 @@ a:focus {
 }
 
 .el-popper {
-    max-width: 300px;
+    /* max-width: 300px; */
     word-break: break-word;
 }
 

@@ -2,13 +2,61 @@
   <section id="space">
     <div id="spaceBody">
       <el-row class="space_body flex-row" v-loading="listLoad">
-        <div class="app-tabs" v-if="listdata.jobResult && listdata.jobResult.length>0 && listdata.space.status === 'Running'">
+        <div class="deployment" v-if="listdata.space && listdata.space.sdk === 'VM'">
+          <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon scroll-to-error>
+            <el-form-item prop="image_name">
+              <label class="label" for="image_name">
+                images name
+                <div class="flex flex-row" v-if="listdata.cpList && listdata.cpList.config && listdata.space&& (listdata.space.status === 'Running'||listdata.space.status === 'Deploying'||listdata.space.status === 'Assigning to provider'||listdata.space.status === 'Waiting for transaction')">
+                  <el-input readonly disabled v-model="listdata.cpList.config.image" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
+                </div>
+                <div class="flex flex-row" v-else>
+                  <el-select v-model="ruleForm.image_name" placeholder="">
+                    <el-option v-for="item in ruleForm.imageNameOption" :key="item.tag" :label="item.tag" :value="item.tag" />
+                  </el-select>
+                </div>
+              </label>
+            </el-form-item>
+            <el-form-item prop="ssh_key">
+              <label class="label" for="ssh_key">
+                ssh key
+                <div class="flex flex-row" v-if="listdata.cpList && listdata.cpList.config && listdata.space&& (listdata.space.status === 'Running'||listdata.space.status === 'Deploying'||listdata.space.status === 'Assigning to provider'||listdata.space.status === 'Waiting for transaction')">
+                  <el-input readonly disabled v-model="listdata.cpList.config.ssh_key" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
+                </div>
+                <div class="flex flex-row" v-else>
+                  <el-input v-model="ruleForm.ssh_key" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
+                </div>
+              </label>
+            </el-form-item>
+            <el-form-item prop="access">
+              <label class="label" for="access">
+                Access mode
+                <div class="flex flex-row access">
+                  {{listdata.cpList.job_result_uri || '-'}}
+                  <div class="copy flex flex-row">
+                    <svg @click="copyAccess" v-if="ruleForm.copy" aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon m-2">
+                      <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+                      <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+                    </svg>
+                    <svg v-else aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success m-2 d-none">
+                      <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </label>
+            </el-form-item>
+            <el-form-item>
+              <el-button @click="submitForm('ruleFormRef')" size="large" :disabled="listdata.space.status === 'Running'||listdata.space.status === 'Deploying'||listdata.space.status === 'Assigning to provider'||listdata.space.status === 'Waiting for transaction'?true:false">Deploy</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div class="app-tabs" v-else-if="listdata.jobResult && listdata.jobResult.length>0 && (listdata.space&&listdata.space.status === 'Running')">
           <iframe v-if="listdata.cpList.job_result_uri" :src="`${listdata.cpList.job_result_uri}#space_id=${listdata.space.task_uuid}`" title="Space app" class="space_iframe"></iframe>
           <div v-else>
             <el-alert :closable="false" title="Result Uri is Null, this result is not available." type="warning" />
           </div>
         </div>
-        <div class="deployment" v-if="listdata.space.status === 'Deploying'">
+        <div class="deployment" v-else-if="listdata.space&&listdata.space.status === 'Deploying'">
           <div class="title">Deployment machine</div>
           <el-table :data="listdata.jobs_status" border style="width: 100%">
             <el-table-column prop="bidder_id" label="CP Node ID" min-width="140">
@@ -36,7 +84,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Assigning to provider'">
+        <div class="deployment" v-else-if="listdata.space&&listdata.space.status === 'Assigning to provider'">
           <div>
             <p class="m">The server is awaiting the CP to initiate the task.</p>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">If your waiting time is prolonged, you might consider
@@ -45,12 +93,12 @@
               <router-link :to="{name:'paymentHistory', query: {type: 'user'}}">User Payment History</router-link>.</p>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Waiting for transaction'">
+        <div class="deployment" v-else-if="listdata.space&&listdata.space.status === 'Waiting for transaction'">
           <div>
             <p class="m">Your space is currently in the 'Waiting for transaction' state. Transaction processing might take some time. </p>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status && (listdata.space.status.toLowerCase() === 'failed' || listdata.space.status === 'Stopped')">
+        <div class="deployment" v-else-if="listdata.space && listdata.space.status && (listdata.space.status.toLowerCase() === 'failed' || listdata.space.status === 'Stopped')">
           <!-- <div>
             <p class="m">All deployments has been not available before the space expires.</p>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">
@@ -60,8 +108,8 @@
               <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
           </div> -->
           <div class="deploy-cont">
-            <p v-if="listdata.cpList.error_msg" class="pre font" v-html="listdata.cpList.error_msg"></p>
-            <p v-else-if="listdata.task.error_msg" class="pre font" v-html="listdata.task.error_msg"></p>
+            <p v-if="listdata.cpList && listdata.cpList.error_msg" class="pre font" v-html="listdata.cpList.error_msg"></p>
+            <p v-else-if="listdata.task && listdata.task.error_msg" class="pre font" v-html="listdata.task.error_msg"></p>
 
             <div class="log-all">
               <div class="flex-row log-title">
@@ -79,12 +127,12 @@
             </div>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status && listdata.space.status.toLowerCase() === 'closed'">
+        <div class="deployment" v-else-if="listdata.space && listdata.space.status && listdata.space.status.toLowerCase() === 'closed'">
           <div>
             <p class="m">The space owner has closed the running space.</p>
           </div>
         </div>
-        <div class="deployment" v-else-if="listdata.space.status === 'Expired'">
+        <div class="deployment" v-else-if="listdata.space&&listdata.space.status === 'Expired'">
           <div>
             <p v-if="metaAddress && metaAddress === route.params.wallet_address">
               All deployments have expired, You can
@@ -216,6 +264,18 @@ export default defineComponent({
     const listCont = reactive({
       data: {}
     })
+    const ruleForm = reactive({
+      image_name: '',
+      imageNameOption: [],
+      ssh_key: '',
+      copy: true
+    })
+    const rules = reactive({
+      ssh_key: [
+        { required: true, message: 'Please fill in this field', trigger: 'blur' }
+      ]
+    })
+    const ruleFormRef = ref()
 
     function handleClick (tab, event) {
       router.push({
@@ -223,7 +283,13 @@ export default defineComponent({
         params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: tab.props.name }
       })
     }
-
+    async function getImagesName () {
+      try {
+        const imagesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}/config/images`, 'get')
+        if (imagesRes && imagesRes.status === "success" && imagesRes.data) ruleForm.imageNameOption = imagesRes.data.list || []
+        if (ruleForm.imageNameOption && ruleForm.imageNameOption.length > 0) ruleForm.image_name = ruleForm.imageNameOption[0].tag
+      } catch { }
+    }
     async function init (type) {
       if (route.params.tabs !== 'app') return
       listLoad.value = type ? true : false
@@ -239,6 +305,8 @@ export default defineComponent({
           if (props.listValue.data.space && props.listValue.data.space.status === 'Deploying' && props.listValue.data.job) listdata.jobs_status = await jobStatusList(props.listValue.data.job)
           listdata.space = props.listValue.data.space
           listdata.task = props.listValue.data.task
+
+          if (listdata.space && listdata.space.sdk === 'VM') await getImagesName()
         }
       }
       context.emit('handleValue', false)
@@ -366,6 +434,27 @@ export default defineComponent({
         ws = null
       }
     }
+    async function copyAccess () {
+      if (listdata.cpList.job_result_uri) {
+        ruleForm.copy = false
+        system.$commonFun.copyContent(document.location.href, 'Copied')
+        await system.$commonFun.timeout(1500)
+        ruleForm.copy = true
+      }
+    }
+    const submitForm = async (formEl) => {
+      if (!formEl) return
+      await ruleFormRef.value.validate(async (valid, fields) => {
+        if (valid) {
+          sessionStorage.setItem('imageName', ruleForm.image_name)
+          sessionStorage.setItem('sshKey', ruleForm.ssh_key)
+          hardRedeploy()
+        } else {
+          console.log('error submit!', fields)
+          return false
+        }
+      })
+    }
     onActivated(() => {
     })
     onMounted(() => {
@@ -406,9 +495,10 @@ export default defineComponent({
       router,
       logsCont,
       checkedLock,
+      ruleFormRef, rules, ruleForm,
       drawer, direction, logsLoad, logsType, clearWebsocket, upWebsocket,
       init, handleClick, hardRedeploy, logMethod, errorLogsType,
-      handleClose, logsMethod
+      handleClose, logsMethod, copyAccess, submitForm
     }
   }
 })
@@ -617,6 +707,117 @@ export default defineComponent({
           }
           .el-card__body {
             padding: 0;
+          }
+        }
+      }
+
+      .demo-ruleForm {
+        max-width: 550px;
+        margin: 0.1rem 0.4rem;
+        .el-form-item {
+          width: 100%;
+          .el-form-item__content {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: flex-start;
+            text-align: left;
+            .label {
+              width: 100%;
+              text-align: left;
+              color: #000;
+              font-size: 18px;
+              // text-transform: capitalize;
+              @media screen and (max-width: 1440px) {
+                font-size: 16px;
+              }
+              @media screen and (max-width: 1024px) {
+                font-size: 14px;
+              }
+              small {
+                display: block;
+                line-height: 1.5;
+                color: #878c93;
+                margin-bottom: 0.1rem;
+              }
+              .flex-row {
+                width: 100%;
+                .el-select {
+                  width: 100%;
+                }
+                .el-input {
+                  margin: 5px 0 0;
+                  .el-input__inner {
+                    height: auto;
+                    padding: 0.07rem 0.16rem;
+                    font-size: 15px;
+                    border: 2px solid #dadada;
+                    border-radius: 0.1rem;
+                    line-height: 0.3rem;
+                    color: #707070;
+                    @media screen and (max-width: 1440px) {
+                      font-size: 14px;
+                    }
+                    @media screen and (max-width: 1024px) {
+                      font-size: 13px;
+                    }
+                  }
+                }
+                .self-end {
+                  width: 30px;
+                  text-align: center;
+                }
+              }
+              .access {
+                width: calc(100% - 0.32rem);
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                padding: 0.08rem 0.16rem;
+                background-color: rgb(246, 248, 250);
+                border-radius: 0.1rem;
+                line-height: 0.3rem;
+                .copy {
+                  width: 16px;
+                  padding: 8px;
+                  background-color: rgb(246, 248, 250);
+                  border: 1px solid rgba(31, 35, 40, 0.15);
+                  border-radius: 6px;
+                  cursor: pointer;
+                  svg {
+                    color: rgb(101, 109, 118);
+                    fill: rgb(101, 109, 118);
+                  }
+                }
+              }
+            }
+            .el-button {
+              height: auto;
+              padding: 0.05rem 0.13rem 0.07rem;
+              background-color: #c27af8;
+              font-family: inherit;
+              border: 0;
+              border-radius: 0.05rem;
+              cursor: pointer;
+              font-size: 0.2rem;
+              color: #fff;
+              @media screen and (max-width: 1440px) {
+                font-size: 19px;
+              }
+              @media screen and (max-width: 1024px) {
+                font-size: 17px;
+              }
+              &.is-disabled {
+                cursor: no-drop;
+                opacity: 0.3;
+              }
+              span {
+                cursor: inherit;
+              }
+            }
+          }
+          .el-form-item__label {
+            display: none;
           }
         }
       }
