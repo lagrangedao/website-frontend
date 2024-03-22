@@ -323,6 +323,9 @@ export default defineComponent({
   .nowrap {
     flex-wrap: nowrap;
   }
+  .center {
+    justify-content: center;
+  }
 }
 </style>
 

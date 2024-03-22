@@ -6,7 +6,7 @@
           <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon scroll-to-error>
             <el-form-item prop="image_name">
               <label class="label" for="image_name">
-                images name
+                <span class="lable_small">Docker Image</span>
                 <div class="flex flex-row" v-if="listdata.cpList && listdata.cpList.config && listdata.space&& (listdata.space.status === 'Running'||listdata.space.status === 'Deploying'||listdata.space.status === 'Assigning to provider'||listdata.space.status === 'Waiting for transaction')">
                   <el-input readonly disabled v-model="listdata.cpList.config.image" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
                 </div>
@@ -19,18 +19,18 @@
             </el-form-item>
             <el-form-item prop="ssh_key">
               <label class="label" for="ssh_key">
-                ssh key
+                <span class="lable_small">SSH Key</span>
                 <div class="flex flex-row" v-if="listdata.cpList && listdata.cpList.config && listdata.space&& (listdata.space.status === 'Running'||listdata.space.status === 'Deploying'||listdata.space.status === 'Assigning to provider'||listdata.space.status === 'Waiting for transaction')">
-                  <el-input readonly disabled v-model="listdata.cpList.config.ssh_key" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
+                  <el-input readonly disabled v-model="listdata.cpList.config.ssh_key" placeholder="ssh-rsa AAAAB3NzaC1yc2EAAA..." :autosize="{ minRows: 2, maxRows: 14 }" type="textarea" />
                 </div>
                 <div class="flex flex-row" v-else>
-                  <el-input v-model="ruleForm.ssh_key" placeholder="Sfrdgfdgdfh/USASFDADSFDSFDSF" />
+                  <el-input v-model="ruleForm.ssh_key" placeholder="ssh-rsa AAAAB3NzaC1yc2EAAA..." :autosize="{ minRows: 2, maxRows: 14 }" type="textarea" />
                 </div>
               </label>
             </el-form-item>
             <el-form-item prop="access">
               <label class="label" for="access">
-                Access mode
+                <span class="lable_small l">Logging in with SSH Key</span>
                 <div class="flex flex-row access">
                   {{listdata.cpList.job_result_uri || '-'}}
                   <div class="copy flex flex-row">
@@ -267,7 +267,7 @@ export default defineComponent({
     const ruleForm = reactive({
       image_name: '',
       imageNameOption: [],
-      ssh_key: '',
+      ssh_key: 'ssh-rsa AAAAB3NzaC1yc2EAAA...',
       copy: true
     })
     const rules = reactive({
@@ -437,7 +437,7 @@ export default defineComponent({
     async function copyAccess () {
       if (listdata.cpList.job_result_uri) {
         ruleForm.copy = false
-        system.$commonFun.copyContent(document.location.href, 'Copied')
+        system.$commonFun.copyContent(listdata.cpList.job_result_uri, 'Copied')
         await system.$commonFun.timeout(1500)
         ruleForm.copy = true
       }
@@ -712,10 +712,11 @@ export default defineComponent({
       }
 
       .demo-ruleForm {
-        max-width: 550px;
-        margin: 0.1rem 0.4rem;
+        max-width: 640px;
+        margin: 0.1rem auto;
         .el-form-item {
           width: 100%;
+          margin: 0 0 0.3rem;
           .el-form-item__content {
             width: 100%;
             display: flex;
@@ -724,6 +725,7 @@ export default defineComponent({
             justify-content: flex-start;
             text-align: left;
             .label {
+              position: relative;
               width: 100%;
               text-align: left;
               color: #000;
@@ -741,10 +743,41 @@ export default defineComponent({
                 color: #878c93;
                 margin-bottom: 0.1rem;
               }
+              .lable_small {
+                position: absolute;
+                top: -6px;
+                left: 10px;
+                padding: 2px 4px;
+                background-color: #fff;
+                font-size: 12px;
+                color: #606060;
+                z-index: 9;
+                line-height: 1;
+                &.l {
+                  background-color: transparent;
+                }
+              }
               .flex-row {
                 width: 100%;
                 .el-select {
                   width: 100%;
+                }
+                .el-textarea {
+                  margin: 5px 0 0;
+                  .el-textarea__inner {
+                    padding: 0.07rem 0.16rem;
+                    font-size: 15px;
+                    border: 2px solid #dadada;
+                    border-radius: 0.1rem;
+                    line-height: 0.3rem;
+                    color: #707070;
+                    @media screen and (max-width: 1440px) {
+                      font-size: 14px;
+                    }
+                    @media screen and (max-width: 1024px) {
+                      font-size: 13px;
+                    }
+                  }
                 }
                 .el-input {
                   margin: 5px 0 0;
@@ -792,21 +825,9 @@ export default defineComponent({
               }
             }
             .el-button {
-              height: auto;
-              padding: 0.05rem 0.13rem 0.07rem;
-              background-color: #c27af8;
               font-family: inherit;
-              border: 0;
-              border-radius: 0.05rem;
+              font-size: 0.18rem;
               cursor: pointer;
-              font-size: 0.2rem;
-              color: #fff;
-              @media screen and (max-width: 1440px) {
-                font-size: 19px;
-              }
-              @media screen and (max-width: 1024px) {
-                font-size: 17px;
-              }
               &.is-disabled {
                 cursor: no-drop;
                 opacity: 0.3;

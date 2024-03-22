@@ -288,7 +288,7 @@
         <div class="auto-area" v-if="ruleForm.autoAvailable">
           <div class="piece flex-row space-between nowrap">
             <div class="flex-row center">
-              <small class="font-12">Docker lmage</small>
+              <small class="font-12">Docker Image</small>
               <div class="flex flex-row nowrap m-body">
                 <div class="width-icon">
                   <svg t="1699606466208" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3074" width="200" height="200">
@@ -307,7 +307,7 @@
             <div class="flex-row center">
               <small class="font-12">ssh key</small>
               <div class="flex flex-row nowrap m-body">
-                <el-input v-model="ruleForm.ssh_key" placeholder="SSH Key" />
+                <el-input v-model="ruleForm.ssh_key" placeholder="ssh-rsa AAAAB3NzaC1yc2EAAA..." />
               </div>
             </div>
           </div>
@@ -478,7 +478,7 @@
         <span class="dialog-footer" :class="{'flex-row':ruleForm.autoAvailable}">
           <div class="footer-price flex-row" v-if="ruleForm.autoAvailable">
             Total
-            <p class="flex-row">{{(hardwarePrices.data.gpu*ruleForm.gpuValue + hardwarePrices.data.memory*ruleForm.memoryValue + hardwarePrices.data.cpu*ruleForm.cpuValue + hardwarePrices.data.storage*ruleForm.storageValue)*ruleForm.usageTime}}
+            <p class="flex-row">{{(hardwarePrices.data.gpu*ruleForm.gpuValue*(ruleForm.gpuCheck?1:0) + hardwarePrices.data.memory*ruleForm.memoryValue + hardwarePrices.data.cpu*ruleForm.cpuValue + hardwarePrices.data.storage*ruleForm.storageValue)*ruleForm.usageTime}}
               <small>SWAN</small>
             </p>
           </div>
@@ -590,7 +590,7 @@ export default defineComponent({
       region: '',
       image_name: '',
       imageNameOption: [],
-      ssh_key: '',
+      ssh_key: 'ssh-rsa AAAAB3NzaC1yc2EAAA...',
     })
     const validateInput = (rule, value, callback) => {
       if ((/[^a-zA-Z0-9-._]/g).test(value)) {
@@ -636,14 +636,13 @@ export default defineComponent({
       hardwareLoad.value = true
       try {
         if (ruleForm.autoAvailable) {
-          const paid = (hardwarePrices.data.gpu * ruleForm.gpuValue + hardwarePrices.data.memory * ruleForm.memoryValue + hardwarePrices.data.cpu * ruleForm.cpuValue + hardwarePrices.data.storage * ruleForm.storageValue) * ruleForm.usageTime
+          const paid = (hardwarePrices.data.gpu * ruleForm.gpuValue * (ruleForm.gpuCheck ? 1 : 0) + hardwarePrices.data.memory * ruleForm.memoryValue + hardwarePrices.data.cpu * ruleForm.cpuValue + hardwarePrices.data.storage * ruleForm.storageValue) * ruleForm.usageTime
 
           console.log(paid)
           if (paid <= 0) {
             hardwareLoad.value = false
             return
           }
-
 
           system.$commonFun.web3Init.eth.sendTransaction({
             from: store.state.metaAddress,
@@ -815,6 +814,7 @@ export default defineComponent({
     }
 
     function close () {
+      hardwareLoad.value = false
       if (props.renewButton === 'renew') context.emit('handleHard', false, false)
       else sleepVisible.value = false
     }
