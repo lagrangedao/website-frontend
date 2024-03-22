@@ -104,10 +104,56 @@
             </el-dropdown>
           </div>
         </div>
+
         <div class="list">
           <div class="title flex-row">
             <i class="icon icon_spaces"></i>
-            Spaces
+            Private Spaces
+            <span>{{spacesPrivateIndex}}</span>
+          </div>
+        </div>
+        <el-row :gutter="32" :class="{'list_body_spaces':true,'list_flex':!listdata.spacesPrivateIsShow}" v-loading="listLoad">
+          <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8" v-for="(list,sIndex) in listdata.spacesPrivate" :key="sIndex">
+            <a :href="`/spaces/${list.wallet_address}/${list.name}/app${list.is_public === 0 ? '?uuid='+list.uuid:''}`" v-show="!listdata.spacesPrivateIsShow ? sIndex<9: true">
+              <el-card class="box-card is-hover">
+                <template #header>
+                  <div class="card-warn flex-row" v-if="list.status === 'Running' && list.activeOrder && list.activeOrder.config && list.activeOrder.config.hardware_type">
+                    <!-- v-if="list.expiration_time !== null && ((list.expireTime <=3&&list.expireTimeUnit!=='hours') ||(list.expireTime <=24&&list.expireTimeUnit==='hours'))"
+                  <el-popover placement="right-start" :width="200" trigger="hover" :content="list.expireTime <= 0 ? 'This space has expired, please click to the details page to reboot':`This Space will expire in ${list.expireTime
+              < 0.1 ? '3': list.expireTime} ${list.expireTimeUnit}, please click to the details page to renew`" popper-style="word-break: break-word; text-align: left;">
+                    <template #reference>
+                      <el-icon>
+                        <Warning />
+                      </el-icon>
+                    </template>
+                  </el-popover> -->
+                    <div class="run background">Running
+                      <span v-if="list.activeOrder.config.hardware_type.indexOf('GPU') > -1"> on
+                        <span class="i">{{list.activeOrder.config.hardware}}</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="card-warn flex-row" v-else-if="list.status === 'Deploying'">
+                    <span class="run">{{list.status}}</span>
+                  </div>
+                  <div class="card-header flex-row">
+                    <span>{{list.likes}}</span>
+                  </div>
+                  <h1>{{list.name}}</h1>
+                </template>
+              </el-card>
+            </a>
+          </el-col>
+        </el-row>
+        <div class="more_style flex-row" v-if="listdata.spacesPrivate.length>9">
+          <img class=" flex-row" v-if="!listdata.spacesPrivateIsShow" @click="listdata.spacesPrivateIsShow = true" src="@/assets/images/icons/icon_38.png" />
+          <img class=" flex-row" v-else @click="listdata.spacesPrivateIsShow = false" src="@/assets/images/icons/icon_38_1.png" />
+        </div>
+
+        <div class="list">
+          <div class="title flex-row">
+            <i class="icon icon_spaces"></i>
+            Public Spaces
             <span>{{spacesIndex}}</span>
           </div>
         </div>
@@ -308,15 +354,18 @@ export default defineComponent({
     const prevType = ref(true)
     const licenseIndex = ref(0)
     const spacesIndex = ref(0)
+    const spacesPrivateIndex = ref(0)
     const dataSetIndex = ref(0)
     const listdata = reactive({
       spaces: [],
+      spacesPrivate: [],
       datasets: [],
       received_licenses: [],
       license_requests_notifications: [],
       outgoing_pending_license_requests: [],
       user: {},
       spacesIsShow: false,
+      spacesPrivateIsShow: false,
       datasetsIsShow: false,
       licenseIsShow: false
     })
@@ -398,7 +447,17 @@ export default defineComponent({
       try {
         const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}profile`, 'get')
         if (listRes && listRes.status === 'success') {
-          listdata.spaces = listRes.data.space || []
+          let spaceList = []
+          let datasetList = []
+          listRes.data.space.forEach(async space => {
+            const current = Math.floor(Date.now() / 1000)
+            const expireTime = await system.$commonFun.expireTimeFun(space.expiration_time)
+            space.expireTime = expireTime.time || current
+            space.expireTimeUnit = expireTime.unit
+            spaceList.push(space.name)
+          })
+          listdata.spaces = await spaceListData(listRes.data.space, '1')
+          listdata.spacesPrivate = await spaceListData(listRes.data.space, '0')
           listdata.datasets = listRes.data.dataset || []
           listdata.received_licenses = listRes.data.received_licenses || []
           listdata.license_requests_notifications = listRes.data.license_requests_notifications || []
@@ -406,23 +465,16 @@ export default defineComponent({
           listdata.user = listRes.data.user || {}
           licenseIndex.value = listRes.data.received_licenses.length
           dataSetIndex.value = listRes.data.dataset.length
-          spacesIndex.value = listRes.data.space.length
+          spacesIndex.value = listdata.spaces.length
+          spacesPrivateIndex.value = listdata.spacesPrivate.length
           store.dispatch('setAccessAvatar', listRes.data.user.avatar && store.state.gateway ? `${store.state.gateway}/ipfs/${listRes.data.user.avatar}` : '')
           store.dispatch('setAccessName', listRes.data.user.full_name)
-          let spaceList = []
-          let datasetList = []
-          listdata.spaces.forEach(async space => {
-            const current = Math.floor(Date.now() / 1000)
-            const expireTime = await system.$commonFun.expireTimeFun(space.expiration_time)
-            space.expireTime = expireTime.time || current
-            space.expireTimeUnit = expireTime.unit
-            spaceList.push(space.name)
-          })
           listdata.datasets.forEach(space => datasetList.push(space.name))
           store.dispatch('setAccessSpace', JSON.stringify(spaceList))
           store.dispatch('setAccessDataset', JSON.stringify(datasetList))
         } else {
           listdata.spaces = []
+          listdata.spacesPrivate = []
           listdata.datasets = []
           listdata.received_licenses = []
           listdata.license_requests_notifications = []
@@ -430,12 +482,25 @@ export default defineComponent({
           listdata.user = {}
           licenseIndex.value = 0
           spacesIndex.value = 0
+          spacesPrivateIndex.value = 0
           dataSetIndex.value = 0
           system.$commonFun.messageTip('error', listRes.error ? listRes.error : 'Failed!')
         }
         // await system.$commonFun.timeout(500)
         listLoad.value = false
       } catch{ listLoad.value = false }
+    }
+    async function spaceListData (list, type) {
+      let arr = list || []
+      let arrJob = []
+      try {
+        for (let j = 0; j < arr.length; j++) {
+          if (arr[j] && arr[j].is_public.toString() === type) arrJob.push(arr[j])
+        }
+      } catch (err) {
+        console.log('err', err)
+      }
+      return arrJob
     }
     function fn () {
       document.addEventListener('visibilitychange', function () {
@@ -509,9 +574,11 @@ export default defineComponent({
     })
     onDeactivated(() => {
       listdata.spacesIsShow = false
+      listdata.spacesPrivateIsShow = false
       listdata.datasetsIsShow = false
       listdata.licenseIsShow = false
       listdata.spaces = []
+      listdata.spacesPrivate = []
       listdata.datasets = []
       listdata.received_licenses = []
       listdata.license_requests_notifications = []
@@ -519,6 +586,7 @@ export default defineComponent({
       listdata.user = {}
       licenseIndex.value = 0
       spacesIndex.value = 0
+      spacesPrivateIndex.value = 0
       dataSetIndex.value = 0
     })
     watch(navLogin, (newValue, oldValue) => {
@@ -543,6 +611,7 @@ export default defineComponent({
       prevType,
       licenseIndex,
       spacesIndex,
+      spacesPrivateIndex,
       dataSetIndex,
       listdata,
       listLoad,

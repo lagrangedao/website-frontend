@@ -28,7 +28,7 @@
                 </div>
               </label>
             </el-form-item>
-            <el-form-item prop="access">
+            <el-form-item prop="access" v-if="!(listdata.space && listdata.space.status && (listdata.space.status.toLowerCase() === 'stopped'||listdata.space.status.toLowerCase() === 'failed'||listdata.space.status.toLowerCase() === 'close'))">
               <label class="label" for="access">
                 <span class="lable_small l">Logging in with SSH Key</span>
                 <div class="flex flex-row access">
@@ -307,6 +307,11 @@ export default defineComponent({
           listdata.task = props.listValue.data.task
 
           if (listdata.space && listdata.space.sdk === 'VM') await getImagesName()
+          if (listdata.cpList && listdata.cpList.config) {
+            ruleForm.ssh_key = listdata.cpList.config.ssh_key || 'ssh-rsa AAAAB3NzaC1yc2EAAA...'
+            const image = ruleForm.image_name
+            ruleForm.image_name = listdata.cpList.config.image || image
+          }
         }
       }
       context.emit('handleValue', false)
@@ -830,7 +835,7 @@ export default defineComponent({
               cursor: pointer;
               &.is-disabled {
                 cursor: no-drop;
-                opacity: 0.3;
+                opacity: .8;
               }
               span {
                 cursor: inherit;
