@@ -60,10 +60,15 @@
               <el-button plain @click="hardRedeploy">Redeploy</el-button> it.</p>
           </div> -->
           <div class="deploy-cont">
-            <p v-if="listdata.cpList.error_msg" class="pre font" v-html="listdata.cpList.error_msg"></p>
-            <p v-else-if="listdata.task.error_msg" class="pre font" v-html="listdata.task.error_msg"></p>
+            <div v-if="listdata.cpList.error_msg || listdata.task.error_msg">
+              <p v-if="listdata.cpList.error_msg" class="pre font" v-html="listdata.cpList.error_msg"></p>
+              <p v-else-if="listdata.task.error_msg" class="pre font" v-html="listdata.task.error_msg"></p>
+              <br />
+              <p class="pre font" v-if="metaAddress && metaAddress === route.params.wallet_address">Please
+                <el-button plain @click="hardRedeploy">redeploy</el-button> the space</p>
+            </div>
 
-            <div class="log-all">
+            <div class="log-all" v-if="listdata.cpList.error_log_container || listdata.cpList.error_log_build">
               <div class="flex-row log-title">
                 <div class="flex-row">
                   <div class="flex-row log">
@@ -454,9 +459,15 @@ export default defineComponent({
       .deploy-cont {
         margin: auto;
         .font {
-          font-family: "FIRACODE-LIGHT";
+          font-family: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo,
+            Monaco, Consolas, Liberation Mono, Courier New, monospace;
           font-size: 15px;
           color: rgb(107, 114, 128);
+          .el-button {
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+          }
         }
       }
 

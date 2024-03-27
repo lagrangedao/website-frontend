@@ -567,7 +567,7 @@ export default defineComponent({
       let arrJob = []
       let status = spaceCont.status || ''
       for (let j = 0; j < arr.length; j++) {
-        if (arr[j] && arr[j].status &&  !((status && status.toLowerCase() === 'running') && arr[j].status.toLowerCase() === "failed")) {
+        if (arr[j] && arr[j].status && !((status && status.toLowerCase() === 'running') && arr[j].status.toLowerCase() === "failed")) {
           try {
             if (arr[j].job_real_uri) arr[j].job_result_uri = arr[j].job_real_uri
             else if (arr[j].job_result_uri) {
