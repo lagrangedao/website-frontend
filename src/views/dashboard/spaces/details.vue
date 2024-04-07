@@ -44,7 +44,7 @@
               <i>{{allData.space.activeOrder.config.hardware}}</i>
             </span>
           </div>
-          <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours')) && (parentValue && parentValue.toLowerCase() !== 'failed') && parentValue !== 'Stopped' && parentValue !== 'Expired'">
+          <el-button-group class="ml-4" v-if="metaAddress && metaAddress === route.params.wallet_address && ((expireTime.time <=3&&expireTime.unit!=='hours') ||(expireTime.time <=24&&expireTime.unit==='hours')) && (parentValue && parentValue.toLowerCase() !== 'failed') && parentValue !== 'Stopped' && parentValue !== 'Expired' && (parentValue && parentValue.toLowerCase() !== 'closed')">
             <el-button type="warning" plain disabled v-if="expireTime.time >= 0">
               <el-icon>
                 <WarningFilled />
@@ -565,12 +565,12 @@ export default defineComponent({
     }
     async function handleSizeChange (val) { }
     async function handleCurrentChange (val) { }
-    async function jobList (list) {
+    async function jobList (list, spaceCont) {
       let arr = list || []
       let arrJob = []
+      let status = spaceCont.status || ''
       for (let j = 0; j < arr.length; j++) {
-        // 如果status为running才显示
-        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
+        if (arr[j] && arr[j].status && !((status && status.toLowerCase() === 'running') && arr[j].status.toLowerCase() === "failed")) {
           try {
             if (arr[j].job_real_uri) arr[j].job_result_uri = arr[j].job_real_uri
             else if (arr[j].job_result_uri) {
@@ -647,7 +647,7 @@ export default defineComponent({
           expireTime.unit = expireTimeCont.unit
           logsCont.data = await jobWSList(listRes.data.job, listRes.data.space, 'log')
           logsContAll.data = await jobWSList(listRes.data.job, listRes.data.space, 'detail')
-          allData.jobResult = await jobList(listRes.data.job)
+          allData.jobResult = await jobList(listRes.data.job, listRes.data.space)
           allData.jobIndex = 0
           if (allData.jobResult && allData.jobResult.length > 0) listValue.cpList = allData.jobResult[0]
         } else if (listRes.message) system.$commonFun.messageTip(listRes.status, listRes.message)
