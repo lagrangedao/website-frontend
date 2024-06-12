@@ -482,6 +482,7 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore()
+    const getNotFund = computed(() => store.state.getNotFund)
     const metaAddress = computed(() => (store.state.metaAddress))
     const accessSpace = computed(() => (store.state.accessSpace ? JSON.parse(store.state.accessSpace) : []))
     const lagLogin = computed(() => { return String(store.state.lagLogin) === 'true' })
@@ -557,7 +558,8 @@ export default defineComponent({
       else {
         const nameTab = tab.props ?.name || tab
         activeName.value = nameTab
-        router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: nameTab } })
+        if (route.query.uuid) router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: nameTab }, query: { uuid: route.query.uuid || '' } })
+        else router.push({ name: 'spaceDetail', params: { wallet_address: route.params.wallet_address, name: route.params.name, tabs: nameTab } })
       }
     }
     async function handleSizeChange (val) { }
@@ -566,7 +568,7 @@ export default defineComponent({
       let arr = list || []
       let arrJob = []
       for (let j = 0; j < arr.length; j++) {
-        if (arr[j] && arr[j].status) {
+        if (arr[j] && arr[j].status && arr[j].status.toLowerCase() !== "failed") {
           try {
             if (arr[j].job_real_uri) arr[j].job_result_uri = arr[j].job_real_uri
             else if (arr[j].job_result_uri) {
@@ -631,7 +633,8 @@ export default defineComponent({
       var numReg = /^[0-9]*$/
       var numRe = new RegExp(numReg)
       try {
-        const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`, 'get')
+        const urlLink = route.query.uuid ? `spaces/${route.query.uuid}/details` : `spaces/${route.params.wallet_address}/${route.params.name}?requester=${store.state.metaAddress}`
+        const listRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}${urlLink}`, 'get')
         if (listRes && listRes.status === 'success') {
           listValue.data = listRes || {}
           allData.space = listRes.data.space
@@ -671,16 +674,19 @@ export default defineComponent({
     async function requestAll (type) {
       switch (type) {
         case 'files':
+          // if (route.query.uuid) return
           requestFiles()
           break
         case 'setting':
           requestDetail()
+          // if (route.query.uuid) return
           requestNft()
           break
         case 'delete':
           break
         default:
           requestDetail()
+          // if (route.query.uuid) return
           requestFiles()
           requestNft()
           break
@@ -958,6 +964,8 @@ export default defineComponent({
       visible.value = false
     })
     watch(route, (to, from) => {
+      sessionStorage.setItem('imageName', '')
+      sessionStorage.setItem('sshKey', '')
       visible.value = false
       if (to.name !== 'spaceDetail') return
       if (!metaAddress.value && to.params.tabs === 'settings') activeName.value = 'app'
