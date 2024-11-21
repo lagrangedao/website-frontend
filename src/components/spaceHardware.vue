@@ -246,8 +246,10 @@
               </div>
               <el-divider/>
             </div>
-            <div class="time flex-row">
-              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_type.indexOf('GPU') > -1? 168:336" :precision="0" :step="1" controls-position="right" /> &nbsp; hours
+            <div class="time flex-row wrap" :class="`${tipBalance?'disabled':''}`">
+              <!-- :max="sleepSelect.hardware_type.indexOf('GPU') > -1? 168:336" -->
+              <el-input-number v-model="ruleForm.usageTime" :min="1" :max="sleepSelect.hardware_id === 0 ? 168 : 9999999" :precision="0" :step="1" controls-position="right" @change="getAmount" /> &nbsp; hours
+              <div class="flex-row balance-tip" v-if="tipBalance">Your account balance is not enough for the time. You can afford <b>{{ maxUsage }}</b> hours.</div>
             </div>
           </div>
           <div v-if="props.renewButton !== 'renew'">
@@ -319,11 +321,14 @@
       </div>
 
       <template #footer>
-        <span class="dialog-footer">
+        <span class="dialog-footer flex-row space-between">
           <el-button-group class="flex-row">
-            <el-button @click="hardwareFun" :disabled="hardwareLoad">{{props.renewButton === 'renew'?'Renew':'Confirm new hardware'}}</el-button>
+            <el-button @click="hardwareFun" :disabled="hardwareLoad || !userTokenBalance || (Number(userTokenBalance) < Number(etherApprove) && props.renewButton !== 'renew')">{{props.renewButton === 'renew'?'Renew':'Confirm new hardware'}}</el-button>
             <el-button @click="close" :disabled="hardwareLoad">Cancel</el-button>
           </el-button-group>
+          <div v-if="props.renewButton !== 'renew'" class="cost">
+            Estimated Cost: <b>{{ etherApprove }} SWAN</b>
+          </div>
         </span>
       </template>
     </el-dialog>
@@ -440,10 +445,40 @@ export default defineComponent({
     let tokenContract = new system.$commonFun.web3Init.eth.Contract(tokenABI, tokenAddress);
     let paymentContractAddress = process.env.VUE_APP_HARDWARE_ADDRESS
     let paymentContract = new system.$commonFun.web3Init.eth.Contract(ClientPaymentABI, paymentContractAddress)
+    const weiApprove = ref('')
+    const etherApprove = ref('')
+    const userTokenBalance = ref('')
+    const tipBalance = ref(false)
+    const maxUsage = ref('')
 
+    async function getAmount() {
+      try{
+        const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
+        const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
+        const priceEther = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'ether')
+        const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6) // usdc is 6 decimal, ensure the amount will not be more than 6
+        weiApprove.value = system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei')
+        etherApprove.value = system.$commonFun.web3Init.utils.fromWei(weiApprove.value, 'ether')
+        etherApprove.value = Number(etherApprove.value).toFixed(2)
+
+        if(Number(userTokenBalance.value) < Number(etherApprove.value)) {
+          const usage = Math.floor(Number(userTokenBalance.value) / Number(priceEther))
+          // ruleForm.usageTime = usage
+          maxUsage.value = usage
+          tipBalance.value = true
+          // getAmount()
+        } else tipBalance.value = false
+      } catch {}
+    }
+    async function getUserBalance() {
+      // const balance = await system.$commonFun.web3Init.eth.getBalance(metaAddress.value)
+      // console.log(balance)
+      const tokenBalance = await tokenContract.methods.balanceOf(metaAddress.value).call()
+      userTokenBalance.value = system.$commonFun.web3Init.utils.fromWei(tokenBalance, 'ether')
+    }
     async function hardwareFun () {
       const net = await networkEstimate()
-      if (!net) return
+      if (!net || Number(userTokenBalance.value) < Number(etherApprove.value)) return
       hardwareLoad.value = true
       try {
         if (props.renewButton === 'fork') {
@@ -453,35 +488,44 @@ export default defineComponent({
             return
           }
         }
-        const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
-        const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
-        const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6) // usdc is 6 decimal, ensure the amount will not be more than 6
-        const wei = system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei')
 
-        const tastUUID = props.renewButton === 'renew' ? props.listdata.task_uuid : await getTaskUUid(wei)
+        const tastUUID = props.renewButton === 'renew' ? props.listdata.task_uuid : await getTaskUUid(weiApprove.value)
         if (!tastUUID) {
           closePart()
           return
         }
 
-        let approveGasLimit = await tokenContract.methods
-          .approve(paymentContractAddress, wei)
-          .estimateGas({ from: store.state.metaAddress })
+        let allowanceGasLimit = await tokenContract.methods
+          .allowance(store.state.metaAddress, paymentContractAddress)
+          .call()
+        const allow = system.$commonFun.web3Init.utils.fromWei(allowanceGasLimit, 'ether') || 0
+        console.log('allowance: ', allow)
+        console.log('Estimated Cost: ', etherApprove.value)
 
-        const approve_tx = await tokenContract.methods
-          .approve(paymentContractAddress, wei)
-          .send({
-            from: store.state.metaAddress, gasLimit: Math.floor(approveGasLimit * 1.5)
-          })
+        if(Number(allow) < Number(etherApprove.value)) {
+          let approveGasLimit = await tokenContract.methods
+            .approve(paymentContractAddress, weiApprove.value)
+            .estimateGas({ from: store.state.metaAddress })
 
-        let payMethod = paymentContract.methods
-          .submitPayment(tastUUID, sleepSelect.value.hardware_id, ruleForm.usageTime * 3600)
+          const approve_tx = await tokenContract.methods
+            .approve(paymentContractAddress, weiApprove.value)
+            .send({
+              from: store.state.metaAddress, gasLimit: Math.floor(approveGasLimit * 1.5)
+            })
+        }
+
+        let payMethod = props.renewButton === 'renew' ?
+              paymentContract.methods
+                .renewPayment(tastUUID, sleepSelect.value.hardware_id, ruleForm.usageTime * 3600)
+              :
+              paymentContract.methods
+                .submitPayment(tastUUID, sleepSelect.value.hardware_id, ruleForm.usageTime * 3600)
 
         let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
         const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: Math.floor(gasLimit * 1.5) })
           .on('transactionHash', async (transactionHash) => {
             console.log('transactionHash:', transactionHash)
-            await hardwareHash(transactionHash, wei, tastUUID)
+            await hardwareHash(transactionHash, weiApprove.value, tastUUID)
             closePart()
             context.emit('handleHard', false, true)
           })
@@ -489,7 +533,7 @@ export default defineComponent({
       } catch (err) {
         console.log('err', err)
         if (err && err.message) {
-          if (err.message.includes('Insufficient funds')) system.$commonFun.messageTip('error', `Not sufficient fund, please follow docs <a href="https://docs.swanchain.io/swan-testnet/atom-accelerator-race/before-you-get-started/claim-testswan" target="_blank" style="color: inherit;text-decoration: underline;">here</a> to claim the testSWAN token`, true)
+          if (err.message.includes('Insufficient funds')) system.$commonFun.messageTip('error', `Not sufficient fund, please follow docs <a href="https://docs.swanchain.io/swan-testnet/atom-accelerator-race/before-you-get-started/claim-testswan" target="_blank" style="color: inherit;text-decoration: underline;">here</a> to claim the swan Credit Token`, true)
           else system.$commonFun.messageTip('error', err.message)
         }
         closePart()
@@ -560,7 +604,7 @@ export default defineComponent({
     async function networkEstimate () {
       const getID = await system.$commonFun.web3Init.eth.net.getId()
       const list = [20241133]
-      const getPast = await list.some(t => t === getID)
+      const getPast = await list.some(t => Number(t) === Number(getID))
       if (getPast) return true
       else {
         context.emit('handleHard', false, false, true)
@@ -630,6 +674,7 @@ export default defineComponent({
       await regionChange()
       ruleForm.sleepTime = sleepSelect.value.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
       if (props.renewButton === 'renew') hardwareLoad.value = false
+      else getAmount()
       sleepVisible.value = true
     }
 
@@ -785,6 +830,7 @@ export default defineComponent({
       requestFiles()
       init()
       nameExist()
+      getUserBalance()
     })
     return {
       route,
@@ -802,13 +848,13 @@ export default defineComponent({
       hardwareOptions,
       hardwareLoad,
       machinesLoad,
-      forkLoad, ruleFormRef, ruleLoad,
-      sleepChange, hardwareFun, close, forkDuplicate, nameExist, availableChange, regionChange
+      forkLoad, ruleFormRef, ruleLoad, etherApprove, userTokenBalance, tipBalance, maxUsage,
+      sleepChange, hardwareFun, close, forkDuplicate, nameExist, availableChange, regionChange, getAmount
     }
   }
 })
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .span-available {
   font-size: 12px;
   line-height: 1;
@@ -1027,7 +1073,9 @@ export default defineComponent({
           @media screen and (max-width: 768px) {
             font-size: 13px;
           }
-
+          &.wrap{
+            flex-wrap: wrap;
+          }
           .el-select {
             margin: 0 0.08rem;
 
@@ -1585,9 +1633,34 @@ export default defineComponent({
         @media screen and (max-width: 768px) {
           font-size: 13px;
         }
-
+        &.disabled {
+          .el-input-number {
+            .el-input__inner{
+              border-color: red;
+            }
+          }
+        }
+        .el-input-number {
+          height: 32px;
+          .el-input-number__increase, .el-input-number__decrease{
+            display: none;
+          }
+          .el-input__inner{
+            padding: 0 0.15rem;
+          }
+        }
         .span-available {
           font-size: inherit;
+        }
+        .balance-tip{
+          align-items: baseline;
+          width: 100%;
+          font-size: 12px;
+          color: red;
+          b{
+            padding: 0 3px;
+            font-size: 14px;
+          }
         }
 
         .el-select {
@@ -1661,6 +1734,14 @@ export default defineComponent({
     text-align: left;
 
     .dialog-footer {
+      .cost{
+        margin-right: 0.16rem;
+        font-size: 16px;
+        font-weight: bold;
+        b{
+          color: #1890FF;
+        }
+      }
       .el-button-group {
         margin: 0;
 

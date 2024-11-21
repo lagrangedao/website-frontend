@@ -66,7 +66,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss">
+<style lang="less">
 .netchange-pop .el-overlay {
   background-color: rgba(0, 0, 0, 0.2);
   .el-overlay-dialog {

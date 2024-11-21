@@ -224,7 +224,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss">
+<style lang="less">
 .dataAdd-pop .el-overlay {
   background-color: rgba(0, 0, 0, 0.2);
 }

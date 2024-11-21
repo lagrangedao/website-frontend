@@ -212,7 +212,6 @@ import {
   UploadFilled,
   EditPen
 } from '@element-plus/icons-vue'
-import { async } from 'q';
 export default defineComponent({
   name: 'Datasets',
   components: {
@@ -772,7 +771,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #dataset {
   background: #fff;
   color: #333;

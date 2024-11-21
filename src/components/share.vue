@@ -88,7 +88,7 @@ export default defineComponent({
         '\n' +
         `${typeName} Link: https://lagrangedao.org/${urlType}/${route.params.wallet_address}/${route.params.name}/card` +
         '\n\n' +
-        `#LagrangeDAO #DecentralizedComputing #Web3GitHub`
+        `#Lagrange #DecentralizedComputing #Web3GitHub`
       system.$commonFun.popupwindow(text);
     }
     onMounted(() => { })
@@ -101,7 +101,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .share_pop {
   width: 100%;
   .share_style {

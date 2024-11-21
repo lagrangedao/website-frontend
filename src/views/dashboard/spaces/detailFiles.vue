@@ -882,7 +882,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #space {
   background: #fff;
   color: #333;

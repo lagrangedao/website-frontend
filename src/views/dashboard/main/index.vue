@@ -187,7 +187,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 @font-face {
   font-family: "TRAJANPRO";
   src: url(../../../assets/font/TRAJANPRO3-BOLD.OTF);

@@ -301,7 +301,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #dataset {
   background: linear-gradient(90deg, #fbfbfc, #fff, #fff, #fff);
   color: #333;

@@ -65,7 +65,7 @@ export default defineComponent({
     },
 })
 </script>
-<style  lang="scss" scoped>
+<style  lang="less" scoped>
 .footer {
   position: relative;
   height: 0.55rem;

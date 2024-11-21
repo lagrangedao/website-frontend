@@ -14,7 +14,8 @@ export default createStore({
     accessSpace: localStorage.getItem('access_space') || '',
     accessDataset: localStorage.getItem('access_dataset') || '',
     gateway: localStorage.getItem('lag_gateway') || '',
-    getRouter: sessionStorage.getItem('lag_get_router') || ''
+    getRouter: sessionStorage.getItem('lag_get_router') || '',
+    signature: sessionStorage.getItem('signature_lag') || ''
   },
   mutations: {
     SET_METAADDRESS: (state, metaAddress) => {
@@ -56,6 +57,10 @@ export default createStore({
     SET_GETROUTER: (state, getRouter) => {
       state.getRouter = getRouter
       sessionStorage.setItem('lag_get_router', getRouter)
+    },
+    SET_SIGNATURE: (state, signature) => {
+      state.signature = signature
+      sessionStorage.setItem('signature_swanv2', signature)
     }
   },
   actions: {
@@ -109,6 +114,11 @@ export default createStore({
       commit
     }, getRouter) {
       commit('SET_GETROUTER', getRouter)
+    },
+    setSignAddress({
+      commit
+    }, signature) {
+      commit('SET_SIGNATURE', signature)
     }
   },
   getters: {

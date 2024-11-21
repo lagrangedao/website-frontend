@@ -151,7 +151,6 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   EditPen, Edit, CircleClose
 } from '@element-plus/icons-vue'
-import { async } from 'q';
 
 export default defineComponent({
   name: 'Models',
@@ -393,7 +392,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #dataset {
   background: #fff;
   color: #333;

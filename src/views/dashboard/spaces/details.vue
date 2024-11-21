@@ -933,7 +933,7 @@ export default defineComponent({
         '\n' +
         `${typeName} Link: ${process.env.VUE_APP_DOMAINLINK}/${urlType}/${route.params.wallet_address}/${route.params.name}/card` +
         '\n\n' +
-        `#LagrangeDAO #DecentralizedComputing #Web3GitHub`
+        `#Lagrange #DecentralizedComputing #Web3GitHub`
       system.$commonFun.popupwindow(text);
     }
 
@@ -1011,7 +1011,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 // @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,600;1,700&display=swap");
 .space-height {
   min-height: 100vh;
@@ -1649,7 +1649,7 @@ export default defineComponent({
   }
 }
 </style>
-<style lang="scss">
+<style lang="less">
 .drawer_style {
   background-color: #fafafa;
   text-align: left;

@@ -154,7 +154,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #dataset {
   color: #333;
   font-size: 18px;

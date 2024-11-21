@@ -38,11 +38,14 @@
           <el-menu-item index="dashboard">
             Provider
           </el-menu-item>
-          <el-menu-item index="personal_center" v-if="!lagLogin">
+          <el-menu-item index="personal_center_login" v-show="!lagLogin">
             &nbsp;
-            <span class="loginBtn">Log In</span>
+            <!-- <span class="loginBtn">Log In</span> -->
+            <div class="web3Modal-style">
+              <web3-modal />
+            </div>
           </el-menu-item>
-          <el-menu-item index="8" class="address-style" v-else>
+          <el-menu-item index="8" class="address-style" v-if="lagLogin">
             <div class="set flex-row">
               <div class="info-style flex-row">
                 <div class="address" @click="wrongMethod">
@@ -139,13 +142,14 @@
   </div>
 </template>
 <script>
+import web3Modal from "@/components/web3Modal"
 import { defineComponent, computed, onMounted, watch, ref, reactive, getCurrentInstance } from 'vue'
 import { useStore } from "vuex"
 import { useRouter, useRoute } from 'vue-router'
 import { ArrowDown, Setting, Avatar } from '@element-plus/icons-vue'
 export default defineComponent({
   name: 'header_page',
-  components: { ArrowDown, Setting, Avatar },
+  components: { ArrowDown, Setting, Avatar, web3Modal },
   setup () {
     const store = useStore()
     const metaAddress = computed(() => (store.state.metaAddress))
@@ -269,7 +273,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .headerCont {
   min-height: 0.65rem;
   overflow: hidden;
@@ -802,7 +806,7 @@ export default defineComponent({
 @media screen and (max-width: 1024px) {
 }
 </style>
-<style lang="scss">
+<style lang="less">
 .menu-style {
   border-radius: 0.1rem;
   border-top-right-radius: 0.05rem;

@@ -344,7 +344,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .dataNFT_pop {
   @media screen and (max-width: 1024px) {
   }

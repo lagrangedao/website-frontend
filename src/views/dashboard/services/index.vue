@@ -31,7 +31,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .services-main {
   display: flex;
   align-items: center;

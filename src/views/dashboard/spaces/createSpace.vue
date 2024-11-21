@@ -307,7 +307,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #space {
   color: #333;
   font-size: 18px;
@@ -528,7 +528,7 @@ export default defineComponent({
   }
 }
 </style>
-<style lang="scss">
+<style lang="less">
 .license_style {
   min-width: auto !important;
   .el-select-dropdown__item {

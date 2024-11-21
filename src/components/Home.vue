@@ -1,5 +1,16 @@
 <template>
   <div class="wrapper" id="wrapper" ref="area" @click="vis=!vis">
+    <el-alert center class="alert-body" v-if="route.name === 'main'">
+      <template #title>
+        <div class="flex-row">
+          This is a Lagrange Computer testnet. You can test and deploy your application here with no cost. If you have any question, see doc&nbsp;
+          <a href="https://docs.lagrange.computer/getting-started/how-to-use-the-test-environment" target="_blank" class="font-14">
+           here
+          </a>
+          .
+        </div>
+      </template>
+    </el-alert>
     <el-container :class="{'container_height':true}">
       <el-header v-if="!(route.name === 'spaceDetail' && route.params.tabs === 'app')">
         <v-head></v-head>
@@ -102,9 +113,65 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .wrapper {
   min-height: 100vh;
+  :deep(.alert-body) {
+    padding: 8px 0;
+    background-color: #7405ff;
+    color: #fff;
+    border-radius: 0;
+    line-height: 1;
+    @media screen and (max-width: 992px) {
+      padding: 6px;
+    }
+    @media screen and (max-width: 414px) {
+      padding: 6px 30px 6px 10px;
+    }
+    .el-alert__content {
+      display: flex;
+      a {
+        font-weight: bold;
+        color: #fff;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    }
+    .el-alert__title {
+      line-height: 1;
+    }
+    .el-icon {
+      top: 50%;
+      margin-top: -7px;
+      width: 14px;
+      height: 14px;
+      color: inherit;
+      @media screen and (min-width: 1920px) {
+        margin-top: -8px;
+        width: 16px;
+        height: 16px;
+      }
+      @media screen and (min-width: 2160px) {
+        margin-top: -9px;
+        width: 18px;
+        height: 18px;
+      }
+      @media screen and (max-width: 992px) {
+        margin-top: -8px;
+        width: 16px;
+        height: 16px;
+      }
+      @media screen and (max-width: 600px) {
+        margin-top: -9px;
+        width: 18px;
+        height: 18px;
+      }
+      svg {
+        width: inherit;
+        height: inherit;
+      }
+    }
+  }
   .content {
     .el-backtop {
       background-color: #c37af9;
@@ -163,7 +230,7 @@ export default defineComponent({
   }
 }
 </style>
-<style lang="scss">
+<style lang="less">
 .popper_style {
   padding: 0.05rem 0 !important;
   word-break: break-word;

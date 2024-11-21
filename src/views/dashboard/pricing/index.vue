@@ -170,7 +170,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="less">
 .pricing_body {
   position: relative;
   width: 100%;

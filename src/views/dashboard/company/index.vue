@@ -51,7 +51,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #terms {
   width: 100%;
   color: rgb(75, 85, 99);

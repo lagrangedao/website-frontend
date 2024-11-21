@@ -250,7 +250,7 @@ export default defineComponent({
   },
 })
 </script>
-<style  lang="scss" scoped>
+<style  lang="less" scoped>
 #payment {
   width: 100%;
   border-top: 1px solid rgba(229, 231, 235, 0.7);

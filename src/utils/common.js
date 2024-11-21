@@ -2,7 +2,9 @@ import store from '../store'
 import {
   ElMessage
 } from 'element-plus'
-import router from '../router';
+import router from '../router'
+import config from './config.js'
+import { disconnect, signMessage } from '@wagmi/core'
 let lastTime = 0
 
 async function sendRequest(apilink, type, jsonObject, api_token) {
@@ -32,6 +34,7 @@ async function sendRequest(apilink, type, jsonObject, api_token) {
     const time = await throttle()
     if (time && err.response && err.response.status !== 404) messageTip('error', err.response ? err.response.status === 403 ? 'The token has expired. Please log in again' : err.response.data.msg || err.response.data.message || err.response.statusText || 'Request failed. Please try again later!' : 'Request failed. Please try again later!')
     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+      if (store.state.getRouter) router.push({ path: store.state.getRouter })
       signOutFun()
     }
     // else if (err.response && err.response.status === 404) {
@@ -83,6 +86,7 @@ async function Init(callback) {
         })
           .catch(async (error) => {
             store.dispatch('setMetaAddress', accounts[0])
+            store.dispatch('setSignAddress', accounts[0])
             callback(accounts[0])
           })
       })
@@ -134,20 +138,17 @@ async function sign(nonce) {
   const local = process.env.VUE_APP_DOMAINNAME
   const buff = Buffer.from("Signing in to " + local + " at " + sortanow, 'utf-8')
   let signature = null
-  let signErr = ''
-  await providerInit.request({
-    method: 'personal_sign',
-    params: [buff.toString('hex'), store.state.metaAddress]
-  }).then(sig => {
-    signErr = ''
-    signature = sig
-  }).catch(err => {
-    console.log(err)
+  const signErr = ''
+  try {
+    // const signatureMessage = await signMessage(config.config, { message: buff.toString('hex') })
+    signature = await signMessage(config.config, { message: "Signing in to " + local + " at " + sortanow })
+    return [signature, signErr]
+  } catch {
+    await disconnect(config.config)
     signature = ''
-    signErr = err && err.code ? String(err.code) : err
     signOutFun()
-  })
-  return [signature, signErr]
+    return [signature, 'error']
+  }
 }
 
 async function performSignin(sig) {
@@ -159,11 +160,11 @@ async function performSignin(sig) {
       store.dispatch('setLogin', true)
       return true
     }
-    messageTip('error', response.message || 'Fail')
+    if (response && response.message) messageTip('error', response.message || 'Fail')
     return null
   } catch (err) {
     console.log('login err:', err)
-    messageTip('error', 'Fail')
+    // messageTip('error', 'Fail')
     return null
   }
 }
@@ -188,7 +189,11 @@ async function messageTip(type, text, HTMLString) {
   })
 }
 
-async function signOutFun() {
+async function signOutFun(status) {
+  if (store.state.accessToken || status) {
+    await disconnect(config.config)
+    store.dispatch('setSignAddress', '')
+  }
   store.dispatch('setAccessToken', '')
   store.dispatch('setLogin', false)
   store.dispatch('setNavLogin', false)
@@ -566,6 +571,7 @@ function cmOptions(owner) {
 }
 
 // const Web3 = require('web3');
+// import Web3 from 'web3'
 let web3Init
 const providerInit = window.ethereum && window.ethereum.providers ? window.ethereum.providers.find((provider) => provider.isMetaMask) : window.ethereum
 // console.log(window.ethereum)

@@ -218,7 +218,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #dataset {
   position: relative;
   padding: 0.15rem 0;
@@ -372,7 +372,7 @@ export default defineComponent({
           }
           .el-button {
             padding: 0.15rem 0.2rem;
-            background: lighten($color: #f0f0f0, $amount: 0);
+            background: #f0f0f0;
             border-radius: 0.07rem;
             color: #606060;
             font-family: inherit;

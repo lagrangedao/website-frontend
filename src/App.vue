@@ -19,7 +19,7 @@ export default defineComponent({
     }
 })
 </script>
-<style lang="scss">
+<style lang="less">
 @import "./assets/css/style.css";
 .black-color {
   color: #000 !important;

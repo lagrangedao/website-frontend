@@ -193,7 +193,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #rpc-container {
   width: 100%;
   font-size: 18px;

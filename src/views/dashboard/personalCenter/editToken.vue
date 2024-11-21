@@ -6,7 +6,7 @@
 
     <div class="token_list flex-row">
       <div class="title flex-row">User Access Tokens</div>
-      <div class="desc">Access tokens programmatically authenticate your identity to the Lagrange DAO, allowing applications to perform specific actions specified by the scope of permissions (read, write, or admin) granted. Visit the documentation to discover
+      <div class="desc">Access tokens programmatically authenticate your identity to the Lagrange, allowing applications to perform specific actions specified by the scope of permissions (read, write, or admin) granted. Visit the documentation to discover
         how to use them.</div>
       <el-button size="large" class="token_button" @click="createToken">New token</el-button>
 
@@ -133,7 +133,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 #access_token {
   position: relative;
   max-width: 620px;
