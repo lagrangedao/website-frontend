@@ -62,12 +62,13 @@ Run `npm i vue-i18n@9.1.0` to reinstall the components.
 $ npm run build:sf_testnet_t / npm run build:sf_testnet_u / npm run build:sf_testnet
 
 # Build production projects
-$ npm run build:prod_t / npm run build:prod_u / npm run build:prod
+# $ npm run build:prod_t / npm run build:prod_u / npm run build:prod
+$ npm run build:mainnet_t / npm run build:mainnet_u / npm run build:mainnet
 # You can use the npm run build command without any suffix if you are using a version of Node lower than 16, or you should use the command with the suffix name if you are using a version higher than 16
 # The only difference between _t and _u is that _t uses the set keyword while _u uses the export keyword, and how you use it depends on which keyword your system supports.
 ```
 
-The build artifacts will be stored in the `dist_test/dist_prod` directory.
+The build artifacts will be stored in the `dist_test/dist_prod/dist_mainnet` directory.
 
 ## Pre order preparation
 
