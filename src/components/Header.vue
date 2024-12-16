@@ -179,29 +179,31 @@ export default defineComponent({
       else router.push({ name: 'main' })
     }
     async function handleSelect (key, keyPath) {
-      // console.log(key, keyPath) //  
-      if (key === 'personal_center') {
-        router.push({ path: '/personal_center' })
-        store.dispatch('setNavLogin', true)
-      } else if (key === '4') window.open('https://docs.lagrange.computer')
-      else if (key === 'asProvider') router.push({ name: 'paymentHistory', query: { type: 'provider' } })
-      else if (key === 'asUser') router.push({ name: 'paymentHistory', query: { type: 'user' } })
-      else if (key === 'dataset') router.push({ path: '/dataset' })
-      else if (key === 'models') router.push({ path: '/models' })
-      else if (key === 'spaces') router.push({ path: '/spaces' })
-      else if (key === 'Infrastructure') router.push({ path: '/Infrastructure' })
-      else if (key === 'create_space') router.push({ path: '/create_space' })
-      else if (key === 'create_dataset') router.push({ path: '/create_dataset' })
-      else if (key === 'create_organizations') router.push({ path: '/create_organizations' })
-      else if (key === 'dashboard') window.open(process.env.VUE_APP_DASHBOARD_LINK)
-      else if (key === 'pricing') router.push({ path: '/pricing' })
-      else if (key === 'settings') router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
-      else if (key === 'sign_out') {
-        await system.$commonFun.signOutFun()
-        // await system.$commonFun.timeout(50)
-        window.location.reload()
-      }
-      else store.dispatch('setNavLogin', false)
+      // console.log(key, keyPath) //
+      try { 
+        if (key === 'personal_center') {
+          router.push({ path: '/personal_center' })
+          store.dispatch('setNavLogin', true)
+        } else if (key === '4') window.open('https://docs.lagrange.computer')
+        else if (key === 'asProvider') router.push({ name: 'paymentHistory', query: { type: 'provider' } })
+        else if (key === 'asUser') router.push({ name: 'paymentHistory', query: { type: 'user' } })
+        else if (key === 'dataset') router.push({ path: '/dataset' })
+        else if (key === 'models') router.push({ path: '/models' })
+        else if (key === 'spaces') router.push({ path: '/spaces' })
+        else if (key === 'Infrastructure') router.push({ path: '/Infrastructure' })
+        else if (key === 'create_space') router.push({ path: '/create_space' })
+        else if (key === 'create_dataset') router.push({ path: '/create_dataset' })
+        else if (key === 'create_organizations') router.push({ path: '/create_organizations' })
+        else if (key === 'dashboard') window.open(process.env.VUE_APP_DASHBOARD_LINK)
+        else if (key === 'pricing') router.push({ path: '/pricing' })
+        else if (key === 'settings') router.push({ name: 'personalCenterProfile', params: { menu: 'profile' } })
+        else if (key === 'sign_out') {
+          await system.$commonFun.signOutFun()
+          // await system.$commonFun.timeout(50)
+          window.location.reload()
+        }
+        else store.dispatch('setNavLogin', false)
+      } catch { console.error }  
     }
     async function activeMenu (row) {
       if (metaAddress.value) getToken()

@@ -1,7 +1,6 @@
 <script setup>
-import { createWeb3Modal, defaultWagmiConfig, useWeb3Modal } from '@web3modal/wagmi/vue'
-import { reconnect, disconnect, getChainId, getAccount, watchAccount, connect } from '@wagmi/core'
-import { injected } from '@wagmi/connectors'
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/vue'
+import { reconnect, disconnect, getChainId, getAccount, watchAccount } from '@wagmi/core'
 import { useStore } from "vuex"
 import {
   computed,
@@ -110,34 +109,13 @@ async function test () {
   // console.log(store.state.signature)
   // console.log("here")
 }
-
-const { open } = useWeb3Modal()
 </script>
 
 <template>
   <div class="flex-row">
-    <!-- <w3m-button balance="hide" size="sm" @click="test" /> -->
-    <div @click="connect(config, { connector: injected() })" class="connect-btn font-20 font-text pointer">Log In</div>
+    <w3m-button balance="hide" size="sm" @click="test" />
     <!-- <el-button @click="login2" v-if="signature === ''" class="m-button">Login</el-button> -->
   </div>
 </template>
 
-
-<style lang="less" scoped>
-.connect-btn {
-  padding: 0.08rem 0.18rem;
-  margin: 0;
-  background-color: #7405ff;
-  font-weight: normal;
-  line-height: 1;
-  color: #fff;
-  border: 1px solid #7405ff;
-  border-radius: 0.5rem;
-  &:hover {
-    background-color: #fff;
-    color: #7405ff;
-    opacity: 1;
-    cursor: pointer;
-  }
-}
-</style>
+<style lang="less" scoped></style>

@@ -10,7 +10,7 @@
               </el-descriptions-item>
               <el-descriptions-item label="Memory">{{ props.listdata.activeOrder.config.memory }}</el-descriptions-item>
               <el-descriptions-item label="VCPU">{{ props.listdata.activeOrder.config.vcpu }}</el-descriptions-item>
-              <el-descriptions-item label="Price">{{ props.listdata.activeOrder.config.price_per_hour }} SWAN per hour
+              <el-descriptions-item label="Price">{{ props.listTaskdata.price_per_hour }} SWAN per hour
               </el-descriptions-item>
               <el-descriptions-item label="Description">{{ props.listdata.activeOrder.config.description }}
               </el-descriptions-item>
@@ -353,6 +353,7 @@ export default defineComponent({
   },
   props: {
     listdata: { type: Object, default: {} },
+    listTaskdata: { type: Object, default: {} },
     renewButton: { type: String, default: 'setting' }
   },
   setup (props, context) {
@@ -451,20 +452,16 @@ export default defineComponent({
     const userTokenBalance = ref('')
     const tipBalance = ref(false)
     const maxUsage = ref('')
+    const pricePerHour = ref('')
 
     async function getAmount() {
       try {
-        console.log(userTokenBalance.value)
-        const hardwareInfo = await paymentContract.methods.hardwareInfo(sleepSelect.value.hardware_id).call()
-        const pricePerHour = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'mwei')
-        const priceEther = system.$commonFun.web3Init.utils.fromWei(String(hardwareInfo.pricePerHour), 'ether')
-        const approveAmount = (pricePerHour * ruleForm.usageTime).toFixed(6) // usdc is 6 decimal, ensure the amount will not be more than 6
-        weiApprove.value = system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'mwei')
-        etherApprove.value = system.$commonFun.web3Init.utils.fromWei(weiApprove.value, 'ether')
-        etherApprove.value = Number(etherApprove.value).toFixed(2)
+        const approveAmount = Number(pricePerHour.value * ruleForm.usageTime).toFixed(6) 
+        weiApprove.value = system.$commonFun.web3Init.utils.toWei(String(approveAmount), 'ether')
+        etherApprove.value = Number(approveAmount).toFixed(2)
 
         if(Number(userTokenBalance.value) < Number(etherApprove.value)) {
-          const usage = Math.floor(Number(userTokenBalance.value) / Number(priceEther))
+          const usage = Math.floor(Number(userTokenBalance.value) / Number(pricePerHour.value))
           // ruleForm.usageTime = usage
           maxUsage.value = usage
           tipBalance.value = true
@@ -494,7 +491,13 @@ export default defineComponent({
           }
         }
 
-        const tastUUID = props.renewButton === 'renew' ? props.listdata.task_uuid : await getTaskUUid(weiApprove.value)
+        let tastUUID, taskData
+        if (props.renewButton === 'renew') {
+          tastUUID = props.listdata.task_uuid
+        } else {
+          taskData = await getTaskUUid(weiApprove.value)
+          tastUUID = taskData?.uuid
+        }
         if (!tastUUID) {
           closePart()
           return
@@ -519,8 +522,15 @@ export default defineComponent({
             })
         }
 
-        let payMethod = paymentContract.methods
-          .submitPayment(tastUUID, sleepSelect.value.hardware_id, ruleForm.usageTime * 3600)
+        const proceCurrent = props.renewButton === 'renew' ? props.listTaskdata.price_per_hour : taskData?.price_per_hour
+        const hardwarePricePerHour = system.$commonFun.web3Init.utils.toWei(String(proceCurrent), 'ether')
+        console.log('params:', tastUUID, sleepSelect.value.hardware_id, hardwarePricePerHour, ruleForm.usageTime * 3600)
+        let payMethod = props.renewButton === 'renew' ?
+              paymentContract.methods
+                .renewPayment(tastUUID, sleepSelect.value.hardware_id, hardwarePricePerHour, ruleForm.usageTime * 3600)
+              :
+              paymentContract.methods
+                .submitPrivatePayment(tastUUID, sleepSelect.value.hardware_id, hardwarePricePerHour, ruleForm.usageTime * 3600)
 
         let gasLimit = await payMethod.estimateGas({ from: store.state.metaAddress })
         const tx = await payMethod.send({ from: store.state.metaAddress, gasLimit: Math.floor(gasLimit * 1.5) })
@@ -546,7 +556,7 @@ export default defineComponent({
       try {
         const getID = await system.$commonFun.web3Init.eth.net.getId()
         let fd = new FormData()
-        fd.append('paid', system.$commonFun.web3Init.utils.fromWei(String(wei), 'ether')) // 授权代币的金额
+        fd.append('paid', String(pricePerHour.value*ruleForm.usageTime)) // 授权代币的金额
         fd.append('space_name', route.params.name)
         fd.append('cfg_name', sleepSelect.value.hardware_name)
         fd.append('duration', ruleForm.usageTime * 3600)
@@ -555,7 +565,7 @@ export default defineComponent({
         fd.append('start_in', ruleForm.sleepTime * 60)
         fd.append('wallet', store.state.metaAddress)
         const taskRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}space/deployment`, 'post', fd)
-        if (taskRes && taskRes.status === "success") return taskRes.data.task.uuid
+        if (taskRes && taskRes.status === "success") return taskRes.data.task
         else if(taskRes.message) system.$commonFun.messageTip('error', taskRes.message)
       } catch{ return null }
     }
@@ -563,6 +573,7 @@ export default defineComponent({
     function closePart () {
       hardwareLoad.value = false
       sleepVisible.value = false
+      etherApprove.value = ''
     }
 
     async function forkDuplicate (type) {
@@ -644,7 +655,10 @@ export default defineComponent({
 
     function close () {
       if (props.renewButton === 'renew') context.emit('handleHard', false, false)
-      else sleepVisible.value = false
+      else {
+        sleepVisible.value = false
+        etherApprove.value = ''
+      }
     }
 
     async function sleepChange (row) {
@@ -671,6 +685,7 @@ export default defineComponent({
       sleepSelect.value.available_resource = available_resource
       sleepSelect.value.whitelist = whitelist
       sleepSelect.value.regionOption = arr
+      pricePerHour.value = sleepSelect.value.hardware_price
       if (props.renewButton === 'renew') sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
       else sleepSelect.value.regionValue = "Global"
       await regionChange()
@@ -787,7 +802,7 @@ export default defineComponent({
             hardware_description: props.listdata.activeOrder.config.description,
             hardware_id: props.listdata.activeOrder.config.hardware_id,
             hardware_name: props.listdata.activeOrder.config.name,
-            hardware_price: props.listdata.activeOrder.config.price_per_hour,
+            hardware_price: props.listTaskdata.price_per_hour,
             hardware_status: "available",
             hardware_type: props.listdata.activeOrder.config.hardware_type,
             region: [],
@@ -795,10 +810,11 @@ export default defineComponent({
           }
           sleepSelect.value.regionValue = props.listdata.activeOrder && props.listdata.activeOrder.region ? props.listdata.activeOrder.region : 'Global'
           ruleForm.sleepTime = props.listdata.activeOrder.config.hardware_type.indexOf('GPU') > -1 ? '20' : '5'
+          pricePerHour.value = sleepSelect.value.hardware_price
           sleepVisible.value = true
           return
         }
-        const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
+        const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines_dp`, 'get')
         if (machinesRes && machinesRes.status === 'success') {
           if (props.renewButton === 'renew') {
             if (props.listdata.activeOrder === null) return

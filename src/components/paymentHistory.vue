@@ -211,16 +211,18 @@ export default defineComponent({
       } else if (paymentsRes.message) system.$commonFun.messageTip('error', paymentsRes.message)
       paymentLoad.value = false
     }
-    function fn () {
-      document.addEventListener('visibilitychange', function () {
-        prevType.value = !document.hidden
-      })
-      if (typeof window.ethereum === 'undefined') return
-      system.$commonFun.providerInit.on('chainChanged', async function (accounts) {
-        if (!prevType.value) return false
-        console.log('payment')
-        system.$commonFun.signOutFun()
-      })
+    function fn() {
+      try {
+        document.addEventListener('visibilitychange', function () {
+          prevType.value = !document.hidden
+        })
+        if (typeof window.ethereum === 'undefined') return
+        system.$commonFun.providerInit.on('chainChanged', async function (accounts) {
+          if (!prevType.value) return false
+          console.log('payment')
+          system.$commonFun.signOutFun()
+        })
+      } catch { console.error }  
     }
     let getnetID = NaN
     onMounted(async () => {
@@ -231,7 +233,9 @@ export default defineComponent({
       //   router.push({ name: 'main' })
       //   return
       // }
-      getnetID = await system.$commonFun.web3Init.eth.net.getId()
+      try {
+        getnetID = await system.$commonFun.web3Init.eth.net.getId()
+      } catch { console.error }  
       // paymentEnv()
       init()
     })

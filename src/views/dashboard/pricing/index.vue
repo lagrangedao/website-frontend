@@ -152,7 +152,7 @@ export default defineComponent({
 
     async function init () {
       machinesLoad.value = true
-      const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines`, 'get')
+      const machinesRes = await system.$commonFun.sendRequest(`${process.env.VUE_APP_BASEAPI}cp/machines_dp`, 'get')
       if (machinesRes && machinesRes.status === 'success') hardwareOptions.value = machinesRes.data.hardware || []
       else if (machinesRes.message) system.$commonFun.messageTip('error', machinesRes.message)
       machinesLoad.value = false
